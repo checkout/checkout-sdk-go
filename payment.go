@@ -157,3 +157,32 @@ type Phone struct {
 	CountryCode string `json:"country_code,omitempty"`
 	Number      string `json:"number,omitempty"`
 }
+
+// Response ...
+type Response struct {
+	APIResponse *APIResponse
+	Pending     *Pending
+	Authorized  *Authorized
+}
+
+// PaymentResponse ...
+type PaymentResponse struct {
+	APIResponse *APIResponse
+	Payment     *Payment
+}
+
+// Payment ...
+type Payment struct {
+}
+
+// Authorized ...
+type Authorized struct {
+}
+
+// Pending ...
+type Pending struct {
+}
+
+// Processed ...
+type Processed struct {
+}

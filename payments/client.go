@@ -30,9 +30,9 @@ func (c *Client) Request(request *checkout.PaymentRequest) (*checkout.Response, 
 		return req, err
 	}
 	if response.StatusCode == 201 {
-		var created checkout.Created
-		err = json.Unmarshal(response.ResponseBody, &created)
-		req.Created = &created
+		var authorized checkout.Authorized
+		err = json.Unmarshal(response.ResponseBody, &authorized)
+		req.Authorized = &authorized
 	} else if response.StatusCode == 202 {
 		var pending checkout.Pending
 		err = json.Unmarshal(response.ResponseBody, &pending)

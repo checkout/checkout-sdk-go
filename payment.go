@@ -162,7 +162,7 @@ type Phone struct {
 type Response struct {
 	APIResponse *APIResponse
 	Pending     *Pending
-	Authorized  *Authorized
+	Created     *Created
 }
 
 // PaymentResponse ...
@@ -175,8 +175,8 @@ type PaymentResponse struct {
 type Payment struct {
 }
 
-// Authorized ...
-type Authorized struct {
+// Created ...
+type Created struct {
 }
 
 // Pending ...

@@ -4,7 +4,7 @@ package checkout
 const ClientVersion = "0.0.1"
 
 const (
-	sandboxURI    = "https://sandbox.checkout.com"
+	sandboxURI    = "https://api.sandbox.checkout.com"
 	productionURI = "https://api.checkout.com"
 )
 

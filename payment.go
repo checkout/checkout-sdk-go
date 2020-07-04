@@ -1,6 +1,8 @@
 package checkout
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -99,8 +101,8 @@ type ThreeDSEnrollment struct {
 // ActionSummary ...
 type ActionSummary struct {
 	ID              string  `json:"id,omitempty"`
-	Type            *string `json:"type,omitempty"`
-	ResponseCode    *string `json:"response_code,omitempty"`
+	Type            string  `json:"type,omitempty"`
+	ResponseCode    string  `json:"response_code,omitempty"`
 	ResponseSummary *string `json:"response_summary,omitempty"`
 }
 
@@ -170,10 +172,73 @@ func (r *PaymentRequest) SetSource(s interface{}) error {
 
 // Source ...
 type Source struct {
-	Type           string   `json:"type" binding:"required"`
-	ID             string   `json:"id" binding:"required"`
-	BillingAddress *Address `json:"billing_address,omitempty"`
-	Phone          *Phone   `json:"phone,omitempty"`
+	*SourceResponse
+	*AlternativePaymentSourceResponse
+}
+
+// MarshalJSON ...
+func (s Source) MarshalJSON() ([]byte, error) {
+	if s.SourceResponse != nil {
+		return json.Marshal(s.SourceResponse)
+	} else if s.AlternativePaymentSourceResponse != nil {
+		return json.Marshal(s.AlternativePaymentSourceResponse)
+	} else {
+		return json.Marshal(nil)
+	}
+}
+
+// UnmarshalJSON ...
+func (s Source) UnmarshalJSON(data []byte) error {
+	temp := struct {
+		Type string `json:"type"`
+	}{}
+	if err := json.Unmarshal(data, &temp); err != nil {
+		return err
+	}
+	if temp.Type == "card" {
+		var source SourceResponse
+		if err := json.Unmarshal(data, &source); err != nil {
+			return err
+		}
+		s.SourceResponse = &source
+		s.AlternativePaymentSourceResponse = nil
+	} else {
+		var source AlternativePaymentSourceResponse
+		if err := json.Unmarshal(data, &source); err != nil {
+			return err
+		}
+		s.SourceResponse = nil
+		s.AlternativePaymentSourceResponse = &source
+	}
+	return errors.New("Invalid object value")
+}
+
+// SourceResponse ...
+type SourceResponse struct {
+	ID                      string   `json:"id,omitempty"`
+	Type                    string   `json:"type,omitempty"`
+	BillingAddress          *Address `json:"billing_address,omitempty"`
+	Phone                   *Phone   `json:"phone,omitempty"`
+	ExpiryMonth             int      `json:"expiry_month,omitempty"`
+	ExpiryYear              int      `json:"expiry_year,omitempty"`
+	Name                    string   `json:"name,omitempty"`
+	Scheme                  string   `json:"scheme,omitempty"`
+	Last4                   string   `json:"last4,omitempty"`
+	Fingerprint             string   `json:"fingerprint,omitempty"`
+	Bin                     string   `json:"bin,omitempty"`
+	CardType                string   `json:"card_type,omitempty"`
+	CardCategory            string   `json:"card_category,omitempty"`
+	Issuer                  string   `json:"issuer,omitempty"`
+	IssuerCountry           string   `json:"issuer_country,omitempty"`
+	ProductID               string   `json:"product_id,omitempty"`
+	ProductType             string   `json:"product_type,omitempty"`
+	AVSCheck                string   `json:"avs_check,omitempty"`
+	CVVCheck                string   `json:"cvv_check,omitempty"`
+	PaymentAccountReference string   `json:"payment_account_reference,omitempty"`
+}
+
+// AlternativePaymentSourceResponse ...
+type AlternativePaymentSourceResponse struct {
 }
 
 // IDSource ...

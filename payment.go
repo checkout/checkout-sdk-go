@@ -2,7 +2,6 @@ package checkout
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 )
@@ -198,21 +197,21 @@ func (s Source) UnmarshalJSON(data []byte) error {
 	fmt.Println(temp)
 	fmt.Println(temp.Type)
 	if temp.Type == "card" {
-		var source SourceResponse
-		if err := json.Unmarshal(data, &source); err != nil {
+		var sourceResponse SourceResponse
+		if err := json.Unmarshal(data, &sourceResponse); err != nil {
 			return err
 		}
-		s.SourceResponse = &source
+		s.SourceResponse = &sourceResponse
 		s.AlternativePaymentSourceResponse = nil
 	} else {
-		var source AlternativePaymentSourceResponse
-		if err := json.Unmarshal(data, &source); err != nil {
+		var alternativePaymentSourceResponse AlternativePaymentSourceResponse
+		if err := json.Unmarshal(data, &alternativePaymentSourceResponse); err != nil {
 			return err
 		}
 		s.SourceResponse = nil
-		s.AlternativePaymentSourceResponse = &source
+		s.AlternativePaymentSourceResponse = &alternativePaymentSourceResponse
 	}
-	return errors.New("Invalid object value")
+	return nil
 }
 
 // SourceResponse ...

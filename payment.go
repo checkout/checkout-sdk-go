@@ -177,6 +177,8 @@ type Source struct {
 
 // MarshalJSON ...
 func (s Source) MarshalJSON() ([]byte, error) {
+	fmt.Println(json.Marshal(s.SourceResponse))
+	fmt.Println(s.AlternativePaymentSourceResponse)
 	if s.SourceResponse != nil {
 		return json.Marshal(s.SourceResponse)
 	} else if s.AlternativePaymentSourceResponse != nil {
@@ -194,22 +196,20 @@ func (s Source) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &temp); err != nil {
 		return err
 	}
-	fmt.Println(temp)
-	fmt.Println(temp.Type)
 	if temp.Type == "card" {
-		var sourceResponse SourceResponse
-		if err := json.Unmarshal(data, &sourceResponse); err != nil {
+		var source SourceResponse
+		if err := json.Unmarshal(data, &source); err != nil {
 			return err
 		}
-		s.SourceResponse = &sourceResponse
+		s.SourceResponse = &source
 		s.AlternativePaymentSourceResponse = nil
 	} else {
-		var alternativePaymentSourceResponse AlternativePaymentSourceResponse
-		if err := json.Unmarshal(data, &alternativePaymentSourceResponse); err != nil {
+		var source AlternativePaymentSourceResponse
+		if err := json.Unmarshal(data, &source); err != nil {
 			return err
 		}
+		s.AlternativePaymentSourceResponse = &source
 		s.SourceResponse = nil
-		s.AlternativePaymentSourceResponse = &alternativePaymentSourceResponse
 	}
 	return nil
 }
@@ -236,6 +236,8 @@ type SourceResponse struct {
 	AVSCheck                string   `json:"avs_check,omitempty"`
 	CVVCheck                string   `json:"cvv_check,omitempty"`
 	PaymentAccountReference string   `json:"payment_account_reference,omitempty"`
+	Payouts                 bool     `json:"payouts,omitempty"`
+	FastFunds               string   `json:"fast_funds,omitempty"`
 }
 
 // AlternativePaymentSourceResponse ...
@@ -347,23 +349,23 @@ type PaymentPending struct {
 
 // PaymentProcessed ...
 type PaymentProcessed struct {
-	ID              string             `json:"id,omitempty"`
-	ActionID        string             `json:"action_id,omitempty"`
-	Amount          uint64             `json:"amount,omitempty"`
-	Currency        string             `json:"currency,omitempty"`
-	Approved        bool               `json:"approved,omitempty"`
-	Status          string             `json:"status,omitempty"`
-	AuthCode        string             `json:"auth_code,omitempty"`
-	ResponseCode    string             `json:"response_code,omitempty"`
-	ResponseSummary string             `json:"response_summary,omitempty"`
-	ThreeDS         *ThreeDSEnrollment `json:"3ds,omitempty"`
-	Risk            *RiskAssessment    `json:"risk,omitempty"`
-	Source          *Source            `json:"source,omitempty"`
-	Customer        *Customer          `json:"customer,omitempty"`
-	ProcessedOn     time.Time          `json:"processed_on,omitempty"`
-	Reference       string             `json:"reference,omitempty"`
-	Processing      *Processing        `json:"processing,omitempty"`
-	ECI             string             `json:"eci,omitempty"`
-	SchemeID        string             `json:"scheme_id,omitempty"`
-	Links           map[string]Link    `json:"_links,omitempty"`
+	ID                string             `json:"id,omitempty"`
+	ActionID          string             `json:"action_id,omitempty"`
+	Amount            uint64             `json:"amount,omitempty"`
+	Currency          string             `json:"currency,omitempty"`
+	Approved          bool               `json:"approved,omitempty"`
+	Status            string             `json:"status,omitempty"`
+	AuthCode          string             `json:"auth_code,omitempty"`
+	ResponseCode      string             `json:"response_code,omitempty"`
+	ResponseSummary   string             `json:"response_summary,omitempty"`
+	ThreeDSEnrollment *ThreeDSEnrollment `json:"3ds,omitempty"`
+	RiskAssessment    *RiskAssessment    `json:"risk,omitempty"`
+	Source            *Source            `json:"source,omitempty"`
+	Customer          *Customer          `json:"customer,omitempty"`
+	ProcessedOn       time.Time          `json:"processed_on,omitempty"`
+	Reference         string             `json:"reference,omitempty"`
+	Processing        *Processing        `json:"processing,omitempty"`
+	ECI               string             `json:"eci,omitempty"`
+	SchemeID          string             `json:"scheme_id,omitempty"`
+	Links             map[string]Link    `json:"_links,omitempty"`
 }

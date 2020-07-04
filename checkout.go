@@ -15,14 +15,14 @@ var DefaultConfig = Config{
 
 // APIResponse ...
 type APIResponse struct {
-	Status       string `json:"status"`
-	StatusCode   int    `json:"status_code"`
-	ResponseBody []byte `json:"response_body"`
+	Status       string `json:"status,omitempty"`
+	StatusCode   int    `json:"status_code,omitempty"`
+	ResponseBody []byte `json:"response_body,omitempty"`
 }
 
-// Link ...
+// Link ...git
 type Link struct {
-	HRef string `json:"href"`
+	HRef string `json:"href,omitempty"`
 }
 
 // HTTPClient ...

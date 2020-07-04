@@ -195,6 +195,8 @@ func (s Source) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &temp); err != nil {
 		return err
 	}
+	fmt.Println(temp)
+	fmt.Println(temp.Type)
 	if temp.Type == "card" {
 		var source SourceResponse
 		if err := json.Unmarshal(data, &source); err != nil {

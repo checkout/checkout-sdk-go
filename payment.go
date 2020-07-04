@@ -5,19 +5,6 @@ import (
 	"time"
 )
 
-// public const string Authorized = "Authorized";
-// public const string Canceled = "Canceled";
-// public const string Captured = "Captured";
-// public const string Declined = "Declined";
-// public const string Expired = "Expired";
-// public const string PartiallyCaptured = "Partially Captured";
-// public const string PartiallyRefunded = "Partially Refunded";
-// public const string Pending = "Pending";
-// public const string Refunded = "Refunded";
-// public const string Voided = "Voided";
-// public const string CardVerified = "Card Verified";
-// public const string Chargeback = "Chargeback";
-
 const (
 	// Authorized ...
 	Authorized string = "Authorized"
@@ -242,15 +229,15 @@ type Phone struct {
 
 // Response ...
 type Response struct {
-	APIResponse *APIResponse
-	Processed   *PaymentProcessed
-	Pending     *PaymentPending
+	APIResponse *APIResponse      `json:"api_response,omitempty"`
+	Processed   *PaymentProcessed `json:"proceed,omitempty"`
+	Pending     *PaymentPending   `json:"pending,omitempty"`
 }
 
 // PaymentResponse ...
 type PaymentResponse struct {
-	APIResponse *APIResponse
-	Payment     *Payment
+	APIResponse *APIResponse `json:"api_response,omitempty"`
+	Payment     *Payment     `json:"payment,omitempty"`
 }
 
 // Payment ...

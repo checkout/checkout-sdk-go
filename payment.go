@@ -5,6 +5,46 @@ import (
 	"time"
 )
 
+// public const string Authorized = "Authorized";
+// public const string Canceled = "Canceled";
+// public const string Captured = "Captured";
+// public const string Declined = "Declined";
+// public const string Expired = "Expired";
+// public const string PartiallyCaptured = "Partially Captured";
+// public const string PartiallyRefunded = "Partially Refunded";
+// public const string Pending = "Pending";
+// public const string Refunded = "Refunded";
+// public const string Voided = "Voided";
+// public const string CardVerified = "Card Verified";
+// public const string Chargeback = "Chargeback";
+
+const (
+	// Authorized ...
+	Authorized string = "Authorized"
+	// Canceled ...
+	Canceled string = "Canceled"
+	// Captured ...
+	Captured string = "Captured"
+	// Declined ...
+	Declined string = "Declined"
+	// Expired ...
+	Expired string = "Expired"
+	// PartiallyCaptured ...
+	PartiallyCaptured string = "Partially Captured"
+	// PartiallyRefunded ...
+	PartiallyRefunded string = "Partially Refunded"
+	// Pending ...
+	Pending string = "Pending"
+	// Refunded ...
+	Refunded string = "Refunded"
+	// Voided ...
+	Voided string = "Voided"
+	// CardVerified ...
+	CardVerified string = "Card Verified"
+	// Chargeback ...
+	Chargeback string = "Chargeback"
+)
+
 // PaymentRequest ...
 type PaymentRequest struct {
 	Source            interface{}        `json:"source"`
@@ -59,10 +99,32 @@ type ThreeDS struct {
 	Version    string `json:"version,omitempty"`
 }
 
+// ThreeDSEnrollment : 3D-Secure Enrollment Data
+type ThreeDSEnrollment struct {
+	Downgraded             bool   `json:"downgraded,omitempty"`
+	Enrolled               string `json:"enrolled,omitempty"`
+	SignatureValid         string `json:"signature_valid,omitempty"`
+	AuthenticationResponse string `json:"authentication_response,omitempty"`
+	Cryptogram             string `json:"cryptogram,omitempty"`
+	XID                    string `json:"xid,omitempty"`
+}
+
+// ActionSummary ...
+type ActionSummary struct {
+	ID              string  `json:"id,omitempty"`
+	Type            *string `json:"type,omitempty"`
+	ResponseCode    *string `json:"response_code,omitempty"`
+	ResponseSummary *string `json:"response_summary,omitempty"`
+}
+
 // Risk ...
 type Risk struct {
-	Flagged bool `json:"flagged,omitempty"`
 	Enabled bool `json:"enabled,omitempty"`
+}
+
+// RiskAssessment ...
+type RiskAssessment struct {
+	Flagged bool `json:"flagged,omitempty"`
 }
 
 // Recipient ...
@@ -105,6 +167,7 @@ type Installment struct {
 func (r *PaymentRequest) SetSource(s interface{}) error {
 	var err error
 	switch p := s.(type) {
+	case *IDSource:
 	case *CardSource:
 	case *TokenSource:
 	case *CustomerSource:
@@ -118,26 +181,45 @@ func (r *PaymentRequest) SetSource(s interface{}) error {
 	return err
 }
 
+// Source ...
+type Source struct {
+	Type           string   `json:"type" binding:"required"`
+	ID             string   `json:"id" binding:"required"`
+	BillingAddress *Address `json:"billing_address,omitempty"`
+	Phone          *Phone   `json:"phone,omitempty"`
+}
+
+// IDSource ...
+type IDSource struct {
+	Type string `json:"type" binding:"required"`
+	ID   string `json:"id" binding:"required"`
+	CVV  string `json:"cvv,omitempty"`
+}
+
 // CardSource ...
 type CardSource struct {
-	Type        string `json:"type"`
-	Number      string `json:"number"`
-	ExpiryMonth uint64 `json:"expiry_month"`
-	ExpiryYear  uint64 `json:"expiry_year"`
-	CVV         string `json:"cvv"`
+	Type           string   `json:"type" binding:"required"`
+	Number         string   `json:"number" binding:"required"`
+	ExpiryMonth    int      `json:"expiry_month" binding:"required"`
+	ExpiryYear     int      `json:"expiry_year" binding:"required"`
+	Name           string   `json:"name,omitempty"`
+	CVV            string   `json:"cvv,omitempty"`
+	Stored         bool     `json:"stored,omitempty"`
+	BillingAddress *Address `json:"billing_address,omitempty"`
+	Phone          *Phone   `json:"phone,omitempty"`
 }
 
 // TokenSource ...
 type TokenSource struct {
-	Type           string   `json:"type"`
-	Token          string   `json:"token"`
-	BillingAddress *Address `json:"billing_address"`
-	Phone          *Phone   `json:"phone"`
+	Type           string   `json:"type" binding:"required"`
+	Token          string   `json:"token" binding:"required"`
+	BillingAddress *Address `json:"billing_address,omitempty"`
+	Phone          *Phone   `json:"phone,omitempty"`
 }
 
 // CustomerSource ...
 type CustomerSource struct {
-	Type  string   `json:"type"`
+	Type  string   `json:"type" binding:"required"`
 	ID    *Address `json:"id,omitempty"`
 	Email string   `json:"email,omitempty"`
 }
@@ -161,8 +243,8 @@ type Phone struct {
 // Response ...
 type Response struct {
 	APIResponse *APIResponse
-	Pending     *Pending
-	Authorized  *Authorized
+	Processed   *PaymentProcessed
+	Pending     *PaymentPending
 }
 
 // PaymentResponse ...
@@ -173,16 +255,58 @@ type PaymentResponse struct {
 
 // Payment ...
 type Payment struct {
+	ID                string             `json:"id,omitempty"`
+	RequestedOn       time.Time          `json:"requested_on,omitempty"`
+	Source            *Source            `json:"source,omitempty"`
+	Amount            int                `json:"amount,omitempty"`
+	Currency          string             `json:"currency,omitempty"`
+	PaymentType       string             `json:"payment_type,omitempty"`
+	Reference         string             `json:"reference,omitempty"`
+	Description       string             `json:"description,omitempty"`
+	Approved          bool               `json:"approved,omitempty"`
+	Status            string             `json:"status,omitempty"`
+	ThreeDS           *ThreeDSEnrollment `json:"3ds,omitempty"`
+	Risk              *RiskAssessment    `json:"risk,omitempty"`
+	Customer          *Customer          `json:"customer,omitempty"`
+	BillingDescriptor *BillingDescriptor `json:"billing_descriptor,omitempty"`
+	Shipping          *Shipping          `json:"shipping,omitempty"`
+	PaymentIP         string             `json:"payment_ip,omitempty"`
+	Recipient         *Recipient         `json:"recipient,omitempty"`
+	Metadata          map[string]string  `json:"metadata,omitempty"`
+	ECI               string             `json:"eci,omitempty"`
+	Actions           []ActionSummary    `json:"actions,omitempty"`
+	SchemeID          string             `json:"scheme_id,omitempty"`
 }
 
-// Authorized ...
-type Authorized struct {
+// PaymentPending ...
+type PaymentPending struct {
+	ID        string             `json:"id,omitempty"`
+	Status    string             `json:"status,omitempty"`
+	Reference string             `json:"reference,omitempty"`
+	Customer  *Customer          `json:"customer,omitempty"`
+	ThreeDS   *ThreeDSEnrollment `json:"3ds,omitempty"`
+	Links     map[string]Link    `json:"_links,omitempty"`
 }
 
-// Pending ...
-type Pending struct {
-}
-
-// Processed ...
-type Processed struct {
+// PaymentProcessed ...
+type PaymentProcessed struct {
+	ID              string             `json:"id,omitempty"`
+	ActionID        string             `json:"action_id,omitempty"`
+	Amount          uint64             `json:"amount,omitempty"`
+	Currency        string             `json:"currency,omitempty"`
+	Approved        bool               `json:"approved,omitempty"`
+	Status          string             `json:"status,omitempty"`
+	AuthCode        string             `json:"auth_code,omitempty"`
+	ResponseCode    string             `json:"response_code,omitempty"`
+	ResponseSummary string             `json:"response_summary,omitempty"`
+	ThreeDS         *ThreeDSEnrollment `json:"3ds,omitempty"`
+	Risk            *RiskAssessment    `json:"risk,omitempty"`
+	Source          *Source            `json:"source,omitempty"`
+	Customer        *Customer          `json:"customer,omitempty"`
+	ProcessedOn     time.Time          `json:"processed_on,omitempty"`
+	Reference       string             `json:"reference,omitempty"`
+	Processing      *Processing        `json:"processing,omitempty"`
+	ECI             string             `json:"eci,omitempty"`
+	SchemeID        string             `json:"scheme_id,omitempty"`
+	Links           map[string]Link    `json:"_links,omitempty"`
 }

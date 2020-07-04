@@ -215,8 +215,8 @@ func (s Source) UnmarshalJSON(data []byte) error {
 
 // SourceResponse ...
 type SourceResponse struct {
-	ID                      string   `json:"id,omitempty"`
-	Type                    string   `json:"type,omitempty"`
+	ID                      string   `json:"id"`
+	Type                    string   `json:"type"`
 	BillingAddress          *Address `json:"billing_address,omitempty"`
 	Phone                   *Phone   `json:"phone,omitempty"`
 	ExpiryMonth             int      `json:"expiry_month,omitempty"`
@@ -239,6 +239,10 @@ type SourceResponse struct {
 
 // AlternativePaymentSourceResponse ...
 type AlternativePaymentSourceResponse struct {
+	ID             string   `json:"id"`
+	Type           string   `json:"type"`
+	BillingAddress *Address `json:"billing_address,omitempty"`
+	Phone          *Phone   `json:"phone,omitempty"`
 }
 
 // IDSource ...

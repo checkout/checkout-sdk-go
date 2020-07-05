@@ -41,7 +41,7 @@ type PaymentRequest struct {
 	Reference         string             `json:"reference,omitempty"`
 	PaymentType       string             `json:"payment_type,omitempty"`
 	Description       string             `json:"description,omitempty"`
-	Capture           bool               `json:"capture,omitempty"`
+	Capture           *bool              `json:"capture,omitempty"`
 	CaptureOn         *time.Time         `json:"capture_on,omitempty"`
 	Customer          *Customer          `json:"customer,omitempty"`
 	BillingDescriptor *BillingDescriptor `json:"billing_descriptor,omitempty"`
@@ -79,8 +79,8 @@ type Shipping struct {
 
 // ThreeDS ...
 type ThreeDS struct {
-	Enabled    bool   `json:"enabled,omitempty"`
-	AttemptN3d bool   `json:"attempt_n3d,omitempty"`
+	Enabled    *bool  `json:"enabled,omitempty"`
+	AttemptN3d *bool  `json:"attempt_n3d,omitempty"`
 	ECI        string `json:"eci,omitempty"`
 	Cryptogram string `json:"cryptogram,omitempty"`
 	XID        string `json:"xid,omitempty"`
@@ -89,7 +89,7 @@ type ThreeDS struct {
 
 // ThreeDSEnrollment : 3D-Secure Enrollment Data
 type ThreeDSEnrollment struct {
-	Downgraded             bool   `json:"downgraded,omitempty"`
+	Downgraded             *bool  `json:"downgraded,omitempty"`
 	Enrolled               string `json:"enrolled,omitempty"`
 	SignatureValid         string `json:"signature_valid,omitempty"`
 	AuthenticationResponse string `json:"authentication_response,omitempty"`
@@ -107,12 +107,12 @@ type ActionSummary struct {
 
 // Risk ...
 type Risk struct {
-	Enabled bool `json:"enabled,omitempty"`
+	Enabled *bool `json:"enabled,omitempty"`
 }
 
 // RiskAssessment ...
 type RiskAssessment struct {
-	Flagged bool `json:"flagged,omitempty"`
+	Flagged *bool `json:"flagged,omitempty"`
 }
 
 // Recipient ...
@@ -133,7 +133,7 @@ type Destination struct {
 // override the data sent during card processing
 type Processing struct {
 	Mid                      string  `json:"mid,omitempty"`
-	Aft                      bool    `json:"aft,omitempty"`
+	Aft                      *bool   `json:"aft,omitempty"`
 	DLocal                   *DLocal `json:"dlocal,omitempty"`
 	AcquirerTransactionID    string  `json:"acquirer_transaction_id,omitempty"`
 	RetrievalReferenceNumber string  `json:"retrieval_reference_number,omitempty"`
@@ -176,34 +176,32 @@ type Source struct {
 }
 
 // MarshalJSON ...
-func (s Source) MarshalJSON() ([]byte, error) {
-	fmt.Println(json.Marshal(s.SourceResponse))
-	fmt.Println(s.AlternativePaymentSourceResponse)
+func (s *Source) MarshalJSON() ([]byte, error) {
 	if s.SourceResponse != nil {
 		return json.Marshal(s.SourceResponse)
 	} else if s.AlternativePaymentSourceResponse != nil {
 		return json.Marshal(s.AlternativePaymentSourceResponse)
-	} else {
-		return json.Marshal(nil)
 	}
+	return json.Marshal(nil)
 }
 
 // UnmarshalJSON ...
-func (s Source) UnmarshalJSON(data []byte) error {
-	temp := struct {
+func (s *Source) UnmarshalJSON(data []byte) error {
+	temp := &struct {
 		Type string `json:"type"`
 	}{}
 	if err := json.Unmarshal(data, &temp); err != nil {
 		return err
 	}
-	if temp.Type == "card" {
+	switch temp.Type {
+	case "card":
 		var source SourceResponse
 		if err := json.Unmarshal(data, &source); err != nil {
 			return err
 		}
 		s.SourceResponse = &source
 		s.AlternativePaymentSourceResponse = nil
-	} else {
+	default:
 		var source AlternativePaymentSourceResponse
 		if err := json.Unmarshal(data, &source); err != nil {
 			return err
@@ -236,7 +234,7 @@ type SourceResponse struct {
 	AVSCheck                string   `json:"avs_check,omitempty"`
 	CVVCheck                string   `json:"cvv_check,omitempty"`
 	PaymentAccountReference string   `json:"payment_account_reference,omitempty"`
-	Payouts                 bool     `json:"payouts,omitempty"`
+	Payouts                 *bool    `json:"payouts,omitempty"`
 	FastFunds               string   `json:"fast_funds,omitempty"`
 }
 
@@ -263,7 +261,7 @@ type CardSource struct {
 	ExpiryYear     int      `json:"expiry_year" binding:"required"`
 	Name           string   `json:"name,omitempty"`
 	CVV            string   `json:"cvv,omitempty"`
-	Stored         bool     `json:"stored,omitempty"`
+	Stored         *bool    `json:"stored,omitempty"`
 	BillingAddress *Address `json:"billing_address,omitempty"`
 	Phone          *Phone   `json:"phone,omitempty"`
 }
@@ -302,7 +300,7 @@ type Phone struct {
 // Response ...
 type Response struct {
 	APIResponse *APIResponse      `json:"api_response,omitempty"`
-	Processed   *PaymentProcessed `json:"proceed,omitempty"`
+	Processed   *PaymentProcessed `json:"processed,omitempty"`
 	Pending     *PaymentPending   `json:"pending,omitempty"`
 }
 
@@ -322,7 +320,7 @@ type Payment struct {
 	PaymentType       string             `json:"payment_type,omitempty"`
 	Reference         string             `json:"reference,omitempty"`
 	Description       string             `json:"description,omitempty"`
-	Approved          bool               `json:"approved,omitempty"`
+	Approved          *bool              `json:"approved,omitempty"`
 	Status            string             `json:"status,omitempty"`
 	ThreeDS           *ThreeDSEnrollment `json:"3ds,omitempty"`
 	Risk              *RiskAssessment    `json:"risk,omitempty"`
@@ -353,14 +351,14 @@ type PaymentProcessed struct {
 	ActionID          string             `json:"action_id,omitempty"`
 	Amount            uint64             `json:"amount,omitempty"`
 	Currency          string             `json:"currency,omitempty"`
-	Approved          bool               `json:"approved,omitempty"`
+	Approved          *bool              `json:"approved,omitempty"`
 	Status            string             `json:"status,omitempty"`
 	AuthCode          string             `json:"auth_code,omitempty"`
 	ResponseCode      string             `json:"response_code,omitempty"`
 	ResponseSummary   string             `json:"response_summary,omitempty"`
 	ThreeDSEnrollment *ThreeDSEnrollment `json:"3ds,omitempty"`
 	RiskAssessment    *RiskAssessment    `json:"risk,omitempty"`
-	Source            *Source            `json:"source,omitempty"`
+	Source            *Source            `json:"source"`
 	Customer          *Customer          `json:"customer,omitempty"`
 	ProcessedOn       time.Time          `json:"processed_on,omitempty"`
 	Reference         string             `json:"reference,omitempty"`

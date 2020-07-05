@@ -39,7 +39,7 @@ func NewClient(config checkout.Config) *HTTPClient {
 }
 
 // Get ...
-func (c *HTTPClient) Get(param string) (*checkout.APIResponse, error) {
+func (c *HTTPClient) Get(param string) (*checkout.StatusResponse, error) {
 
 	request, err := http.NewRequest("GET", c.URI+param, nil)
 	if err != nil {
@@ -51,7 +51,7 @@ func (c *HTTPClient) Get(param string) (*checkout.APIResponse, error) {
 		return nil, err
 	}
 	defer response.Body.Close()
-	apiResponse := &checkout.APIResponse{
+	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 	}
@@ -68,7 +68,7 @@ func (c *HTTPClient) Get(param string) (*checkout.APIResponse, error) {
 }
 
 // Post ...
-func (c *HTTPClient) Post(param string, body interface{}) (*checkout.APIResponse, error) {
+func (c *HTTPClient) Post(param string, body interface{}) (*checkout.StatusResponse, error) {
 
 	request, err := c.NewRequest("POST", c.URI+param, body)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *HTTPClient) Post(param string, body interface{}) (*checkout.APIResponse
 		return nil, err
 	}
 	defer response.Body.Close()
-	apiResponse := &checkout.APIResponse{
+	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 	}
@@ -116,7 +116,7 @@ func (c *HTTPClient) setHeader(req *http.Request) {
 	req.Header.Add("Authorization", c.SecretKey)
 }
 
-func responseToError(apiRes *checkout.APIResponse, body []byte) *checkout.Error {
+func responseToError(apiRes *checkout.StatusResponse, body []byte) *checkout.Error {
 	err := &checkout.Error{}
 	if apiRes.StatusCode == 422 {
 		var details checkout.ErrorDetails

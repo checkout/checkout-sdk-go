@@ -13,8 +13,8 @@ var DefaultConfig = Config{
 	URI: sandboxURI,
 }
 
-// APIResponse ...
-type APIResponse struct {
+// StatusResponse ...
+type StatusResponse struct {
 	Status       string `json:"status,omitempty"`
 	StatusCode   int    `json:"status_code,omitempty"`
 	ResponseBody []byte `json:"response_body,omitempty"`
@@ -27,6 +27,6 @@ type Link struct {
 
 // HTTPClient ...
 type HTTPClient interface {
-	Get(param string) (*APIResponse, error)
-	Post(param string, request interface{}) (*APIResponse, error)
+	Get(param string) (*StatusResponse, error)
+	Post(param string, request interface{}) (*StatusResponse, error)
 }

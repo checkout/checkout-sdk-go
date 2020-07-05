@@ -21,20 +21,20 @@ func NewClient(config checkout.Config) *Client {
 }
 
 // Request ...
-func (c *Client) Request(request *checkout.PaymentRequest) (*checkout.Response, error) {
+func (c *Client) Request(request *Request) (*Response, error) {
 	response, err := c.API.Post("/payments", request)
-	req := &checkout.Response{
-		APIResponse: response,
+	req := &Response{
+		StatusResponse: response,
 	}
 	if err != nil {
 		return req, err
 	}
 	if response.StatusCode == 201 {
-		var processed checkout.PaymentProcessed
+		var processed Processed
 		err = json.Unmarshal(response.ResponseBody, &processed)
 		req.Processed = &processed
 	} else if response.StatusCode == 202 {
-		var pending checkout.PaymentPending
+		var pending PaymentPending
 		err = json.Unmarshal(response.ResponseBody, &pending)
 		req.Pending = &pending
 	}
@@ -42,16 +42,79 @@ func (c *Client) Request(request *checkout.PaymentRequest) (*checkout.Response, 
 }
 
 // Get ...
-func (c *Client) Get(paymentID string) (*checkout.PaymentResponse, error) {
+func (c *Client) Get(paymentID string) (*PaymentResponse, error) {
 	response, err := c.API.Get(fmt.Sprintf("/payments/%v", paymentID))
-	payment := &checkout.PaymentResponse{
-		APIResponse: response,
+	payment := &PaymentResponse{
+		StatusResponse: response,
 	}
 	if err != nil {
 		return payment, err
 	}
-	var paymentDetails checkout.Payment
+	var paymentDetails Payment
 	err = json.Unmarshal(response.ResponseBody, &paymentDetails)
 	payment.Payment = &paymentDetails
 	return payment, err
+}
+
+// Actions ...
+func (c *Client) Actions(paymentID string) (*ActionsResponse, error) {
+	response, err := c.API.Get(fmt.Sprintf("/payments/%v/actions", paymentID))
+	act := &ActionsResponse{
+		StatusResponse: response,
+	}
+	if err != nil {
+		return act, err
+	}
+	actions := make([]*Action, 0)
+	err = json.Unmarshal(response.ResponseBody, &actions)
+	act.Actions = actions
+	return act, err
+}
+
+// Captures ...
+func (c *Client) Captures(paymentID string, request *CapturesRequest) (*CapturesResponse, error) {
+	response, err := c.API.Post(fmt.Sprintf("/payments/%v/captures", paymentID), request)
+	cap := &CapturesResponse{
+		StatusResponse: response,
+	}
+	if err != nil {
+		return cap, err
+	}
+
+	var accepted Accepted
+	err = json.Unmarshal(response.ResponseBody, &accepted)
+	cap.Accepted = &accepted
+	return cap, err
+}
+
+// Refunds ...
+func (c *Client) Refunds(paymentID string, request *RefundsRequest) (*RefundsResponse, error) {
+	response, err := c.API.Post(fmt.Sprintf("/payments/%v/refunds", paymentID), request)
+	ref := &RefundsResponse{
+		StatusResponse: response,
+	}
+	if err != nil {
+		return ref, err
+	}
+
+	var accepted Accepted
+	err = json.Unmarshal(response.ResponseBody, &accepted)
+	ref.Accepted = &accepted
+	return ref, err
+}
+
+// Voids ...
+func (c *Client) Voids(paymentID string, request *VoidsRequest) (*VoidsResponse, error) {
+	response, err := c.API.Post(fmt.Sprintf("/payments/%v/voids", paymentID), request)
+	void := &VoidsResponse{
+		StatusResponse: response,
+	}
+	if err != nil {
+		return void, err
+	}
+
+	var accepted Accepted
+	err = json.Unmarshal(response.ResponseBody, &accepted)
+	void.Accepted = &accepted
+	return void, err
 }

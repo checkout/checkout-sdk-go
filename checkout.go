@@ -13,6 +13,29 @@ var DefaultConfig = Config{
 	URI: sandboxURI,
 }
 
+// Create ...
+func Create(secretKey string, useSandbox bool, publicKey *string) Config {
+
+	var config = create(secretKey, useSandbox)
+	if publicKey != nil {
+		config.PublicKey = *publicKey
+	}
+	return config
+}
+
+func create(secretKey string, useSandbox bool) Config {
+	if useSandbox {
+		return Config{
+			URI:       sandboxURI,
+			SecretKey: secretKey,
+		}
+	}
+	return Config{
+		URI:       productionURI,
+		SecretKey: secretKey,
+	}
+}
+
 // StatusResponse ...
 type StatusResponse struct {
 	Status       string `json:"status,omitempty"`

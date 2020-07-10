@@ -1,8 +1,11 @@
 package common
 
+// CardCategory ...
+type CardCategory string
+
 const (
 	// Consumer ...
-	Consumer string = "Consumer"
+	Consumer CardCategory = "Consumer"
 	// Commercial ...
-	Commercial string = "Commercial"
+	Commercial CardCategory = "Commercial"
 )

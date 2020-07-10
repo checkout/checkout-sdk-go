@@ -46,8 +46,8 @@ type (
 	CardSource struct {
 		Type           string          `json:"type" binding:"required"`
 		Number         string          `json:"number" binding:"required"`
-		ExpiryMonth    int             `json:"expiry_month" binding:"required"`
-		ExpiryYear     int             `json:"expiry_year" binding:"required"`
+		ExpiryMonth    uint64          `json:"expiry_month" binding:"required"`
+		ExpiryYear     uint64          `json:"expiry_year" binding:"required"`
 		Name           string          `json:"name,omitempty"`
 		CVV            string          `json:"cvv,omitempty"`
 		Stored         *bool           `json:"stored,omitempty"`
@@ -202,7 +202,7 @@ type (
 		ID                string             `json:"id,omitempty"`
 		RequestedOn       time.Time          `json:"requested_on,omitempty"`
 		Source            *SourceResponse    `json:"source,omitempty"`
-		Amount            int                `json:"amount,omitempty"`
+		Amount            uint64             `json:"amount,omitempty"`
 		Currency          string             `json:"currency,omitempty"`
 		PaymentType       string             `json:"payment_type,omitempty"`
 		Reference         string             `json:"reference,omitempty"`
@@ -232,8 +232,8 @@ type (
 		Type                    string          `json:"type,omitempty"`
 		BillingAddress          *common.Address `json:"billing_address,omitempty"`
 		Phone                   *common.Phone   `json:"phone,omitempty"`
-		ExpiryMonth             int             `json:"expiry_month,omitempty"`
-		ExpiryYear              int             `json:"expiry_year,omitempty"`
+		ExpiryMonth             uint64          `json:"expiry_month,omitempty"`
+		ExpiryYear              uint64          `json:"expiry_year,omitempty"`
 		Name                    string          `json:"name,omitempty"`
 		Scheme                  string          `json:"scheme,omitempty"`
 		Last4                   string          `json:"last4,omitempty"`

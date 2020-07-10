@@ -20,11 +20,6 @@ type StatusResponse struct {
 	ResponseBody []byte `json:"response_body,omitempty"`
 }
 
-// Link ...
-type Link struct {
-	HRef string `json:"href,omitempty"`
-}
-
 // HTTPClient ...
 type HTTPClient interface {
 	Get(param string) (*StatusResponse, error)

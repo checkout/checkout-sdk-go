@@ -1,10 +1,13 @@
 package common
 
+// CardType ...
+type CardType string
+
 const (
 	// Credit ...
-	Credit string = "Credit"
+	Credit CardType = "Credit"
 	// Debit ...
-	Debit string = "Debit"
+	Debit CardType = "Debit"
 	// Prepaid ...
-	Prepaid string = "Prepaid"
+	Prepaid CardType = "Prepaid"
 )

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/shiuh-yaw-cko/checkout"
@@ -19,6 +20,7 @@ const (
 
 // HTTPClient ...
 type HTTPClient struct {
+	PublicKey  string
 	SecretKey  string
 	URI        string
 	HTTPClient *http.Client
@@ -32,6 +34,7 @@ func GetClient() *HTTPClient {
 // NewClient ...
 func NewClient(config checkout.Config) *HTTPClient {
 	client = &HTTPClient{
+		PublicKey:  config.PublicKey,
 		SecretKey:  config.SecretKey,
 		URI:        config.URI,
 		HTTPClient: &http.Client{Timeout: defaultHTTPTimeout},
@@ -47,6 +50,7 @@ func (c *HTTPClient) Get(param string) (*checkout.StatusResponse, error) {
 		return nil, err
 	}
 	c.setHeader(request)
+	c.setCredential(c.URI+param, request)
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
@@ -89,7 +93,7 @@ func (c *HTTPClient) Post(param string, body interface{}) (*checkout.StatusRespo
 		return apiResponse, err
 	}
 	apiResponse.ResponseBody = responseBody
-	if response.StatusCode >= 400 {
+	if response.StatusCode >= http.StatusBadRequest {
 		err := responseToError(apiResponse, responseBody)
 		return apiResponse, err
 	}
@@ -99,22 +103,31 @@ func (c *HTTPClient) Post(param string, body interface{}) (*checkout.StatusRespo
 // NewRequest ...
 func (c *HTTPClient) NewRequest(method, path string, body interface{}) (*http.Request, error) {
 
-	jsonBody, err := json.Marshal(body)
+	requestBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
-	request, err := http.NewRequest("POST", path, bytes.NewBuffer(jsonBody))
+	request, err := http.NewRequest("POST", path, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
 	}
 	c.setHeader(request)
+	c.setCredential(path, request)
 	return request, nil
+}
+
+func (c *HTTPClient) setCredential(path string, req *http.Request) {
+
+	if strings.Contains(path, "/tokens") {
+		req.Header.Add("Authorization", c.PublicKey)
+	} else {
+		req.Header.Add("Authorization", c.SecretKey)
+	}
 }
 
 func (c *HTTPClient) setHeader(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
-	req.Header.Add("Authorization", c.SecretKey)
 }
 
 func responseToError(apiRes *checkout.StatusResponse, body []byte) *common.Error {

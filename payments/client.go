@@ -3,6 +3,7 @@ package payments
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/shiuh-yaw-cko/checkout"
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
@@ -23,22 +24,22 @@ func NewClient(config checkout.Config) *Client {
 // Request ...
 func (c *Client) Request(request *Request) (*Response, error) {
 	response, err := c.API.Post("/payments", request)
-	req := &Response{
+	resp := &Response{
 		StatusResponse: response,
 	}
 	if err != nil {
-		return req, err
+		return resp, err
 	}
-	if response.StatusCode == 201 {
+	if response.StatusCode == http.StatusCreated {
 		var processed Processed
 		err = json.Unmarshal(response.ResponseBody, &processed)
-		req.Processed = &processed
-	} else if response.StatusCode == 202 {
+		resp.Processed = &processed
+	} else if response.StatusCode == http.StatusAccepted {
 		var pending PaymentPending
 		err = json.Unmarshal(response.ResponseBody, &pending)
-		req.Pending = &pending
+		resp.Pending = &pending
 	}
-	return req, err
+	return resp, err
 }
 
 // Get ...

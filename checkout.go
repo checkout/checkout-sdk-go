@@ -47,4 +47,7 @@ type StatusResponse struct {
 type HTTPClient interface {
 	Get(param string) (*StatusResponse, error)
 	Post(param string, request interface{}) (*StatusResponse, error)
+	Put(param string, request interface{}) (*StatusResponse, error)
+	Patch(param string, request interface{}) (*StatusResponse, error)
+	Delete(param string) (*StatusResponse, error)
 }

@@ -1,4 +1,4 @@
-package checkout
+package common
 
 // ErrorDetails ...
 type ErrorDetails struct {

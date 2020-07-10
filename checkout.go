@@ -20,7 +20,7 @@ type StatusResponse struct {
 	ResponseBody []byte `json:"response_body,omitempty"`
 }
 
-// Link ...git
+// Link ...
 type Link struct {
 	HRef string `json:"href,omitempty"`
 }

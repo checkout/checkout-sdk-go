@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/shiuh-yaw-cko/checkout"
+	"github.com/shiuh-yaw-cko/checkout/common"
 )
 
 var client *HTTPClient
@@ -116,10 +117,10 @@ func (c *HTTPClient) setHeader(req *http.Request) {
 	req.Header.Add("Authorization", c.SecretKey)
 }
 
-func responseToError(apiRes *checkout.StatusResponse, body []byte) *checkout.Error {
-	err := &checkout.Error{}
+func responseToError(apiRes *checkout.StatusResponse, body []byte) *common.Error {
+	err := &common.Error{}
 	if apiRes.StatusCode == 422 {
-		var details checkout.ErrorDetails
+		var details common.ErrorDetails
 		json.Unmarshal(body, &details)
 		err.Data = &details
 	}

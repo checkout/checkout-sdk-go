@@ -33,31 +33,34 @@ const (
 	Chargeback string = "Chargeback"
 )
 
-// ActionsResponse ...
-type ActionsResponse struct {
-	StatusResponse *checkout.StatusResponse
-	Actions        []*Action
-}
+type (
+	// ActionsResponse ...
+	ActionsResponse struct {
+		StatusResponse *checkout.StatusResponse
+		Actions        []*Action
+	}
+)
 
-// Action ...
-type Action struct {
-	ID              string            `json:"id,omitempty"`
-	Type            string            `json:"type,omitempty"`
-	ProcessedOn     time.Time         `json:"processed_on,omitempty"`
-	Amount          uint64            `json:"amount,omitempty"`
-	Approved        *bool             `json:"approved,omitempty"`
-	AuthCode        string            `json:"auth_code,omitempty"`
-	Reference       string            `json:"reference,omitempty"`
-	ResponseCode    string            `json:"response_code,omitempty"`
-	ResponseSummary *string           `json:"response_summary,omitempty"`
-	Processing      *Processing       `json:"processing,omitempty"`
-	Metadata        map[string]string `json:"metadata,omitempty"`
-}
-
-// ActionSummary ...
-type ActionSummary struct {
-	ID              string  `json:"id,omitempty"`
-	Type            string  `json:"type,omitempty"`
-	ResponseCode    string  `json:"response_code,omitempty"`
-	ResponseSummary *string `json:"response_summary,omitempty"`
-}
+type (
+	// Action ...
+	Action struct {
+		ID              string            `json:"id,omitempty"`
+		Type            string            `json:"type,omitempty"`
+		ProcessedOn     time.Time         `json:"processed_on,omitempty"`
+		Amount          uint64            `json:"amount,omitempty"`
+		Approved        *bool             `json:"approved,omitempty"`
+		AuthCode        string            `json:"auth_code,omitempty"`
+		Reference       string            `json:"reference,omitempty"`
+		ResponseCode    string            `json:"response_code,omitempty"`
+		ResponseSummary *string           `json:"response_summary,omitempty"`
+		Processing      *Processing       `json:"processing,omitempty"`
+		Metadata        map[string]string `json:"metadata,omitempty"`
+	}
+	// ActionSummary ...
+	ActionSummary struct {
+		ID              string  `json:"id,omitempty"`
+		Type            string  `json:"type,omitempty"`
+		ResponseCode    string  `json:"response_code,omitempty"`
+		ResponseSummary *string `json:"response_summary,omitempty"`
+	}
+)

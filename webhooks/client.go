@@ -33,7 +33,7 @@ func (c *Client) Retrieve() (*Response, error) {
 	if resp.StatusCode == http.StatusOK {
 		var webhookResponse []WebhookResponse
 		err = json.Unmarshal(resp.ResponseBody, &webhookResponse)
-		response.ConfiguredWebhooks = &webhookResponse
+		response.ConfiguredWebhooks = webhookResponse
 		return response, err
 	}
 	return response, err
@@ -127,6 +127,7 @@ func (c *Client) RemoveWebhook(webhookID string) (*Response, error) {
 		err = json.Unmarshal(resp.ResponseBody, &webhookResponse)
 		response.Webhook = &webhookResponse
 		return response, err
+
 	}
 	return response, err
 }

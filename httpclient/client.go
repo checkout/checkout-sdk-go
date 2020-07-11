@@ -3,6 +3,7 @@ package httpclient
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -65,7 +66,7 @@ func (c *HTTPClient) Get(param string) (*checkout.StatusResponse, error) {
 		return apiResponse, err
 	}
 	apiResponse.ResponseBody = responseBody
-	if response.StatusCode >= 400 {
+	if response.StatusCode >= http.StatusBadRequest {
 		err := responseToError(apiResponse, responseBody)
 		return apiResponse, err
 	}
@@ -107,6 +108,7 @@ func (c *HTTPClient) NewRequest(method, path string, body interface{}) (*http.Re
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(string(requestBody))
 	request, err := http.NewRequest(method, path, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, err
@@ -165,7 +167,7 @@ func (c *HTTPClient) Delete(param string) (*checkout.StatusResponse, error) {
 		return apiResponse, err
 	}
 	apiResponse.ResponseBody = responseBody
-	if response.StatusCode >= 400 {
+	if response.StatusCode >= http.StatusBadRequest {
 		err := responseToError(apiResponse, responseBody)
 		return apiResponse, err
 	}

@@ -173,6 +173,7 @@ type (
 		ResponseCode      string                 `json:"response_code,omitempty"`
 		ResponseSummary   string                 `json:"response_summary,omitempty"`
 		ThreeDSEnrollment *ThreeDSEnrollment     `json:"3ds,omitempty"`
+		Flagged           *bool                  `json:"flagged,omitempty"`
 		RiskAssessment    *RiskAssessment        `json:"risk,omitempty"`
 		Source            *SourceResponse        `json:"source"`
 		Customer          *Customer              `json:"customer,omitempty"`

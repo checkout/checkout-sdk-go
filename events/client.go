@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/google/go-querystring/query"
 	"github.com/shiuh-yaw-cko/checkout"
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
@@ -22,8 +23,12 @@ func NewClient(config checkout.Config) *Client {
 }
 
 // RetrieveEventTypes -
-func (c *Client) RetrieveEventTypes() (*Response, error) {
-	resp, err := c.API.Get("/event-types?version=2.0")
+func (c *Client) RetrieveEventTypes(request *Request) (*Response, error) {
+
+	value, _ := query.Values(request.EventTypeRequest)
+	var query string = value.Encode()
+	var urlPath string = "/event-types" + "?"
+	resp, err := c.API.Get(urlPath + query)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -40,21 +45,12 @@ func (c *Client) RetrieveEventTypes() (*Response, error) {
 }
 
 // RetrieveEvents -
-func (c *Client) RetrieveEvents(data map[string]string) (*Response, error) {
-	var urlPath string = "/events?"
-	var query string = ""
-	var keyValue string
-	for key, val := range data {
-		keyValue = fmt.Sprintf("%s=%s&", key, val)
-		query = query + keyValue
-	}
-	queryLength := len(query)
-	if queryLength > 0 && query[queryLength-1] == '&' {
-		query = query[:queryLength-1]
-	}
-	fmt.Printf("query: %s", query)
-	fmt.Printf("urlPath+query: %s", fmt.Sprintf(urlPath+query))
-	resp, err := c.API.Get(fmt.Sprintf(urlPath + query))
+func (c *Client) RetrieveEvents(request *Request) (*Response, error) {
+
+	value, _ := query.Values(request.QueryParameter)
+	var query string = value.Encode()
+	var urlPath string = "/events" + "?"
+	resp, err := c.API.Get(urlPath + query)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -70,42 +66,6 @@ func (c *Client) RetrieveEvents(data map[string]string) (*Response, error) {
 	return response, err
 
 }
-
-// // RetrieveEventWithTime -
-// func (c *Client) RetrieveEventWithTime(from time.Time, to time.Time, limit int64) (*Response, error) {
-// 	resp, err := c.API.Get(fmt.Sprintf("/events?from=%v&to=%v&limit=%v", from, to, limit))
-// 	response := &Response{
-// 		StatusResponse: resp,
-// 	}
-// 	if err != nil {
-// 		return response, err
-// 	}
-// 	if resp.StatusCode == http.StatusOK {
-// 		var event Event
-// 		err = json.Unmarshal(resp.ResponseBody, &event)
-// 		response.Event = &event
-// 		return response, err
-// 	}
-// 	return response, err
-// }
-
-// // RetrieveEventWithPayment -
-// func (c *Client) RetrieveEventWithPayment(paymentID string) (*Response, error) {
-// 	resp, err := c.API.Get(fmt.Sprintf("/events?payment_id=%v", paymentID))
-// 	response := &Response{
-// 		StatusResponse: resp,
-// 	}
-// 	if err != nil {
-// 		return response, err
-// 	}
-// 	if resp.StatusCode == http.StatusOK {
-// 		var event Event
-// 		err = json.Unmarshal(resp.ResponseBody, &event)
-// 		response.Event = &event
-// 		return response, err
-// 	}
-// 	return response, err
-// }
 
 // RetrieveEvent -
 func (c *Client) RetrieveEvent(eventID string) (*Response, error) {

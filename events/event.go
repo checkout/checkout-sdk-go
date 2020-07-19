@@ -11,6 +11,21 @@ import (
 type (
 	// Request -
 	Request struct {
+		*QueryParameter
+		*EventTypeRequest
+	}
+
+	// QueryParameter -
+	QueryParameter struct {
+		From      time.Time `url:"from,omitempty"`
+		To        time.Time `url:"to,omitempty"`
+		Limit     uint64    `url:"limit,omitempty"`
+		PaymentID string    `url:"payment_id,omitempty"`
+	}
+
+	// EventTypeRequest -
+	EventTypeRequest struct {
+		Version string `url:"version,omitempty"`
 	}
 )
 

@@ -3,11 +3,14 @@ package files
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/shiuh-yaw-cko/checkout"
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
+
+const path = "files"
 
 // Client ...
 type Client struct {
@@ -22,9 +25,9 @@ func NewClient(config checkout.Config) *Client {
 }
 
 // UploadFile -
-func (c *Client) UploadFile(request *Request) (*Response, error) {
+func (c *Client) UploadFile(values map[string]io.Reader) (*Response, error) {
 
-	resp, err := c.API.Post(fmt.Sprintf("/files"), request)
+	resp, err := c.API.Upload(fmt.Sprintf("/%v", path), values)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -43,7 +46,7 @@ func (c *Client) UploadFile(request *Request) (*Response, error) {
 // GetFile -
 func (c *Client) GetFile(fileID string) (*Response, error) {
 
-	resp, err := c.API.Get(fmt.Sprintf("/files/%v", fileID))
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, fileID))
 	response := &Response{
 		StatusResponse: resp,
 	}

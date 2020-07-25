@@ -10,6 +10,8 @@ import (
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
 
+const path = "disputes"
+
 // Client ...
 type Client struct {
 	API checkout.HTTPClient
@@ -26,7 +28,7 @@ func NewClient(config checkout.Config) *Client {
 func (c *Client) GetDisputes(request *Request) (*Response, error) {
 	value, _ := query.Values(request.QueryParameter)
 	var query string = value.Encode()
-	var urlPath string = "/disputes" + "?"
+	var urlPath string = "/" + path + "?"
 	resp, err := c.API.Get(urlPath + query)
 	response := &Response{
 		StatusResponse: resp,
@@ -45,7 +47,7 @@ func (c *Client) GetDisputes(request *Request) (*Response, error) {
 
 // GetDispute ...
 func (c *Client) GetDispute(disputeID string) (*Response, error) {
-	resp, err := c.API.Get(fmt.Sprintf("/disputes/%v", disputeID))
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, disputeID))
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -63,7 +65,7 @@ func (c *Client) GetDispute(disputeID string) (*Response, error) {
 
 // AcceptDispute -
 func (c *Client) AcceptDispute(disputeID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/disputes/%v/accept", disputeID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/accept", path, disputeID), nil)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -78,7 +80,7 @@ func (c *Client) AcceptDispute(disputeID string) (*Response, error) {
 
 // ProvideDisputeEvidence ...
 func (c *Client) ProvideDisputeEvidence(disputeID string, request *Request) (*Response, error) {
-	resp, err := c.API.Put(fmt.Sprintf("/disputes/%v", disputeID), request)
+	resp, err := c.API.Put(fmt.Sprintf("/%v/%v", path, disputeID), request)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -93,7 +95,7 @@ func (c *Client) ProvideDisputeEvidence(disputeID string, request *Request) (*Re
 
 // GetDisputeEvidence ...
 func (c *Client) GetDisputeEvidence(disputeID string) (*Response, error) {
-	resp, err := c.API.Get(fmt.Sprintf("/disputes/%v/evidence", disputeID))
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v/evidence", path, disputeID))
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -111,7 +113,7 @@ func (c *Client) GetDisputeEvidence(disputeID string) (*Response, error) {
 
 // SubmitDisputeEvidence -
 func (c *Client) SubmitDisputeEvidence(disputeID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/disputes/%v/evidence", disputeID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/evidence", path, disputeID), nil)
 	response := &Response{
 		StatusResponse: resp,
 	}

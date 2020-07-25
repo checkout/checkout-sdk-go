@@ -1,5 +1,7 @@
 package checkout
 
+import "io"
+
 // ClientVersion ...
 const ClientVersion = "0.0.1"
 
@@ -50,4 +52,5 @@ type HTTPClient interface {
 	Put(param string, request interface{}) (*StatusResponse, error)
 	Patch(param string, request interface{}) (*StatusResponse, error)
 	Delete(param string) (*StatusResponse, error)
+	Upload(param string, values map[string]io.Reader) (*StatusResponse, error)
 }

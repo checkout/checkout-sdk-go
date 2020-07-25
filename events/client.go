@@ -10,6 +10,8 @@ import (
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
 
+const path = "events"
+
 // Client ...
 type Client struct {
 	API checkout.HTTPClient
@@ -49,7 +51,7 @@ func (c *Client) RetrieveEvents(request *Request) (*Response, error) {
 
 	value, _ := query.Values(request.QueryParameter)
 	var query string = value.Encode()
-	var urlPath string = "/events" + "?"
+	var urlPath string = "/" + path + "?"
 	resp, err := c.API.Get(urlPath + query)
 	response := &Response{
 		StatusResponse: resp,
@@ -69,7 +71,7 @@ func (c *Client) RetrieveEvents(request *Request) (*Response, error) {
 
 // RetrieveEvent -
 func (c *Client) RetrieveEvent(eventID string) (*Response, error) {
-	resp, err := c.API.Get(fmt.Sprintf("/events/%v", eventID))
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, eventID))
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -87,7 +89,7 @@ func (c *Client) RetrieveEvent(eventID string) (*Response, error) {
 
 // RetrieveEventNotification -
 func (c *Client) RetrieveEventNotification(eventID string, notificationID string) (*Response, error) {
-	resp, err := c.API.Get(fmt.Sprintf("/events/%v/notifications/%v", eventID, notificationID))
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v/notifications/%v", path, eventID, notificationID))
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -105,7 +107,7 @@ func (c *Client) RetrieveEventNotification(eventID string, notificationID string
 
 // Retry -
 func (c *Client) Retry(eventID string, webhookID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/events/%v/webhooks/%v/retry", eventID, webhookID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/webhooks/%v/retry", path, eventID, webhookID), nil)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -120,7 +122,7 @@ func (c *Client) Retry(eventID string, webhookID string) (*Response, error) {
 
 // RetryAll -
 func (c *Client) RetryAll(eventID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/events/%v/webhooks/retry", eventID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/webhooks/retry", path, eventID), nil)
 	response := &Response{
 		StatusResponse: resp,
 	}

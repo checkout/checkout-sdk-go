@@ -12,7 +12,8 @@ import (
 type (
 	// Request ...
 	Request struct {
-		Source            interface{}        `json:"source"`
+		Source            interface{}        `json:"source,omitempty"`
+		Destination       interface{}        `json:"destination,omitempty"`
 		Amount            uint64             `json:"amount,omitempty"`
 		Currency          string             `json:"currency"`
 		Reference         string             `json:"reference,omitempty"`
@@ -68,6 +69,37 @@ type (
 		Type  string `json:"type" binding:"required"`
 		ID    string `json:"id,omitempty"`
 		Email string `json:"email,omitempty"`
+	}
+
+	// TokenDestination ...
+	TokenDestination struct {
+		Type           string          `json:"type" binding:"required"`
+		Token          string          `json:"token" binding:"required"`
+		FirstName      string          `json:"first_name,required"`
+		LastName       string          `json:"last_name,required"`
+		BillingAddress *common.Address `json:"billing_address,omitempty"`
+		Phone          *common.Phone   `json:"phone,omitempty"`
+	}
+
+	// IDDestination ...
+	IDDestination struct {
+		Type      string `json:"type" binding:"required"`
+		ID        string `json:"id" binding:"required"`
+		FirstName string `json:"first_name,required"`
+		LastName  string `json:"last_name,required"`
+	}
+
+	// CardDestination ...
+	CardDestination struct {
+		Type           string          `json:"type" binding:"required"`
+		Number         string          `json:"number" binding:"required"`
+		ExpiryMonth    uint64          `json:"expiry_month" binding:"required"`
+		ExpiryYear     uint64          `json:"expiry_year" binding:"required"`
+		FirstName      string          `json:"first_name,required"`
+		LastName       string          `json:"last_name,required"`
+		Name           string          `json:"name,omitempty"`
+		BillingAddress *common.Address `json:"billing_address,omitempty"`
+		Phone          *common.Phone   `json:"phone,omitempty"`
 	}
 
 	// Customer ...
@@ -143,13 +175,29 @@ func (r *Request) SetSource(s interface{}) error {
 	case *IDSource:
 	case *CardSource:
 	case *TokenSource:
-	case *CustomerSource:
 	case map[string]string:
 	default:
 		err = fmt.Errorf("Unsupported source type %T", p)
 	}
 	if err == nil {
 		r.Source = s
+	}
+	return err
+}
+
+// SetDestination ...
+func (r *Request) SetDestination(d interface{}) error {
+	var err error
+	switch p := d.(type) {
+	case *IDDestination:
+	case *CardDestination:
+	case *TokenDestination:
+	case map[string]string:
+	default:
+		err = fmt.Errorf("Unsupported source type %T", p)
+	}
+	if err == nil {
+		r.Destination = d
 	}
 	return err
 }

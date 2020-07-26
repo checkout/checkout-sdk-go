@@ -9,6 +9,8 @@ import (
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
 
+const path = "payments"
+
 // Client ...
 type Client struct {
 	API checkout.HTTPClient
@@ -23,7 +25,7 @@ func NewClient(config checkout.Config) *Client {
 
 // Request ...
 func (c *Client) Request(request *Request) (*Response, error) {
-	response, err := c.API.Post("/payments", request)
+	response, err := c.API.Post("/"+path, request)
 	resp := &Response{
 		StatusResponse: response,
 	}
@@ -44,7 +46,7 @@ func (c *Client) Request(request *Request) (*Response, error) {
 
 // Get ...
 func (c *Client) Get(paymentID string) (*PaymentResponse, error) {
-	response, err := c.API.Get(fmt.Sprintf("/payments/%v", paymentID))
+	response, err := c.API.Get(fmt.Sprintf("/%v/%v", path, paymentID))
 	payment := &PaymentResponse{
 		StatusResponse: response,
 	}
@@ -59,7 +61,7 @@ func (c *Client) Get(paymentID string) (*PaymentResponse, error) {
 
 // Actions ...
 func (c *Client) Actions(paymentID string) (*ActionsResponse, error) {
-	response, err := c.API.Get(fmt.Sprintf("/payments/%v/actions", paymentID))
+	response, err := c.API.Get(fmt.Sprintf("/%v/%v/actions", path, paymentID))
 	act := &ActionsResponse{
 		StatusResponse: response,
 	}
@@ -74,7 +76,7 @@ func (c *Client) Actions(paymentID string) (*ActionsResponse, error) {
 
 // Captures ...
 func (c *Client) Captures(paymentID string, request *CapturesRequest) (*CapturesResponse, error) {
-	response, err := c.API.Post(fmt.Sprintf("/payments/%v/captures", paymentID), request)
+	response, err := c.API.Post(fmt.Sprintf("/%v/%v/captures", path, paymentID), request)
 	cap := &CapturesResponse{
 		StatusResponse: response,
 	}
@@ -90,7 +92,7 @@ func (c *Client) Captures(paymentID string, request *CapturesRequest) (*Captures
 
 // Refunds ...
 func (c *Client) Refunds(paymentID string, request *RefundsRequest) (*RefundsResponse, error) {
-	response, err := c.API.Post(fmt.Sprintf("/payments/%v/refunds", paymentID), request)
+	response, err := c.API.Post(fmt.Sprintf("/%v/%v/refunds", path, paymentID), request)
 	ref := &RefundsResponse{
 		StatusResponse: response,
 	}
@@ -106,7 +108,7 @@ func (c *Client) Refunds(paymentID string, request *RefundsRequest) (*RefundsRes
 
 // Voids ...
 func (c *Client) Voids(paymentID string, request *VoidsRequest) (*VoidsResponse, error) {
-	response, err := c.API.Post(fmt.Sprintf("/payments/%v/voids", paymentID), request)
+	response, err := c.API.Post(fmt.Sprintf("/%v/%v/voids", path, paymentID), request)
 	void := &VoidsResponse{
 		StatusResponse: response,
 	}

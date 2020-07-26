@@ -80,7 +80,7 @@ func (c *Client) AcceptDispute(disputeID string) (*Response, error) {
 
 // ProvideDisputeEvidence ...
 func (c *Client) ProvideDisputeEvidence(disputeID string, request *Request) (*Response, error) {
-	resp, err := c.API.Put(fmt.Sprintf("/%v/%v", path, disputeID), request)
+	resp, err := c.API.Put(fmt.Sprintf("/%v/%v/evidence", path, disputeID), request)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -103,9 +103,9 @@ func (c *Client) GetDisputeEvidence(disputeID string) (*Response, error) {
 		return response, err
 	}
 	if resp.StatusCode == http.StatusOK {
-		var evidence map[string]string
-		err = json.Unmarshal(resp.ResponseBody, &evidence)
-		response.Evidence = &evidence
+		var evidences DisputeEvidence
+		err = json.Unmarshal(resp.ResponseBody, &evidences)
+		response.Evidences = &evidences
 		return response, err
 	}
 	return response, err

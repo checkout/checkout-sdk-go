@@ -8,6 +8,8 @@ import (
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
 
+const path = "tokens"
+
 // Client ...
 type Client struct {
 	API checkout.HTTPClient
@@ -22,7 +24,7 @@ func NewClient(config checkout.Config) *Client {
 
 // Request ...
 func (c *Client) Request(request *Request) (*Response, error) {
-	response, err := c.API.Post("/tokens", request)
+	response, err := c.API.Post("/"+path, request)
 	resp := &Response{
 		StatusResponse: response,
 	}

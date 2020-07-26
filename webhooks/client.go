@@ -9,6 +9,8 @@ import (
 	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
 
+const path = "webhooks"
+
 // Client ...
 type Client struct {
 	API checkout.HTTPClient
@@ -23,7 +25,7 @@ func NewClient(config checkout.Config) *Client {
 
 // Retrieve ...
 func (c *Client) Retrieve() (*Response, error) {
-	resp, err := c.API.Get("/webhooks")
+	resp, err := c.API.Get("/" + path)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -41,7 +43,7 @@ func (c *Client) Retrieve() (*Response, error) {
 
 // RegisterWebhook ...
 func (c *Client) RegisterWebhook(request *Request) (*Response, error) {
-	resp, err := c.API.Post("/webhooks", request)
+	resp, err := c.API.Post("/"+path, request)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -60,7 +62,7 @@ func (c *Client) RegisterWebhook(request *Request) (*Response, error) {
 // RetrieveWebhook ...
 func (c *Client) RetrieveWebhook(webhookID string) (*Response, error) {
 
-	resp, err := c.API.Get(fmt.Sprintf("/webhooks/%v", webhookID))
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, webhookID))
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -78,7 +80,7 @@ func (c *Client) RetrieveWebhook(webhookID string) (*Response, error) {
 
 // UpdateWebhook ...
 func (c *Client) UpdateWebhook(webhookID string, request *Request) (*Response, error) {
-	resp, err := c.API.Put(fmt.Sprintf("/webhooks/%v", webhookID), request)
+	resp, err := c.API.Put(fmt.Sprintf("/%v/%v", path, webhookID), request)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -96,7 +98,7 @@ func (c *Client) UpdateWebhook(webhookID string, request *Request) (*Response, e
 
 // PartiallyUpdateWebhook ...
 func (c *Client) PartiallyUpdateWebhook(webhookID string, request *Request) (*Response, error) {
-	resp, err := c.API.Patch(fmt.Sprintf("/webhooks/%v", webhookID), request)
+	resp, err := c.API.Patch(fmt.Sprintf("/%v/%v", path, webhookID), request)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -115,7 +117,7 @@ func (c *Client) PartiallyUpdateWebhook(webhookID string, request *Request) (*Re
 
 // RemoveWebhook ...
 func (c *Client) RemoveWebhook(webhookID string) (*Response, error) {
-	resp, err := c.API.Delete(fmt.Sprintf("/webhooks/%v", webhookID))
+	resp, err := c.API.Delete(fmt.Sprintf("/%v/%v", path, webhookID))
 	response := &Response{
 		StatusResponse: resp,
 	}

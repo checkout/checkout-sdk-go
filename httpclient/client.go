@@ -124,7 +124,7 @@ func (c *HTTPClient) NewRequest(method, path string, body interface{}) (*http.Re
 }
 
 // Upload -
-func (c *HTTPClient) Upload(param string, values map[string]io.Reader) (resp *checkout.StatusResponse, err error) {
+func (c *HTTPClient) Upload(path string, values map[string]io.Reader) (resp *checkout.StatusResponse, err error) {
 	// Prepare a form that you will submit to that URL.
 	var b bytes.Buffer
 	w := multipart.NewWriter(&b)
@@ -144,6 +144,7 @@ func (c *HTTPClient) Upload(param string, values map[string]io.Reader) (resp *ch
 				return nil, err
 			}
 		}
+
 		if _, err = io.Copy(fw, r); err != nil {
 			return nil, err
 		}
@@ -153,12 +154,12 @@ func (c *HTTPClient) Upload(param string, values map[string]io.Reader) (resp *ch
 	w.Close()
 
 	// Now that you have a form, you can submit it to your handler.
-	request, err := http.NewRequest("POST", c.URI+param, &b)
+	request, err := http.NewRequest("POST", c.URI+path, &b)
 	if err != nil {
 		return nil, err
 	}
-	c.setHeader(request)
-	c.setCredential(c.URI+param, request)
+	// c.setHeader(request)
+	c.setCredential(c.URI+path, request)
 	// Don't forget to set the content type, this will contain the boundary.
 	request.Header.Set("Content-Type", w.FormDataContentType())
 

@@ -11,6 +11,7 @@ type (
 	// Request -
 	Request struct {
 		*QueryParameter
+		*DisputeEvidence
 	}
 
 	// QueryParameter -
@@ -26,6 +27,27 @@ type (
 		PaymentARN       string    `url:"payment_arn,omitempty"`
 		ThisChannelOnly  *bool     `url:"this_channel_only,omitempty"`
 	}
+
+	// DisputeEvidence -
+	DisputeEvidence struct {
+		Links                                  map[string]common.Link `json:"_links,omitempty"`
+		ProofOfDeliveryOrServiceFile           string                 `json:"proof_of_delivery_or_service_file,omitempty"`
+		ProofOfDeliveryOrServiceText           string                 `json:"proof_of_delivery_or_service_text,omitempty"`
+		InvoiceOrReceiptFile                   string                 `json:"invoice_or_receipt_file,omitempty"`
+		InvoiceOrReceiptText                   string                 `json:"invoice_or_receipt_text,omitempty"`
+		InvoiceShowingDistinctTransactionsFile string                 `json:"invoice_showing_distinct_transactions_file,omitempty"`
+		InvoiceShowingDistinctTransactionsText string                 `json:"invoice_showing_distinct_transactions_text,omitempty"`
+		CustomerCommunicationFile              string                 `json:"customer_communication_file,omitempty"`
+		CustomerCommunicationText              string                 `json:"customer_communication_text,omitempty"`
+		RefundOrCancellationPolicyFile         string                 `json:"refund_or_cancellation_policy_file,omitempty"`
+		RefundOrCancellationPolicyText         string                 `json:"refund_or_cancellation_policy_text,omitempty"`
+		RecurringTransactionAgreementFile      string                 `json:"recurring_transaction_agreement_file,omitempty"`
+		RecurringTransactionAgreementText      string                 `json:"recurring_transaction_agreement_text,omitempty"`
+		AdditionalEvidenceFile                 string                 `json:"additional_evidence_file,omitempty"`
+		AdditionalEvidenceText                 string                 `json:"additional_evidence_text,omitempty"`
+		ProofOfDeliveryOrServiceDateFile       string                 `json:"proof_of_delivery_or_service_date_file,omitempty"`
+		ProofOfDeliveryOrServiceDateText       string                 `json:"proof_of_delivery_or_service_date_text,omitempty"`
+	}
 )
 type (
 	// Response -
@@ -33,7 +55,7 @@ type (
 		StatusResponse *checkout.StatusResponse `json:"api_response,omitempty"`
 		Disputes       *Disputes                `json:"disputes,omitempty"`
 		Dispute        *Dispute                 `json:"dispute,omitempty"`
-		Evidence       *map[string]string       `json:"evidence,omitempty"`
+		Evidences      *DisputeEvidence         `json:"evidences,omitempty"`
 	}
 
 	// Disputes -
@@ -59,9 +81,9 @@ type (
 		Status             string                 `json:"status,omitempty"`
 		Amount             uint64                 `json:"amount,omitempty"`
 		Currency           string                 `json:"currency,omitempty"`
-		PaymentID          string                 `url:"payment_id,omitempty"`
-		PaymentReference   string                 `url:"payment_reference,omitempty"`
-		PaymentARN         string                 `url:"payment_arn,omitempty"`
+		PaymentID          string                 `json:"payment_id,omitempty"`
+		PaymentReference   string                 `json:"payment_reference,omitempty"`
+		PaymentARN         string                 `json:"payment_arn,omitempty"`
 		PaymentMethod      string                 `json:"payment_method,omitempty"`
 		EvidenceRequiredBy time.Time              `json:"evidence_required_by,omitempty"`
 		ReceivedOn         time.Time              `json:"received_on,omitempty"`

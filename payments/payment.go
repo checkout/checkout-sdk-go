@@ -33,6 +33,7 @@ type (
 		Recipient         *Recipient         `json:"recipient,omitempty"`
 		Destinations      []*Destination     `json:"destinations,omitempty"`
 		Processing        *Processing        `json:"processing,omitempty"`
+		FundTransferType  string             `json:"fund_transfer_type,omitempty"`
 		Metadata          map[string]string  `json:"metadata,omitempty"`
 	}
 
@@ -421,11 +422,26 @@ type (
 	// Processing - Use the processing object to influence or
 	// override the data sent during card processing
 	Processing struct {
-		Mid                      string  `json:"mid,omitempty"`
-		Aft                      *bool   `json:"aft,omitempty"`
-		DLocal                   *DLocal `json:"dlocal,omitempty"`
-		AcquirerTransactionID    string  `json:"acquirer_transaction_id,omitempty"`
-		RetrievalReferenceNumber string  `json:"retrieval_reference_number,omitempty"`
+		Mid                      string             `json:"mid,omitempty"`
+		Aft                      *bool              `json:"aft,omitempty"`
+		DLocal                   *DLocal            `json:"dlocal,omitempty"`
+		AcquirerTransactionID    string             `json:"acquirer_transaction_id,omitempty"`
+		RetrievalReferenceNumber string             `json:"retrieval_reference_number,omitempty"`
+		SenderInformation        *SenderInformation `json:"senderInformation,omitempty"`
+	}
+
+	// SenderInformation -
+	SenderInformation struct {
+		FirstName     string `json:"firstName" binding:"required"`
+		LastName      string `json:"lastName" binding:"required"`
+		Address       string `json:"address" binding:"required"`
+		City          string `json:"city,omitempty"`
+		State         string `json:"state,omitempty"`
+		PostalCode    string `json:"postalCode" binding:"required"`
+		Country       string `json:"country" binding:"required"`
+		SourceOfFunds string `json:"sourceOfFunds" binding:"required"`
+		AccountNumber string `json:"accountNumber" binding:"required"`
+		Reference     string `json:"reference" binding:"required"`
 	}
 
 	// DLocal - Processing information required for dLocal payments.
@@ -517,7 +533,8 @@ type (
 		ThreeDSEnrollment *ThreeDSEnrollment     `json:"3ds,omitempty"`
 		Flagged           *bool                  `json:"flagged,omitempty"`
 		RiskAssessment    *RiskAssessment        `json:"risk,omitempty"`
-		Source            *SourceResponse        `json:"source"`
+		Source            *SourceResponse        `json:"source,omitempty"`
+		Destination       *DestinationResponse   `json:"destination,omitempty"`
 		Customer          *Customer              `json:"customer,omitempty"`
 		ProcessedOn       time.Time              `json:"processed_on,omitempty"`
 		Reference         string                 `json:"reference,omitempty"`
@@ -594,12 +611,31 @@ type (
 		Payouts                 *bool           `json:"payouts,omitempty"`
 		FastFunds               string          `json:"fast_funds,omitempty"`
 	}
+
 	// AlternativePaymentSourceResponse ...
 	AlternativePaymentSourceResponse struct {
 		ID             string          `json:"id"`
 		Type           string          `json:"type"`
 		BillingAddress *common.Address `json:"billing_address,omitempty"`
 		Phone          *common.Phone   `json:"phone,omitempty"`
+	}
+
+	// DestinationResponse -
+	DestinationResponse struct {
+		ID            string `json:"id,omitempty"`
+		Type          string `json:"type,omitempty"`
+		ExpiryMonth   uint64 `json:"expiry_month,omitempty"`
+		ExpiryYear    uint64 `json:"expiry_year,omitempty"`
+		Scheme        string `json:"scheme,omitempty"`
+		Last4         string `json:"last4,omitempty"`
+		Fingerprint   string `json:"fingerprint,omitempty"`
+		Bin           string `json:"bin,omitempty"`
+		CardType      string `json:"card_type,omitempty"`
+		CardCategory  string `json:"card_category,omitempty"`
+		Issuer        string `json:"issuer,omitempty"`
+		IssuerCountry string `json:"issuer_country,omitempty"`
+		ProductID     string `json:"product_id,omitempty"`
+		ProductType   string `json:"product_type,omitempty"`
 	}
 )
 

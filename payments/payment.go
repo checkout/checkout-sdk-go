@@ -71,12 +71,285 @@ type (
 		Email string `json:"email,omitempty"`
 	}
 
+	// NetworkTokenSource ...
+	NetworkTokenSource struct {
+		Type           string          `json:"type" binding:"required"`
+		Token          string          `json:"token" binding:"required"`
+		ExpiryMonth    uint64          `json:"expiry_month" binding:"required"`
+		ExpiryYear     uint64          `json:"expiry_year" binding:"required"`
+		TokenType      string          `json:"token_type" binding:"required"`
+		Cryptogram     string          `json:"cryptogram" binding:"required"`
+		ECI            string          `json:"eci" binding:"required"`
+		Stored         *bool           `json:"stored,omitempty"`
+		Name           string          `json:"name,omitempty"`
+		CVV            string          `json:"cvv,omitempty"`
+		BillingAddress *common.Address `json:"billing_address,omitempty"`
+		Phone          *common.Phone   `json:"phone,omitempty"`
+	}
+
+	// AlipaySource ...
+	AlipaySource struct {
+		Type string `json:"type" binding:"required"`
+	}
+
+	// BenefitpaySource ...
+	BenefitpaySource struct {
+		Type            string `json:"type" binding:"required"`
+		IntegrationType string `json:"integration_type" binding:"required"`
+	}
+
+	// BalotoSource ...
+	BalotoSource struct {
+		Type            string `json:"type" binding:"required"`
+		IntegrationType string `json:"integration_type" binding:"required"`
+		Country         string `json:"country" binding:"required"`
+		Description     string `json:"description,omitempty"`
+		Payer           *Payer `json:"payer,omitempty"`
+	}
+
+	// BoletoSource ...
+	BoletoSource struct {
+		Type            string `json:"type" binding:"required"`
+		IntegrationType string `json:"integration_type" binding:"required"`
+		Country         string `json:"country" binding:"required"`
+		Description     string `json:"description,omitempty"`
+		Payer           *Payer `json:"payer,omitempty"`
+	}
+
+	// Payer -
+	Payer struct {
+		Name     string `json:"name" binding:"required"`
+		Email    string `json:"email" binding:"required"`
+		Document string `json:"document" binding:"required"`
+	}
+
+	// EPSSource -
+	EPSSource struct {
+		Type    string `json:"type" binding:"required"`
+		Purpose string `json:"purpose" binding:"required"`
+		BIC     string `json:"bic" binding:"required"`
+	}
+
+	// GiropaySource ...
+	GiropaySource struct {
+		Type       string      `json:"type" binding:"required"`
+		Purpose    string      `json:"purpose" binding:"required"`
+		BIC        string      `json:"bic,omitempty"`
+		InfoFields []InfoField `json:"info_fields,omitempty"`
+	}
+
+	// InfoField ...
+	InfoField struct {
+		Label string `json:"label,omitempty"`
+		Text  string `json:"text,omitempty"`
+	}
+
+	// IDealSource ...
+	IDealSource struct {
+		Type        string `json:"type" binding:"required"`
+		Description string `json:"description,omitempty"`
+		BIC         string `json:"bic" binding:"required"`
+		Language    string `json:"language,omitempty"`
+	}
+
+	// KlarnaSource ...
+	KlarnaSource struct {
+		Type               string            `json:"type" binding:"required"`
+		AuthorizationToken string            `json:"authorization_token" binding:"required"`
+		Locale             string            `json:"locale" binding:"required"`
+		PurchaseCountry    string            `json:"purchase_country" binding:"required"`
+		AutoCapture        string            `json:"auto_capture,omitempty"`
+		BillingAddress     *KlarnaAddress    `json:"billing_address,omitempty"`
+		ShippingAddress    *KlarnaAddress    `json:"shipping_address,omitempty"`
+		TaxAmount          uint64            `json:"tax_amount,omitempty"`
+		Product            *KlarnaProduct    `json:"products,omitempty"`
+		Customer           *KlarnaCustomer   `json:"customer,omitempty"`
+		MerchantReference1 string            `json:"merchant_reference1,omitempty"`
+		MerchantReference2 string            `json:"merchant_reference2,omitempty"`
+		MerchantData       string            `json:"merchant_data,omitempty"`
+		Attachment         *KlarnaAttachment `json:"attachment,omitempty"`
+	}
+
+	// KlarnaAddress ...
+	KlarnaAddress struct {
+		Attention        string `json:"attention,omitempty"`
+		City             string `json:"city,omitempty"`
+		Country          string `json:"country,omitempty"`
+		Email            string `json:"email,omitempty"`
+		FamilyName       string `json:"family_name,omitempty"`
+		GivenName        string `json:"given_name,omitempty"`
+		OrganizationName string `json:"organization_name,omitempty"`
+		Phone            string `json:"phone,omitempty"`
+		PostalCode       string `json:"postal_code,omitempty"`
+		Region           string `json:"region,omitempty"`
+		StreetAddress    string `json:"street_address,omitempty"`
+		StreetAddress2   string `json:"street_address2,omitempty"`
+		Title            string `json:"title,omitempty"`
+	}
+
+	// KlarnaCustomer ...
+	KlarnaCustomer struct {
+		DateOfBirth                  string `json:"date_of_birth,omitempty"`
+		Gender                       string `json:"gender,omitempty"`
+		LastFourSSN                  string `json:"last_four_ssn,omitempty"`
+		NationalIdentificationNumber string `json:"national_identification_number,omitempty"`
+		OrganizationEntityType       string `json:"organization_entity_type,omitempty"`
+		OrganizationRegistrationID   string `json:"organization_registration_id,omitempty"`
+		Title                        string `json:"title,omitempty"`
+		Type                         string `json:"type,omitempty"`
+		VatID                        string `json:"vat_id,omitempty"`
+	}
+
+	// KlarnaProduct ...
+	KlarnaProduct struct {
+		ImageURL            string                    `json:"image_url,omitempty"`
+		MerchantData        string                    `json:"merchant_data,omitempty"`
+		Name                string                    `json:"name,omitempty"`
+		ProductIdentifiers  *KlarnaProductIdentifiers `json:"product_identifiers,omitempty"`
+		ProductURL          string                    `json:"product_url,omitempty"`
+		Quantity            uint64                    `json:"quantity,omitempty"`
+		QuantityUnit        string                    `json:"quantity_unit,omitempty"`
+		Reference           string                    `json:"reference,omitempty"`
+		TaxRate             uint64                    `json:"tax_rate,omitempty"`
+		TotalAmount         uint64                    `json:"total_amount,omitempty"`
+		TotalDiscountAmount uint64                    `json:"total_discount_amount,omitempty"`
+		TotalTaxAmount      uint64                    `json:"total_tax_amount,omitempty"`
+		Type                string                    `json:"type,omitempty"`
+		UnitPrice           uint64                    `json:"unit_price,omitempty"`
+	}
+
+	// KlarnaProductIdentifiers ...
+	KlarnaProductIdentifiers struct {
+		Brand                  string `json:"brand,omitempty"`
+		CategoryPath           string `json:"category_path,omitempty"`
+		GlobalTradeItemNumber  string `json:"global_trade_item_number,omitempty"`
+		ManufacturerPartNumber string `json:"manufacturer_part_number,omitempty"`
+	}
+
+	// KlarnaAttachment ...
+	KlarnaAttachment struct {
+		Body        string `json:"body,omitempty"`
+		ContentType string `json:"content_type,omitempty"`
+	}
+	// KNetSource ...
+	KNetSource struct {
+		Type              string `json:"type" binding:"required"`
+		Language          string `json:"language" binding:"required"`
+		UserDefinedField1 string `json:"user_defined_field1,omitempty"`
+		UserDefinedField2 string `json:"user_defined_field2,omitempty"`
+		UserDefinedField3 string `json:"user_defined_field3,omitempty"`
+		UserDefinedField4 string `json:"user_defined_field4,omitempty"`
+		UserDefinedField5 string `json:"user_defined_field5,omitempty"`
+		CardToken         string `json:"card_token,omitempty"`
+		PTLF              string `json:"ptlf,omitempty"`
+	}
+
+	// OxxoSource ...
+	OxxoSource struct {
+		Type            string `json:"type" binding:"required"`
+		IntegrationType string `json:"integration_type" binding:"required"`
+		Country         string `json:"country,omitempty"`
+		Description     string `json:"description,omitempty"`
+		Payer           *Payer `json:"payer,omitempty"`
+	}
+
+	// P24Source ...
+	P24Source struct {
+		Type               string `json:"type" binding:"required"`
+		PaymentCountry     string `json:"payment_country" binding:"required"`
+		AccountHolderName  string `json:"account_holder_name,omitempty"`
+		AccountHolderEmail string `json:"account_holder_email,omitempty"`
+		BillingDescriptor  string `json:"billing_descriptor,omitempty"`
+	}
+
+	// PagofacilSource ...
+	PagofacilSource struct {
+		Type            string `json:"type" binding:"required"`
+		IntegrationType string `json:"integration_type" binding:"required"`
+		Country         string `json:"country,omitempty"`
+		Description     string `json:"description,omitempty"`
+		Payer           *Payer `json:"payer,omitempty"`
+	}
+
+	// PayPalSource ...
+	PayPalSource struct {
+		Type          string            `json:"type" binding:"required"`
+		InvoiceNumber string            `json:"invoice_number" binding:"required"`
+		RecipientName string            `json:"recipient_name,omitempty"`
+		LogoURL       string            `json:"logo_url,omitempty"`
+		STC           map[string]string `json:"stc,omitempty"`
+	}
+
+	// PoliSource ...
+	PoliSource struct {
+		Type string `json:"type" binding:"required"`
+	}
+
+	// RapipagoSource ...
+	RapipagoSource struct {
+		Type            string `json:"type" binding:"required"`
+		IntegrationType string `json:"integration_type" binding:"required"`
+		Country         string `json:"country,omitempty"`
+		Description     string `json:"description,omitempty"`
+		Payer           *Payer `json:"payer,omitempty"`
+	}
+
+	// SofortSource ...
+	SofortSource struct {
+		Type string `json:"type" binding:"required"`
+	}
+
+	// BancontactSource ...
+	BancontactSource struct {
+		Type              string `json:"type" binding:"required"`
+		PaymentCountry    string `json:"payment_country,omitempty"`
+		AccountHolderName string `json:"account_holder_name,omitempty"`
+		BillingDescriptor string `json:"billing_descriptor,omitempty"`
+		Language          string `json:"language,omitempty"`
+	}
+
+	// FawrySource ...
+	FawrySource struct {
+		Type              string          `json:"type" binding:"required"`
+		Description       string          `json:"description,omitempty"`
+		CustomerProfileID string          `json:"customer_profile_id,omitempty"`
+		CustomerEmail     string          `json:"customer_email,omitempty"`
+		CustomerMobile    string          `json:"customer_mobile,omitempty"`
+		ExpiresOn         time.Time       `json:"expires_on,omitempty"`
+		Products          *[]FawryProduct `json:"products,omitempty"`
+	}
+
+	// FawryProduct ...
+	FawryProduct struct {
+		ProductID   string `json:"product_id,omitempty"`
+		Quantity    uint64 `json:"quantity,omitempty"`
+		Price       uint64 `json:"price,omitempty"`
+		Description string `json:"description,omitempty"`
+	}
+
+	// QPaySource ...
+	QPaySource struct {
+		Type        string `json:"type" binding:"required"`
+		Quantity    uint64 `json:"quantity,omitempty"`
+		Description string `json:"description,omitempty"`
+		Language    string `json:"language,omitempty"`
+		NationalID  string `json:"national_id,omitempty"`
+	}
+
+	// MultibancoSource ...
+	MultibancoSource struct {
+		Type              string `json:"type" binding:"required"`
+		PaymentCountry    string `json:"payment_country,omitempty"`
+		AccountHolderName string `json:"account_holder_name,omitempty"`
+		BillingDescriptor string `json:"billing_descriptor,omitempty"`
+	}
+
 	// TokenDestination ...
 	TokenDestination struct {
 		Type           string          `json:"type" binding:"required"`
 		Token          string          `json:"token" binding:"required"`
-		FirstName      string          `json:"first_name,required"`
-		LastName       string          `json:"last_name,required"`
+		FirstName      string          `json:"first_name" binding:"required"`
+		LastName       string          `json:"last_name" binding:"required"`
 		BillingAddress *common.Address `json:"billing_address,omitempty"`
 		Phone          *common.Phone   `json:"phone,omitempty"`
 	}
@@ -104,9 +377,9 @@ type (
 
 	// Customer ...
 	Customer struct {
-		ID    string `json:"id,omitempty"`
-		Email string `json:"email,omitempty"`
-		Name  string `json:"name,omitempty"`
+		Document string `json:"document,omitempty"`
+		Email    string `json:"email,omitempty"`
+		Name     string `json:"name,omitempty"`
 	}
 
 	// BillingDescriptor ...
@@ -157,13 +430,13 @@ type (
 
 	// DLocal - Processing information required for dLocal payments.
 	DLocal struct {
-		Country     string       `json:"country,omitempty"`
-		Payer       *Customer    `json:"payer,omitempty"`
-		Installment *Installment `json:"installment,omitempty"`
+		Country      string        `json:"country,omitempty"`
+		Payer        *Customer     `json:"payer,omitempty"`
+		Installments *Installments `json:"installments,omitempty"`
 	}
 
-	// Installment - Details about the installments.
-	Installment struct {
+	// Installments - Details about the installments.
+	Installments struct {
 		Count string `json:"count,omitempty"`
 	}
 )
@@ -175,6 +448,27 @@ func (r *Request) SetSource(s interface{}) error {
 	case *IDSource:
 	case *CardSource:
 	case *TokenSource:
+	case *NetworkTokenSource:
+	case *AlipaySource:
+	case *BenefitpaySource:
+	case *BalotoSource:
+	case *BoletoSource:
+	case *EPSSource:
+	case *GiropaySource:
+	case *IDealSource:
+	case *KlarnaSource:
+	case *KNetSource:
+	case *OxxoSource:
+	case *P24Source:
+	case *PagofacilSource:
+	case *PayPalSource:
+	case *PoliSource:
+	case *RapipagoSource:
+	case SofortSource:
+	case BancontactSource:
+	case FawrySource:
+	case QPaySource:
+	case MultibancoSource:
 	case map[string]string:
 	default:
 		err = fmt.Errorf("Unsupported source type %T", p)

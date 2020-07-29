@@ -3,7 +3,6 @@ package files
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/shiuh-yaw-cko/checkout"
@@ -25,16 +24,22 @@ func NewClient(config checkout.Config) *Client {
 }
 
 // UploadFile -
-func (c *Client) UploadFile(values map[string]io.Reader) (*Response, error) {
-
-	resp, err := c.API.Upload(fmt.Sprintf("/%v", path), values)
+func (c *Client) UploadFile(file *FileUpload) (*Response, error) {
+	if file == nil {
+		return nil, fmt.Errorf("file cannot be nil, and params.Purpose and params.File must be set")
+	}
+	bodyBuffer, boundary, err := file.GetBody()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.API.Upload(fmt.Sprintf("/%v", path), boundary, bodyBuffer)
 	response := &Response{
 		StatusResponse: resp,
 	}
 	if err != nil {
 		return response, err
 	}
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusCreated {
 		var file File
 		err = json.Unmarshal(resp.ResponseBody, &file)
 		response.File = &file

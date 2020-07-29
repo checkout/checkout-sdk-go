@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"mime/multipart"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -35,6 +33,12 @@ type HTTPClient struct {
 func GetClient() *HTTPClient {
 	return client
 }
+
+type nopReadCloser struct {
+	io.Reader
+}
+
+func (nopReadCloser) Close() error { return nil }
 
 // NewClient ...
 func NewClient(config checkout.Config) *HTTPClient {
@@ -124,46 +128,25 @@ func (c *HTTPClient) NewRequest(method, path string, body interface{}) (*http.Re
 }
 
 // Upload -
-func (c *HTTPClient) Upload(path string, values map[string]io.Reader) (resp *checkout.StatusResponse, err error) {
-	// Prepare a form that you will submit to that URL.
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-	for key, r := range values {
-		var fw io.Writer
-		if x, ok := r.(io.Closer); ok {
-			defer x.Close()
-		}
-		// Add an image file
-		if x, ok := r.(*os.File); ok {
-			if fw, err = w.CreateFormFile(key, x.Name()); err != nil {
-				return nil, err
-			}
-		} else {
-			// Add other fields
-			if fw, err = w.CreateFormField(key); err != nil {
-				return nil, err
-			}
-		}
+func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (resp *checkout.StatusResponse, err error) {
 
-		if _, err = io.Copy(fw, r); err != nil {
-			return nil, err
-		}
-	}
-	// Don't forget to close the multipart writer.
-	// If you don't close it, your request will be missing the terminating boundary.
-	w.Close()
-
-	// Now that you have a form, you can submit it to your handler.
-	request, err := http.NewRequest("POST", c.URI+path, &b)
+	contentType := "multipart/form-data; boundary=" + boundary
+	req, err := http.NewRequest(http.MethodPost, c.URI+path, nil)
 	if err != nil {
 		return nil, err
 	}
-	// c.setHeader(request)
-	c.setCredential(c.URI+path, request)
-	// Don't forget to set the content type, this will contain the boundary.
-	request.Header.Set("Content-Type", w.FormDataContentType())
-
-	response, err := c.HTTPClient.Do(request)
+	if body != nil {
+		reader := bytes.NewReader(body.Bytes())
+		req.Body = nopReadCloser{reader}
+		req.GetBody = func() (io.ReadCloser, error) {
+			reader := bytes.NewReader(body.Bytes())
+			return nopReadCloser{reader}, nil
+		}
+	}
+	c.setCredential(c.URI+path, req)
+	req.Header.Add("Content-Type", contentType)
+	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
+	response, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

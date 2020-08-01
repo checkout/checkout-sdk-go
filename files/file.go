@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
 	"net/textproto"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -26,20 +28,22 @@ type (
 
 	// FileUpload -
 	FileUpload struct {
-		FileReader  io.Reader
-		File        *string
-		Purpose     *string
-		ContentType *string
+		FileReader *os.File
+		File       *string
+		Purpose    *string
 	}
 )
 
-// StringValue returns the value of the string pointer passed in or
-// "" if the pointer is nil.
-func StringValue(v *string) string {
-	if v != nil {
-		return *v
+// GetFileContentType -
+func GetFileContentType(out *os.File) (string, error) {
+
+	buffer := make([]byte, 512)
+	_, err := out.Read(buffer)
+	if err != nil {
+		return "", err
 	}
-	return ""
+	contentType := http.DetectContentType(buffer)
+	return contentType, nil
 }
 
 // CreateFormFile -
@@ -55,18 +59,23 @@ func (f *FileUpload) GetBody() (*bytes.Buffer, string, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	if f.Purpose != nil {
-		err := writer.WriteField("purpose", StringValue(f.Purpose))
+		err := writer.WriteField("purpose", checkout.StringValue(f.Purpose))
 		if err != nil {
 			return nil, "", err
 		}
 	}
-	if f.FileReader != nil && f.File != nil && f.ContentType != nil {
-		part, err := CreateFormFile(writer, "file", filepath.Base(StringValue(f.File)), StringValue(f.ContentType))
+	if f.FileReader != nil && f.File != nil {
+		contentType, err := GetFileContentType(f.FileReader)
 		if err != nil {
 			return nil, "", err
 		}
-
-		_, err = io.Copy(part, f.FileReader)
+		part, err := CreateFormFile(writer, "file", filepath.Base(checkout.StringValue(f.File)), checkout.StringValue(&contentType))
+		if err != nil {
+			return nil, "", err
+		}
+		var r io.Reader
+		r = f.FileReader
+		_, err = io.Copy(part, r)
 		if err != nil {
 			return nil, "", err
 		}

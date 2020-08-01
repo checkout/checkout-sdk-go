@@ -54,3 +54,12 @@ type HTTPClient interface {
 	Delete(param string) (*StatusResponse, error)
 	Upload(param, boundary string, body *bytes.Buffer) (*StatusResponse, error)
 }
+
+// StringValue returns the value of the string pointer passed in or
+// "" if the pointer is nil.
+func StringValue(v *string) string {
+	if v != nil {
+		return *v
+	}
+	return ""
+}

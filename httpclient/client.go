@@ -2,6 +2,7 @@ package httpclient
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -164,6 +165,34 @@ func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (r
 		err := responseToError(apiResponse, responseBody)
 		return apiResponse, err
 	}
+	return apiResponse, nil
+}
+
+// Download -
+func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err error) {
+
+	req, err := http.NewRequest(http.MethodGet, c.URI+path, nil)
+	// Setting headers if needed
+	c.setCredential(c.URI+path, req)
+	contentType := "text/csv;"
+	req.Header.Add("Content-Type", contentType)
+	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
+
+	response, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+	apiResponse := &checkout.StatusResponse{
+		Status:     response.Status,
+		StatusCode: response.StatusCode,
+	}
+	reader := csv.NewReader(response.Body)
+	data, err := reader.ReadAll()
+	if err != nil {
+		return apiResponse, err
+	}
+	apiResponse.ResponseCSV = data
 	return apiResponse, nil
 }
 

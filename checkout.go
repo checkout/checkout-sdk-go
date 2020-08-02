@@ -40,9 +40,10 @@ func create(secretKey string, useSandbox bool) Config {
 
 // StatusResponse ...
 type StatusResponse struct {
-	Status       string `json:"status,omitempty"`
-	StatusCode   int    `json:"status_code,omitempty"`
-	ResponseBody []byte `json:"response_body,omitempty"`
+	Status       string     `json:"status,omitempty"`
+	StatusCode   int        `json:"status_code,omitempty"`
+	ResponseBody []byte     `json:"response_body,omitempty"`
+	ResponseCSV  [][]string `json:"response_csv,omitempty"`
 }
 
 // HTTPClient ...
@@ -53,6 +54,7 @@ type HTTPClient interface {
 	Patch(param string, request interface{}) (*StatusResponse, error)
 	Delete(param string) (*StatusResponse, error)
 	Upload(param, boundary string, body *bytes.Buffer) (*StatusResponse, error)
+	Download(path string) (*StatusResponse, error)
 }
 
 // StringValue returns the value of the string pointer passed in or

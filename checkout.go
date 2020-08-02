@@ -44,6 +44,13 @@ type StatusResponse struct {
 	StatusCode   int        `json:"status_code,omitempty"`
 	ResponseBody []byte     `json:"response_body,omitempty"`
 	ResponseCSV  [][]string `json:"response_csv,omitempty"`
+	Headers      *Headers   `json:"headers,omitempty"`
+}
+
+// Headers ...
+type Headers struct {
+	CKORequestID string `json:"cko-request-id,omitempty"`
+	CKOVersion   string `json:"cko-version,omitempty"`
 }
 
 // HTTPClient ...

@@ -80,6 +80,7 @@ func (c *Client) RetrieveWebhook(webhookID string) (*Response, error) {
 
 // UpdateWebhook ...
 func (c *Client) UpdateWebhook(webhookID string, request *Request) (*Response, error) {
+
 	resp, err := c.API.Put(fmt.Sprintf("/%v/%v", path, webhookID), request)
 	response := &Response{
 		StatusResponse: resp,

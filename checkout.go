@@ -1,6 +1,8 @@
 package checkout
 
-import "bytes"
+import (
+	"bytes"
+)
 
 // ClientVersion ...
 const ClientVersion = "0.0.1"
@@ -16,11 +18,14 @@ var DefaultConfig = Config{
 }
 
 // Create ...
-func Create(secretKey string, useSandbox bool, publicKey *string) Config {
+func Create(secretKey string, useSandbox bool, publicKey *string, idempotencyKey *string) Config {
 
 	var config = create(secretKey, useSandbox)
 	if publicKey != nil {
 		config.PublicKey = *publicKey
+	}
+	if idempotencyKey != nil {
+		config.IdempotencyKey = *idempotencyKey
 	}
 	return config
 }
@@ -49,8 +54,8 @@ type StatusResponse struct {
 
 // Headers ...
 type Headers struct {
-	CKORequestID string `json:"cko-request-id,omitempty"`
-	CKOVersion   string `json:"cko-version,omitempty"`
+	CKORequestID *string `json:"cko-request-id,omitempty"`
+	CKOVersion   *string `json:"cko-version,omitempty"`
 }
 
 // HTTPClient ...
@@ -64,6 +69,11 @@ type HTTPClient interface {
 	Download(path string) (*StatusResponse, error)
 }
 
+// String returns a pointer to the string value passed in.
+func String(v string) *string {
+	return &v
+}
+
 // StringValue returns the value of the string pointer passed in or
 // "" if the pointer is nil.
 func StringValue(v *string) string {
@@ -71,4 +81,13 @@ func StringValue(v *string) string {
 		return *v
 	}
 	return ""
+}
+
+// StringSlice returns a slice of string pointers given a slice of strings.
+func StringSlice(v []string) []*string {
+	out := make([]*string, len(v))
+	for i := range v {
+		out[i] = &v[i]
+	}
+	return out
 }

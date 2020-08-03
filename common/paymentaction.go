@@ -1,0 +1,23 @@
+package common
+
+// PaymentStatus ...
+type PaymentAction string
+
+const (
+	// Authorized ...
+	Authorized PaymentAction = "Authorized"
+	// Pending ...
+	Pending PaymentAction = "Pending"
+	// CardVerified ...
+	CardVerified PaymentAction = "Card Verified"
+	// Captured ...
+	Captured PaymentAction = "Captured"
+	// Declined ...
+	Declined PaymentAction = "Declined"
+	// Paid ...
+	Paid PaymentAction = "Paid"
+)
+
+func (c PaymentAction) String() string {
+	return string(c)
+}

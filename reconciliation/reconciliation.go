@@ -68,8 +68,8 @@ type (
 		ChannelName        string                 `json:"channel_name,omitempty"`
 		Reference          string                 `json:"reference,omitempty"`
 		PaymentMethod      string                 `json:"payment_method,omitempty"`
-		CardType           string                 `json:"card_type,omitempty"`
-		CardCategory       string                 `json:"card_category,omitempty"`
+		CardType           common.CardType        `json:"card_type,omitempty"`
+		CardCategory       common.CardCategory    `json:"card_category,omitempty"`
 		IssuerCountry      string                 `json:"issuer_country,omitempty"`
 		MerchantCountry    string                 `json:"merchant_country,omitempty"`
 		MID                string                 `json:"mid,omitempty"`

@@ -2,9 +2,9 @@ package common
 
 // ErrorDetails ...
 type ErrorDetails struct {
-	RequestID  string   `json:"request_id,"`
-	ErrorType  string   `json:"error_type"`
-	ErrorCodes []string `json:"error_codes"`
+	RequestID  string   `json:"request_id,omitempty"`
+	ErrorType  string   `json:"error_type,omitempty"`
+	ErrorCodes []string `json:"error_codes,omitempty"`
 }
 
 // Error ...

@@ -11,6 +11,6 @@ type CapturesRequest struct {
 
 // CapturesResponse ...
 type CapturesResponse struct {
-	StatusResponse *checkout.StatusResponse
-	Accepted       *Accepted
+	StatusResponse *checkout.StatusResponse `json:"api_response,omitempty"`
+	Accepted       *Accepted                `json:"accepted,omitempty"`
 }

@@ -10,4 +10,6 @@ const (
 	Debit CardType = "Debit"
 	// Prepaid ...
 	Prepaid CardType = "Prepaid"
+	// Charge ...
+	Charge CardType = "Charge"
 )

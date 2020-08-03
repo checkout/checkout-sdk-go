@@ -17,7 +17,7 @@ type (
 		Amount            uint64             `json:"amount,omitempty"`
 		Currency          string             `json:"currency"`
 		Reference         string             `json:"reference,omitempty"`
-		PaymentType       string             `json:"payment_type,omitempty"`
+		PaymentType       common.PaymentType `json:"payment_type,omitempty"`
 		Description       string             `json:"description,omitempty"`
 		Capture           *bool              `json:"capture,omitempty"`
 		CaptureOn         *time.Time         `json:"capture_on,omitempty"`
@@ -526,7 +526,7 @@ type (
 		Amount            uint64                 `json:"amount,omitempty"`
 		Currency          string                 `json:"currency,omitempty"`
 		Approved          *bool                  `json:"approved,omitempty"`
-		Status            string                 `json:"status,omitempty"`
+		Status            common.PaymentAction   `json:"status,omitempty"`
 		AuthCode          string                 `json:"auth_code,omitempty"`
 		ResponseCode      string                 `json:"response_code,omitempty"`
 		ResponseSummary   string                 `json:"response_summary,omitempty"`
@@ -546,7 +546,7 @@ type (
 	// PaymentPending ...
 	PaymentPending struct {
 		ID        string                 `json:"id,omitempty"`
-		Status    string                 `json:"status,omitempty"`
+		Status    common.PaymentAction   `json:"status,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Customer  *Customer              `json:"customer,omitempty"`
 		ThreeDS   *ThreeDSEnrollment     `json:"3ds,omitempty"`
@@ -559,27 +559,27 @@ type (
 	}
 	// Payment ...
 	Payment struct {
-		ID                string             `json:"id,omitempty"`
-		RequestedOn       time.Time          `json:"requested_on,omitempty"`
-		Source            *SourceResponse    `json:"source,omitempty"`
-		Amount            uint64             `json:"amount,omitempty"`
-		Currency          string             `json:"currency,omitempty"`
-		PaymentType       string             `json:"payment_type,omitempty"`
-		Reference         string             `json:"reference,omitempty"`
-		Description       string             `json:"description,omitempty"`
-		Approved          *bool              `json:"approved,omitempty"`
-		Status            string             `json:"status,omitempty"`
-		ThreeDS           *ThreeDSEnrollment `json:"3ds,omitempty"`
-		Risk              *RiskAssessment    `json:"risk,omitempty"`
-		Customer          *Customer          `json:"customer,omitempty"`
-		BillingDescriptor *BillingDescriptor `json:"billing_descriptor,omitempty"`
-		Shipping          *Shipping          `json:"shipping,omitempty"`
-		PaymentIP         string             `json:"payment_ip,omitempty"`
-		Recipient         *Recipient         `json:"recipient,omitempty"`
-		Metadata          map[string]string  `json:"metadata,omitempty"`
-		ECI               string             `json:"eci,omitempty"`
-		Actions           []ActionSummary    `json:"actions,omitempty"`
-		SchemeID          string             `json:"scheme_id,omitempty"`
+		ID                string               `json:"id,omitempty"`
+		RequestedOn       time.Time            `json:"requested_on,omitempty"`
+		Source            *SourceResponse      `json:"source,omitempty"`
+		Amount            uint64               `json:"amount,omitempty"`
+		Currency          string               `json:"currency,omitempty"`
+		PaymentType       common.PaymentType   `json:"payment_type,omitempty"`
+		Reference         string               `json:"reference,omitempty"`
+		Description       string               `json:"description,omitempty"`
+		Approved          *bool                `json:"approved,omitempty"`
+		Status            common.PaymentAction `json:"status,omitempty"`
+		ThreeDS           *ThreeDSEnrollment   `json:"3ds,omitempty"`
+		Risk              *RiskAssessment      `json:"risk,omitempty"`
+		Customer          *Customer            `json:"customer,omitempty"`
+		BillingDescriptor *BillingDescriptor   `json:"billing_descriptor,omitempty"`
+		Shipping          *Shipping            `json:"shipping,omitempty"`
+		PaymentIP         string               `json:"payment_ip,omitempty"`
+		Recipient         *Recipient           `json:"recipient,omitempty"`
+		Metadata          map[string]string    `json:"metadata,omitempty"`
+		ECI               string               `json:"eci,omitempty"`
+		Actions           []ActionSummary      `json:"actions,omitempty"`
+		SchemeID          string               `json:"scheme_id,omitempty"`
 	}
 	// SourceResponse ...
 	SourceResponse struct {
@@ -588,28 +588,28 @@ type (
 	}
 	// CardSourceResponse ...
 	CardSourceResponse struct {
-		ID                      string          `json:"id,omitempty"`
-		Type                    string          `json:"type,omitempty"`
-		BillingAddress          *common.Address `json:"billing_address,omitempty"`
-		Phone                   *common.Phone   `json:"phone,omitempty"`
-		ExpiryMonth             uint64          `json:"expiry_month,omitempty"`
-		ExpiryYear              uint64          `json:"expiry_year,omitempty"`
-		Name                    string          `json:"name,omitempty"`
-		Scheme                  string          `json:"scheme,omitempty"`
-		Last4                   string          `json:"last4,omitempty"`
-		Fingerprint             string          `json:"fingerprint,omitempty"`
-		Bin                     string          `json:"bin,omitempty"`
-		CardType                string          `json:"card_type,omitempty"`
-		CardCategory            string          `json:"card_category,omitempty"`
-		Issuer                  string          `json:"issuer,omitempty"`
-		IssuerCountry           string          `json:"issuer_country,omitempty"`
-		ProductID               string          `json:"product_id,omitempty"`
-		ProductType             string          `json:"product_type,omitempty"`
-		AVSCheck                string          `json:"avs_check,omitempty"`
-		CVVCheck                string          `json:"cvv_check,omitempty"`
-		PaymentAccountReference string          `json:"payment_account_reference,omitempty"`
-		Payouts                 *bool           `json:"payouts,omitempty"`
-		FastFunds               string          `json:"fast_funds,omitempty"`
+		ID                      string              `json:"id,omitempty"`
+		Type                    string              `json:"type,omitempty"`
+		BillingAddress          *common.Address     `json:"billing_address,omitempty"`
+		Phone                   *common.Phone       `json:"phone,omitempty"`
+		ExpiryMonth             uint64              `json:"expiry_month,omitempty"`
+		ExpiryYear              uint64              `json:"expiry_year,omitempty"`
+		Name                    string              `json:"name,omitempty"`
+		Scheme                  string              `json:"scheme,omitempty"`
+		Last4                   string              `json:"last4,omitempty"`
+		Fingerprint             string              `json:"fingerprint,omitempty"`
+		Bin                     string              `json:"bin,omitempty"`
+		CardType                common.CardType     `json:"card_type,omitempty"`
+		CardCategory            common.CardCategory `json:"card_category,omitempty"`
+		Issuer                  string              `json:"issuer,omitempty"`
+		IssuerCountry           string              `json:"issuer_country,omitempty"`
+		ProductID               string              `json:"product_id,omitempty"`
+		ProductType             string              `json:"product_type,omitempty"`
+		AVSCheck                string              `json:"avs_check,omitempty"`
+		CVVCheck                string              `json:"cvv_check,omitempty"`
+		PaymentAccountReference string              `json:"payment_account_reference,omitempty"`
+		Payouts                 *bool               `json:"payouts,omitempty"`
+		FastFunds               string              `json:"fast_funds,omitempty"`
 	}
 
 	// AlternativePaymentSourceResponse ...
@@ -622,20 +622,20 @@ type (
 
 	// DestinationResponse -
 	DestinationResponse struct {
-		ID            string `json:"id,omitempty"`
-		Type          string `json:"type,omitempty"`
-		ExpiryMonth   uint64 `json:"expiry_month,omitempty"`
-		ExpiryYear    uint64 `json:"expiry_year,omitempty"`
-		Scheme        string `json:"scheme,omitempty"`
-		Last4         string `json:"last4,omitempty"`
-		Fingerprint   string `json:"fingerprint,omitempty"`
-		Bin           string `json:"bin,omitempty"`
-		CardType      string `json:"card_type,omitempty"`
-		CardCategory  string `json:"card_category,omitempty"`
-		Issuer        string `json:"issuer,omitempty"`
-		IssuerCountry string `json:"issuer_country,omitempty"`
-		ProductID     string `json:"product_id,omitempty"`
-		ProductType   string `json:"product_type,omitempty"`
+		ID            string              `json:"id,omitempty"`
+		Type          string              `json:"type,omitempty"`
+		ExpiryMonth   uint64              `json:"expiry_month,omitempty"`
+		ExpiryYear    uint64              `json:"expiry_year,omitempty"`
+		Scheme        string              `json:"scheme,omitempty"`
+		Last4         string              `json:"last4,omitempty"`
+		Fingerprint   string              `json:"fingerprint,omitempty"`
+		Bin           string              `json:"bin,omitempty"`
+		CardType      common.CardType     `json:"card_type,omitempty"`
+		CardCategory  common.CardCategory `json:"card_category,omitempty"`
+		Issuer        string              `json:"issuer,omitempty"`
+		IssuerCountry string              `json:"issuer_country,omitempty"`
+		ProductID     string              `json:"product_id,omitempty"`
+		ProductType   string              `json:"product_type,omitempty"`
 	}
 )
 

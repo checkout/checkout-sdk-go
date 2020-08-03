@@ -17,19 +17,19 @@ type (
 
 	// Card -
 	Card struct {
-		Type           common.PaymentType `json:"type" binding:"required"`
-		Number         string             `json:"number" binding:"required"`
-		ExpiryMonth    uint64             `json:"expiry_month" binding:"required"`
-		ExpiryYear     uint64             `json:"expiry_year" binding:"required"`
-		Name           string             `json:"name,omitempty"`
-		CVV            string             `json:"cvv,omitempty"`
-		BillingAddress *common.Address    `json:"billing_address,omitempty"`
-		Phone          *common.Phone      `json:"phone,omitempty"`
+		Type           common.TokenType `json:"type" binding:"required"`
+		Number         string           `json:"number" binding:"required"`
+		ExpiryMonth    uint64           `json:"expiry_month" binding:"required"`
+		ExpiryYear     uint64           `json:"expiry_year" binding:"required"`
+		Name           string           `json:"name,omitempty"`
+		CVV            string           `json:"cvv,omitempty"`
+		BillingAddress *common.Address  `json:"billing_address,omitempty"`
+		Phone          *common.Phone    `json:"phone,omitempty"`
 	}
 
 	// Wallet -
 	Wallet struct {
-		Type      common.PaymentType     `json:"type" binding:"required"`
+		Type      common.TokenType       `json:"type" binding:"required"`
 		TokenData map[string]interface{} `json:"token_data" binding:"required"`
 	}
 )
@@ -80,19 +80,19 @@ type (
 
 	// Created -
 	Created struct {
-		Type          string    `json:"type,omitempty"`
-		Token         string    `json:"token" binding:"required"`
-		ExpiresOn     time.Time `json:"expires_on,omitempty"`
-		ExpiryMonth   uint64    `json:"expiry_month,omitempty"`
-		ExpiryYear    uint64    `json:"expiry_year,omitempty"`
-		Scheme        string    `json:"scheme,omitempty"`
-		Last4         string    `json:"last4,omitempty"`
-		Bin           string    `json:"bin,omitempty"`
-		CardType      string    `json:"card_type,omitempty"`
-		CardCategory  string    `json:"card_category,omitempty"`
-		Issuer        string    `json:"issuer,omitempty"`
-		IssuerCountry string    `json:"issuer_country,omitempty"`
-		ProductID     string    `json:"product_id,omitempty"`
-		ProductType   string    `json:"product_type,omitempty"`
+		Type          string              `json:"type,omitempty"`
+		Token         string              `json:"token" binding:"required"`
+		ExpiresOn     time.Time           `json:"expires_on,omitempty"`
+		ExpiryMonth   uint64              `json:"expiry_month,omitempty"`
+		ExpiryYear    uint64              `json:"expiry_year,omitempty"`
+		Scheme        string              `json:"scheme,omitempty"`
+		Last4         string              `json:"last4,omitempty"`
+		Bin           string              `json:"bin,omitempty"`
+		CardType      common.CardType     `json:"card_type,omitempty"`
+		CardCategory  common.CardCategory `json:"card_category,omitempty"`
+		Issuer        string              `json:"issuer,omitempty"`
+		IssuerCountry string              `json:"issuer_country,omitempty"`
+		ProductID     string              `json:"product_id,omitempty"`
+		ProductType   string              `json:"product_type,omitempty"`
 	}
 )

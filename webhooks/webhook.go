@@ -12,11 +12,11 @@ type (
 	}
 	// Webhook ...
 	Webhook struct {
-		URL         string   `json:"url,omitempty"`
-		Active      *bool    `json:"active,omitempty"`
-		Headers     *Headers `json:"headers,omitempty"`
-		ContentType string   `json:"content_type,omitempty"`
-		EventTypes  []string `json:"event_types,omitempty"`
+		URL         string                    `json:"url,omitempty"`
+		Active      *bool                     `json:"active,omitempty"`
+		Headers     *Headers                  `json:"headers,omitempty"`
+		ContentType common.WebhookContentType `json:"content_type,omitempty"`
+		EventTypes  []string                  `json:"event_types,omitempty"`
 	}
 	// Headers ...
 	Headers struct {
@@ -34,13 +34,13 @@ type (
 
 	// WebhookResponse -
 	WebhookResponse struct {
-		ID          string                 `json:"id,omitempty"`
-		URL         string                 `json:"url,omitempty"`
-		Active      *bool                  `json:"active,omitempty"`
-		Headers     *Headers               `json:"headers,omitempty"`
-		ContentType string                 `json:"content_type,omitempty"`
-		EventTypes  []string               `json:"event_types,omitempty"`
-		Links       map[string]common.Link `json:"_links,omitempty"`
-		Version     string                 `json:"version,omitempty"`
+		ID          string                    `json:"id,omitempty"`
+		URL         string                    `json:"url,omitempty"`
+		Active      *bool                     `json:"active,omitempty"`
+		Headers     *Headers                  `json:"headers,omitempty"`
+		ContentType common.WebhookContentType `json:"content_type,omitempty"`
+		EventTypes  []string                  `json:"event_types,omitempty"`
+		Links       map[string]common.Link    `json:"_links,omitempty"`
+		Version     string                    `json:"version,omitempty"`
 	}
 )

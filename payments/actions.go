@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/shiuh-yaw-cko/checkout"
+	"github.com/shiuh-yaw-cko/checkout/common"
 )
 
 const (
@@ -36,25 +37,25 @@ const (
 type (
 	// ActionsResponse ...
 	ActionsResponse struct {
-		StatusResponse *checkout.StatusResponse
-		Actions        []*Action
+		StatusResponse *checkout.StatusResponse `json:"api_response,omitempty"`
+		Actions        []*Action                `json:"actions,omitempty"`
 	}
 )
 
 type (
 	// Action ...
 	Action struct {
-		ID              string            `json:"id,omitempty"`
-		Type            string            `json:"type,omitempty"`
-		ProcessedOn     time.Time         `json:"processed_on,omitempty"`
-		Amount          uint64            `json:"amount,omitempty"`
-		Approved        *bool             `json:"approved,omitempty"`
-		AuthCode        string            `json:"auth_code,omitempty"`
-		Reference       string            `json:"reference,omitempty"`
-		ResponseCode    string            `json:"response_code,omitempty"`
-		ResponseSummary *string           `json:"response_summary,omitempty"`
-		Processing      *Processing       `json:"processing,omitempty"`
-		Metadata        map[string]string `json:"metadata,omitempty"`
+		ID              string               `json:"id,omitempty"`
+		Type            common.PaymentAction `json:"type,omitempty"`
+		ProcessedOn     time.Time            `json:"processed_on,omitempty"`
+		Amount          uint64               `json:"amount,omitempty"`
+		Approved        *bool                `json:"approved,omitempty"`
+		AuthCode        string               `json:"auth_code,omitempty"`
+		Reference       string               `json:"reference,omitempty"`
+		ResponseCode    string               `json:"response_code,omitempty"`
+		ResponseSummary *string              `json:"response_summary,omitempty"`
+		Processing      *Processing          `json:"processing,omitempty"`
+		Metadata        map[string]string    `json:"metadata,omitempty"`
 	}
 	// ActionSummary ...
 	ActionSummary struct {

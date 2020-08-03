@@ -2,8 +2,10 @@ package httpclient
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -48,12 +50,18 @@ func (nopReadCloser) Close() error { return nil }
 
 // NewClient ...
 func NewClient(config checkout.Config) *HTTPClient {
+
 	client = &HTTPClient{
 		PublicKey:      config.PublicKey,
 		SecretKey:      config.SecretKey,
 		URI:            config.URI,
 		IdempotencyKey: config.IdempotencyKey,
-		HTTPClient:     &http.Client{Timeout: defaultHTTPTimeout},
+		HTTPClient: &http.Client{
+			Timeout: defaultHTTPTimeout,
+			Transport: &http.Transport{
+				TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
+			},
+		},
 	}
 	return client
 }
@@ -61,23 +69,28 @@ func NewClient(config checkout.Config) *HTTPClient {
 // Get ...
 func (c *HTTPClient) Get(param string) (*checkout.StatusResponse, error) {
 
-	request, err := http.NewRequest(http.MethodGet, c.URI+param, nil)
+	request, err := c.NewRequest(http.MethodGet, c.URI+param, nil)
 	if err != nil {
 		return nil, err
 	}
 	c.setHeader(request)
+	c.setUserAgent(request)
 	c.setCredential(c.URI+param, request)
+	c.setIdempotencyKey(request)
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
+
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -99,17 +112,25 @@ func (c *HTTPClient) Post(param string, body interface{}) (*checkout.StatusRespo
 	if err != nil {
 		return nil, err
 	}
+	c.setHeader(request)
+	c.setUserAgent(request)
+	c.setCredential(c.URI+param, request)
+	c.setIdempotencyKey(request)
+
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -127,17 +148,21 @@ func (c *HTTPClient) Post(param string, body interface{}) (*checkout.StatusRespo
 // NewRequest ...
 func (c *HTTPClient) NewRequest(method, path string, body interface{}) (*http.Request, error) {
 
-	requestBody, err := json.Marshal(body)
+	if body != nil {
+		requestBody, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		request, err := http.NewRequest(method, path, bytes.NewBuffer(requestBody))
+		if err != nil {
+			return nil, err
+		}
+		return request, nil
+	}
+	request, err := http.NewRequest(method, path, nil)
 	if err != nil {
 		return nil, err
 	}
-	request, err := http.NewRequest(method, path, bytes.NewBuffer(requestBody))
-	if err != nil {
-		return nil, err
-	}
-	c.setHeader(request)
-	c.setCredential(path, request)
-	c.setIdempotencyKey(request)
 	return request, nil
 }
 
@@ -145,32 +170,36 @@ func (c *HTTPClient) NewRequest(method, path string, body interface{}) (*http.Re
 func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (resp *checkout.StatusResponse, err error) {
 
 	contentType := "multipart/form-data; boundary=" + boundary
-	req, err := http.NewRequest(http.MethodPost, c.URI+path, nil)
+	request, err := c.NewRequest(http.MethodPost, c.URI+path, nil)
 	if err != nil {
 		return nil, err
 	}
 	if body != nil {
 		reader := bytes.NewReader(body.Bytes())
-		req.Body = nopReadCloser{reader}
-		req.GetBody = func() (io.ReadCloser, error) {
+		request.Body = nopReadCloser{reader}
+		request.GetBody = func() (io.ReadCloser, error) {
 			reader := bytes.NewReader(body.Bytes())
 			return nopReadCloser{reader}, nil
 		}
 	}
-	c.setCredential(c.URI+path, req)
-	req.Header.Add("Content-Type", contentType)
-	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
-	response, err := c.HTTPClient.Do(req)
+	c.setCredential(c.URI+path, request)
+	c.setIdempotencyKey(request)
+	c.setUserAgent(request)
+	request.Header.Add("Content-Type", contentType)
+	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
+
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -188,24 +217,27 @@ func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (r
 // Download -
 func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err error) {
 
-	req, err := http.NewRequest(http.MethodGet, c.URI+path, nil)
+	request, err := c.NewRequest(http.MethodGet, c.URI+path, nil)
 	// Setting headers if needed
-	c.setCredential(c.URI+path, req)
-	contentType := "text/csv;"
-	req.Header.Add("Content-Type", contentType)
-	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
+	c.setCredential(c.URI+path, request)
+	c.setUserAgent(request)
+	c.setIdempotencyKey(request)
+	request.Header.Add("Content-Type", "text/csv;")
 
-	response, err := c.HTTPClient.Do(req)
+	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
+
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	reader := csv.NewReader(response.Body)
@@ -226,9 +258,12 @@ func (c *HTTPClient) setCredential(path string, req *http.Request) {
 	}
 }
 
+func (c *HTTPClient) setUserAgent(req *http.Request) {
+	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
+}
+
 func (c *HTTPClient) setHeader(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
 }
 
 func (c *HTTPClient) setIdempotencyKey(req *http.Request) {
@@ -250,23 +285,28 @@ func responseToError(apiRes *checkout.StatusResponse, body []byte) *common.Error
 // Delete ...
 func (c *HTTPClient) Delete(param string) (*checkout.StatusResponse, error) {
 
-	request, err := http.NewRequest(http.MethodDelete, c.URI+param, nil)
+	request, err := c.NewRequest(http.MethodDelete, c.URI+param, nil)
 	if err != nil {
 		return nil, err
 	}
 	c.setHeader(request)
+	c.setUserAgent(request)
 	c.setCredential(c.URI+param, request)
+	c.setIdempotencyKey(request)
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -288,17 +328,24 @@ func (c *HTTPClient) Put(param string, body interface{}) (*checkout.StatusRespon
 	if err != nil {
 		return nil, err
 	}
+	c.setHeader(request)
+	c.setUserAgent(request)
+	c.setCredential(c.URI+param, request)
+
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -320,17 +367,25 @@ func (c *HTTPClient) Patch(param string, body interface{}) (*checkout.StatusResp
 	if err != nil {
 		return nil, err
 	}
+	c.setHeader(request)
+	c.setUserAgent(request)
+	c.setCredential(c.URI+param, request)
+	c.setIdempotencyKey(request)
+
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
+	ckoRequestID := response.Header.Get(ckoRequestID)
+	ckoVersion := response.Header.Get(ckoVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: response.Header.Get(ckoRequestID),
-			CKOVersion:   response.Header.Get(ckoVersion),
+			CKORequestID: &ckoRequestID,
+			CKOVersion:   &ckoVersion,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)

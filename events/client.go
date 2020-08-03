@@ -71,6 +71,7 @@ func (c *Client) RetrieveEvents(request *Request) (*Response, error) {
 
 // RetrieveEvent -
 func (c *Client) RetrieveEvent(eventID string) (*Response, error) {
+
 	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, eventID))
 	response := &Response{
 		StatusResponse: resp,

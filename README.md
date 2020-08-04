@@ -4,7 +4,7 @@
 
 The official [Checkout][checkout] Go client library.
 
-## Installation
+## :rocket: Installation
 
 Make sure your project is using Go Modules (it will have a `go.mod` file in its
 root if it already is):
@@ -25,7 +25,7 @@ Run any of the normal `go` commands (`build`/`install`/`test`). The Go
 toolchain will resolve and fetch the stripe-go module automatically.
 
 
-# :book: Documentation
+## :book: Documentation
 
 You can see the [SDK documentation here][api-docs].
 

@@ -2,8 +2,11 @@ package checkout
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"regexp"
+	"time"
 
 	"github.com/shiuh-yaw-cko/checkout/common"
 )
@@ -126,4 +129,12 @@ func StringSlice(v []string) []*string {
 		out[i] = &v[i]
 	}
 	return out
+}
+
+// NewIdempotencyKey -
+func NewIdempotencyKey() string {
+	now := time.Now().UnixNano()
+	buf := make([]byte, 4)
+	rand.Read(buf)
+	return fmt.Sprintf("%v_%v", now, base64.URLEncoding.EncodeToString(buf)[:6])
 }

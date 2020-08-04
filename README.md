@@ -27,7 +27,7 @@ toolchain will resolve and fetch the stripe-go module automatically.
 
 # :book: Documentation
 
-You can see the [SDK documentation here][api-docs]].
+You can see the [SDK documentation here][api-docs].
 
 For details on all the functionality in this library, see the [GoDoc][godoc]
 documentation.
@@ -207,7 +207,6 @@ request := &payments.RefundsRequest{
 response, err := client.Refunds("pay_", request)
 ```
 
-
 [api-docs]: https://api-reference.checkout.com/
-[stripe]: https://checkout.com
+[checkout]: https://checkout.com
 [godoc]: http://godoc.org/github.com/checkout/checkout-sdk-go

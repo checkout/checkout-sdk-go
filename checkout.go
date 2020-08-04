@@ -2,6 +2,10 @@ package checkout
 
 import (
 	"bytes"
+	"fmt"
+	"regexp"
+
+	"github.com/shiuh-yaw-cko/checkout/common"
 )
 
 // ClientVersion ...
@@ -18,29 +22,61 @@ var DefaultConfig = Config{
 }
 
 // Create ...
-func Create(secretKey string, useSandbox bool, publicKey *string, idempotencyKey *string) Config {
+func Create(secretKey string, useSandbox bool, publicKey *string, idempotencyKey *string) (*Config, error) {
 
 	var config = create(secretKey, useSandbox)
-	if publicKey != nil {
-		config.PublicKey = *publicKey
+	if config != nil {
+		if idempotencyKey != nil {
+			config.IdempotencyKey = idempotencyKey
+		}
+		if publicKey != nil {
+			if useSandbox {
+				var publicKeyMatch = regexp.MustCompile(common.SandboxPublicKeyRegex)
+				fmt.Println("SandboxPublicKeyRegex: ", common.SandboxPublicKeyRegex)
+				if publicKeyMatch.MatchString(StringValue(publicKey)) {
+					config.PublicKey = StringValue(publicKey)
+					return config, nil
+				}
+			} else {
+				var publicKeyMatch = regexp.MustCompile(common.LivePublicKeyRegex)
+				if publicKeyMatch.MatchString(StringValue(publicKey)) {
+					config.PublicKey = StringValue(publicKey)
+					return config, nil
+				}
+			}
+			return config, &common.Error{
+				Status: "Configuration Error - Please review your secret key and public key ",
+			}
+		}
+		return config, &common.Error{
+			Status: "Configuration Error - Please review your secret key and public key ",
+		}
 	}
-	if idempotencyKey != nil {
-		config.IdempotencyKey = *idempotencyKey
+	return config, &common.Error{
+		Status: "Configuration Error - Please review your secret key and public key ",
 	}
-	return config
 }
 
-func create(secretKey string, useSandbox bool) Config {
+func create(secretKey string, useSandbox bool) *Config {
 	if useSandbox {
-		return Config{
-			URI:       sandboxURI,
+		var secretKeyMatch = regexp.MustCompile(common.SandboxSecretKeyRegex)
+		fmt.Println("SandboxSecretKeyRegex: ", common.SandboxSecretKeyRegex)
+		if secretKeyMatch.MatchString(secretKey) {
+			return &Config{
+				URI:       sandboxURI,
+				SecretKey: secretKey,
+			}
+		}
+		return nil
+	}
+	var secretKeyMatch = regexp.MustCompile(common.LiveSecretKeyRegex)
+	if secretKeyMatch.MatchString(secretKey) {
+		return &Config{
+			URI:       productionURI,
 			SecretKey: secretKey,
 		}
 	}
-	return Config{
-		URI:       productionURI,
-		SecretKey: secretKey,
-	}
+	return nil
 }
 
 // StatusResponse ...

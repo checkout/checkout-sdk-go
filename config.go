@@ -5,6 +5,6 @@ type Config struct {
 	PublicKey         string
 	SecretKey         string
 	URI               string
-	IdempotencyKey    string
+	IdempotencyKey    *string
 	CancellationToken string
 }

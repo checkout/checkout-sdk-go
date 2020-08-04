@@ -54,7 +54,7 @@ func NewClient(config checkout.Config) *HTTPClient {
 		PublicKey:      config.PublicKey,
 		SecretKey:      config.SecretKey,
 		URI:            config.URI,
-		IdempotencyKey: config.IdempotencyKey,
+		IdempotencyKey: checkout.StringValue(config.IdempotencyKey),
 		HTTPClient: &http.Client{
 			Timeout: defaultHTTPTimeout,
 			Transport: &http.Transport{

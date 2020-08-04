@@ -1,4 +1,4 @@
-# Go Checkout
+# Checkout.com Go
 
 ![Status](https://img.shields.io/badge/status-BETA-red.svg)
 
@@ -22,7 +22,7 @@ import (
 ```
 
 Run any of the normal `go` commands (`build`/`install`/`test`). The Go
-toolchain will resolve and fetch the stripe-go module automatically.
+toolchain will resolve and fetch the checkout-sdk-go module automatically.
 
 
 ## :book: Documentation

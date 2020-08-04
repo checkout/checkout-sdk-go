@@ -115,7 +115,7 @@ var client = payments.NewClient(*config)
 response, err := client.Get("pay_")
 ```
 
-### Payment Actions
+### Actions
 
 ```go
 import (
@@ -133,7 +133,7 @@ var client = payments.NewClient(*config)
 response, err := client.Actions("pay_")
 ```
 
-### Payment Capture
+### Captures
 
 ```go
 import (
@@ -158,7 +158,7 @@ request := &payments.CapturesRequest{
 response, err := client.Captures("pay_", request)
 ```
 
-### Payment Voids
+### Voids
 
 ```go
 import (
@@ -182,7 +182,7 @@ request := &payments.VoidsRequest{
 response, err := client.Voids("pay_", request)
 ```
 
-### Payment Refunds
+### Refunds
 
 ```go
 import (

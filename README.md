@@ -44,7 +44,6 @@ individual key.
 import (
     "github.com/shiuh-yaw-cko/checkout"
     "github.com/shiuh-yaw-cko/checkout/client"
-    uuid "github.com/google/uuid"
 )
 
 api := &client.API{}
@@ -56,10 +55,10 @@ api.Init(secretKey, true, &publicKey)
 ```go
 import (
     "github.com/checkout/checkout-sdk-go"
-    uuid "github.com/google/uuid"
+    "github.com/checkout/checkout-sdk-go/tokens"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 con:q!fig, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
@@ -85,10 +84,9 @@ response, err := client.Request(request)
 import (
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/payments"
-    uuid "github.com/google/uuid"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
@@ -120,10 +118,9 @@ response, err := client.Request(request)
 import (
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/payments"
-    uuid "github.com/google/uuid"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
@@ -138,10 +135,9 @@ response, err := client.Get("pay_")
 import (
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/payments"
-    uuid "github.com/google/uuid"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
@@ -156,10 +152,9 @@ response, err := client.Actions("pay_")
 import (
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/payments"
-    uuid "github.com/google/uuid"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
@@ -181,10 +176,9 @@ response, err := client.Captures("pay_", request)
 import (
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/payments"
-    uuid "github.com/google/uuid"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
@@ -205,10 +199,9 @@ response, err := client.Voids("pay_", request)
 import (
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/payments"
-    uuid "github.com/google/uuid"
 )
 
-idempotencyKey := uuid.New().String()
+idempotencyKey := checkout.NewIdempotencyKey()
 config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return

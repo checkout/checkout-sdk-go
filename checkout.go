@@ -35,7 +35,6 @@ func Create(secretKey string, useSandbox bool, publicKey *string, idempotencyKey
 		if publicKey != nil {
 			if useSandbox {
 				var publicKeyMatch = regexp.MustCompile(common.SandboxPublicKeyRegex)
-				fmt.Println("SandboxPublicKeyRegex: ", common.SandboxPublicKeyRegex)
 				if publicKeyMatch.MatchString(StringValue(publicKey)) {
 					config.PublicKey = StringValue(publicKey)
 					return config, nil
@@ -63,7 +62,6 @@ func Create(secretKey string, useSandbox bool, publicKey *string, idempotencyKey
 func create(secretKey string, useSandbox bool) *Config {
 	if useSandbox {
 		var secretKeyMatch = regexp.MustCompile(common.SandboxSecretKeyRegex)
-		fmt.Println("SandboxSecretKeyRegex: ", common.SandboxSecretKeyRegex)
 		if secretKeyMatch.MatchString(secretKey) {
 			return &Config{
 				URI:       sandboxURI,
@@ -108,6 +106,14 @@ type HTTPClient interface {
 	Download(path string) (*StatusResponse, error)
 }
 
+// NewIdempotencyKey -
+func NewIdempotencyKey() string {
+	now := time.Now().UnixNano()
+	buf := make([]byte, 4)
+	rand.Read(buf)
+	return fmt.Sprintf("%v_%v", now, base64.URLEncoding.EncodeToString(buf)[:6])
+}
+
 // String returns a pointer to the string value passed in.
 func String(v string) *string {
 	return &v
@@ -131,10 +137,48 @@ func StringSlice(v []string) []*string {
 	return out
 }
 
-// NewIdempotencyKey -
-func NewIdempotencyKey() string {
-	now := time.Now().UnixNano()
-	buf := make([]byte, 4)
-	rand.Read(buf)
-	return fmt.Sprintf("%v_%v", now, base64.URLEncoding.EncodeToString(buf)[:6])
+// Bool returns a pointer to the bool value passed in.
+func Bool(v bool) *bool {
+	return &v
+}
+
+// BoolValue returns the value of the bool pointer passed in or
+// false if the pointer is nil.
+func BoolValue(v *bool) bool {
+	if v != nil {
+		return *v
+	}
+	return false
+}
+
+// BoolSlice returns a slice of bool pointers given a slice of bools.
+func BoolSlice(v []bool) []*bool {
+	out := make([]*bool, len(v))
+	for i := range v {
+		out[i] = &v[i]
+	}
+	return out
+}
+
+// Float64 returns a pointer to the float64 value passed in.
+func Float64(v float64) *float64 {
+	return &v
+}
+
+// Float64Value returns the value of the float64 pointer passed in or
+// 0 if the pointer is nil.
+func Float64Value(v *float64) float64 {
+	if v != nil {
+		return *v
+	}
+	return 0
+}
+
+// Float64Slice returns a slice of float64 pointers given a slice of float64s.
+func Float64Slice(v []float64) []*float64 {
+	out := make([]*float64, len(v))
+	for i := range v {
+		out[i] = &v[i]
+	}
+	return out
 }

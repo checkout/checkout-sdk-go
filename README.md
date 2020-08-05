@@ -207,6 +207,11 @@ request := &payments.RefundsRequest{
 response, err := client.Refunds("pay_", request)
 ```
 
+For any requests, bug or comments, please [open an issue][issues] or [submit a
+pull request][pulls].
+
+[issues]: https://github.com/checkout/checkout-sdk-go/issues/new
+[pulls]: https://github.com/checkout/checkout-sdk-go/pulls
 [api-docs]: https://api-reference.checkout.com/
 [checkout]: https://checkout.com
 [godoc]: http://godoc.org/github.com/checkout/checkout-sdk-go

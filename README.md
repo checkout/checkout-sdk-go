@@ -34,6 +34,23 @@ documentation.
 
 Below are a few simple examples:
 
+### API
+
+If you're dealing with multiple keys, it is recommended you use `client.API`.
+This allows you to create as many clients as needed, each with their own
+individual key.
+
+```go
+import (
+    "github.com/shiuh-yaw-cko/checkout"
+    "github.com/shiuh-yaw-cko/checkout/client"
+    uuid "github.com/google/uuid"
+)
+
+api := &client.API{}
+api.Init(secretKey, true, &publicKey)
+```
+
 ### Tokens
 
 ```go
@@ -43,7 +60,7 @@ import (
 )
 
 idempotencyKey := uuid.New().String()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+con:q!fig, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }

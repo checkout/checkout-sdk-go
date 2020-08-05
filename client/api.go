@@ -25,9 +25,10 @@ type API struct {
 }
 
 // Init -
-func (a *API) Init(secretKey string, useSandbox bool, publicKey *string, idempotencyKey *string) {
+func (a *API) Init(secretKey string, useSandbox bool, publicKey *string) {
 
-	config, err := checkout.Create(secretKey, useSandbox, publicKey, idempotencyKey)
+	idempotencyKey := checkout.NewIdempotencyKey()
+	config, err := checkout.Create(secretKey, useSandbox, publicKey, &idempotencyKey)
 	if err != nil {
 		return
 	}
@@ -42,9 +43,9 @@ func (a *API) Init(secretKey string, useSandbox bool, publicKey *string, idempot
 }
 
 // New -
-func New(secretKey string, useSandbox bool, publicKey *string, idempotencyKey *string) *API {
+func New(secretKey string, useSandbox bool, publicKey *string) *API {
 
 	api := API{}
-	api.Init(secretKey, useSandbox, publicKey, idempotencyKey)
+	api.Init(secretKey, useSandbox, publicKey)
 	return &api
 }

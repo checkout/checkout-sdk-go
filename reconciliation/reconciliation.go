@@ -130,7 +130,7 @@ type (
 
 	// CurrentPeriodBreakdown -
 	CurrentPeriodBreakdown struct {
-		ProcessedAmount         **float64                `json:"processed_amount,omitempty"`
+		ProcessedAmount         *float64                 `json:"processed_amount,omitempty"`
 		RefundAmount            *float64                 `json:"refund_amount,omitempty"`
 		ChargebackAmount        *float64                 `json:"chargeback_amount,omitempty"`
 		ProcessingFees          *float64                 `json:"processing_fees,omitempty"`

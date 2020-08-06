@@ -47,7 +47,7 @@ import (
 )
 
 api := &client.API{}
-api.Init(secretKey, true, &publicKey)
+api.Init(secretKey, &publicKey)
 ```
 
 ### Tokens
@@ -59,7 +59,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-con:q!fig, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+con:q!fig, err := checkout.Create(secretKe, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }
@@ -87,7 +87,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }
@@ -121,7 +121,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }
@@ -138,7 +138,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }
@@ -155,7 +155,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }
@@ -179,7 +179,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }
@@ -202,7 +202,7 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, true, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
 if err != nil {
     return
 }

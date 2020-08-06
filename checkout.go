@@ -31,6 +31,9 @@ func Create(secretKey string, publicKey *string, idempotencyKey *string) (*Confi
 	if idempotencyKey != nil {
 		config.IdempotencyKey = idempotencyKey
 	}
+	if publicKey == nil {
+		return &config, nil
+	}
 	if !isSandbox {
 		publicKeyMatch := regexp.MustCompile(common.LivePublicKeyRegex)
 		if publicKeyMatch.MatchString(StringValue(publicKey)) {

@@ -28,7 +28,7 @@ type API struct {
 func (a *API) Init(secretKey string, useSandbox bool, publicKey *string) {
 
 	idempotencyKey := checkout.NewIdempotencyKey()
-	config, err := checkout.Create(secretKey, useSandbox, publicKey, &idempotencyKey)
+	config, err := checkout.Create(secretKey, publicKey, &idempotencyKey)
 	if err != nil {
 		return
 	}

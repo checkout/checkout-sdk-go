@@ -25,59 +25,45 @@ var DefaultConfig = Config{
 }
 
 // Create ...
-func Create(secretKey string, useSandbox bool, publicKey *string, idempotencyKey *string) (*Config, error) {
+func Create(secretKey string, publicKey *string, idempotencyKey *string) (*Config, error) {
 
-	var config = create(secretKey, useSandbox)
-	if config != nil {
-		if idempotencyKey != nil {
-			config.IdempotencyKey = idempotencyKey
+	var config, isSandbox = create(secretKey)
+	if idempotencyKey != nil {
+		config.IdempotencyKey = idempotencyKey
+	}
+	if !isSandbox {
+		publicKeyMatch := regexp.MustCompile(common.LivePublicKeyRegex)
+		if publicKeyMatch.MatchString(StringValue(publicKey)) {
+			config.PublicKey = StringValue(publicKey)
+			return &config, nil
 		}
-		if publicKey != nil {
-			if useSandbox {
-				var publicKeyMatch = regexp.MustCompile(common.SandboxPublicKeyRegex)
-				if publicKeyMatch.MatchString(StringValue(publicKey)) {
-					config.PublicKey = StringValue(publicKey)
-					return config, nil
-				}
-			} else {
-				var publicKeyMatch = regexp.MustCompile(common.LivePublicKeyRegex)
-				if publicKeyMatch.MatchString(StringValue(publicKey)) {
-					config.PublicKey = StringValue(publicKey)
-					return config, nil
-				}
-			}
-			return config, &common.Error{
-				Status: "Configuration Error - Please review your secret key and public key ",
-			}
-		}
-		return config, &common.Error{
+		return nil, &common.Error{
 			Status: "Configuration Error - Please review your secret key and public key ",
 		}
 	}
-	return config, &common.Error{
+	publicKeyMatch := regexp.MustCompile(common.SandboxPublicKeyRegex)
+	if publicKeyMatch.MatchString(StringValue(publicKey)) {
+		config.PublicKey = StringValue(publicKey)
+		return &config, nil
+	}
+	return nil, &common.Error{
 		Status: "Configuration Error - Please review your secret key and public key ",
 	}
 }
 
-func create(secretKey string, useSandbox bool) *Config {
-	if useSandbox {
-		var secretKeyMatch = regexp.MustCompile(common.SandboxSecretKeyRegex)
-		if secretKeyMatch.MatchString(secretKey) {
-			return &Config{
-				URI:       sandboxURI,
-				SecretKey: secretKey,
-			}
-		}
-		return nil
-	}
-	var secretKeyMatch = regexp.MustCompile(common.LiveSecretKeyRegex)
-	if secretKeyMatch.MatchString(secretKey) {
-		return &Config{
+func create(secretKey string) (Config, bool) {
+
+	liveSecretKeyMatch := regexp.MustCompile(common.LiveSecretKeyRegex)
+	if liveSecretKeyMatch.MatchString(secretKey) {
+		return Config{
 			URI:       productionURI,
 			SecretKey: secretKey,
-		}
+		}, false
 	}
-	return nil
+	return Config{
+		URI:       sandboxURI,
+		SecretKey: secretKey,
+	}, true
 }
 
 // StatusResponse ...

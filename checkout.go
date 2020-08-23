@@ -2,9 +2,8 @@ package checkout
 
 import (
 	"bytes"
-	"crypto/rand"
-	"encoding/base64"
-	"fmt"
+	"crypto/tls"
+	"net/http"
 	"regexp"
 	"time"
 
@@ -19,21 +18,81 @@ const (
 	productionURI = "https://api.checkout.com"
 )
 
+const (
+	// UPAPI - Unified Payment API
+	UPAPI SupportedAPI = "api"
+	// Access - OAuth Authorization
+	Access SupportedAPI = "access"
+)
+
+const (
+	// Sandbox - Sandbox
+	Sandbox SupportedEnvironment = "sandbox.checkout.com"
+	// Production - Production
+	Production SupportedEnvironment = "checkout.com"
+)
+
+const (
+	// DefaultMaxNetworkRetries is the default maximum number of retries made
+	// by a Checkout.com client.
+	DefaultMaxNetworkRetries int64 = 2
+)
+
+// SupportedAPI is an enumeration of supported Checkout.com endpoints.
+// Currently supported values are "Unified Payment Gateway".
+type SupportedAPI string
+
+// SupportedEnvironment is an enumeration of supported Checkout.com environment.
+// Currently supported values are "Sandbox" & "Production".
+type SupportedEnvironment string
+
+// Config ...
+type Config struct {
+	PublicKey         string
+	SecretKey         string
+	URI               *string
+	HTTPClient        *http.Client
+	LeveledLogger     LeveledLoggerInterface
+	MaxNetworkRetries *int64
+}
+
 // DefaultConfig ...
 var DefaultConfig = Config{
-	URI: sandboxURI,
+	URI: String(sandboxURI),
+}
+
+const (
+	defaultHTTPTimeout = 30 * time.Second
+)
+
+var httpClient = &http.Client{
+	Timeout: defaultHTTPTimeout,
+	Transport: &http.Transport{
+		TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
+	},
 }
 
 // Create ...
-func Create(secretKey string, publicKey *string, idempotencyKey *string) (*Config, error) {
+func Create(secretKey string, publicKey *string) (*Config, error) {
 
 	var config, isSandbox = create(secretKey)
-	if idempotencyKey != nil {
-		config.IdempotencyKey = idempotencyKey
+
+	if config.HTTPClient == nil {
+		config.HTTPClient = httpClient
 	}
+
+	if config.LeveledLogger == nil {
+		config.LeveledLogger = DefaultLeveledLogger
+	}
+
+	if config.MaxNetworkRetries == nil {
+		config.MaxNetworkRetries = Int64(DefaultMaxNetworkRetries)
+	}
+
 	if publicKey == nil {
 		return &config, nil
 	}
+
 	if !isSandbox {
 		publicKeyMatch := regexp.MustCompile(common.LivePublicKeyRegex)
 		if publicKeyMatch.MatchString(StringValue(publicKey)) {
@@ -59,12 +118,12 @@ func create(secretKey string) (Config, bool) {
 	liveSecretKeyMatch := regexp.MustCompile(common.LiveSecretKeyRegex)
 	if liveSecretKeyMatch.MatchString(secretKey) {
 		return Config{
-			URI:       productionURI,
+			URI:       String(productionURI),
 			SecretKey: secretKey,
 		}, false
 	}
 	return Config{
-		URI:       sandboxURI,
+		URI:       String(sandboxURI),
 		SecretKey: secretKey,
 	}, true
 }
@@ -80,27 +139,34 @@ type StatusResponse struct {
 
 // Headers ...
 type Headers struct {
+	Header       http.Header
 	CKORequestID *string `json:"cko-request-id,omitempty"`
 	CKOVersion   *string `json:"cko-version,omitempty"`
 }
 
 // HTTPClient ...
 type HTTPClient interface {
-	Get(param string) (*StatusResponse, error)
-	Post(param string, request interface{}) (*StatusResponse, error)
-	Put(param string, request interface{}) (*StatusResponse, error)
-	Patch(param string, request interface{}) (*StatusResponse, error)
-	Delete(param string) (*StatusResponse, error)
-	Upload(param, boundary string, body *bytes.Buffer) (*StatusResponse, error)
+	Get(path string) (*StatusResponse, error)
+	Post(path string, request interface{}, params *Params) (*StatusResponse, error)
+	Put(path string, request interface{}) (*StatusResponse, error)
+	Patch(path string, request interface{}) (*StatusResponse, error)
+	Delete(path string) (*StatusResponse, error)
+	Upload(path, boundary string, body *bytes.Buffer) (*StatusResponse, error)
 	Download(path string) (*StatusResponse, error)
 }
 
-// NewIdempotencyKey -
-func NewIdempotencyKey() string {
-	now := time.Now().UnixNano()
-	buf := make([]byte, 4)
-	rand.Read(buf)
-	return fmt.Sprintf("%v_%v", now, base64.URLEncoding.EncodeToString(buf)[:6])
+// Int64 returns a pointer to the int64 value passed in.
+func Int64(v int64) *int64 {
+	return &v
+}
+
+// Int64Value returns the value of the int64 pointer passed in or
+// 0 if the pointer is nil.
+func Int64Value(v *int64) int64 {
+	if v != nil {
+		return *v
+	}
+	return 0
 }
 
 // String returns a pointer to the string value passed in.

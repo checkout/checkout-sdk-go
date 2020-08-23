@@ -108,7 +108,7 @@ func (c *Client) RetrieveEventNotification(eventID string, notificationID string
 
 // Retry -
 func (c *Client) Retry(eventID string, webhookID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/webhooks/%v/retry", path, eventID, webhookID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/webhooks/%v/retry", path, eventID, webhookID), nil, nil)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -123,7 +123,7 @@ func (c *Client) Retry(eventID string, webhookID string) (*Response, error) {
 
 // RetryAll -
 func (c *Client) RetryAll(eventID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/webhooks/retry", path, eventID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/webhooks/retry", path, eventID), nil, nil)
 	response := &Response{
 		StatusResponse: resp,
 	}

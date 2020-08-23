@@ -2,14 +2,12 @@ package httpclient
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/csv"
 	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/shiuh-yaw-cko/checkout"
 	"github.com/shiuh-yaw-cko/checkout/common"
@@ -18,22 +16,19 @@ import (
 var client *HTTPClient
 
 const (
-	defaultHTTPTimeout = 30 * time.Second
-)
-
-const (
 	ckoRequestID = "cko-request-id"
 	ckoVersion   = "cko-version"
 )
 
 // HTTPClient ...
 type HTTPClient struct {
-	PublicKey         string
-	SecretKey         string
-	URI               string
-	IdempotencyKey    string
-	CancellationToken string
-	HTTPClient        *http.Client
+	HTTPClient          *http.Client
+	PublicKey           string
+	SecretKey           string
+	URI                 string
+	LeveledLogger       checkout.LeveledLoggerInterface
+	MaxNetworkRetries   int64
+	networkRetriesSleep bool
 }
 
 // GetClient ...
@@ -51,43 +46,40 @@ func (nopReadCloser) Close() error { return nil }
 func NewClient(config checkout.Config) *HTTPClient {
 
 	client = &HTTPClient{
-		PublicKey:      config.PublicKey,
-		SecretKey:      config.SecretKey,
-		URI:            config.URI,
-		IdempotencyKey: checkout.StringValue(config.IdempotencyKey),
-		HTTPClient: &http.Client{
-			Timeout: defaultHTTPTimeout,
-			Transport: &http.Transport{
-				TLSNextProto: make(map[string]func(string, *tls.Conn) http.RoundTripper),
-			},
-		},
+		HTTPClient:          config.HTTPClient,
+		PublicKey:           config.PublicKey,
+		SecretKey:           config.SecretKey,
+		URI:                 checkout.StringValue(config.URI),
+		LeveledLogger:       config.LeveledLogger,
+		MaxNetworkRetries:   *config.MaxNetworkRetries,
+		networkRetriesSleep: true,
 	}
 	return client
 }
 
 // Get ...
-func (c *HTTPClient) Get(param string) (*checkout.StatusResponse, error) {
+func (c *HTTPClient) Get(path string) (*checkout.StatusResponse, error) {
 
-	request, err := c.NewRequest(http.MethodGet, c.URI+param, nil)
+	request, err := c.NewRequest(http.MethodGet, c.URI+path, nil)
 	if err != nil {
 		return nil, err
 	}
-	c.setHeader(request)
+	c.setContentType(request)
 	c.setUserAgent(request)
-	c.setCredential(c.URI+param, request)
-	c.setIdempotencyKey(request)
+	c.setAuthorization(c.URI+path, request)
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
 	}
 	defer response.Body.Close()
+
 	ckoRequestID := response.Header.Get(ckoRequestID)
 	ckoVersion := response.Header.Get(ckoVersion)
-
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
+			Header:       response.Header,
 			CKORequestID: &ckoRequestID,
 			CKOVersion:   &ckoVersion,
 		},
@@ -105,16 +97,16 @@ func (c *HTTPClient) Get(param string) (*checkout.StatusResponse, error) {
 }
 
 // Post ...
-func (c *HTTPClient) Post(param string, body interface{}) (*checkout.StatusResponse, error) {
+func (c *HTTPClient) Post(path string, body interface{}, params *checkout.Params) (*checkout.StatusResponse, error) {
 
-	request, err := c.NewRequest(http.MethodPost, c.URI+param, body)
+	request, err := c.NewRequest(http.MethodPost, c.URI+path, body)
 	if err != nil {
 		return nil, err
 	}
-	c.setHeader(request)
+	c.setContentType(request)
 	c.setUserAgent(request)
-	c.setCredential(c.URI+param, request)
-	c.setIdempotencyKey(request)
+	c.setAuthorization(c.URI+path, request)
+	c.setIdempotencyKey(request, params)
 
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
@@ -181,8 +173,7 @@ func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (r
 			return nopReadCloser{reader}, nil
 		}
 	}
-	c.setCredential(c.URI+path, request)
-	c.setIdempotencyKey(request)
+	c.setAuthorization(c.URI+path, request)
 	c.setUserAgent(request)
 	request.Header.Add("Content-Type", contentType)
 	response, err := c.HTTPClient.Do(request)
@@ -190,9 +181,9 @@ func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (r
 		return nil, err
 	}
 	defer response.Body.Close()
+
 	ckoRequestID := response.Header.Get(ckoRequestID)
 	ckoVersion := response.Header.Get(ckoVersion)
-
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
@@ -218,9 +209,8 @@ func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err e
 
 	request, err := c.NewRequest(http.MethodGet, c.URI+path, nil)
 	// Setting headers if needed
-	c.setCredential(c.URI+path, request)
+	c.setAuthorization(c.URI+path, request)
 	c.setUserAgent(request)
-	c.setIdempotencyKey(request)
 	request.Header.Add("Content-Type", "text/csv;")
 
 	response, err := c.HTTPClient.Do(request)
@@ -228,9 +218,9 @@ func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err e
 		return nil, err
 	}
 	defer response.Body.Close()
+
 	ckoRequestID := response.Header.Get(ckoRequestID)
 	ckoVersion := response.Header.Get(ckoVersion)
-
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
@@ -248,7 +238,7 @@ func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err e
 	return apiResponse, nil
 }
 
-func (c *HTTPClient) setCredential(path string, req *http.Request) {
+func (c *HTTPClient) setAuthorization(path string, req *http.Request) {
 
 	if strings.Contains(path, "/tokens") {
 		req.Header.Add("Authorization", c.PublicKey)
@@ -261,12 +251,29 @@ func (c *HTTPClient) setUserAgent(req *http.Request) {
 	req.Header.Add("User-Agent", "checkout-sdk-go/"+checkout.ClientVersion)
 }
 
-func (c *HTTPClient) setHeader(req *http.Request) {
+func (c *HTTPClient) setContentType(req *http.Request) {
 	req.Header.Add("Content-Type", "application/json")
 }
 
-func (c *HTTPClient) setIdempotencyKey(req *http.Request) {
-	req.Header.Add("Cko-Idempotency-Key", c.IdempotencyKey)
+func isHTTPWriteMethod(method string) bool {
+	return method == http.MethodPost || method == http.MethodPut || method == http.MethodPatch || method == http.MethodDelete
+}
+
+func (c *HTTPClient) setIdempotencyKey(req *http.Request, params *checkout.Params) {
+	if params != nil {
+		if params.IdempotencyKey != nil {
+			idempotencyKey := strings.TrimSpace(*params.IdempotencyKey)
+			req.Header.Add("Cko-Idempotency-Key", idempotencyKey)
+		} else if isHTTPWriteMethod(req.Method) {
+			req.Header.Add("Cko-Idempotency-Key", checkout.NewIdempotencyKey())
+		}
+		for k, v := range params.Headers {
+			for _, line := range v {
+				// Use Set to override the default value possibly set before
+				req.Header.Set(k, line)
+			}
+		}
+	}
 }
 
 func responseToError(apiRes *checkout.StatusResponse, body []byte) *common.Error {
@@ -282,16 +289,15 @@ func responseToError(apiRes *checkout.StatusResponse, body []byte) *common.Error
 }
 
 // Delete ...
-func (c *HTTPClient) Delete(param string) (*checkout.StatusResponse, error) {
+func (c *HTTPClient) Delete(path string) (*checkout.StatusResponse, error) {
 
-	request, err := c.NewRequest(http.MethodDelete, c.URI+param, nil)
+	request, err := c.NewRequest(http.MethodDelete, c.URI+path, nil)
 	if err != nil {
 		return nil, err
 	}
-	c.setHeader(request)
+	c.setContentType(request)
 	c.setUserAgent(request)
-	c.setCredential(c.URI+param, request)
-	c.setIdempotencyKey(request)
+	c.setAuthorization(c.URI+path, request)
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
 		return nil, err
@@ -321,15 +327,15 @@ func (c *HTTPClient) Delete(param string) (*checkout.StatusResponse, error) {
 }
 
 // Put ...
-func (c *HTTPClient) Put(param string, body interface{}) (*checkout.StatusResponse, error) {
+func (c *HTTPClient) Put(path string, body interface{}) (*checkout.StatusResponse, error) {
 
-	request, err := c.NewRequest(http.MethodPut, c.URI+param, body)
+	request, err := c.NewRequest(http.MethodPut, c.URI+path, body)
 	if err != nil {
 		return nil, err
 	}
-	c.setHeader(request)
+	c.setContentType(request)
 	c.setUserAgent(request)
-	c.setCredential(c.URI+param, request)
+	c.setAuthorization(c.URI+path, request)
 
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {
@@ -360,16 +366,15 @@ func (c *HTTPClient) Put(param string, body interface{}) (*checkout.StatusRespon
 }
 
 // Patch ...
-func (c *HTTPClient) Patch(param string, body interface{}) (*checkout.StatusResponse, error) {
+func (c *HTTPClient) Patch(path string, body interface{}) (*checkout.StatusResponse, error) {
 
-	request, err := c.NewRequest(http.MethodPatch, c.URI+param, body)
+	request, err := c.NewRequest(http.MethodPatch, c.URI+path, body)
 	if err != nil {
 		return nil, err
 	}
-	c.setHeader(request)
+	c.setContentType(request)
 	c.setUserAgent(request)
-	c.setCredential(c.URI+param, request)
-	c.setIdempotencyKey(request)
+	c.setAuthorization(c.URI+path, request)
 
 	response, err := c.HTTPClient.Do(request)
 	if err != nil {

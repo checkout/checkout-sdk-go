@@ -43,7 +43,7 @@ func (c *Client) Retrieve() (*Response, error) {
 
 // RegisterWebhook ...
 func (c *Client) RegisterWebhook(request *Request) (*Response, error) {
-	resp, err := c.API.Post("/"+path, request)
+	resp, err := c.API.Post("/"+path, request, nil)
 	response := &Response{
 		StatusResponse: resp,
 	}

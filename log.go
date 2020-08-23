@@ -19,6 +19,7 @@ const (
 	LevelDebug Level = 4
 )
 
+// DefaultLeveledLogger -
 var DefaultLeveledLogger LeveledLoggerInterface = &LeveledLogger{
 	Level: LevelError,
 }

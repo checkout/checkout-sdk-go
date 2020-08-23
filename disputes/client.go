@@ -65,7 +65,7 @@ func (c *Client) GetDispute(disputeID string) (*Response, error) {
 
 // AcceptDispute -
 func (c *Client) AcceptDispute(disputeID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/accept", path, disputeID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/accept", path, disputeID), nil, nil)
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -113,7 +113,7 @@ func (c *Client) GetDisputeEvidence(disputeID string) (*Response, error) {
 
 // SubmitDisputeEvidence -
 func (c *Client) SubmitDisputeEvidence(disputeID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/evidence", path, disputeID), nil)
+	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/evidence", path, disputeID), nil, nil)
 	response := &Response{
 		StatusResponse: resp,
 	}

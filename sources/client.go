@@ -24,7 +24,7 @@ func NewClient(config checkout.Config) *Client {
 
 // AddPaymentSource -
 func (c *Client) AddPaymentSource(request *Request) (*Response, error) {
-	response, err := c.API.Post("/"+path, request)
+	response, err := c.API.Post("/"+path, request, nil)
 	resp := &Response{
 		StatusResponse: response,
 	}

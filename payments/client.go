@@ -24,8 +24,8 @@ func NewClient(config checkout.Config) *Client {
 }
 
 // Request ...
-func (c *Client) Request(request *Request) (*Response, error) {
-	response, err := c.API.Post("/"+path, request)
+func (c *Client) Request(request *Request, params *checkout.Params) (*Response, error) {
+	response, err := c.API.Post("/"+path, request, params)
 	resp := &Response{
 		StatusResponse: response,
 	}
@@ -75,8 +75,8 @@ func (c *Client) Actions(paymentID string) (*ActionsResponse, error) {
 }
 
 // Captures ...
-func (c *Client) Captures(paymentID string, request *CapturesRequest) (*CapturesResponse, error) {
-	response, err := c.API.Post(fmt.Sprintf("/%v/%v/captures", path, paymentID), request)
+func (c *Client) Captures(paymentID string, request *CapturesRequest, params *checkout.Params) (*CapturesResponse, error) {
+	response, err := c.API.Post(fmt.Sprintf("/%v/%v/captures", path, paymentID), request, params)
 	cap := &CapturesResponse{
 		StatusResponse: response,
 	}
@@ -91,8 +91,8 @@ func (c *Client) Captures(paymentID string, request *CapturesRequest) (*Captures
 }
 
 // Refunds ...
-func (c *Client) Refunds(paymentID string, request *RefundsRequest) (*RefundsResponse, error) {
-	response, err := c.API.Post(fmt.Sprintf("/%v/%v/refunds", path, paymentID), request)
+func (c *Client) Refunds(paymentID string, request *RefundsRequest, params *checkout.Params) (*RefundsResponse, error) {
+	response, err := c.API.Post(fmt.Sprintf("/%v/%v/refunds", path, paymentID), request, params)
 	ref := &RefundsResponse{
 		StatusResponse: response,
 	}
@@ -107,8 +107,8 @@ func (c *Client) Refunds(paymentID string, request *RefundsRequest) (*RefundsRes
 }
 
 // Voids ...
-func (c *Client) Voids(paymentID string, request *VoidsRequest) (*VoidsResponse, error) {
-	response, err := c.API.Post(fmt.Sprintf("/%v/%v/voids", path, paymentID), request)
+func (c *Client) Voids(paymentID string, request *VoidsRequest, params *checkout.Params) (*VoidsResponse, error) {
+	response, err := c.API.Post(fmt.Sprintf("/%v/%v/voids", path, paymentID), request, params)
 	void := &VoidsResponse{
 		StatusResponse: response,
 	}

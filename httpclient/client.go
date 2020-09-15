@@ -15,11 +15,6 @@ import (
 
 var client *HTTPClient
 
-const (
-	ckoRequestID = "cko-request-id"
-	ckoVersion   = "cko-version"
-)
-
 // HTTPClient ...
 type HTTPClient struct {
 	HTTPClient          *http.Client
@@ -73,15 +68,15 @@ func (c *HTTPClient) Get(path string) (*checkout.StatusResponse, error) {
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
 			Header:       response.Header,
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -114,14 +109,14 @@ func (c *HTTPClient) Post(path string, body interface{}, params *checkout.Params
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -182,14 +177,14 @@ func (c *HTTPClient) Upload(path string, boundary string, body *bytes.Buffer) (r
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -219,14 +214,14 @@ func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err e
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	reader := csv.NewReader(response.Body)
@@ -304,14 +299,14 @@ func (c *HTTPClient) Delete(path string) (*checkout.StatusResponse, error) {
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -343,14 +338,14 @@ func (c *HTTPClient) Put(path string, body interface{}) (*checkout.StatusRespons
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)
@@ -382,14 +377,14 @@ func (c *HTTPClient) Patch(path string, body interface{}) (*checkout.StatusRespo
 	}
 	defer response.Body.Close()
 
-	ckoRequestID := response.Header.Get(ckoRequestID)
-	ckoVersion := response.Header.Get(ckoVersion)
+	requestID := response.Header.Get(checkout.CKORequestID)
+	version := response.Header.Get(checkout.CKOVersion)
 	apiResponse := &checkout.StatusResponse{
 		Status:     response.Status,
 		StatusCode: response.StatusCode,
 		Headers: &checkout.Headers{
-			CKORequestID: &ckoRequestID,
-			CKOVersion:   &ckoVersion,
+			CKORequestID: &requestID,
+			CKOVersion:   &version,
 		},
 	}
 	responseBody, err := ioutil.ReadAll(response.Body)

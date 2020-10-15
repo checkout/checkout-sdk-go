@@ -58,8 +58,7 @@ import (
     "github.com/checkout/checkout-sdk-go/tokens"
 )
 
-idempotencyKey := checkout.NewIdempotencyKey()
-con:q!fig, err := checkout.Create(secretKe, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey)
 if err != nil {
     return
 }
@@ -87,7 +86,11 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
+params := checkout.Params{
+    IdempotencyKey: &idempotencyKey,
+}
+config, err := checkout.Create(secretKey, &publicKey)
+
 if err != nil {
     return
 }
@@ -109,7 +112,7 @@ var request = &payments.Request{
         "udf1": "User Define",
     },
 }
-response, err := client.Request(request)
+response, err := client.Request(request, &params)
 ```
 
 ### Payment Detail
@@ -120,8 +123,8 @@ import (
     "github.com/checkout/checkout-sdk-go/payments"
 )
 
-idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey)
+
 if err != nil {
     return
 }
@@ -137,8 +140,7 @@ import (
     "github.com/checkout/checkout-sdk-go/payments"
 )
 
-idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
+config, err := checkout.Create(secretKey, &publicKey)
 if err != nil {
     return
 }
@@ -155,7 +157,10 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
+params := checkout.Params{
+    IdempotencyKey: &idempotencyKey,
+}
+config, err := checkout.Create(secretKey, &publicKey)
 if err != nil {
     return
 }
@@ -167,7 +172,7 @@ request := &payments.CapturesRequest{
         "udf1": "User Define",
     },
 }
-response, err := client.Captures("pay_", request)
+response, err := client.Captures("pay_", request, &params)
 ```
 
 ### Voids
@@ -179,7 +184,10 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
+params := checkout.Params{
+    IdempotencyKey: &idempotencyKey,
+}
+config, err := checkout.Create(secretKey, &publicKey)
 if err != nil {
     return
 }
@@ -190,7 +198,7 @@ request := &payments.VoidsRequest{
         "udf1": "User Define",
     },
 }
-response, err := client.Voids("pay_", request)
+response, err := client.Voids("pay_", request, &params)
 ```
 
 ### Refunds
@@ -202,7 +210,10 @@ import (
 )
 
 idempotencyKey := checkout.NewIdempotencyKey()
-config, err := checkout.Create(secretKey, &publicKey, &idempotencyKey)
+params := checkout.Params{
+    IdempotencyKey: &idempotencyKey,
+}
+config, err := checkout.Create(secretKey, &publicKey)
 if err != nil {
     return
 }
@@ -214,7 +225,7 @@ request := &payments.RefundsRequest{
         "udf1": "User Define",
     },
 }
-response, err := client.Refunds("pay_", request)
+response, err := client.Refunds("pay_", request, &params)
 ```
 
 For any requests, bug or comments, please [open an issue][issues] or [submit a

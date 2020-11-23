@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/httpclient"
 	"github.com/google/go-querystring/query"
-	"github.com/shiuh-yaw-cko/checkout"
-	"github.com/shiuh-yaw-cko/checkout/httpclient"
 )
 
 const path = "disputes"

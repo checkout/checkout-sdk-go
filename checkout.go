@@ -11,7 +11,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/shiuh-yaw-cko/checkout/common"
+	"github.com/checkout/checkout-sdk-go/common"
 )
 
 // ClientVersion ...

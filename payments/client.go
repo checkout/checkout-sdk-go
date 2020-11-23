@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/shiuh-yaw-cko/checkout"
-	"github.com/shiuh-yaw-cko/checkout/httpclient"
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/httpclient"
 )
 
 const path = "payments"

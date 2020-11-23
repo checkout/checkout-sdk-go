@@ -1,7 +1,7 @@
 package customers
 
 import (
-	"github.com/shiuh-yaw-cko/checkout"
+	"github.com/checkout/checkout-sdk-go"
 )
 
 type (

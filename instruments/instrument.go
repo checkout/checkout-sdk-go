@@ -1,9 +1,9 @@
 package instruments
 
 import (
-	"github.com/shiuh-yaw-cko/checkout"
-	"github.com/shiuh-yaw-cko/checkout/common"
-	"github.com/shiuh-yaw-cko/checkout/payments"
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 type (

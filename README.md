@@ -42,8 +42,8 @@ individual key.
 
 ```go
 import (
-    "github.com/shiuh-yaw-cko/checkout"
-    "github.com/shiuh-yaw-cko/checkout/client"
+    "github.com/checkout/checkout-sdk-go"
+    "github.com/checkout/checkout-sdk-go/client"
 )
 
 api := &client.API{}

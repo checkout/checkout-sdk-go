@@ -1,15 +1,15 @@
 package client
 
 import (
-	"github.com/shiuh-yaw-cko/checkout"
-	"github.com/shiuh-yaw-cko/checkout/disputes"
-	"github.com/shiuh-yaw-cko/checkout/events"
-	"github.com/shiuh-yaw-cko/checkout/files"
-	"github.com/shiuh-yaw-cko/checkout/payments"
-	"github.com/shiuh-yaw-cko/checkout/reconciliation"
-	"github.com/shiuh-yaw-cko/checkout/sources"
-	"github.com/shiuh-yaw-cko/checkout/tokens"
-	"github.com/shiuh-yaw-cko/checkout/webhooks"
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/disputes"
+	"github.com/checkout/checkout-sdk-go/events"
+	"github.com/checkout/checkout-sdk-go/files"
+	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/reconciliation"
+	"github.com/checkout/checkout-sdk-go/sources"
+	"github.com/checkout/checkout-sdk-go/tokens"
+	"github.com/checkout/checkout-sdk-go/webhooks"
 )
 
 // API -

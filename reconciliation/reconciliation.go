@@ -3,8 +3,8 @@ package reconciliation
 import (
 	"time"
 
-	"github.com/shiuh-yaw-cko/checkout"
-	"github.com/shiuh-yaw-cko/checkout/common"
+	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/common"
 )
 
 type (

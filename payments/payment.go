@@ -18,6 +18,7 @@ type (
 		Currency          string             `json:"currency"`
 		Reference         string             `json:"reference,omitempty"`
 		PaymentType       common.PaymentType `json:"payment_type,omitempty"`
+		MerchantInitiated *bool              `json:"merchant_initiated,omitempty"`
 		Description       string             `json:"description,omitempty"`
 		Capture           *bool              `json:"capture,omitempty"`
 		CaptureOn         *time.Time         `json:"capture_on,omitempty"`

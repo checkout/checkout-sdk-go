@@ -11,6 +11,7 @@ import (
 
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/internal/utils"
 )
 
 var client *HTTPClient
@@ -44,7 +45,7 @@ func NewClient(config checkout.Config) *HTTPClient {
 		HTTPClient:          config.HTTPClient,
 		PublicKey:           config.PublicKey,
 		SecretKey:           config.SecretKey,
-		URI:                 checkout.StringValue(config.URI),
+		URI:                 utils.StringValue(config.URI),
 		LeveledLogger:       config.LeveledLogger,
 		MaxNetworkRetries:   *config.MaxNetworkRetries,
 		networkRetriesSleep: true,

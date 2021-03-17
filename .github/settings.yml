@@ -1,0 +1,22 @@
+repository:
+  name: checkout-sdk-go
+  default_branch: master
+  has_wiki: false
+
+labels:
+  - name: Ready for Review
+    color: '#00FF00'
+  - name: Merging on Hold
+    color: '#FF4500'
+  - name: Discovery
+    color: '#E26C41'
+
+branches:
+  - name: master
+    protection:
+      required_pull_request_reviews:
+        require_code_owner_reviews: true
+        required_approving_review_count: 1
+        required_status_checks:
+          strict: true
+          contexts: []

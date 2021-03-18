@@ -1,5 +1,8 @@
 package utils
 
+// TODO: rename me to something better
+// TODO: remove me when code is refactored
+
 // Int64 returns a pointer to the int64 value passed in.
 func Int64(v int64) *int64 {
 	return &v

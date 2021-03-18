@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/internal/utils"
 )
 
 // ClientVersion ...
@@ -42,7 +41,7 @@ const (
 const (
 	// DefaultMaxNetworkRetries is the default maximum number of retries made
 	// by a Checkout.com client.
-	DefaultMaxNetworkRetries int64 = 2
+	DefaultMaxNetworkRetries = 2
 )
 
 const (
@@ -64,15 +63,10 @@ type SupportedEnvironment string
 type Config struct {
 	PublicKey         string
 	SecretKey         string
-	URI               *string
+	URI               string
 	HTTPClient        *http.Client
 	LeveledLogger     LeveledLoggerInterface
-	MaxNetworkRetries *int64
-}
-
-// DefaultConfig ...
-var DefaultConfig = Config{
-	URI: utils.String(sandboxURI),
+	MaxNetworkRetries int
 }
 
 const (
@@ -86,60 +80,57 @@ var httpClient = &http.Client{
 	},
 }
 
-// Create ...
-func Create(secretKey string, publicKey *string) (*Config, error) {
+type CheckoutKey string
 
-	var config, isSandbox = create(secretKey)
-
-	if config.HTTPClient == nil {
-		config.HTTPClient = httpClient
-	}
-
-	if config.LeveledLogger == nil {
-		config.LeveledLogger = DefaultLeveledLogger
-	}
-
-	if config.MaxNetworkRetries == nil {
-		config.MaxNetworkRetries = utils.Int64(DefaultMaxNetworkRetries)
-	}
-
-	if publicKey == nil {
-		return &config, nil
-	}
-
-	if !isSandbox {
-		publicKeyMatch := regexp.MustCompile(common.LivePublicKeyRegex)
-		if publicKeyMatch.MatchString(utils.StringValue(publicKey)) {
-			config.PublicKey = utils.StringValue(publicKey)
-			return &config, nil
-		}
-		return nil, &common.Error{
-			Status: "Configuration Error - Please review your secret key and public key ",
-		}
-	}
-	publicKeyMatch := regexp.MustCompile(common.SandboxPublicKeyRegex)
-	if publicKeyMatch.MatchString(utils.StringValue(publicKey)) {
-		config.PublicKey = utils.StringValue(publicKey)
-		return &config, nil
-	}
-	return nil, &common.Error{
-		Status: "Configuration Error - Please review your secret key and public key ",
-	}
+func (ck CheckoutKey) isLive() bool {
+	pattern := `^(pk|sk)_?(\w{8})-(\w{4})-(\w{4})-(\w{4})-(\w{12})$`
+	publicKeyMatch := regexp.MustCompile(pattern)
+	return publicKeyMatch.MatchString(string(ck))
 }
 
-func create(secretKey string) (Config, bool) {
+func (ck CheckoutKey) isTest() bool {
+	pattern := `^(pk|sk)_test_?(\w{8})-(\w{4})-(\w{4})-(\w{4})-(\w{12})$`
+	publicKeyMatch := regexp.MustCompile(pattern)
+	return publicKeyMatch.MatchString(string(ck))
+}
 
-	liveSecretKeyMatch := regexp.MustCompile(common.LiveSecretKeyRegex)
-	if liveSecretKeyMatch.MatchString(secretKey) {
-		return Config{
-			URI:       utils.String(productionURI),
-			SecretKey: secretKey,
-		}, false
+func (key CheckoutKey) isValid() bool {
+	return key.isLive() || key.isTest()
+}
+
+func Create(secretKey, publicKey CheckoutKey) (*Config, error) {
+
+	var config Config
+
+	if !secretKey.isValid() {
+		return nil, &common.Error{
+			Status: "Configuration Error - Secret key is not valid!"}
 	}
-	return Config{
-		URI:       utils.String(sandboxURI),
-		SecretKey: secretKey,
-	}, true
+
+	config.SecretKey = string(secretKey)
+	config.MaxNetworkRetries = DefaultMaxNetworkRetries
+	config.LeveledLogger = DefaultLeveledLogger
+	config.HTTPClient = httpClient
+
+	if len(publicKey) == 0 {
+		return &config, nil
+	}
+
+	if secretKey.isLive() && publicKey.isLive() {
+		config.URI = productionURI
+		config.PublicKey = string(publicKey)
+		return &config, nil
+	}
+
+	if secretKey.isTest() && publicKey.isTest() {
+		config.URI = sandboxURI
+		config.PublicKey = string(publicKey)
+		return &config, nil
+	}
+
+	return nil, &common.Error{
+		Status: "Configuration Error - Please review your secret and public key!"}
+
 }
 
 var appInfo *AppInfo

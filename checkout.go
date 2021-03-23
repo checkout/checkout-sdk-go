@@ -41,7 +41,7 @@ const (
 const (
 	// DefaultMaxNetworkRetries is the default maximum number of retries made
 	// by a Checkout.com client.
-	DefaultMaxNetworkRetries int64 = 2
+	DefaultMaxNetworkRetries = 2
 )
 
 const (
@@ -63,15 +63,10 @@ type SupportedEnvironment string
 type Config struct {
 	PublicKey         string
 	SecretKey         string
-	URI               *string
+	URI               string
 	HTTPClient        *http.Client
 	LeveledLogger     LeveledLoggerInterface
-	MaxNetworkRetries *int64
-}
-
-// DefaultConfig ...
-var DefaultConfig = Config{
-	URI: String(sandboxURI),
+	MaxNetworkRetries int
 }
 
 const (
@@ -85,60 +80,57 @@ var httpClient = &http.Client{
 	},
 }
 
-// Create ...
-func Create(secretKey string, publicKey *string) (*Config, error) {
+type CheckoutKey string
 
-	var config, isSandbox = create(secretKey)
-
-	if config.HTTPClient == nil {
-		config.HTTPClient = httpClient
-	}
-
-	if config.LeveledLogger == nil {
-		config.LeveledLogger = DefaultLeveledLogger
-	}
-
-	if config.MaxNetworkRetries == nil {
-		config.MaxNetworkRetries = Int64(DefaultMaxNetworkRetries)
-	}
-
-	if publicKey == nil {
-		return &config, nil
-	}
-
-	if !isSandbox {
-		publicKeyMatch := regexp.MustCompile(common.LivePublicKeyRegex)
-		if publicKeyMatch.MatchString(StringValue(publicKey)) {
-			config.PublicKey = StringValue(publicKey)
-			return &config, nil
-		}
-		return nil, &common.Error{
-			Status: "Configuration Error - Please review your secret key and public key ",
-		}
-	}
-	publicKeyMatch := regexp.MustCompile(common.SandboxPublicKeyRegex)
-	if publicKeyMatch.MatchString(StringValue(publicKey)) {
-		config.PublicKey = StringValue(publicKey)
-		return &config, nil
-	}
-	return nil, &common.Error{
-		Status: "Configuration Error - Please review your secret key and public key ",
-	}
+func (ck CheckoutKey) isLive() bool {
+	pattern := `^(pk|sk)_?(\w{8})-(\w{4})-(\w{4})-(\w{4})-(\w{12})$`
+	publicKeyMatch := regexp.MustCompile(pattern)
+	return publicKeyMatch.MatchString(string(ck))
 }
 
-func create(secretKey string) (Config, bool) {
+func (ck CheckoutKey) isTest() bool {
+	pattern := `^(pk|sk)_test_?(\w{8})-(\w{4})-(\w{4})-(\w{4})-(\w{12})$`
+	publicKeyMatch := regexp.MustCompile(pattern)
+	return publicKeyMatch.MatchString(string(ck))
+}
 
-	liveSecretKeyMatch := regexp.MustCompile(common.LiveSecretKeyRegex)
-	if liveSecretKeyMatch.MatchString(secretKey) {
-		return Config{
-			URI:       String(productionURI),
-			SecretKey: secretKey,
-		}, false
+func (key CheckoutKey) isValid() bool {
+	return key.isLive() || key.isTest()
+}
+
+func Create(secretKey, publicKey CheckoutKey) (*Config, error) {
+
+	var config Config
+
+	if !secretKey.isValid() {
+		return nil, &common.Error{
+			Status: "Configuration Error - Secret key is not valid!"}
 	}
-	return Config{
-		URI:       String(sandboxURI),
-		SecretKey: secretKey,
-	}, true
+
+	config.SecretKey = string(secretKey)
+	config.MaxNetworkRetries = DefaultMaxNetworkRetries
+	config.LeveledLogger = DefaultLeveledLogger
+	config.HTTPClient = httpClient
+
+	if len(publicKey) == 0 {
+		return &config, nil
+	}
+
+	if secretKey.isLive() && publicKey.isLive() {
+		config.URI = productionURI
+		config.PublicKey = string(publicKey)
+		return &config, nil
+	}
+
+	if secretKey.isTest() && publicKey.isTest() {
+		config.URI = sandboxURI
+		config.PublicKey = string(publicKey)
+		return &config, nil
+	}
+
+	return nil, &common.Error{
+		Status: "Configuration Error - Please review your secret and public key!"}
+
 }
 
 var appInfo *AppInfo
@@ -251,87 +243,4 @@ type HTTPClient interface {
 	Delete(path string) (*StatusResponse, error)
 	Upload(path, boundary string, body *bytes.Buffer) (*StatusResponse, error)
 	Download(path string) (*StatusResponse, error)
-}
-
-// Int64 returns a pointer to the int64 value passed in.
-func Int64(v int64) *int64 {
-	return &v
-}
-
-// Int64Value returns the value of the int64 pointer passed in or
-// 0 if the pointer is nil.
-func Int64Value(v *int64) int64 {
-	if v != nil {
-		return *v
-	}
-	return 0
-}
-
-// String returns a pointer to the string value passed in.
-func String(v string) *string {
-	return &v
-}
-
-// StringValue returns the value of the string pointer passed in or
-// "" if the pointer is nil.
-func StringValue(v *string) string {
-	if v != nil {
-		return *v
-	}
-	return ""
-}
-
-// StringSlice returns a slice of string pointers given a slice of strings.
-func StringSlice(v []string) []*string {
-	out := make([]*string, len(v))
-	for i := range v {
-		out[i] = &v[i]
-	}
-	return out
-}
-
-// Bool returns a pointer to the bool value passed in.
-func Bool(v bool) *bool {
-	return &v
-}
-
-// BoolValue returns the value of the bool pointer passed in or
-// false if the pointer is nil.
-func BoolValue(v *bool) bool {
-	if v != nil {
-		return *v
-	}
-	return false
-}
-
-// BoolSlice returns a slice of bool pointers given a slice of bools.
-func BoolSlice(v []bool) []*bool {
-	out := make([]*bool, len(v))
-	for i := range v {
-		out[i] = &v[i]
-	}
-	return out
-}
-
-// Float64 returns a pointer to the float64 value passed in.
-func Float64(v float64) *float64 {
-	return &v
-}
-
-// Float64Value returns the value of the float64 pointer passed in or
-// 0 if the pointer is nil.
-func Float64Value(v *float64) float64 {
-	if v != nil {
-		return *v
-	}
-	return 0
-}
-
-// Float64Slice returns a slice of float64 pointers given a slice of float64s.
-func Float64Slice(v []float64) []*float64 {
-	out := make([]*float64, len(v))
-	for i := range v {
-		out[i] = &v[i]
-	}
-	return out
 }

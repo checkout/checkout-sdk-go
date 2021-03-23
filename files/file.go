@@ -13,6 +13,7 @@ import (
 
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/internal/utils"
 )
 
 type (
@@ -59,7 +60,7 @@ func (f *FileUpload) GetBody() (*bytes.Buffer, string, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	if f.Purpose != nil {
-		err := writer.WriteField("purpose", checkout.StringValue(f.Purpose))
+		err := writer.WriteField("purpose", utils.StringValue(f.Purpose))
 		if err != nil {
 			return nil, "", err
 		}
@@ -69,7 +70,7 @@ func (f *FileUpload) GetBody() (*bytes.Buffer, string, error) {
 		if err != nil {
 			return nil, "", err
 		}
-		part, err := CreateFormFile(writer, "file", filepath.Base(checkout.StringValue(f.File)), checkout.StringValue(&contentType))
+		part, err := CreateFormFile(writer, "file", filepath.Base(utils.StringValue(f.File)), utils.StringValue(&contentType))
 		if err != nil {
 			return nil, "", err
 		}

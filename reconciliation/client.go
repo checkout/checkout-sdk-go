@@ -7,6 +7,7 @@ import (
 
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/httpclient"
+	"github.com/checkout/checkout-sdk-go/internal/utils"
 	"github.com/google/go-querystring/query"
 )
 
@@ -90,7 +91,7 @@ func (c *Client) StatementsReportCSV(request *Request) (*Response, error) {
 // StatementPaymentReportCSV -
 func (c *Client) StatementPaymentReportCSV(statementID *string) (*Response, error) {
 
-	resp, err := c.API.Download(fmt.Sprintf("/%v/%v/payments/download", statementsPath, checkout.StringValue(statementID)))
+	resp, err := c.API.Download(fmt.Sprintf("/%v/%v/payments/download", statementsPath, utils.StringValue(statementID)))
 	response := &Response{
 		StatusResponse: resp,
 	}
@@ -109,7 +110,7 @@ func (c *Client) PaymentReport(paymentID *string, request *Request) (*Response, 
 
 	if paymentID != nil {
 
-		resp, err := c.API.Get(fmt.Sprintf("/%v/%v", paymentsPath, checkout.StringValue(paymentID)))
+		resp, err := c.API.Get(fmt.Sprintf("/%v/%v", paymentsPath, utils.StringValue(paymentID)))
 		response := &Response{
 			StatusResponse: resp,
 		}

@@ -22,7 +22,7 @@ type HTTPClient struct {
 	SecretKey           string
 	URI                 string
 	LeveledLogger       checkout.LeveledLoggerInterface
-	MaxNetworkRetries   int64
+	MaxNetworkRetries   int
 	networkRetriesSleep bool
 }
 
@@ -44,9 +44,9 @@ func NewClient(config checkout.Config) *HTTPClient {
 		HTTPClient:          config.HTTPClient,
 		PublicKey:           config.PublicKey,
 		SecretKey:           config.SecretKey,
-		URI:                 checkout.StringValue(config.URI),
+		URI:                 config.URI,
 		LeveledLogger:       config.LeveledLogger,
-		MaxNetworkRetries:   *config.MaxNetworkRetries,
+		MaxNetworkRetries:   config.MaxNetworkRetries,
 		networkRetriesSleep: true,
 	}
 	return client

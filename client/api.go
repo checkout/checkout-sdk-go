@@ -25,7 +25,7 @@ type API struct {
 }
 
 // Init -
-func (a *API) Init(secretKey string, useSandbox bool, publicKey *string) {
+func (a *API) Init(secretKey checkout.CheckoutKey, useSandbox bool, publicKey checkout.CheckoutKey) {
 
 	config, err := checkout.Create(secretKey, publicKey)
 	if err != nil {
@@ -42,7 +42,7 @@ func (a *API) Init(secretKey string, useSandbox bool, publicKey *string) {
 }
 
 // New -
-func New(secretKey string, useSandbox bool, publicKey *string) *API {
+func New(secretKey checkout.CheckoutKey, useSandbox bool, publicKey checkout.CheckoutKey) *API {
 
 	api := API{}
 	api.Init(secretKey, useSandbox, publicKey)

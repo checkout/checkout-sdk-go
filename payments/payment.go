@@ -36,6 +36,9 @@ type (
 		Processing        *Processing        `json:"processing,omitempty"`
 		FundTransferType  string             `json:"fund_transfer_type,omitempty"`
 		Metadata          map[string]string  `json:"metadata,omitempty"`
+		// FOUR only
+		AuthorizationType   string `json:"authorization_type,omitempty"`
+		ProcessingChannelId string `json:"processing_channel_id,omitempty"`
 	}
 
 	// IDSource ...
@@ -393,7 +396,7 @@ type (
 	// Shipping ...
 	Shipping struct {
 		Address *common.Address `json:"address,omitempty"`
-		Phione  *common.Phone   `json:"phone,omitempty"`
+		Phone   *common.Phone   `json:"phone,omitempty"`
 	}
 
 	// Risk ...

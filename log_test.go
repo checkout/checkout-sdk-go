@@ -101,8 +101,8 @@ func TestLeveledLoggerErrorf(t *testing.T) {
 		logger.Level = level
 
 		logger.Errorf("test")
-		assert.Equal(t, "", stdout.String())
-		assert.Equal(t, "[ERROR] test\n", stderr.String())
+		assert.Equal(t, "[ERROR] test\n", stdout.String())
+		assert.Equal(t, "", stderr.String())
 	}
 }
 

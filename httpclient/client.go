@@ -17,13 +17,14 @@ var client *HTTPClient
 
 // HTTPClient ...
 type HTTPClient struct {
-	HTTPClient          *http.Client
-	PublicKey           string
-	SecretKey           string
-	URI                 string
-	LeveledLogger       checkout.LeveledLoggerInterface
-	MaxNetworkRetries   int64
-	networkRetriesSleep bool
+	HTTPClient           *http.Client
+	PublicKey            string
+	SecretKey            string
+	URI                  string
+	LeveledLogger        checkout.LeveledLoggerInterface
+	MaxNetworkRetries    int64
+	networkRetriesSleep  bool
+	BearerAuthentication bool
 }
 
 // GetClient ...
@@ -41,13 +42,14 @@ func (nopReadCloser) Close() error { return nil }
 func NewClient(config checkout.Config) *HTTPClient {
 
 	client = &HTTPClient{
-		HTTPClient:          config.HTTPClient,
-		PublicKey:           config.PublicKey,
-		SecretKey:           config.SecretKey,
-		URI:                 checkout.StringValue(config.URI),
-		LeveledLogger:       config.LeveledLogger,
-		MaxNetworkRetries:   *config.MaxNetworkRetries,
-		networkRetriesSleep: true,
+		HTTPClient:           config.HTTPClient,
+		PublicKey:            config.PublicKey,
+		SecretKey:            config.SecretKey,
+		URI:                  checkout.StringValue(config.URI),
+		LeveledLogger:        config.LeveledLogger,
+		MaxNetworkRetries:    *config.MaxNetworkRetries,
+		networkRetriesSleep:  true,
+		BearerAuthentication: config.BearerAuthentication,
 	}
 	return client
 }
@@ -236,10 +238,17 @@ func (c *HTTPClient) Download(path string) (resp *checkout.StatusResponse, err e
 func (c *HTTPClient) setAuthorization(path string, req *http.Request) {
 
 	if strings.Contains(path, "/tokens") {
-		req.Header.Add("Authorization", c.PublicKey)
+		req.Header.Add("Authorization", getAuthorizationHeader(c.PublicKey, c.BearerAuthentication))
 	} else {
-		req.Header.Add("Authorization", c.SecretKey)
+		req.Header.Add("Authorization", getAuthorizationHeader(c.SecretKey, c.BearerAuthentication))
 	}
+}
+
+func getAuthorizationHeader(key string, bearerAuthentication bool) string {
+	if bearerAuthentication {
+		return "Bearer " + key
+	}
+	return key
 }
 
 func (c *HTTPClient) setUserAgent(req *http.Request) {

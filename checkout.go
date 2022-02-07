@@ -29,6 +29,10 @@ const (
 	Access SupportedAPI = "access"
 )
 
+var mbcLiveSecretKeyPattern = regexp.MustCompile(common.LiveSecretKeyRegex)
+var fourKeyPattern = regexp.MustCompile(common.FourKeyRegex)
+var fourOAuthJwtPattern = regexp.MustCompile(common.FourOAuthJwtPattern)
+
 const (
 	// Sandbox - Sandbox
 	Sandbox SupportedEnvironment = "sandbox.checkout.com"
@@ -61,17 +65,13 @@ type SupportedEnvironment string
 
 // Config ...
 type Config struct {
-	PublicKey         string
-	SecretKey         string
-	URI               *string
-	HTTPClient        *http.Client
-	LeveledLogger     LeveledLoggerInterface
-	MaxNetworkRetries *int64
-}
-
-// DefaultConfig ...
-var DefaultConfig = Config{
-	URI: String(sandboxURI),
+	PublicKey            string
+	SecretKey            string
+	URI                  *string
+	HTTPClient           *http.Client
+	LeveledLogger        LeveledLoggerInterface
+	MaxNetworkRetries    *int64
+	BearerAuthentication bool
 }
 
 const (
@@ -85,7 +85,7 @@ var httpClient = &http.Client{
 	},
 }
 
-// Create ...
+// Deprecated: Please use SdkConfig
 func Create(secretKey string, publicKey *string) (*Config, error) {
 
 	var config, isSandbox = create(secretKey)
@@ -126,10 +126,47 @@ func Create(secretKey string, publicKey *string) (*Config, error) {
 	}
 }
 
+func SdkConfig(secretKey *string, publicKey *string, env SupportedEnvironment) (*Config, error) {
+
+	var config Config
+	config.SecretKey = StringValue(secretKey)
+	config.PublicKey = StringValue(publicKey)
+	config.BearerAuthentication = shouldApplyBearer(config)
+
+	if env == Sandbox {
+		config.URI = String(sandboxURI)
+	} else if env == Production {
+		config.URI = String(productionURI)
+	}
+
+	if config.HTTPClient == nil {
+		config.HTTPClient = httpClient
+	}
+	if config.LeveledLogger == nil {
+		config.LeveledLogger = DefaultLeveledLogger
+	}
+	if config.MaxNetworkRetries == nil {
+		config.MaxNetworkRetries = Int64(DefaultMaxNetworkRetries)
+	}
+
+	return &config, nil
+}
+
+func shouldApplyBearer(config Config) bool {
+	// SecretKey or PublicKey matches a Four pattern
+	if fourKeyPattern.MatchString(config.SecretKey) || fourKeyPattern.MatchString(config.PublicKey) {
+		return true
+	}
+	// SecretKey or PublicKey matches a JWT
+	if fourOAuthJwtPattern.MatchString(config.SecretKey) || fourOAuthJwtPattern.MatchString(config.PublicKey) {
+		return true
+	}
+	return false
+}
+
 func create(secretKey string) (Config, bool) {
 
-	liveSecretKeyMatch := regexp.MustCompile(common.LiveSecretKeyRegex)
-	if liveSecretKeyMatch.MatchString(secretKey) {
+	if mbcLiveSecretKeyPattern.MatchString(secretKey) {
 		return Config{
 			URI:       String(productionURI),
 			SecretKey: secretKey,

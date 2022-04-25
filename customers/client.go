@@ -1,6 +1,7 @@
 package customers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -34,5 +35,27 @@ func (c *Client) Update(customerID string, request *Request) (*Response, error) 
 	if resp.StatusCode == http.StatusNoContent {
 		return response, err
 	}
+	return response, err
+}
+
+func (c *Client) Get(customerID string) (*GetCustomerResponse, error) {
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, customerID))
+	response := &GetCustomerResponse{
+		StatusResponse: resp,
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var customer Customer
+	err = json.Unmarshal(resp.ResponseBody, &customer)
+
+	if resp.StatusCode == http.StatusNoContent {
+		return nil, err
+	}
+
+	response.Customer = &customer
+
 	return response, err
 }

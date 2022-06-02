@@ -430,6 +430,7 @@ type (
 		Aft                      *bool              `json:"aft,omitempty"`
 		DLocal                   *DLocal            `json:"dlocal,omitempty"`
 		AcquirerTransactionID    string             `json:"acquirer_transaction_id,omitempty"`
+		AcquirerReferenceNumber  string             `json:"acquirer_reference_number,omitempty"`
 		RetrievalReferenceNumber string             `json:"retrieval_reference_number,omitempty"`
 		SenderInformation        *SenderInformation `json:"senderInformation,omitempty"`
 	}

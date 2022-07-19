@@ -62,7 +62,7 @@ import (
 "github.com/checkout/checkout-sdk-go/client"
 )
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
+config, err := checkout.SdkConfig(&secretKey, &publicKey, checkout.Sandbox) // or Production
 var tokensClient = tokens.NewClient(*config)
 ```
 
@@ -76,7 +76,7 @@ import (
 
 config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
 var client = tokens.NewClient(*config) // or api.Tokens
-var card = &client.Card{
+var card = &tokens.Card{
     Type:        common.Card,
     Number:      "4242424242424242",
     ExpiryMonth: 2,

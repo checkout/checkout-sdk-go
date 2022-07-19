@@ -1,6 +1,7 @@
 package customers
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -22,6 +23,24 @@ func NewClient(config checkout.Config) *Client {
 	}
 }
 
+// Create a customer
+func (c *Client) Create(request *Request) (*Response, error) {
+	resp, err := c.API.Post("/"+path, request, nil)
+	response := &Response{
+		StatusResponse: resp,
+	}
+	if err != nil {
+		return response, err
+	}
+	if resp.StatusCode == http.StatusCreated {
+		var instrumentResponse CustomerResponse
+		err = json.Unmarshal(resp.ResponseBody, &instrumentResponse)
+		response.Customer = &instrumentResponse
+		return response, err
+	}
+	return response, err
+}
+
 // Update customer details
 func (c *Client) Update(customerID string, request *Request) (*Response, error) {
 	resp, err := c.API.Patch(fmt.Sprintf("/%v/%v", path, customerID), request)
@@ -32,6 +51,25 @@ func (c *Client) Update(customerID string, request *Request) (*Response, error) 
 		return response, err
 	}
 	if resp.StatusCode == http.StatusNoContent {
+		return response, err
+	}
+	return response, err
+}
+
+// Get customer details
+func (c *Client) Get(customerID string) (*Response, error) {
+
+	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, customerID))
+	response := &Response{
+		StatusResponse: resp,
+	}
+	if err != nil {
+		return response, err
+	}
+	if resp.StatusCode == http.StatusOK {
+		var customerResponse CustomerResponse
+		err = json.Unmarshal(resp.ResponseBody, &customerResponse)
+		response.Customer = &customerResponse
 		return response, err
 	}
 	return response, err

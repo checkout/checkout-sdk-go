@@ -382,9 +382,9 @@ type (
 
 	// Customer ...
 	Customer struct {
-		Document string `json:"document,omitempty"`
-		Email    string `json:"email,omitempty"`
-		Name     string `json:"name,omitempty"`
+		ID    string `json:"id,omitempty"`
+		Email string `json:"email,omitempty"`
+		Name  string `json:"name,omitempty"`
 	}
 
 	// BillingDescriptor ...

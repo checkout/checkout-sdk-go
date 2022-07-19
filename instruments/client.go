@@ -7,7 +7,6 @@ import (
 
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/httpclient"
-	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 const path = "instruments"
@@ -34,9 +33,9 @@ func (c *Client) Create(request *Request) (*Response, error) {
 		return response, err
 	}
 	if resp.StatusCode == http.StatusCreated {
-		var source payments.SourceResponse
-		err = json.Unmarshal(resp.ResponseBody, &source)
-		response.Source = &source
+		var instrumentResponse InstrumentResponse
+		err = json.Unmarshal(resp.ResponseBody, &instrumentResponse)
+		response.Instrument = &instrumentResponse
 		return response, err
 	}
 	return response, err
@@ -53,9 +52,9 @@ func (c *Client) Get(sourceID string) (*Response, error) {
 		return response, err
 	}
 	if resp.StatusCode == http.StatusOK {
-		var source payments.SourceResponse
-		err = json.Unmarshal(resp.ResponseBody, &source)
-		response.Source = &source
+		var instrumentResponse InstrumentResponse
+		err = json.Unmarshal(resp.ResponseBody, &instrumentResponse)
+		response.Instrument = &instrumentResponse
 		return response, err
 	}
 	return response, err
@@ -73,7 +72,7 @@ func (c *Client) Update(sourceID string, request *Request) (*Response, error) {
 	if resp.StatusCode == http.StatusOK {
 		var instrumentResponse InstrumentResponse
 		err = json.Unmarshal(resp.ResponseBody, &instrumentResponse)
-		response.InstrumentResponse = &instrumentResponse
+		response.Instrument = &instrumentResponse
 		return response, err
 	}
 	return response, err

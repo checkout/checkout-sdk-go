@@ -70,5 +70,6 @@ func CheckoutApi(secretKey *string, publicKey *string, environment checkout.Supp
 	api.Files = files.NewClient(*config)
 	api.Reconciliation = reconciliation.NewClient(*config)
 	api.Instruments = instruments.NewClient(*config)
+	api.Customers = customers.NewClient(*config)
 	return &api
 }

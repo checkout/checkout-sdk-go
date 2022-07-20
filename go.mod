@@ -1,4 +1,4 @@
-module github.com/checkout/checkout-sdk-go
+module github.com/HelloRelai/checkout-sdk-go
 
 go 1.14
 
@@ -9,4 +9,4 @@ require (
 		github.com/checkout/checkout-sdk-go v0.0.22
 )
 
-replace github.com/checkout/checkout-sdk-go => github.com/HelloRelai/checkout-sdk-go v0.0.24
+replace github.com/checkout/checkout-sdk-go => github.com/HelloRelai/checkout-sdk-go v0.0.25

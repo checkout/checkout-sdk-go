@@ -9,4 +9,4 @@ require (
 		github.com/checkout/checkout-sdk-go v0.0.22
 )
 
-replace github.com/checkout/checkout-sdk-go => github.com/HelloRelai/checkout-sdk-go v0.0.25
+replace github.com/checkout/checkout-sdk-go => github.com/HelloRelai/checkout-sdk-go master

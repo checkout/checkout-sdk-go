@@ -278,11 +278,8 @@ type (
 
 	// PayPalSource ...
 	PayPalSource struct {
-		Type          string            `json:"type" binding:"required"`
-		InvoiceNumber string            `json:"invoice_number" binding:"required"`
-		RecipientName string            `json:"recipient_name,omitempty"`
-		LogoURL       string            `json:"logo_url,omitempty"`
-		STC           map[string]string `json:"stc,omitempty"`
+		Type string       `json:"type" binding:"required"`
+		Plan *common.Plan `json:"plan,omitempty"`
 	}
 
 	// PoliSource ...

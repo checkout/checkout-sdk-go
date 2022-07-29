@@ -63,10 +63,11 @@ type (
 
 	// TokenSource ...
 	TokenSource struct {
-		Type           string          `json:"type" binding:"required"`
-		Token          string          `json:"token" binding:"required"`
-		BillingAddress *common.Address `json:"billing_address,omitempty"`
-		Phone          *common.Phone   `json:"phone,omitempty"`
+		Type              string          `json:"type" binding:"required"`
+		Token             string          `json:"token" binding:"required"`
+		BillingAddress    *common.Address `json:"billing_address,omitempty"`
+		Phone             *common.Phone   `json:"phone,omitempty"`
+		StoreForFutureUse bool            `json:"store_for_future_use,omitempty"`
 	}
 
 	// CustomerSource ...

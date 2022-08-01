@@ -27,23 +27,23 @@ This SDK can be used with two different pair of API keys provided by Checkout. H
 using specific API features. Please find in the table below the types of keys that can be used within this SDK.
 
 | Account System | Public Key (example)                    | Secret Key (example)                    |
-|----------------|-----------------------------------------|-----------------------------------------|
+| -------------- | --------------------------------------- | --------------------------------------- |
 | default        | pk_g650ff27-7c42-4ce1-ae90-5691a188ee7b | sk_gk3517a8-3z01-45fq-b4bd-4282384b0a64 |
-| Four           | pk_pkhpdtvabcf7hdgpwnbhw7r2uic          | sk_m73dzypy7cf3gf5d2xr4k7sxo4e          |
+| Previous       | pk_pkhpdtvabcf7hdgpwnbhw7r2uic          | sk_m73dzypy7cf3gf5d2xr4k7sxo4e          |
 
-Note: sandbox keys have a `test_` or `sbox_` identifier, for Default and Four accounts respectively.
+Note: sandbox keys have a `test_` or `sbox_` identifier, for current and previous api respectively.
 
 If you don't have your own API keys, you can sign up for a test
 account [here](https://www.checkout.com/get-test-account).
 
 ### OAuth
 
-The SDK doesn't support any OAuth authentication flow natively, however it supports OAuth authorization tokens that can be used as API keys. For more information about OAuth please refer 
+The SDK doesn't support any OAuth authentication flow natively, however it supports OAuth authorization tokens that can be used as API keys. For more information about OAuth please refer
 to the official documentation.
 
 ## How to use the SDK
 
-The SDK is structured by different modules and each module gives you access to different business features. All these modules can 
+The SDK is structured by different modules and each module gives you access to different business features. All these modules can
 be instantiated at once, or you can choose to create single modules separately.
 
 ```go
@@ -235,15 +235,15 @@ response, err := client.Refunds("pay_", request, &params)
 
 More documentation related to Checkout API and the SDK is available at:
 
-* [API Reference (Default)](https://api-reference.checkout.com/)
-* [API Reference (Four)](https://api-reference.checkout.com/preview/crusoe/)
-* [Official Docs (Default)](https://docs.checkout.com/)
-* [Official Docs (Four)](https://docs.checkout.com/four)
+- [API Reference](https://api-reference.checkout.com/)
+- [API Reference for our previous api reference](https://api-reference.checkout.com/previous/)
+- [Docs](https://docs.checkout.com/)
+- [Our previous docs](https://www.checkout.com/docs/previous)
 
 The execution of integration tests require the following environment variables set in your system:
 
-* For Default account systems: `CHECKOUT_PUBLIC_KEY` & `CHECKOUT_SECRET_KEY`
-* For Four account systems: `CHECKOUT_FOUR_PUBLIC_KEY` & `CHECKOUT_FOUR_SECRET_KEY`
+- Variables: `CHECKOUT_FOUR_PUBLIC_KEY` & `CHECKOUT_FOUR_SECRET_KEY`
+- If you use our previous api set the variables: `CHECKOUT_PUBLIC_KEY` & `CHECKOUT_SECRET_KEY`
 
 ## Code of Conduct
 

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/HelloRelai/checkout-sdk-go/workflows"
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/customers"
 	"github.com/checkout/checkout-sdk-go/disputes"
@@ -26,6 +27,7 @@ type API struct {
 	Reconciliation *reconciliation.Client
 	Instruments    *instruments.Client
 	Customers      *customers.Client
+	Workflows      *workflows.Client
 }
 
 // Deprecated: This initialization method does not support the new Configuration entrypoint. To use the new entrypoint

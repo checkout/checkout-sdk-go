@@ -1,3 +1,5 @@
+github.com/HelloRelai/checkout-sdk-go v0.0.28 h1:gbvHIeBkrmpClpY+sVQrl3nIh6e9bScvJC5vjIuNYBU=
+github.com/HelloRelai/checkout-sdk-go v0.0.28/go.mod h1:rBWwSnYyDH/ZXuPGJYVNevUuDJyf23VxKEIHjCPOmAA=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASuANWTrk=

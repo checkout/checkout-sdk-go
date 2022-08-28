@@ -2,6 +2,7 @@ package transfers
 
 import (
     "encoding/json"
+    "fmt"
 
     "github.com/checkout/checkout-sdk-go"
     "github.com/checkout/checkout-sdk-go/httpclient"
@@ -35,4 +36,19 @@ func (c *Client) Initiate(request *InitiateRequest, params *checkout.Params) (*I
     }
 
     return resp, nil
+}
+
+// Get ...
+func (c *Client) Get(id string) (*Transfer, error) {
+    response, err := c.API.Get(fmt.Sprintf("/%v/%v", path, id))
+    if err != nil {
+        return nil, err
+    }
+    transfer := &Transfer{}
+    err = json.Unmarshal(response.ResponseBody, &transfer)
+    if err != nil {
+        return nil, err
+    }
+
+    return transfer, nil
 }

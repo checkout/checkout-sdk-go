@@ -5,11 +5,11 @@ type TransferType string
 
 const (
     // Commission ...
-    Commission TransferStatus = "commission"
+    Commission TransferType = "commission"
     // Promotion ...
-    Promotion TransferStatus = "promotion"
+    Promotion TransferType = "promotion"
     // Refund ...
-    Refund TransferStatus = "refund"
+    Refund TransferType = "refund"
 )
 
 func (c TransferType) String() string {

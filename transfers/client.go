@@ -18,7 +18,7 @@ type Client struct {
 // NewClient ...
 func NewClient(config checkout.Config) *Client {
     return &Client{
-        API: httpclient.NewClient(config),
+        API: httpclient.NewTransferClient(config),
     }
 }
 

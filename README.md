@@ -1,249 +1,193 @@
-# Checkout.com Go SDK
+# Checkout.com Golang SDK
 
-![Status](https://img.shields.io/badge/status-beta-red.svg)
-
-The official [Checkout][checkout] Go client library.
+![build-status](https://github.com/checkout/checkout-sdk-go/workflows/build-master/badge.svg)
+[![Go Reference](https://pkg.go.dev/badge/github.com/checkout/checkout-sdk-go.svg)](https://pkg.go.dev/github.com/checkout/checkout-sdk-go)
+[![GitHub license](https://img.shields.io/github/license/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/releases/)
 
 ## Getting started
 
-Make sure your project is using Go Modules (it will have a `go.mod` file in its root if it already is):
+> **Version 1.0.0 is here!**
+> <br/><br/>
+> We improved the initialization of SDK making it easier to understand the available options. <br/>
+> Now `NAS` accounts are the default instance for the SDK and `ABC` structure was moved to a `previous` prefixes. <br/>
 
+### Module installer
+Make sure your project is using Go Modules:
 ```sh
-go mod init
+go get github.com/checkout-sdk-go@{version}
+```
+Then import the library into your code:
+```sh
+import "github.com/checkout-sdk-go"
 ```
 
-```go
-import (
-    "github.com/checkout/checkout-sdk-go"
-)
-```
+### :rocket: Please check in [GitHub releases](https://github.com/checkout/checkout-sdk-go/releases) for all the versions available.
 
-Run any of the normal `go` commands (`build`/`install`/`test`). The Go toolchain will resolve and fetch the
-checkout-sdk-go module automatically.
+### :book: Checkout our official documentation.
 
-## API Keys
+* [Official Docs (Default)](https://docs.checkout.com/)
+* [Official Docs (Previous)](https://docs.checkout.com/previous)
+
+### :books: Check out our official API documentation guide, where you can also find more usage examples.
+
+* [API Reference (Default)](https://api-reference.checkout.com/)
+* [API Reference (Previous)](https://api-reference.checkout.com/previous)
+
+## How to use the SDK
 
 This SDK can be used with two different pair of API keys provided by Checkout. However, using different API keys imply
-using specific API features. Please find in the table below the types of keys that can be used within this SDK.
+using specific API features. </br>
+Please find in the table below the types of keys that can be used within this SDK.
 
 | Account System | Public Key (example)                    | Secret Key (example)                    |
 |----------------|-----------------------------------------|-----------------------------------------|
-| default        | pk_g650ff27-7c42-4ce1-ae90-5691a188ee7b | sk_gk3517a8-3z01-45fq-b4bd-4282384b0a64 |
-| Four           | pk_pkhpdtvabcf7hdgpwnbhw7r2uic          | sk_m73dzypy7cf3gf5d2xr4k7sxo4e          |
+| Default        | pk_pkhpdtvabcf7hdgpwnbhw7r2uic          | sk_m73dzypy7cf3gf5d2xr4k7sxo4e          |
+| Previous       | pk_g650ff27-7c42-4ce1-ae90-5691a188ee7b | sk_gk3517a8-3z01-45fq-b4bd-4282384b0a64 |
 
-Note: sandbox keys have a `test_` or `sbox_` identifier, for Default and Four accounts respectively.
+Note: sandbox keys have a `sbox_` or `test_` identifier, for Default and Previous accounts respectively.
 
 If you don't have your own API keys, you can sign up for a test
 account [here](https://www.checkout.com/get-test-account).
 
-### OAuth
+**PLEASE NEVER SHARE OR PUBLISH YOUR CHECKOUT CREDENTIALS.**
 
-The SDK doesn't support any OAuth authentication flow natively, however it supports OAuth authorization tokens that can be used as API keys. For more information about OAuth please refer 
-to the official documentation.
+### Default
 
-## How to use the SDK
-
-The SDK is structured by different modules and each module gives you access to different business features. All these modules can 
-be instantiated at once, or you can choose to create single modules separately.
+Default keys client instantiation can be done as follows:
 
 ```go
 import (
     "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/client"
+    "github.com/checkout/checkout-sdk-go/configuration"
 )
 
-api := client.CheckoutApi(&secretKey, &publicKey, Sandbox) // or Production
-var tokensClient = api.Tokens
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithSecretKey("secret_key").
+                     WithPublicKey("public_key"). // optional, only required for operations related with tokens
+                     Build()
 ```
 
-```go
-import (
-"github.com/checkout/checkout-sdk-go"
-"github.com/checkout/checkout-sdk-go/client"
-)
+### Default OAuth
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var tokensClient = tokens.NewClient(*config)
-```
-
-### Tokens
+The SDK supports client credentials OAuth, when initialized as follows:
 
 ```go
 import (
     "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/tokens"
+    "github.com/checkout/checkout-sdk-go/configuration"
 )
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = tokens.NewClient(*config) // or api.Tokens
-var card = &client.Card{
-    Type:        common.Card,
-    Number:      "4242424242424242",
-    ExpiryMonth: 2,
-    ExpiryYear:  2022,
-    Name:        "Customer Name",
-    CVV:         "100",
-}
-var request = &tokens.Request{
-    Card: card,
-}
-response, err := client.Request(request)
+api, err := checkout.Builder().
+                     OAuth().
+                     WithAuthorizationUri("https://access.sandbox.checkout.com/connect/token"). // optional, custom authorization URI
+                     WithClientCredentials("client_id", "client_secret").
+                     WithEnvironment(configuration.Sandbox()).
+                     WithScopes(getOAuthScopes()).
+                     Build()
 ```
 
-### Payments
+### Previous
+
+If your pair of keys matches the previous system type, this is how the SDK should be used:
 
 ```go
 import (
     "github.com/checkout/checkout-sdk-go"
+    "github.com/checkout/checkout-sdk-go/configuration"
+)
+
+api, err := checkout.Builder().
+                     Previous().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithSecretKey("secret_key").
+                     WithPublicKey("public_key"). // optional, only required for operations related with tokens
+                     Build()
+```
+
+Then just get any client, and start making requests:
+
+```go
+import (
     "github.com/checkout/checkout-sdk-go/payments"
+    "github.com/checkout/checkout-sdk-go/payments/nas"
 )
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = payments.NewClient(*config) // or api.Payments
-
-var source = payments.TokenSource{
-    Type:  common.Token.String(),
-    Token: "tok_",
-}
-var request = &payments.Request{
-    Source:   source,
-    Amount:   "100",
-    Currency: "USD",
-    Reference: "Payment Reference",
-    Customer: &payments.Customer{
-        Email: "example@email.com",
-        Name:  "First Name Last Name",
-    },
-    Metadata: map[string]string{
-        "udf1": "User Define",
-    },
-}
-
-idempotencyKey := checkout.NewIdempotencyKey()
-params := checkout.Params{
-    IdempotencyKey: &idempotencyKey,
-}
-
-response, err := client.Request(request, &params)
+request := nas.PaymentRequest{}
+response, err := api.Payments.RequestPayment(request)
 ```
 
-### Payment Detail
+## Error Handling
+
+All the API responses that do not fall in the 2** status codes will return a `errors.CheckoutApiError`. The
+error encapsulates the `StatusCode`, `Status` and a the `ErrorDetails`, if available.
+
+## Custom Http Client
+Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows:
+
+```go
+import (
+    "net/http"
+    
+    "github.com/checkout/checkout-sdk-go"
+    "github.com/checkout/checkout-sdk-go/configuration"
+)
+
+httpClient := http.Client{
+    Timeout: time.Duration(20) * time.Millisecond,
+}
+
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithHttpClient(&httpClient).
+                     WithSecretKey("secret_key")).
+                     WithPublicKey("public_key")). // optional, only required for operations related with tokens
+                     Build()
+```
+
+## Custom Environment
+In case that you want to use an integrator or mock server, you can specify your own URI configuration as follows:
 
 ```go
 import (
     "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/payments"
+    "github.com/checkout/checkout-sdk-go/configuration"
 )
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = payments.NewClient(*config) // or api.Payments
-
-response, err := client.Get("pay_")
-```
-
-### Actions
-
-```go
-import (
-    "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/payments"
+environment := configuration.NewEnvironment(
+	"https://the.base.uri/", // the uri for all CKO operations 
+	"https://the.oauth.uri/connect/token", // the uri used for OAUTH authorization, only required for OAuth operations 
+	"https://the.files.uri/", // the uri used for Files operations, only required for Accounts module 
+	"https://the.transfers.uri/", // the uri used for Transfer operations, only required for Transfers module 
+	"https://the.balances.uri/", // the uri used for Balances operations, only required for Balances module false 
 )
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = payments.NewClient(*config) // or api.Payments
-
-response, err := client.Actions("pay_")
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(environment).
+                     WithSecretKey("secret_key")).
+                     WithPublicKey("public_key")). // optional, only required for operations related with tokens
+                     Build()
 ```
 
-### Captures
+## Building from source
 
-```go
-import (
-    "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/payments"
-)
+Once you check out the code from GitHub, the project can be built using:
 
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = payments.NewClient(*config) // or api.Payments
+```sh
+go mod tidy
 
-idempotencyKey := checkout.NewIdempotencyKey()
-params := checkout.Params{
-    IdempotencyKey: &idempotencyKey,
-}
-
-request := &client.CapturesRequest{
-    Amount:    100,
-    Reference: "Reference",
-    Metadata: map[string]string{
-        "udf1": "User Define",
-    },
-}
-response, err := client.Captures("pay_", request, &params)
+go build
 ```
-
-### Voids
-
-```go
-import (
-    "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/payments"
-)
-
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = payments.NewClient(*config) // or api.Payments
-
-idempotencyKey := checkout.NewIdempotencyKey()
-params := checkout.Params{
-    IdempotencyKey: &idempotencyKey,
-}
-
-request := &client.VoidsRequest{
-    Reference: "Reference",
-    Metadata: map[string]string{
-        "udf1": "User Define",
-    },
-}
-response, err := client.Voids("pay_", request, &params)
-```
-
-### Refunds
-
-```go
-import (
-    "github.com/checkout/checkout-sdk-go"
-    "github.com/checkout/checkout-sdk-go/payments"
-)
-
-config, err := checkout.SdkConfig(&secretKey, &publicKey, Sandbox) // or Production
-var client = payments.NewClient(*config) // or api.Payments
-
-request := &payments.RefundsRequest{
-    Amount:    100,
-    Reference: "Reference",
-    Metadata: map[string]string{
-        "udf1": "User Define",
-    },
-}
-
-idempotencyKey := checkout.NewIdempotencyKey()
-params := checkout.Params{
-    IdempotencyKey: &idempotencyKey,
-}
-
-response, err := client.Refunds("pay_", request, &params)
-```
-
-More documentation related to Checkout API and the SDK is available at:
-
-* [API Reference (Default)](https://api-reference.checkout.com/)
-* [API Reference (Four)](https://api-reference.checkout.com/preview/crusoe/)
-* [Official Docs (Default)](https://docs.checkout.com/)
-* [Official Docs (Four)](https://docs.checkout.com/four)
 
 The execution of integration tests require the following environment variables set in your system:
 
-* For Default account systems: `CHECKOUT_PUBLIC_KEY` & `CHECKOUT_SECRET_KEY`
-* For Four account systems: `CHECKOUT_FOUR_PUBLIC_KEY` & `CHECKOUT_FOUR_SECRET_KEY`
+* For default account systems (NAS): `CHECKOUT_DEFAULT_PUBLIC_KEY` & `CHECKOUT_DEFAULT_SECRET_KEY`
+* For default account systems (OAuth): `CHECKOUT_DEFAULT_OAUTH_CLIENT_ID` & `CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET`
+* For Previous account systems (ABC): `CHECKOUT_PREVIOUS_PUBLIC_KEY` & `CHECKOUT_PREVIOUS_SECRET_KEY`
 
 ## Code of Conduct
 

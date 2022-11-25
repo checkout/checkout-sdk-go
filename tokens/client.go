@@ -1,40 +1,61 @@
 package tokens
 
 import (
-	"encoding/json"
-	"net/http"
-
-	"github.com/checkout/checkout-sdk-go"
-	"github.com/checkout/checkout-sdk-go/httpclient"
+	"github.com/checkout/checkout-sdk-go-beta/client"
+	"github.com/checkout/checkout-sdk-go-beta/common"
+	"github.com/checkout/checkout-sdk-go-beta/configuration"
 )
 
-const path = "tokens"
-
-// Client ...
 type Client struct {
-	API checkout.HTTPClient
+	configuration *configuration.Configuration
+	apiClient     client.HttpClient
 }
 
-// NewClient ...
-func NewClient(config checkout.Config) *Client {
+func NewClient(configuration *configuration.Configuration, apiClient client.HttpClient) *Client {
 	return &Client{
-		API: httpclient.NewClient(config),
+		configuration: configuration,
+		apiClient:     apiClient,
 	}
 }
 
-// Request ...
-func (c *Client) Request(request *Request) (*Response, error) {
-	response, err := c.API.Post("/"+path, request, nil)
-	resp := &Response{
-		StatusResponse: response,
-	}
+func (c *Client) RequestCardToken(request CardTokenRequest) (*CardTokenResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.PublicKey)
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
-	if response.StatusCode == http.StatusCreated {
-		var created Created
-		err = json.Unmarshal(response.ResponseBody, &created)
-		resp.Created = &created
+
+	var response CardTokenResponse
+	err = c.apiClient.Post(
+		common.BuildPath(tokensPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
 	}
-	return resp, err
+
+	return &response, nil
+}
+
+func (c *Client) RequestWalletToken(request WalletTokenRequest) (*CardTokenResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var response CardTokenResponse
+	err = c.apiClient.Post(
+		common.BuildPath(tokensPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }

@@ -156,6 +156,137 @@ func TestRequestPayment(t *testing.T) {
 	}
 }
 
+func TestRequestPaymentList(t *testing.T) {
+	var (
+		httpMetadata = common.HttpMetadata{
+			Status:     "200 OK",
+			StatusCode: http.StatusOK,
+		}
+
+		queryRequest = payments.QueryRequest{
+			Limit:     1,
+			Skip:      0,
+			Reference: "reference",
+		}
+
+		paymentResponse = GetPaymentResponse{
+			HttpMetadata: httpMetadata,
+			Id:           paymentId,
+			Amount:       amount,
+			Currency:     currency,
+			Source: &SourceResponse{
+				ResponseCardSource: &ResponseCardSource{
+					Type: payments.CardSource,
+				},
+			},
+			Reference: reference,
+		}
+
+		paymentListResponse = GetPaymentListResponse{
+			HttpMetadata: httpMetadata,
+			Limit:        1,
+			Skip:         0,
+			TotalCount:   1,
+			Data:         []GetPaymentResponse{paymentResponse},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		queryRequest     payments.QueryRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*GetPaymentListResponse, error)
+	}{
+		{
+			name:         "when reference is correct then return a payment list",
+			queryRequest: queryRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*GetPaymentListResponse)
+						*respMapping = paymentListResponse
+					})
+			},
+			checker: func(response *GetPaymentListResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, paymentListResponse.Limit, response.Limit)
+				assert.Equal(t, paymentListResponse.Skip, response.Skip)
+				assert.Equal(t, paymentListResponse.TotalCount, response.TotalCount)
+				assert.Equal(t, paymentListResponse.Data[0].Id, response.Data[0].Id)
+				assert.Equal(t, paymentListResponse.Data[0].Amount, response.Data[0].Amount)
+				assert.Equal(t, paymentListResponse.Data[0].Currency, response.Data[0].Currency)
+				assert.Equal(t, paymentListResponse.Data[0].Source.ResponseCardSource.Type, response.Data[0].Source.ResponseCardSource.Type)
+				assert.Equal(t, paymentListResponse.Data[0].Reference, response.Data[0].Reference)
+			},
+		},
+		{
+			name:         "when credentials invalid then return error",
+			queryRequest: queryRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *GetPaymentListResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:         "when reference not found then return error",
+			queryRequest: queryRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *GetPaymentListResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+				assert.Equal(t, "404 Not Found", chkErr.Status)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.RequestPaymentList(tc.queryRequest))
+		})
+	}
+}
+
 func TestRequestPayout(t *testing.T) {
 	var (
 		payoutRequest = PayoutRequest{

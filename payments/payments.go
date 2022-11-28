@@ -387,6 +387,12 @@ type (
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}
+
+	QueryRequest struct {
+		Limit     int    `url:"limit,10"`
+		Skip      int    `url:"skip,0"`
+		Reference string `url:"reference,omitempty"`
+	}
 )
 
 //Response

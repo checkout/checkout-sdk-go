@@ -30,57 +30,7 @@ func TestRequestCardPayment(t *testing.T) {
 	assert.NotEmpty(t, paymentResponse.Currency)
 	assert.Nil(t, paymentResponse.ThreeDs)
 
-	//Source
-	assert.NotEmpty(t, paymentResponse.Source)
-	responseCardSource := paymentResponse.Source.ResponseCardSource
-	assert.NotEmpty(t, payments.CardSource, responseCardSource.Type)
-	assert.NotEmpty(t, responseCardSource.Id)
-	assert.NotEmpty(t, responseCardSource.AvsCheck)
-	assert.NotEmpty(t, responseCardSource.CvvCheck)
-	assert.NotEmpty(t, responseCardSource.Bin)
-	assert.NotEmpty(t, common.Consumer, responseCardSource.CardCategory)
-	assert.NotEmpty(t, common.Credit, responseCardSource.CardType)
-	assert.NotEmpty(t, responseCardSource.ExpiryYear)
-	assert.NotEmpty(t, responseCardSource.ExpiryMonth)
-	assert.NotEmpty(t, responseCardSource.Last4)
-	assert.NotEmpty(t, responseCardSource.Name)
-	assert.NotEmpty(t, responseCardSource.Fingerprint)
-	assert.NotEmpty(t, responseCardSource.ProductId)
-	assert.NotEmpty(t, responseCardSource.ProductType)
-
-	//Customer
-	assert.NotEmpty(t, paymentResponse.Customer)
-	customer := paymentResponse.Customer
-	assert.NotEmpty(t, customer)
-	assert.NotEmpty(t, customer.Id)
-	assert.NotEmpty(t, customer.Name)
-	assert.NotEmpty(t, customer.Email)
-
-	//Processing
-	assert.NotEmpty(t, paymentResponse.Processing)
-	processing := paymentResponse.Processing
-	assert.NotEmpty(t, processing)
-	assert.NotEmpty(t, processing.AcquirerTransactionId)
-	assert.NotEmpty(t, processing.RetrievalReferenceNumber)
-
-	//Risk
-	assert.False(t, paymentResponse.Risk.Flagged)
-
-	//Balances
-	assert.NotEmpty(t, paymentResponse.Balances)
-	assert.Equal(t, 10, paymentResponse.Balances.TotalAuthorized)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalCaptured)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalRefunded)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalVoided)
-	assert.Equal(t, 10, paymentResponse.Balances.AvailableToCapture)
-	assert.Equal(t, 0, paymentResponse.Balances.AvailableToRefund)
-	assert.Equal(t, 10, paymentResponse.Balances.AvailableToVoid)
-
-	//Links
-	assert.NotEmpty(t, paymentResponse.Links["self"])
-	assert.NotEmpty(t, paymentResponse.Links["actions"])
-	assert.NotEmpty(t, paymentResponse.Links["capture"])
-	assert.NotEmpty(t, paymentResponse.Links["void"])
+	paymentCommonAssertions(t, paymentResponse)
 
 }
 
@@ -167,6 +117,30 @@ func TestMakeCardVerification(t *testing.T) {
 	assert.NotEmpty(t, paymentResponse.Links["actions"])
 	assert.Empty(t, paymentResponse.Links["capture"])
 	assert.Empty(t, paymentResponse.Links["void"])
+
+}
+
+func TestRequestPaymentList(t *testing.T) {
+
+	paymentResponse := makeCardPayment(t, false, 10)
+
+	queryRequest := payments.QueryRequest{
+		Limit:     1,
+		Skip:      0,
+		Reference: paymentResponse.Reference,
+	}
+
+	paymentListResponse, err := DefaultApi().Payments.RequestPaymentList(queryRequest)
+	assert.Nil(t, err)
+	assert.NotNil(t, paymentListResponse)
+	assert.Equal(t, 200, paymentListResponse.HttpMetadata.StatusCode)
+	assert.Equal(t, 1, paymentListResponse.Limit)
+	assert.Equal(t, 0, paymentListResponse.Skip)
+	assert.NotNil(t, paymentListResponse.TotalCount)
+	assert.NotNil(t, paymentListResponse.Data)
+	assert.NotNil(t, paymentListResponse.Data[0].Source)
+
+	paymentCommonAssertions(t, paymentResponse)
 
 }
 
@@ -483,4 +457,59 @@ func makeCardTokenPayment(t *testing.T) *nas.PaymentResponse {
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	return response
+}
+
+func paymentCommonAssertions(t *testing.T, paymentResponse *nas.PaymentResponse) {
+
+	//Source
+	assert.NotEmpty(t, paymentResponse.Source)
+	responseCardSource := paymentResponse.Source.ResponseCardSource
+	assert.NotEmpty(t, payments.CardSource, responseCardSource.Type)
+	assert.NotEmpty(t, responseCardSource.Id)
+	assert.NotEmpty(t, responseCardSource.AvsCheck)
+	assert.NotEmpty(t, responseCardSource.CvvCheck)
+	assert.NotEmpty(t, responseCardSource.Bin)
+	assert.NotEmpty(t, common.Consumer, responseCardSource.CardCategory)
+	assert.NotEmpty(t, common.Credit, responseCardSource.CardType)
+	assert.NotEmpty(t, responseCardSource.ExpiryYear)
+	assert.NotEmpty(t, responseCardSource.ExpiryMonth)
+	assert.NotEmpty(t, responseCardSource.Last4)
+	assert.NotEmpty(t, responseCardSource.Name)
+	assert.NotEmpty(t, responseCardSource.Fingerprint)
+	assert.NotEmpty(t, responseCardSource.ProductId)
+	assert.NotEmpty(t, responseCardSource.ProductType)
+
+	//Customer
+	assert.NotEmpty(t, paymentResponse.Customer)
+	customer := paymentResponse.Customer
+	assert.NotEmpty(t, customer)
+	assert.NotEmpty(t, customer.Id)
+	assert.NotEmpty(t, customer.Name)
+	assert.NotEmpty(t, customer.Email)
+
+	//Processing
+	assert.NotEmpty(t, paymentResponse.Processing)
+	processing := paymentResponse.Processing
+	assert.NotEmpty(t, processing)
+	assert.NotEmpty(t, processing.AcquirerTransactionId)
+	assert.NotEmpty(t, processing.RetrievalReferenceNumber)
+
+	//Risk
+	assert.False(t, paymentResponse.Risk.Flagged)
+
+	//Balances
+	assert.NotEmpty(t, paymentResponse.Balances)
+	assert.Equal(t, 10, paymentResponse.Balances.TotalAuthorized)
+	assert.Equal(t, 0, paymentResponse.Balances.TotalCaptured)
+	assert.Equal(t, 0, paymentResponse.Balances.TotalRefunded)
+	assert.Equal(t, 0, paymentResponse.Balances.TotalVoided)
+	assert.Equal(t, 10, paymentResponse.Balances.AvailableToCapture)
+	assert.Equal(t, 0, paymentResponse.Balances.AvailableToRefund)
+	assert.Equal(t, 10, paymentResponse.Balances.AvailableToVoid)
+
+	//Links
+	assert.NotEmpty(t, paymentResponse.Links["self"])
+	assert.NotEmpty(t, paymentResponse.Links["actions"])
+	assert.NotEmpty(t, paymentResponse.Links["capture"])
+	assert.NotEmpty(t, paymentResponse.Links["void"])
 }

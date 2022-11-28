@@ -40,6 +40,26 @@ func (c *Client) RequestPayment(request PaymentRequest, idempotencyKey *string) 
 	return &response, nil
 }
 
+func (c *Client) RequestPaymentList(request payments.QueryRequest) (*GetPaymentListResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(payments.PathPayments, request)
+	if err != nil {
+		return nil, err
+	}
+
+	var response GetPaymentListResponse
+	err = c.apiClient.Get(url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) RequestPayout(request PayoutRequest, idempotencyKey *string) (*PaymentResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {

@@ -245,6 +245,14 @@ type (
 		AmountAllocations []common.AmountAllocations   `json:"amount_allocations,omitempty"`
 		Links             map[string]common.Link       `json:"_links"`
 	}
+
+	GetPaymentListResponse struct {
+		HttpMetadata common.HttpMetadata
+		Limit        int                  `json:"limit,omitempty"`
+		Skip         int                  `json:"skip,omitempty"`
+		TotalCount   int                  `json:"total_count,omitempty"`
+		Data         []GetPaymentResponse `json:"data,omitempty"`
+	}
 )
 
 func (p *GetPaymentActionsResponse) UnmarshalJSON(data []byte) error {

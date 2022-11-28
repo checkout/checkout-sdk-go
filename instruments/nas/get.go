@@ -7,6 +7,11 @@ import (
 	"github.com/checkout/checkout-sdk-go/instruments"
 )
 
+type QueryBankAccountFormatting struct {
+	AccountHolderType common.AccountHolderType `json:"account-holder-type,omitempty"`
+	PaymentNetwork    PaymentNetwork           `json:"payment-network,omitempty"`
+}
+
 type (
 	GetInstrumentResponse struct {
 		HttpMetadata                     common.HttpMetadata
@@ -53,6 +58,40 @@ type (
 		Currency      common.Currency     `json:"currency,omitempty"`
 		Country       common.Country      `json:"country,omitempty"`
 		BankDetails   *common.BankDetails `json:"bank,omitempty"`
+	}
+
+	InstrumentSectionFieldAllowedOption struct {
+		Id      string `json:"id,omitempty"`
+		Display string `json:"display,omitempty"`
+	}
+
+	InstrumentSectionFieldDependencies struct {
+		FieldId string `json:"field_id,omitempty"`
+		Value   string `json:"value,omitempty"`
+	}
+
+	InstrumentSectionField struct {
+		Id              string                                `json:"id" binding:"required"`
+		Section         string                                `json:"section,omitempty"`
+		Display         string                                `json:"display" binding:"required"`
+		HelpText        string                                `json:"help_text,omitempty"`
+		Type            string                                `json:"type" binding:"required"`
+		Required        bool                                  `json:"required" binding:"required"`
+		ValidationRegex string                                `json:"validation_regex,omitempty"`
+		MinLength       int                                   `json:"min_length,omitempty"`
+		MaxLength       int                                   `json:"max_length,omitempty"`
+		AllowedOptions  []InstrumentSectionFieldAllowedOption `json:"allowed_options,omitempty"`
+		Dependencies    []InstrumentSectionFieldDependencies  `json:"dependencies,omitempty"`
+	}
+
+	InstrumentSection struct {
+		Name   string                   `json:"name,omitempty" binding:"required"`
+		Fields []InstrumentSectionField `json:"fields,omitempty"`
+	}
+
+	GetBankAccountFieldFormattingResponse struct {
+		HttpMetadata common.HttpMetadata
+		Sections     []InstrumentSection `json:"sections,omitempty"`
 	}
 )
 

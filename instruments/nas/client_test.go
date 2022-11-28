@@ -329,6 +329,161 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestClientGetBankAccountFieldFormatting(t *testing.T) {
+	var (
+		httpMetadata = common.HttpMetadata{
+			Status:     "200 OK",
+			StatusCode: http.StatusOK,
+		}
+
+		allowOption = InstrumentSectionFieldAllowedOption{
+			Id:      "1234",
+			Display: "1234",
+		}
+
+		dependencies = InstrumentSectionFieldDependencies{
+			FieldId: "1234",
+			Value:   "1234",
+		}
+
+		sectionField = InstrumentSectionField{
+			Id:              "1234",
+			Section:         "1234",
+			Display:         "1234",
+			HelpText:        "1234",
+			Type:            "1234",
+			Required:        true,
+			ValidationRegex: "1234",
+			MinLength:       0,
+			MaxLength:       1000,
+			AllowedOptions:  []InstrumentSectionFieldAllowedOption{allowOption},
+			Dependencies:    []InstrumentSectionFieldDependencies{dependencies},
+		}
+
+		section = InstrumentSection{
+			Name:   "name",
+			Fields: []InstrumentSectionField{sectionField},
+		}
+
+		query = QueryBankAccountFormatting{
+			AccountHolderType: common.Individual,
+			PaymentNetwork:    Ach,
+		}
+
+		response = GetBankAccountFieldFormattingResponse{
+			HttpMetadata: httpMetadata,
+			Sections:     []InstrumentSection{section},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		country          string
+		currency         string
+		query            QueryBankAccountFormatting
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*GetBankAccountFieldFormattingResponse, error)
+	}{
+		{
+			name:     "When fetching valid bank account validations then it returns validations",
+			country:  string(common.GB),
+			currency: string(common.GBP),
+			query:    query,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*GetBankAccountFieldFormattingResponse)
+						*respMapping = response
+					})
+			},
+			checker: func(response *GetBankAccountFieldFormattingResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Sections)
+				assert.NotNil(t, response.Sections[0].Name)
+				assert.NotNil(t, response.Sections[0].Fields)
+				assert.NotNil(t, response.Sections[0].Fields[0].Id)
+				assert.NotNil(t, response.Sections[0].Fields[0].Section)
+				assert.NotNil(t, response.Sections[0].Fields[0].Display)
+				assert.NotNil(t, response.Sections[0].Fields[0].HelpText)
+				assert.NotNil(t, response.Sections[0].Fields[0].Type)
+				assert.NotNil(t, response.Sections[0].Fields[0].Required)
+				assert.NotNil(t, response.Sections[0].Fields[0].ValidationRegex)
+				assert.NotNil(t, response.Sections[0].Fields[0].MinLength)
+				assert.NotNil(t, response.Sections[0].Fields[0].MaxLength)
+			},
+		},
+		{
+			name:     "when credentials invalid then return error",
+			country:  string(common.GB),
+			currency: string(common.GBP),
+			query:    query,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *GetBankAccountFieldFormattingResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:     "when bank account validation not found then return error",
+			country:  string(common.GB),
+			currency: string(common.GBP),
+			query:    query,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *GetBankAccountFieldFormattingResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+				assert.Equal(t, "404 Not Found", chkErr.Status)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.GetBankAccountFieldFormatting(tc.country, tc.currency, tc.query))
+		})
+	}
+}
+
 func TestUpdate(t *testing.T) {
 	var (
 		httpMetadata = common.HttpMetadata{

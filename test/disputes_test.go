@@ -457,7 +457,7 @@ func getDispute(paymentId string) (dispute disputes.DisputeSummary) {
 			return response.Data[0]
 		}
 		attempt++
-		Wait(time.Duration(15))
+		Wait(time.Duration(10))
 	}
 
 	return dispute

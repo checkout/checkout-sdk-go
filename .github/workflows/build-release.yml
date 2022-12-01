@@ -30,7 +30,7 @@ jobs:
           CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID }}
           CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET }}
         run:
-          go build && go test -v ./...
+          go build && go test -v -timeout 15m ./...
       - id: read-version
         run: echo "CURRENT_VERSION=v$( grep "VERSION" client/version.go | awk '{ print $4 }' | tr -d "\"")" >> $GITHUB_ENV
       - id: print-version

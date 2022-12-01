@@ -15,6 +15,7 @@ import (
 	payments "github.com/checkout/checkout-sdk-go/payments/nas"
 	"github.com/checkout/checkout-sdk-go/sessions"
 	"github.com/checkout/checkout-sdk-go/tokens"
+	"github.com/checkout/checkout-sdk-go/workflows"
 )
 
 type Api struct {
@@ -27,6 +28,7 @@ type Api struct {
 	Accounts    *accounts.Client
 	Sessions    *sessions.Client
 	Metadata    *metadata.Client
+	WorkFlows   *workflows.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -46,6 +48,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Accounts = accounts.NewClient(configuration, apiClient, buildFilesClient(configuration))
 	api.Sessions = sessions.NewClient(configuration, apiClient)
 	api.Metadata = metadata.NewClient(configuration, apiClient)
+	api.WorkFlows = workflows.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

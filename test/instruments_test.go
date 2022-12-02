@@ -75,6 +75,27 @@ func TestShouldGetInstrument(t *testing.T) {
 	assert.NotEmpty(t, getCardInstrumentResponse.ProductType)
 }
 
+func TestShouldGetBankAccountFields(t *testing.T) {
+
+	response, err := OAuthApi().Instruments.GetBankAccountFieldFormatting("GB", "GBP", nas.QueryBankAccountFormatting{
+		AccountHolderType: common.Individual,
+		PaymentNetwork:    nas.Ach,
+	})
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	getBankAccountFieldsResponse := response.Sections[0]
+	assert.Equal(t, "Account holder details", getBankAccountFieldsResponse.Name)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].Id)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].Section)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].Display)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].HelpText)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].Type)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].Required)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].ValidationRegex)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].MinLength)
+	assert.NotNil(t, getBankAccountFieldsResponse.Fields[0].MaxLength)
+}
+
 func TestShouldUpdateInstrument(t *testing.T) {
 
 	token := RequestCardToken(t)

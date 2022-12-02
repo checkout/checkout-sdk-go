@@ -55,6 +55,34 @@ func (c *Client) Get(instrumentId string) (*GetInstrumentResponse, error) {
 	return &response, nil
 }
 
+func (c *Client) GetBankAccountFieldFormatting(
+	country string,
+	currency string,
+	query QueryBankAccountFormatting,
+) (*GetBankAccountFieldFormattingResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(
+		common.BuildPath(instruments.ValidationPath,
+			country,
+			currency),
+		query)
+	if err != nil {
+		return nil, err
+	}
+
+	var response GetBankAccountFieldFormattingResponse
+	err = c.apiClient.Get(url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) Update(instrumentId string, request UpdateInstrumentRequest) (*UpdateInstrumentResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

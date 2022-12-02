@@ -40,22 +40,6 @@ const (
 )
 
 type (
-	Product struct {
-		Name           string `json:"name,omitempty"`
-		Quantity       int    `json:"quantity,omitempty"`
-		UnitPrice      int    `json:"unit_price,omitempty"`
-		Reference      string `json:"reference,omitempty"`
-		CommodityCode  string `json:"commodity_code,omitempty"`
-		UnitOfMeasure  string `json:"unit_of_measure,omitempty"`
-		TotalAmount    int64  `json:"total_amount,omitempty"`
-		TaxAmount      int64  `json:"tax_amount,omitempty"`
-		DiscountAmount int64  `json:"discount_amount,omitempty"`
-		WxpayGoodsId   string `json:"wxpay_goods_id,omitempty"`
-		ImageUrl       string `json:"image_url,omitempty"`
-		Url            string `json:"url,omitempty"`
-		Sku            string `json:"sku,omitempty"`
-	}
-
 	PayoutBillingDescriptor struct {
 		Reference string `json:"reference,omitempty"`
 	}
@@ -121,7 +105,7 @@ type (
 		Recipient           *payments.PaymentRecipient   `json:"recipient,omitempty"`
 		Marketplace         *common.MarketplaceData      `json:"marketplace,omitempty"`
 		Processing          *payments.ProcessingSettings `json:"processing,omitempty"`
-		Items               []Product                    `json:"items,omitempty"`
+		Items               []payments.Product           `json:"items,omitempty"`
 		Metadata            map[string]interface{}       `json:"metadata,omitempty"`
 	}
 
@@ -146,7 +130,7 @@ type (
 		Description       string                       `json:"description,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
 		Shipping          *payments.ShippingDetails    `json:"shipping,omitempty"`
-		Items             []Product                    `json:"items,omitempty"`
+		Items             []payments.Product           `json:"items,omitempty"`
 		Marketplace       *common.MarketplaceData      `json:"marketplace,omitempty"`
 		AmountAllocations []common.AmountAllocations   `json:"amount_allocations,omitempty"`
 		Processing        *payments.ProcessingSettings `json:"processing,omitempty"`
@@ -215,7 +199,7 @@ type (
 		AmountAllocations []common.AmountAllocations      `json:"amount_allocations,omitempty"`
 		Recipient         *payments.PaymentRecipient      `json:"recipient,omitempty"`
 		ProcessingData    *payments.ProcessingData        `json:"processing,omitempty"`
-		Items             []Product                       `json:"items,omitempty"`
+		Items             []payments.Product              `json:"items,omitempty"`
 		Metadata          map[string]interface{}          `json:"metadata,omitempty"`
 		Eci               string                          `json:"eci,omitempty"`
 		SchemeId          string                          `json:"scheme_id,omitempty"`

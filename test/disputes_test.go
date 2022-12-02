@@ -68,20 +68,6 @@ func TestQuery(t *testing.T) {
 			},
 		},
 		{
-			name: "when no disputes match filters then return null data",
-			request: disputes.QueryFilter{
-				Limit: 10,
-				From:  now,
-				To:    now,
-			},
-			checker: func(response *disputes.QueryResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, 0, response.TotalCount)
-				assert.Empty(t, response.Data)
-			},
-		},
-		{
 			name: "when invalid filters then return error",
 			request: disputes.QueryFilter{
 				Limit: 255,

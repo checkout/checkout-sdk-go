@@ -25,8 +25,10 @@ const (
 type CardCategory string
 
 const (
-	Consumer   CardCategory = "Consumer"
-	Commercial CardCategory = "Commercial"
+	Consumer          CardCategory = "Consumer"
+	Commercial        CardCategory = "Commercial"
+	All               CardCategory = "All"
+	OtherCardCategory CardCategory = "Other"
 )
 
 type AccountHolderType string

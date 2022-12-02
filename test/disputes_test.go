@@ -15,7 +15,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/payments/nas"
 	"github.com/checkout/checkout-sdk-go/payments/nas/sources"
-	"github.com/checkout/checkout-sdk-go/tokens"
 )
 
 var (
@@ -30,7 +29,7 @@ var (
 
 func TestSetup(t *testing.T) {
 	var (
-		cardToken = getCardToken(t)
+		cardToken = RequestCardToken(t)
 		payment   = getPaymentRequest(t, cardToken.Token)
 	)
 
@@ -408,23 +407,6 @@ func TestGetFileDetails(t *testing.T) {
 			tc.checker(client.GetFileDetails(tc.fileId))
 		})
 	}
-}
-
-func getCardToken(t *testing.T) *tokens.CardTokenResponse {
-	request := tokens.CardTokenRequest{
-		Type:        tokens.Card,
-		Number:      CardNumber,
-		ExpiryMonth: ExpiryMonth,
-		ExpiryYear:  ExpiryYear,
-		Name:        Name,
-		CVV:         Cvv,
-	}
-	response, err := DefaultApi().Tokens.RequestCardToken(request)
-	if err != nil {
-		assert.Fail(t, fmt.Sprintf("error generating card token - %s", err.Error()))
-	}
-
-	return response
 }
 
 func getPaymentRequest(t *testing.T, token string) *nas.PaymentResponse {

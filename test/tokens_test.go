@@ -35,5 +35,6 @@ func RequestCardToken(t *testing.T) *tokens.CardTokenResponse {
 	response, err := DefaultApi().Tokens.RequestCardToken(request)
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
+	assert.NotNil(t, response.Token)
 	return response
 }

@@ -203,6 +203,7 @@ type (
 		Passenger        *Passenger         `json:"passenger,omitempty"`
 		FlightLegDetails []FlightLegDetails `json:"flight_leg_details,omitempty"`
 	}
+
 	Ticket struct {
 		Number             string `json:"number,omitempty"`
 		IssueDate          string `json:"issue_date,omitempty"`
@@ -210,14 +211,17 @@ type (
 		TravelAgencyName   string `json:"travel_agency_name,omitempty"`
 		TravelAgencyCode   string `json:"travel_agency_code,omitempty"`
 	}
+
 	Passenger struct {
 		Name        *PassengerName `json:"name,omitempty"`
 		DateOfBirth string         `json:"date_of_birth,omitempty"`
 		CountryCode common.Country `json:"country_code,omitempty"`
 	}
+
 	PassengerName struct {
 		FullName string `json:"full_name,omitempty"`
 	}
+
 	FlightLegDetails struct {
 		FlightNumber     int64  `json:"flight_number,omitempty"`
 		CarrierCode      string `json:"carrier_code,omitempty"`
@@ -229,6 +233,7 @@ type (
 		StopoverCode     string `json:"stopover_code,omitempty"`
 		FareBasisCode    string `json:"fare_basis_code,omitempty"`
 	}
+
 	ShippingInfo struct {
 		ShippingCompany       string `json:"shipping_company,omitempty"`
 		ShippingMethod        string `json:"shipping_method,omitempty"`
@@ -238,6 +243,7 @@ type (
 		ReturnTrackingNumber  string `json:"return_tracking_number,omitempty"`
 		ReturnTrackingUri     string `json:"return_tracking_uri,omitempty"`
 	}
+
 	ShippingDetails struct {
 		Address        *common.Address `json:"address,omitempty"`
 		Phone          *common.Phone   `json:"phone,omitempty"`
@@ -372,6 +378,28 @@ type (
 		Country      common.Country `json:"country,omitempty"`
 		Payer        Payer          `json:"payer,omitempty"`
 		Installments *Installments  `json:"installments,omitempty"`
+	}
+
+	Product struct {
+		Name           string `json:"name,omitempty"`
+		Quantity       int    `json:"quantity,omitempty"`
+		UnitPrice      int    `json:"unit_price,omitempty"`
+		Price          int    `json:"price,omitempty"`
+		Reference      string `json:"reference,omitempty"`
+		CommodityCode  string `json:"commodity_code,omitempty"`
+		UnitOfMeasure  string `json:"unit_of_measure,omitempty"`
+		TotalAmount    int64  `json:"total_amount,omitempty"`
+		TaxAmount      int64  `json:"tax_amount,omitempty"`
+		DiscountAmount int64  `json:"discount_amount,omitempty"`
+		WxpayGoodsId   string `json:"wxpay_goods_id,omitempty"`
+		ImageUrl       string `json:"image_url,omitempty"`
+		Url            string `json:"url,omitempty"`
+		Sku            string `json:"sku,omitempty"`
+	}
+
+	BillingInformation struct {
+		Address *common.Address `json:"address,omitempty"`
+		Phone   *common.Phone   `json:"phone,omitempty"`
 	}
 )
 

@@ -211,6 +211,7 @@ type (
 )
 
 type (
+	// Deprecated: should use AmountAllocations instead
 	MarketplaceData struct {
 		SubEntityId string              `json:"sub_entity_id,omitempty"`
 		SubEntities []AmountAllocations `json:"sub_entities,omitempty"`

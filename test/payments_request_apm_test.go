@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/payments/nas"
 	"github.com/checkout/checkout-sdk-go/payments/nas/sources/apm"
 	"net/http"
@@ -86,7 +87,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				Reference:   Reference,
 				Description: Description,
 				Customer:    &customer,
-				Items: []nas.Product{
+				Items: []payments.Product{
 					{
 						Name:      "test item",
 						Quantity:  1,
@@ -144,7 +145,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				Reference:   Reference,
 				Description: Description,
 				Customer:    &customer,
-				Items: []nas.Product{
+				Items: []payments.Product{
 					{
 						Name:      "test item",
 						Quantity:  1,

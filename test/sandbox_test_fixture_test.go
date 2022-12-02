@@ -117,5 +117,5 @@ func getOAuthScopes() []string {
 	return []string{configuration.Files, configuration.Flow, configuration.Fx, configuration.Gateway,
 		configuration.Marketplace, configuration.SessionsApp, configuration.SessionsBrowser,
 		configuration.Vault, configuration.PayoutsBankDetails, configuration.Disputes,
-		configuration.TransfersCreate, configuration.BalancesView}
+		configuration.TransfersCreate, configuration.BalancesView, configuration.VaultCardMetadata}
 }

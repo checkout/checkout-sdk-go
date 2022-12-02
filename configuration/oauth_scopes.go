@@ -40,4 +40,5 @@ const (
 	MiddlewareMerchantsPublic   = "middleware:merchants-public"
 	Reporting                   = "reporting"
 	ReportingView               = "reporting:view"
+	VaultCardMetadata           = "vault:card-metadata"
 )

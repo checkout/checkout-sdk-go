@@ -35,13 +35,8 @@ func TestQuery(t *testing.T) {
 
 		disputesList = []DisputeSummary{dispute}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		queryResponse = QueryResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Limit:        10,
 			Skip:         0,
 			From:         time.Now().Add(-5 * time.Hour),
@@ -168,13 +163,8 @@ func TestGetDisputeDetails(t *testing.T) {
 			Currency: common.GBP,
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		disputeResponse = DisputeResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Dispute:      dispute,
 		}
 	)
@@ -273,12 +263,7 @@ func TestGetDisputeDetails(t *testing.T) {
 
 func TestAccept(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
-		response = common.MetadataResponse{HttpMetadata: httpMetadata}
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
 	)
 
 	cases := []struct {
@@ -369,12 +354,7 @@ func TestAccept(t *testing.T) {
 
 func TestPutEvidence(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
-		response = common.MetadataResponse{HttpMetadata: httpMetadata}
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
 	)
 
 	cases := []struct {
@@ -470,13 +450,8 @@ func TestPutEvidence(t *testing.T) {
 
 func TestGetEvidence(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		evidenceResponse = EvidenceResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Evidence:     disputeEvidence,
 		}
 	)
@@ -571,12 +546,7 @@ func TestGetEvidence(t *testing.T) {
 
 func TestSubmitEvidence(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
-		response = common.MetadataResponse{HttpMetadata: httpMetadata}
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
 	)
 
 	cases := []struct {
@@ -661,6 +631,109 @@ func TestSubmitEvidence(t *testing.T) {
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.SubmitEvidence(tc.disputeId))
+		})
+	}
+}
+
+func TestGetDisputeSchemeFiles(t *testing.T) {
+	var (
+		schemeFilesResponse = SchemeFilesResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Id:           "dis_1234",
+			Files: []SchemeFile{
+				{
+					DisputeStatus: ACCEPTED,
+					File:          "file_1234",
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		disputeId        string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*SchemeFilesResponse, error)
+	}{
+		{
+			name:      "when disputeId is correct then return scheme files",
+			disputeId: disputeId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*SchemeFilesResponse)
+						*respMapping = schemeFilesResponse
+					})
+			},
+			checker: func(response *SchemeFilesResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, schemeFilesResponse.Id, response.Id)
+				assert.Equal(t, schemeFilesResponse.Files, response.Files)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *SchemeFilesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:      "when dispute not found then return error",
+			disputeId: "not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *SchemeFilesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+				assert.Equal(t, "404 Not Found", chkErr.Status)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.GetDisputeSchemeFiles(tc.disputeId))
 		})
 	}
 }

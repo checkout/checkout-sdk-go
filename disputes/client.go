@@ -24,7 +24,7 @@ func (c *Client) Query(queryFilter QueryFilter) (*QueryResponse, error) {
 		return nil, err
 	}
 
-	url, err := common.BuildQueryPath(path, queryFilter)
+	url, err := common.BuildQueryPath(disputes, queryFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *Client) GetDisputeDetails(disputeId string) (*DisputeResponse, error) {
 	}
 
 	var response DisputeResponse
-	err = c.apiClient.Get(common.BuildPath(path, disputeId), auth, &response)
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *Client) Accept(disputeId string) (*common.MetadataResponse, error) {
 
 	var response common.MetadataResponse
 	err = c.apiClient.Post(
-		common.BuildPath(path, disputeId, accept),
+		common.BuildPath(disputes, disputeId, accept),
 		auth,
 		nil,
 		&response,
@@ -82,7 +82,7 @@ func (c *Client) PutEvidence(disputeId string, evidenceRequest Evidence) (*commo
 
 	var response common.MetadataResponse
 	err = c.apiClient.Put(
-		common.BuildPath(path, disputeId, evidence),
+		common.BuildPath(disputes, disputeId, evidence),
 		auth,
 		evidenceRequest,
 		&response,
@@ -102,7 +102,7 @@ func (c *Client) GetEvidence(disputeId string) (*EvidenceResponse, error) {
 	}
 
 	var response EvidenceResponse
-	err = c.apiClient.Get(common.BuildPath(path, disputeId, evidence), auth, &response)
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, evidence), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (c *Client) SubmitEvidence(disputeId string) (*common.MetadataResponse, err
 
 	var response common.MetadataResponse
 	err = c.apiClient.Post(
-		common.BuildPath(path, disputeId, evidence),
+		common.BuildPath(disputes, disputeId, evidence),
 		auth,
 		nil,
 		&response,
@@ -159,6 +159,21 @@ func (c *Client) GetFileDetails(fileId string) (*common.FileResponse, error) {
 
 	var response common.FileResponse
 	err = c.apiClient.Get(common.BuildPath(files, fileId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetDisputeSchemeFiles(disputeId string) (*SchemeFilesResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response SchemeFilesResponse
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, schemeFiles), auth, &response)
 	if err != nil {
 		return nil, err
 	}

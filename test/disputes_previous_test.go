@@ -396,6 +396,49 @@ func TestGetFileDetailsPrevious(t *testing.T) {
 	}
 }
 
+func TestGetDisputeSchemeFilesPrevious(t *testing.T) {
+	dispute := getDisputesPrevious(t).Data[0]
+
+	cases := []struct {
+		name      string
+		disputeId string
+		checker   func(*disputes.SchemeFilesResponse, error)
+	}{
+		{
+			name:      "when dispute has files then return scheme files",
+			disputeId: dispute.Id,
+			checker: func(response *disputes.SchemeFilesResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, dispute.Id, response.Id)
+				assert.NotEmpty(t, response.Files)
+				for _, file := range response.Files {
+					assert.NotNil(t, file.File)
+					assert.NotNil(t, file.DisputeStatus)
+				}
+			},
+		},
+		{
+			name:      "when dispute does not exist then return error",
+			disputeId: "not_found",
+			checker: func(response *disputes.SchemeFilesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := PreviousApi().Disputes
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetDisputeSchemeFiles(tc.disputeId))
+		})
+	}
+}
+
 func getCardTokenPrevious(t *testing.T) *tokens.CardTokenResponse {
 	request := tokens.CardTokenRequest{
 		Type:        tokens.Card,
@@ -474,4 +517,33 @@ func uploadDisputeFilePrevious(t *testing.T, fileRequest common.File) *common.Id
 	}
 
 	return response
+}
+
+func getDisputesPrevious(t *testing.T) *disputes.QueryResponse {
+	layout := "2006-01-02T15:04:05Z"
+	from, _ := time.Parse(layout, time.Now().AddDate(0, -1, 0).String())
+	to, _ := time.Parse(layout, time.Now().Format(layout))
+
+	query := disputes.QueryFilter{
+		Limit:           1,
+		Skip:            0,
+		From:            from,
+		To:              to,
+		ThisChannelOnly: true,
+	}
+
+	process := func() (interface{}, error) {
+		return PreviousApi().Disputes.Query(query)
+	}
+	predicate := func(data interface{}) bool {
+		response := data.(*disputes.QueryResponse)
+		return response.Data != nil && len(response.Data) >= 0
+	}
+
+	response, err := retriable(process, predicate, 2)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error getting subject events - %s", err.Error()))
+	}
+
+	return response.(*disputes.QueryResponse)
 }

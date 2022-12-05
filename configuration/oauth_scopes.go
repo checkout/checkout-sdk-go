@@ -19,6 +19,7 @@ const (
 	DisputesView                = "disputes:view"
 	DisputesProvideEvidence     = "disputes:provide-evidence"
 	DisputesAccept              = "disputes:accept"
+	DisputesSchemeFiles         = "disputes:scheme-files"
 	Marketplace                 = "marketplace"
 	Accounts                    = "accounts"
 	Flow                        = "flow"

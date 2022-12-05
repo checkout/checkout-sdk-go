@@ -7,10 +7,11 @@ import (
 )
 
 const (
-	path     = "disputes"
-	accept   = "accept"
-	evidence = "evidence"
-	files    = "files"
+	disputes    = "disputes"
+	accept      = "accept"
+	evidence    = "evidence"
+	files       = "files"
+	schemeFiles = "schemefiles"
 )
 
 type (
@@ -157,5 +158,20 @@ type (
 	EvidenceResponse struct {
 		HttpMetadata common.HttpMetadata
 		Evidence
+	}
+)
+
+// Files
+type (
+	SchemeFilesResponse struct {
+		HttpMetadata common.HttpMetadata
+		Id           string                 `json:"id,omitempty"`
+		Files        []SchemeFile           `json:"files,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
+	}
+
+	SchemeFile struct {
+		DisputeStatus DisputeStatus `json:"dispute_status,omitempty"`
+		File          string        `json:"file,omitempty"`
 	}
 )

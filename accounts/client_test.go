@@ -10,6 +10,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/mocks"
 )
 
@@ -396,83 +397,147 @@ func TestUpdateEntity(t *testing.T) {
 	}
 }
 
-func TestUpdatePayoutSchedule(t *testing.T) {
+func TestCreatePaymentInstruments(t *testing.T) {
 	var (
+		entityId = "ent_1234"
+
 		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
+			Status:     "202 Accepted",
+			StatusCode: http.StatusAccepted,
 		}
 
-		idResponse = common.IdResponse{
+		metadataResponse = common.MetadataResponse{
 			HttpMetadata: httpMetadata,
-			Links: map[string]common.Link{
-				"self": {
-					HRef: &[]string{"https://www.test-link.com"}[0],
-				},
-			},
+		}
+
+		instrumentDocument = InstrumentDocument{
+			Type:   "bank_statement",
+			FileId: "file_wxglze3wwywujg4nna5fb7ldli",
+		}
+
+		address = common.Address{
+			AddressLine1: "90 Tottenham Court Road",
+			AddressLine2: "",
+			City:         "London",
+			State:        "London",
+			Zip:          "W1T 4TJ",
+			Country:      common.GB,
+		}
+
+		accountHolder = AccountHolder{
+			FirstName:      "Peter",
+			LastName:       "Parker",
+			BillingAddress: &address,
+		}
+
+		paymentInstrument = PaymentInstrument{
+			Type:          instruments.Card,
+			Label:         "Peter's Personal Account",
+			AccountType:   common.Cash,
+			AccountNumber: "12345678",
+			BankCode:      "050389",
+			Currency:      common.GBP,
+			Country:       common.GB,
+			Document:      &instrumentDocument,
+			AccountHolder: &accountHolder,
 		}
 	)
 
 	cases := []struct {
-		name             string
-		entityId         string
-		currency         common.Currency
-		request          CurrencySchedule
-		getAuthorization func(*mock.Mock) mock.Call
-		apiPut           func(*mock.Mock) mock.Call
-		checker          func(*common.IdResponse, error)
+		name              string
+		entityId          string
+		paymentInstrument PaymentInstrument
+		getAuthorization  func(*mock.Mock) mock.Call
+		apiPost           func(*mock.Mock) mock.Call
+		checker           func(*common.MetadataResponse, error)
 	}{
 		{
-			name:     "when request is correct then update entity",
-			entityId: "ent_1234",
-			currency: common.USD,
-			request: CurrencySchedule{
-				Enabled:    true,
-				Threshold:  500,
-				Recurrence: NewScheduleFrequencyDailyRequest(),
-			},
+			name:              "when create a payment instrument then return 202 status",
+			entityId:          entityId,
+			paymentInstrument: paymentInstrument,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
-			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.IdResponse)
-						*respMapping = idResponse
+						respMapping := args.Get(3).(*common.MetadataResponse)
+						*respMapping = metadataResponse
 					})
 			},
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *common.MetadataResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
-				assert.NotNil(t, response.Links)
-				assert.Equal(t, idResponse.Links, response.Links)
+				assert.Equal(t, http.StatusAccepted, response.HttpMetadata.StatusCode)
 			},
 		},
 		{
-			name:     "when entity not_found then return error",
-			entityId: "ent_zzzzzzzzzzzzzzzzzzzzzzzzzz",
-			currency: common.USD,
-			request:  CurrencySchedule{},
+			name:     "when send a bad request then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
-			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
-							StatusCode: http.StatusNotFound,
-							Status:     "404 Not Found",
+							StatusCode: http.StatusBadRequest,
+							Status:     "400 Bad Request",
 						})
 			},
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *common.MetadataResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:              "when request is not correct then return error",
+			paymentInstrument: PaymentInstrument{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Unprocessable",
+							Data: &errors.ErrorDetails{
+								ErrorType:  "invalid_request",
+								ErrorCodes: []string{"company_or_individual_required"},
+							},
+						})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "company_or_individual_required")
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
 			},
 		},
 	}
@@ -485,12 +550,473 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 			environment := new(mocks.EnvironmentMock)
 
 			tc.getAuthorization(&credentials.Mock)
-			tc.apiPut(&apiClient.Mock)
+			tc.apiPost(&apiClient.Mock)
 
 			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
-			tc.checker(client.UpdatePayoutSchedule(tc.entityId, tc.currency, tc.request))
+			tc.checker(client.CreatePaymentInstruments(tc.entityId, tc.paymentInstrument))
+		})
+	}
+}
+
+func TestCreatePaymentInstrument(t *testing.T) {
+	var (
+		entityId = "ent_1234"
+
+		httpMetadata = common.HttpMetadata{
+			Status:     "201 Created",
+			StatusCode: http.StatusCreated,
+		}
+
+		idResponse = common.IdResponse{
+			HttpMetadata: httpMetadata,
+			Id:           "ppi_qn4nis4k3ykpzzu7cvtuvhqqga",
+		}
+
+		instrumentDocument = InstrumentDocument{
+			Type:   "bank_statement",
+			FileId: "file_wxglze3wwywujg4nna5fb7ldli",
+		}
+
+		instrumentDetails = InstrumentDetailsFasterPayments{
+			AccountNumber: "12345678",
+			BankCode:      "050389",
+		}
+
+		paymentInstrumentRequest = PaymentInstrumentRequest{
+			Label:              "Bob's Bank Account",
+			Type:               instruments.BankAccount,
+			Currency:           common.GBP,
+			Country:            common.GB,
+			DefaultDestination: true,
+			Document:           &instrumentDocument,
+			InstrumentDetails:  &instrumentDetails,
+		}
+	)
+
+	cases := []struct {
+		name                     string
+		entityId                 string
+		paymentInstrumentRequest PaymentInstrumentRequest
+		getAuthorization         func(*mock.Mock) mock.Call
+		apiPost                  func(*mock.Mock) mock.Call
+		checker                  func(*common.IdResponse, error)
+	}{
+		{
+			name:                     "when create a payment instrument then return 201 status",
+			entityId:                 entityId,
+			paymentInstrumentRequest: paymentInstrumentRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*common.IdResponse)
+						*respMapping = idResponse
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, idResponse.Id, response.Id)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:     "when send a bad request then return error",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusBadRequest,
+							Status:     "400 Bad Request",
+						})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:                     "when request is not correct then return error",
+			paymentInstrumentRequest: PaymentInstrumentRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Unprocessable",
+							Data: &errors.ErrorDetails{
+								ErrorType:  "invalid_request",
+								ErrorCodes: []string{"company_or_individual_required"},
+							},
+						})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "company_or_individual_required")
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.CreatePaymentInstrument(tc.entityId, tc.paymentInstrumentRequest))
+		})
+	}
+}
+
+func TestQueryPaymentInstruments(t *testing.T) {
+	var (
+		entityId = "ent_1234"
+
+		httpMetadata = common.HttpMetadata{
+			Status:     "200 OK",
+			StatusCode: http.StatusOK,
+		}
+
+		query = PaymentInstrumentsQuery{
+			Status: InstrumentPending,
+		}
+
+		instrumentDocument = InstrumentDocument{
+			Type:   "bank_statement",
+			FileId: "file_wxglze3wwywujg4nna5fb7ldli",
+		}
+
+		paymentInstrumentDetailsResponse = PaymentInstrumentDetailsResponse{
+			HttpMetadata:       httpMetadata,
+			Id:                 "ppi_qn4nis4k3ykpzzu7cvtuvhqqga",
+			Status:             "verified",
+			InstrumentId:       "src_pdasnoaxrtoevpyh3opgaxcrti",
+			Label:              "Bob's Bank Account",
+			Type:               "bank_account",
+			Currency:           common.GBP,
+			Country:            common.GB,
+			DefaultDestination: true,
+			Document:           &instrumentDocument,
+		}
+
+		paymentInstrumentQueryResponse = PaymentInstrumentQueryResponse{
+			HttpMetadata: httpMetadata,
+			Data:         []PaymentInstrumentDetailsResponse{paymentInstrumentDetailsResponse},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		query            PaymentInstrumentsQuery
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*PaymentInstrumentQueryResponse, error)
+	}{
+		{
+			name:     "when query status of payment instruments then return a list of payment instruments",
+			entityId: entityId,
+			query:    query,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*PaymentInstrumentQueryResponse)
+						*respMapping = paymentInstrumentQueryResponse
+					})
+			},
+			checker: func(response *PaymentInstrumentQueryResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:     "when send a bad request then return error",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusBadRequest,
+							Status:     "400 Bad Request",
+						})
+			},
+			checker: func(response *PaymentInstrumentQueryResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:  "when request is not correct then return error",
+			query: PaymentInstrumentsQuery{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Unprocessable",
+							Data: &errors.ErrorDetails{
+								ErrorType:  "invalid_request",
+								ErrorCodes: []string{"company_or_individual_required"},
+							},
+						})
+			},
+			checker: func(response *PaymentInstrumentQueryResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "company_or_individual_required")
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *PaymentInstrumentQueryResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.QueryPaymentInstruments(tc.entityId, tc.query))
+		})
+	}
+}
+
+func TestRetrievePaymentInstrumentDetails(t *testing.T) {
+	var (
+		entityId            = "ent_1234"
+		paymentInstrumentId = "1234"
+
+		httpMetadata = common.HttpMetadata{
+			Status:     "200 OK",
+			StatusCode: http.StatusOK,
+		}
+
+		instrumentDocument = InstrumentDocument{
+			Type:   "bank_statement",
+			FileId: "file_wxglze3wwywujg4nna5fb7ldli",
+		}
+
+		paymentInstrumentDetailsResponse = PaymentInstrumentDetailsResponse{
+			HttpMetadata:       httpMetadata,
+			Id:                 "ppi_qn4nis4k3ykpzzu7cvtuvhqqga",
+			Status:             "verified",
+			InstrumentId:       "src_pdasnoaxrtoevpyh3opgaxcrti",
+			Label:              "Bob's Bank Account",
+			Type:               "bank_account",
+			Currency:           common.GBP,
+			Country:            common.GB,
+			DefaultDestination: true,
+			Document:           &instrumentDocument,
+		}
+	)
+
+	cases := []struct {
+		name                string
+		entityId            string
+		paymentInstrumentId string
+		getAuthorization    func(*mock.Mock) mock.Call
+		apiGet              func(*mock.Mock) mock.Call
+		checker             func(*PaymentInstrumentDetailsResponse, error)
+	}{
+		{
+			name:                "when retrieve a payment instrument details then return payment instrument details",
+			entityId:            entityId,
+			paymentInstrumentId: paymentInstrumentId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*PaymentInstrumentDetailsResponse)
+						*respMapping = paymentInstrumentDetailsResponse
+					})
+			},
+			checker: func(response *PaymentInstrumentDetailsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Id, response.Id)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Label, response.Label)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Type, response.Type)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Currency, response.Currency)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Country, response.Country)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Document, response.Document)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.Status, response.Status)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.DefaultDestination, response.DefaultDestination)
+				assert.NotNil(t, paymentInstrumentDetailsResponse.InstrumentId, response.InstrumentId)
+			},
+		},
+		{
+			name:     "when send a bad request then return error",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusBadRequest,
+							Status:     "400 Bad Request",
+						})
+			},
+			checker: func(response *PaymentInstrumentDetailsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:                "when request is not correct then return error",
+			paymentInstrumentId: "",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Unprocessable",
+							Data: &errors.ErrorDetails{
+								ErrorType:  "invalid_request",
+								ErrorCodes: []string{"company_or_individual_required"},
+							},
+						})
+			},
+			checker: func(response *PaymentInstrumentDetailsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "company_or_individual_required")
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *PaymentInstrumentDetailsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.RetrievePaymentInstrumentDetails(tc.entityId, tc.paymentInstrumentId))
 		})
 	}
 }
@@ -589,6 +1115,105 @@ func TestGetPayoutSchedule(t *testing.T) {
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.RetrievePayoutSchedule(tc.entityId))
+		})
+	}
+}
+
+func TestUpdatePayoutSchedule(t *testing.T) {
+	var (
+		httpMetadata = common.HttpMetadata{
+			Status:     "200 OK",
+			StatusCode: http.StatusOK,
+		}
+
+		idResponse = common.IdResponse{
+			HttpMetadata: httpMetadata,
+			Links: map[string]common.Link{
+				"self": {
+					HRef: &[]string{"https://www.test-link.com"}[0],
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		currency         common.Currency
+		request          CurrencySchedule
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPut           func(*mock.Mock) mock.Call
+		checker          func(*common.IdResponse, error)
+	}{
+		{
+			name:     "when request is correct then update entity",
+			entityId: "ent_1234",
+			currency: common.USD,
+			request: CurrencySchedule{
+				Enabled:    true,
+				Threshold:  500,
+				Recurrence: NewScheduleFrequencyDailyRequest(),
+			},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*common.IdResponse)
+						*respMapping = idResponse
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Links)
+				assert.Equal(t, idResponse.Links, response.Links)
+			},
+		},
+		{
+			name:     "when entity not_found then return error",
+			entityId: "ent_zzzzzzzzzzzzzzzzzzzzzzzzzz",
+			currency: common.USD,
+			request:  CurrencySchedule{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPut(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.UpdatePayoutSchedule(tc.entityId, tc.currency, tc.request))
 		})
 	}
 }

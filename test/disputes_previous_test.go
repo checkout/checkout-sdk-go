@@ -397,7 +397,7 @@ func TestGetFileDetailsPrevious(t *testing.T) {
 }
 
 func TestGetDisputeSchemeFilesPrevious(t *testing.T) {
-	t.Skip("Skipping tests because this suit is unstable")
+	t.Skip("Skipping tests because this suite is unstable")
 	dispute := getDisputesPrevious(t).Data[0]
 
 	cases := []struct {

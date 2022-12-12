@@ -5,11 +5,12 @@ import (
 )
 
 const (
-	accountsPath        = "accounts"
-	entitiesPath        = "entities"
-	instrumentsPath     = "instruments"
-	payoutSchedulesPath = "payout-schedules"
-	filesPath           = "files"
+	accountsPath           = "accounts"
+	entitiesPath           = "entities"
+	instrumentsPath        = "instruments"
+	payoutSchedulesPath    = "payout-schedules"
+	filesPath              = "files"
+	paymentInstrumentsPath = "payment-instruments"
 )
 
 type AccountHolderType string

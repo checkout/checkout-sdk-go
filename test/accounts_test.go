@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
@@ -12,8 +13,74 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/nas"
 )
+
+func TestSubmitFileAccounts(t *testing.T) {
+	cases := []struct {
+		name        string
+		fileRequest accounts.File
+		checker     func(*common.IdResponse, error)
+	}{
+		{
+			name: "when data is correct then return ID for uploaded file - IMAGE",
+			fileRequest: accounts.File{
+				File:    "./checkout.jpeg",
+				Purpose: common.BankVerification,
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.Links)
+			},
+		},
+		{
+			name: "when data is correct then return ID for uploaded file - PDF",
+			fileRequest: accounts.File{
+				File:    "./checkout.pdf",
+				Purpose: common.BankVerification,
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.Links)
+			},
+		},
+		{
+			name:        "when file path is missing then return error",
+			fileRequest: accounts.File{},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				assert.Equal(t, "Invalid file name", err.Error())
+			},
+		},
+		{
+			name: "when purpose is missing then return error",
+			fileRequest: accounts.File{
+				File: "./checkout.pdf",
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				assert.Equal(t, "Invalid purpose", err.Error())
+			},
+		},
+	}
+
+	client := buildPayoutsScheduleClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.SubmitFile(tc.fileRequest))
+		})
+	}
+}
 
 func TestCreateEntity(t *testing.T) {
 	cases := []struct {
@@ -71,7 +138,7 @@ func TestCreateEntity(t *testing.T) {
 
 func TestGetEntity(t *testing.T) {
 	var (
-		entityId = createEntity()
+		entityId = createEntity(t)
 	)
 
 	cases := []struct {
@@ -111,7 +178,7 @@ func TestGetEntity(t *testing.T) {
 
 func TestUpdateEntity(t *testing.T) {
 	var (
-		entityId = createEntity()
+		entityId = createEntity(t)
 	)
 
 	cases := []struct {
@@ -177,28 +244,109 @@ func TestUpdateEntity(t *testing.T) {
 	}
 }
 
-func createEntity() string {
-	r := accounts.OnboardEntityRequest{
-		Reference:      GenerateRandomReference(),
-		ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-		Profile: &accounts.Profile{
-			Urls: []string{"https://www.superheroexample.com"},
-			Mccs: []string{"0742"},
+func TestQueryPaymentInstruments(t *testing.T) {
+	var (
+		entityId = createEntityCompany(t)
+		query    = accounts.PaymentInstrumentsQuery{
+			Status: accounts.Unverified,
+		}
+	)
+
+	cases := []struct {
+		name     string
+		entityId string
+		query    accounts.PaymentInstrumentsQuery
+		checker  func(*accounts.PaymentInstrumentQueryResponse, error)
+	}{
+		{
+			name:     "when query a payment instrument then return payment instrument data",
+			entityId: entityId,
+			query:    query,
+			checker: func(response *accounts.PaymentInstrumentQueryResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotNil(t, response.Data)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
 		},
-		Individual: &accounts.Individual{
-			FirstName:         "Bruce",
-			LastName:          "Wayne",
-			TradingName:       "Batman's Super Hero Masks",
-			NationalTaxId:     "TAX123456",
-			RegisteredAddress: Address(),
-			DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-			Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
+		{
+			name:     "when entity is incorrect then return error",
+			entityId: "",
+			checker: func(response *accounts.PaymentInstrumentQueryResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+			},
 		},
 	}
+	client := buildAccountClient().Accounts
 
-	entity, _ := OAuthApi().Accounts.CreateEntity(r)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.QueryPaymentInstruments(tc.entityId, tc.query))
+		})
+	}
+}
 
-	return entity.Id
+func TestRetrievePaymentInstrumentsDetails(t *testing.T) {
+	var (
+		entityId = createEntityCompany(t)
+
+		file = accounts.File{
+			File:    "./checkout.pdf",
+			Purpose: common.BankVerification,
+		}
+
+		requestFileId = submitFile(t, file)
+
+		paymentInstrumentId = paymentInstrumentRequest(t, entityId, requestFileId)
+	)
+
+	cases := []struct {
+		name                string
+		entityId            string
+		paymentInstrumentId string
+		checker             func(*accounts.PaymentInstrumentDetailsResponse, error)
+	}{
+		{
+			name:                "when fetching valid payment instrument details then return payment instrument details",
+			entityId:            entityId,
+			paymentInstrumentId: paymentInstrumentId,
+			checker: func(response *accounts.PaymentInstrumentDetailsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.Status)
+				assert.NotNil(t, response.Label)
+				assert.NotNil(t, response.Type)
+				assert.NotNil(t, response.Currency)
+				assert.NotNil(t, response.Country)
+				assert.NotNil(t, response.Document)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.Links)
+			},
+		},
+		{
+			name:                "when entity does not exist then return error",
+			entityId:            "ent_zzzzzzzzzzzzzzzzzzzzzzzzzz",
+			paymentInstrumentId: "ppi_zzzzzzzzzzzzzzzzzzzzzzzzzz",
+			checker: func(response *accounts.PaymentInstrumentDetailsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+	client := buildAccountClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.RetrievePaymentInstrumentDetails(tc.entityId, tc.paymentInstrumentId))
+		})
+	}
 }
 
 func TestUpdatePayoutSchedule(t *testing.T) {
@@ -301,7 +449,7 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 		},
 	}
 
-	client := buildAccountsClient().Accounts
+	client := buildPayoutsScheduleClient().Accounts
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -378,7 +526,7 @@ func TestGetPayoutSchedule(t *testing.T) {
 			},
 		},
 	}
-	client := buildAccountsClient().Accounts
+	client := buildPayoutsScheduleClient().Accounts
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -387,78 +535,134 @@ func TestGetPayoutSchedule(t *testing.T) {
 	}
 }
 
-func TestUploadFileAccounts(t *testing.T) {
-	cases := []struct {
-		name        string
-		fileRequest accounts.File
-		checker     func(*common.IdResponse, error)
-	}{
-		{
-			name: "when data is correct then return ID for uploaded file - IMAGE",
-			fileRequest: accounts.File{
-				File:    "./checkout.jpeg",
-				Purpose: common.BankVerification,
-			},
-			checker: func(response *common.IdResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
-				assert.NotNil(t, response.Id)
-				assert.NotNil(t, response.Links)
-			},
+func createEntity(t *testing.T) string {
+	r := accounts.OnboardEntityRequest{
+		Reference:      GenerateRandomReference(),
+		ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
+		Profile: &accounts.Profile{
+			Urls: []string{"https://www.superheroexample.com"},
+			Mccs: []string{"0742"},
 		},
-		{
-			name: "when data is correct then return ID for uploaded file - PDF",
-			fileRequest: accounts.File{
-				File:    "./checkout.pdf",
-				Purpose: common.BankVerification,
-			},
-			checker: func(response *common.IdResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
-				assert.NotNil(t, response.Id)
-				assert.NotNil(t, response.Links)
-			},
-		},
-		{
-			name:        "when file path is missing then return error",
-			fileRequest: accounts.File{},
-			checker: func(response *common.IdResponse, err error) {
-				assert.Nil(t, response)
-				assert.NotNil(t, err)
-				assert.Equal(t, "Invalid file name", err.Error())
-			},
-		},
-		{
-			name: "when purpose is missing then return error",
-			fileRequest: accounts.File{
-				File: "./checkout.pdf",
-			},
-			checker: func(response *common.IdResponse, err error) {
-				assert.Nil(t, response)
-				assert.NotNil(t, err)
-				assert.Equal(t, "Invalid purpose", err.Error())
-			},
+		Individual: &accounts.Individual{
+			FirstName:         "Bruce",
+			LastName:          "Wayne",
+			TradingName:       "Batman's Super Hero Masks",
+			NationalTaxId:     "TAX123456",
+			RegisteredAddress: Address(),
+			DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
+			Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
 		},
 	}
 
-	client := buildAccountsClient().Accounts
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.UploadFile(tc.fileRequest))
-		})
+	entity, err := OAuthApi().Accounts.CreateEntity(r)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating entity - %s", err.Error()))
 	}
+
+	return entity.Id
 }
 
-func buildAccountsClient() *nas.Api {
-	oauthAccountsApi, _ := checkout.Builder().OAuth().
+func createEntityCompany(t *testing.T) string {
+	r := accounts.OnboardEntityRequest{
+		Reference: GenerateRandomReference(),
+		ContactDetails: &accounts.ContactDetails{
+			Phone: &accounts.Phone{
+				Number: "2345678910",
+			},
+			EntityEmailAddresses: &accounts.EntityEmailAddresses{
+				Primary: []string{GenerateRandomEmail()},
+			},
+		},
+		Profile: &accounts.Profile{
+			Urls: []string{"https://www.superheroexample.com"},
+			Mccs: []string{"0742"},
+		},
+
+		Company: &accounts.Company{
+			BusinessRegistrationNumber: "01234567",
+			BusinessType:               "",
+			LegalName:                  "Super Hero Masks Inc.",
+			TradingName:                "Super Hero Masks",
+			PrincipalAddress:           Address(),
+			RegisteredAddress:          Address(),
+			Representatives: []accounts.Representative{
+				{
+					FirstName: "John",
+					LastName:  "Doe",
+					Address:   Address(),
+					Identification: &accounts.Identification{
+						NationalIdNumber: "AB123456C",
+					},
+				},
+			},
+		},
+	}
+
+	entity, err := buildAccountClient().Accounts.CreateEntity(r)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating entity company - %s", err.Error()))
+	}
+
+	return entity.Id
+}
+
+func submitFile(t *testing.T, fileRequest accounts.File) string {
+	file, err := OAuthApi().Accounts.SubmitFile(fileRequest)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error uploading file - %s", err.Error()))
+	}
+
+	return file.Id
+}
+
+func paymentInstrumentRequest(t *testing.T, entityId string, fileId string) string {
+	instrumentDocument := accounts.InstrumentDocument{
+		Type:   "bank_statement",
+		FileId: fileId,
+	}
+
+	instrumentDetails := accounts.InstrumentDetailsFasterPayments{
+		AccountNumber: "12334454",
+		BankCode:      "050389",
+	}
+
+	paymentInstrument := accounts.PaymentInstrumentRequest{
+		Label:              "Barclays",
+		Type:               instruments.BankAccount,
+		Currency:           common.GBP,
+		Country:            common.GB,
+		DefaultDestination: false,
+		Document:           &instrumentDocument,
+		InstrumentDetails:  &instrumentDetails,
+	}
+
+	instrumentResponse, err := buildAccountClient().Accounts.CreatePaymentInstrument(entityId, paymentInstrument)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating payment instrument - %s", err.Error()))
+	}
+
+	return instrumentResponse.Id
+}
+
+func buildPayoutsScheduleClient() *nas.Api {
+	oauthPayoutsScheduleApi, _ := checkout.Builder().OAuth().
 		WithClientCredentials(
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 		WithEnvironment(configuration.Sandbox()).
 		WithScopes([]string{configuration.Marketplace, configuration.Files}).
+		Build()
+
+	return oauthPayoutsScheduleApi
+}
+
+func buildAccountClient() *nas.Api {
+	oauthAccountsApi, _ := checkout.Builder().OAuth().
+		WithClientCredentials(
+			os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_ID"),
+			os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET")).
+		WithEnvironment(configuration.Sandbox()).
+		WithScopes([]string{configuration.Accounts}).
 		Build()
 
 	return oauthAccountsApi

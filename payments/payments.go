@@ -329,7 +329,8 @@ type (
 	}
 
 	RiskAssessment struct {
-		Flagged bool `json:"flagged,omitempty"`
+		Flagged bool  `json:"flagged,omitempty"`
+		Score   int64 `json:"score,omitempty"`
 	}
 
 	PaymentProcessing struct {

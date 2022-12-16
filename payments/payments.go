@@ -280,7 +280,8 @@ type (
 	}
 
 	RiskRequest struct {
-		Enabled bool `json:"enabled"`
+		Enabled         bool   `json:"enabled"`
+		DeviceSessionId string `json:"device_session_id,omitempty"`
 	}
 
 	PaymentRecipient struct {

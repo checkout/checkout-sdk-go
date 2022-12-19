@@ -119,7 +119,7 @@ func TestRetrieveAllEventTypes(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			eventsClient := NewClient(configuration, apiClient)
 
 			tc.checker(eventsClient.RetrieveAllEventTypes(tc.requestVersions))

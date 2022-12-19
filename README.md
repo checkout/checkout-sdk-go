@@ -148,6 +148,29 @@ api, err := checkout.Builder().
                      Build()
 ```
 
+## Logging
+
+The SDK supports custom Log provider. You can provide your log configuration via SDK initialization. By default, the SDK uses the `log` package from the standard library.
+
+```go
+import (
+    "log"	
+	
+    "github.com/checkout/checkout-sdk-go"
+    "github.com/checkout/checkout-sdk-go/configuration"
+)
+
+logger := log.New(os.Stderr, "checkout-sdk-go - ", log.LstdFlags)
+
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithSecretKey("secret_key")).
+                     WithPublicKey("public_key")). // optional, only required for operations related with tokens
+                     WithLogger(logger) // your own custom configuration
+                     Build()
+```
+
 ## Custom Environment
 In case that you want to use an integrator or mock server, you can specify your own URI configuration as follows:
 

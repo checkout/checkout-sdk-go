@@ -139,7 +139,7 @@ func TestRequestCardToken(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.RequestCardToken(tc.request))

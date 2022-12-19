@@ -1,6 +1,7 @@
 package test
 
 import (
+	"log"
 	"os"
 	"testing"
 	"time"
@@ -24,6 +25,7 @@ func TestGetAccessToken(t *testing.T) {
 				ClientSecret:     os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET"),
 				AuthorizationUri: "https://access.sandbox.checkout.com/connect/token",
 				Scopes:           []string{configuration.Disputes},
+				Log:              log.New(os.Stderr, "checkout-sdk-go - ", log.LstdFlags),
 			},
 			checker: func(token *configuration.OAuthAccessToken, err error) {
 				assert.Nil(t, err)
@@ -40,6 +42,7 @@ func TestGetAccessToken(t *testing.T) {
 				ClientSecret:     "invalid_client_secret",
 				AuthorizationUri: "https://access.sandbox.checkout.com/connect/token",
 				Scopes:           []string{configuration.Disputes},
+				Log:              log.New(os.Stderr, "checkout-sdk-go - ", log.LstdFlags),
 			},
 			checker: func(token *configuration.OAuthAccessToken, err error) {
 				assert.NotNil(t, err)
@@ -55,6 +58,7 @@ func TestGetAccessToken(t *testing.T) {
 				ClientSecret:     os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET"),
 				AuthorizationUri: "https://access.sandbox.checkout.com/connect/token",
 				Scopes:           []string{"invalid_scope"},
+				Log:              log.New(os.Stderr, "checkout-sdk-go - ", log.LstdFlags),
 			},
 			checker: func(token *configuration.OAuthAccessToken, err error) {
 				assert.NotNil(t, err)

@@ -20,6 +20,11 @@ func (b *CheckoutDefaultSdkBuilder) WithHttpClient(client *http.Client) *Checkou
 	return b
 }
 
+func (b *CheckoutDefaultSdkBuilder) WithLogger(logger configuration.StdLogger) *CheckoutDefaultSdkBuilder {
+	b.Logger = logger
+	return b
+}
+
 func (b *CheckoutDefaultSdkBuilder) WithPublicKey(publicKey string) *CheckoutDefaultSdkBuilder {
 	b.PublicKey = publicKey
 	return b
@@ -42,7 +47,7 @@ func (b *CheckoutDefaultSdkBuilder) Build() (*Api, error) {
 	}
 
 	sdkCredentials := configuration.NewDefaultKeysSdkCredentials(b.SecretKey, b.PublicKey)
-	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient)
+	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient, b.Logger)
 
 	return CheckoutApi(newConfiguration), nil
 }

@@ -10,9 +10,15 @@ type Configuration struct {
 	Credentials SdkCredentials
 	Environment Environment
 	HttpClient  http.Client
+	Logger      StdLogger
 }
 
-func NewConfiguration(credentials SdkCredentials, environment Environment, client *http.Client) *Configuration {
+func NewConfiguration(
+	credentials SdkCredentials,
+	environment Environment,
+	client *http.Client,
+	logger StdLogger,
+) *Configuration {
 	if environment == nil {
 		environment = Sandbox()
 	}
@@ -21,9 +27,14 @@ func NewConfiguration(credentials SdkCredentials, environment Environment, clien
 		client = common.BuildDefaultClient()
 	}
 
+	if logger == nil {
+		logger = DefaultLogger()
+	}
+
 	return &Configuration{
 		Credentials: credentials,
 		Environment: environment,
 		HttpClient:  *client,
+		Logger:      logger,
 	}
 }

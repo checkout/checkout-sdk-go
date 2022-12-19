@@ -135,7 +135,7 @@ func TestCreateEntity(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.CreateEntity(tc.request))
@@ -263,7 +263,7 @@ func TestGetEntity(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.GetEntity(tc.entityId))
@@ -388,7 +388,7 @@ func TestUpdateEntity(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.UpdateEntity(tc.entityId, tc.request))
@@ -487,7 +487,7 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.UpdatePayoutSchedule(tc.entityId, tc.currency, tc.request))
@@ -585,7 +585,7 @@ func TestGetPayoutSchedule(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.RetrievePayoutSchedule(tc.entityId))

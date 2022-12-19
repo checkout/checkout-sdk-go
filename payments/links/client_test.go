@@ -109,7 +109,7 @@ func TestCreatePaymentLink(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.CreatePaymentLink(tc.request))
@@ -215,7 +215,7 @@ func TestGetPaymentLink(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetPaymentLink(tc.paymentLinkId))

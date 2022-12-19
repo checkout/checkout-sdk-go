@@ -145,7 +145,7 @@ func TestQuery(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.Query(tc.query))
@@ -253,7 +253,7 @@ func TestGetDisputeDetails(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetDisputeDetails(tc.disputeId))
@@ -344,7 +344,7 @@ func TestAccept(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.Accept(tc.disputeId))
@@ -440,7 +440,7 @@ func TestPutEvidence(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.PutEvidence(tc.disputeId, tc.request))
@@ -536,7 +536,7 @@ func TestGetEvidence(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetEvidence(tc.disputeId))
@@ -627,7 +627,7 @@ func TestSubmitEvidence(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.SubmitEvidence(tc.disputeId))
@@ -730,7 +730,7 @@ func TestGetDisputeSchemeFiles(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{})
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetDisputeSchemeFiles(tc.disputeId))

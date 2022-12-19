@@ -135,7 +135,9 @@ func getPaymentLinkRequest() *links.PaymentLinkRequest {
 		Recipient: &payments.PaymentRecipient{
 			DateOfBirth:   "1985-05-15",
 			AccountNumber: "1234567",
+			CountryCode:   common.GB,
 			Zip:           "12345",
+			FirstName:     FirstName,
 			LastName:      LastName,
 		},
 		Processing: &payments.ProcessingSettings{Aft: true},

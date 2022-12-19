@@ -285,10 +285,12 @@ type (
 	}
 
 	PaymentRecipient struct {
-		DateOfBirth   string `json:"dob,omitempty"`
-		AccountNumber string `json:"account_number,omitempty"`
-		Zip           string `json:"zip,omitempty"`
-		LastName      string `json:"last_name,omitempty"`
+		DateOfBirth   string         `json:"dob,omitempty"`
+		AccountNumber string         `json:"account_number,omitempty"`
+		CountryCode   common.Country `json:"country_code,omitempty"`
+		Zip           string         `json:"zip,omitempty"`
+		FirstName     string         `json:"first_name,omitempty"`
+		LastName      string         `json:"last_name,omitempty"`
 	}
 
 	ProcessingSettings struct {

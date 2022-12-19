@@ -233,7 +233,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.Nil(t, response)
 				ckoErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "cko_processing_channel_id_invalid", ckoErr.Data.ErrorCodes[0])
+				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{

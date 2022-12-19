@@ -19,6 +19,7 @@ type (
 		AuthorizationUri string
 		Scopes           []string
 		AccessToken      *OAuthAccessToken
+		Log              StdLogger
 	}
 
 	OAuthAccessToken struct {
@@ -32,12 +33,23 @@ type (
 	}
 )
 
-func NewOAuthSdkCredentials(clientId, clientSecret, authorizationUri string, scopes []string) (*OAuthSdkCredentials, error) {
+func NewOAuthSdkCredentials(
+	clientId,
+	clientSecret,
+	authorizationUri string,
+	scopes []string,
+	logger StdLogger,
+) (*OAuthSdkCredentials, error) {
+	if logger == nil {
+		logger = DefaultLogger()
+	}
+
 	sdkCredentials := OAuthSdkCredentials{
 		ClientId:         clientId,
 		ClientSecret:     clientSecret,
 		AuthorizationUri: authorizationUri,
 		Scopes:           scopes,
+		Log:              logger,
 	}
 
 	err := sdkCredentials.GetAccessToken()
@@ -82,6 +94,8 @@ func (f *OAuthSdkCredentials) GetAccessToken() error {
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	client := http.Client{Timeout: time.Duration(5) * time.Second}
+
+	f.Log.Printf("post: %s", f.AuthorizationUri)
 	resp, err := client.Do(req)
 	if err != nil {
 		return err

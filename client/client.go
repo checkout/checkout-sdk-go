@@ -23,6 +23,7 @@ type HttpClient interface {
 type ApiClient struct {
 	HttpClient http.Client
 	BaseUri    string
+	Log        configuration.StdLogger
 }
 
 const (
@@ -34,6 +35,7 @@ func NewApiClient(configuration *configuration.Configuration, baseUri string) *A
 	return &ApiClient{
 		HttpClient: configuration.HttpClient,
 		BaseUri:    baseUri,
+		Log:        configuration.Logger,
 	}
 }
 
@@ -79,6 +81,7 @@ func (a *ApiClient) invoke(
 		return err
 	}
 
+	a.Log.Printf("%s: %s", method, path)
 	resp, err := a.HttpClient.Do(req)
 	if err != nil {
 		return err
@@ -105,6 +108,7 @@ func (a *ApiClient) submit(
 		return err
 	}
 
+	a.Log.Printf("post: %s", path)
 	resp, err := a.HttpClient.Do(req)
 	if err != nil {
 		return err

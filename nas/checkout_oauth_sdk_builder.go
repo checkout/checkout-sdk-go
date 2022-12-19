@@ -41,6 +41,11 @@ func (b *CheckoutOAuthSdkBuilder) WithHttpClient(client *http.Client) *CheckoutO
 	return b
 }
 
+func (b *CheckoutOAuthSdkBuilder) WithLogger(logger configuration.StdLogger) *CheckoutOAuthSdkBuilder {
+	b.Logger = logger
+	return b
+}
+
 func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 	if b.ClientId == "" || b.ClientSecret == "" {
 		return nil, errors.CheckoutArgumentError("Invalid OAuth 'client_id' or 'client_secret'")
@@ -54,12 +59,13 @@ func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 		b.ClientId,
 		b.ClientSecret,
 		b.AuthorizationUri,
-		b.Scopes)
+		b.Scopes,
+		b.Logger)
 	if err != nil {
 		return nil, err
 	}
 
-	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient)
+	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient, b.Logger)
 
 	return CheckoutApi(newConfiguration), nil
 }

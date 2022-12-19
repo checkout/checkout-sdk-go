@@ -20,9 +20,11 @@ type (
 	}
 
 	RequestIdSource struct {
-		Type payments.SourceType `json:"type,omitempty"`
-		Id   string              `json:"id,omitempty"`
-		Cvv  string              `json:"cvv,omitempty"`
+		Type              payments.SourceType `json:"type,omitempty"`
+		Id                string              `json:"id,omitempty"`
+		Cvv               string              `json:"cvv,omitempty"`
+		Stored            *bool               `json:"stored,omitempty"`
+		StoreForFutureUse *bool               `json:"storeForFutureUse,omitempty"`
 	}
 
 	RequestCustomerSource struct {
@@ -35,6 +37,7 @@ type (
 		Token             string              `json:"token,omitempty"`
 		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
 		Phone             *common.Phone       `json:"phone,omitempty"`
+		Stored            *bool               `json:"stored,omitempty"`
 		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
 	}
 

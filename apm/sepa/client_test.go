@@ -15,13 +15,8 @@ import (
 
 func TestGetMandate(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		mandate = MandateResponse{
-			HttpMetadata:     httpMetadata,
+			HttpMetadata:     mocks.HttpMetadataStatusOk,
 			MandateReference: "reference",
 			CustomerId:       "cus_1234",
 			FirstName:        "Bruce",
@@ -106,13 +101,8 @@ func TestCancelMandate(t *testing.T) {
 	var (
 		link = "https://test-link.com"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		cancelResponse = SepaResource{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Links: map[string]common.Link{
 				"payment": {
 					HRef: &link,

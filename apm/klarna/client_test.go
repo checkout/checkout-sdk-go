@@ -1,7 +1,6 @@
 package klarna
 
 import (
-	"github.com/checkout/checkout-sdk-go/payments"
 	"net/http"
 	"testing"
 
@@ -12,17 +11,13 @@ import (
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/mocks"
+	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 func TestCreateSession(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		session = CreditSessionResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			SessionId:    "session_id",
 			ClientToken:  "client_token",
 		}
@@ -130,13 +125,8 @@ func TestGetCreditSession(t *testing.T) {
 	var (
 		sessionId = "session_id"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		session = CreditSession{
-			HttpMetadata:    httpMetadata,
+			HttpMetadata:    mocks.HttpMetadataStatusOk,
 			ClientToken:     "client_token",
 			PurchaseCountry: string(common.GB),
 			Currency:        string(common.GBP),
@@ -221,13 +211,8 @@ func TestGetCreditSession(t *testing.T) {
 
 func TestCapturePayment(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "202 Accepted",
-			StatusCode: http.StatusAccepted,
-		}
-
 		captureResponse = CaptureResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusAccepted,
 			ActionId:     "action_id",
 			Reference:    "reference",
 		}
@@ -320,13 +305,8 @@ func TestCapturePayment(t *testing.T) {
 
 func TestVoidPayment(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "202 Accepted",
-			StatusCode: http.StatusAccepted,
-		}
-
 		voidResponse = payments.VoidResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusAccepted,
 			ActionId:     "action_id",
 		}
 	)

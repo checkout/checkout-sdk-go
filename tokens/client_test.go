@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/mocks"
@@ -34,13 +33,8 @@ func TestRequestCardToken(t *testing.T) {
 			CVV:         "111",
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		cardTokenResponse = CardTokenResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Type:         typeCard,
 			Token:        tokenId,
 			ExpiryMonth:  expiryMonth,

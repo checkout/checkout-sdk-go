@@ -30,13 +30,8 @@ var (
 
 func TestCreateSepaSource(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		sepaResponse = CreateSepaSourceResponse{
-			HttpResponse: httpMetadata,
+			HttpResponse: mocks.HttpMetadataStatusCreated,
 			SourceResponse: &SourceResponse{
 				SourceType: sepa,
 			},

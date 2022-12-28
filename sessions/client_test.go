@@ -17,13 +17,8 @@ import (
 
 func TestRequestSession(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		sessionDetails = SessionDetails{
-			HttpMetadata:  httpMetadata,
+			HttpMetadata:  mocks.HttpMetadataStatusCreated,
 			Id:            "ses_1234",
 			SessionSecret: "session_secret",
 		}
@@ -136,13 +131,8 @@ func TestRequestSession(t *testing.T) {
 
 func TestGetSessionDetails(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		session = SessionDetails{
-			HttpMetadata:  httpMetadata,
+			HttpMetadata:  mocks.HttpMetadataStatusOk,
 			Id:            "ses_1234",
 			SessionSecret: "session_secret",
 		}
@@ -243,13 +233,8 @@ func TestGetSessionDetails(t *testing.T) {
 
 func TestUpdateSession(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		session = SessionDetails{
-			HttpMetadata:  httpMetadata,
+			HttpMetadata:  mocks.HttpMetadataStatusOk,
 			Id:            "ses_1234",
 			SessionSecret: "session_secret",
 		}
@@ -350,12 +335,7 @@ func TestUpdateSession(t *testing.T) {
 
 func TestCompleteSession(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
-		response = common.MetadataResponse{HttpMetadata: httpMetadata}
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
 	)
 
 	cases := []struct {
@@ -446,13 +426,8 @@ func TestCompleteSession(t *testing.T) {
 
 func TestUpdate3dsMethodCompletion(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		sessionResponse = Update3dsMethodCompletionResponse{
-			HttpMetadata:  httpMetadata,
+			HttpMetadata:  mocks.HttpMetadataStatusOk,
 			Id:            "ses_1234",
 			SessionSecret: "session_secret",
 		}

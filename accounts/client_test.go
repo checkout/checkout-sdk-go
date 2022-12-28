@@ -16,13 +16,8 @@ import (
 
 func TestCreateEntity(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		onboardEntity = OnboardEntityResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Id:           "ent_1234",
 			Reference:    "reference",
 			Status:       Active,
@@ -148,13 +143,8 @@ func TestGetEntity(t *testing.T) {
 	var (
 		entityId = "ent_1234"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		entityDetails = OnboardEntityDetails{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Id:           entityId,
 			Reference:    "reference",
 			Capabilities: &Capabilities{
@@ -274,13 +264,8 @@ func TestGetEntity(t *testing.T) {
 
 func TestUpdateEntity(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		onboardEntity = OnboardEntityResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Id:           "ent_1234",
 			Reference:    "reference",
 			Status:       Active,
@@ -401,13 +386,8 @@ func TestCreatePaymentInstruments(t *testing.T) {
 	var (
 		entityId = "ent_1234"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "202 Accepted",
-			StatusCode: http.StatusAccepted,
-		}
-
 		metadataResponse = common.MetadataResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusAccepted,
 		}
 
 		instrumentDocument = InstrumentDocument{
@@ -564,13 +544,8 @@ func TestCreatePaymentInstrument(t *testing.T) {
 	var (
 		entityId = "ent_1234"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		idResponse = common.IdResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Id:           "ppi_qn4nis4k3ykpzzu7cvtuvhqqga",
 		}
 
@@ -717,11 +692,6 @@ func TestQueryPaymentInstruments(t *testing.T) {
 	var (
 		entityId = "ent_1234"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		query = PaymentInstrumentsQuery{
 			Status: InstrumentPending,
 		}
@@ -732,7 +702,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 		}
 
 		paymentInstrumentDetailsResponse = PaymentInstrumentDetailsResponse{
-			HttpMetadata:       httpMetadata,
+			HttpMetadata:       mocks.HttpMetadataStatusOk,
 			Id:                 "ppi_qn4nis4k3ykpzzu7cvtuvhqqga",
 			Status:             "verified",
 			InstrumentId:       "src_pdasnoaxrtoevpyh3opgaxcrti",
@@ -745,7 +715,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 		}
 
 		paymentInstrumentQueryResponse = PaymentInstrumentQueryResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Data:         []PaymentInstrumentDetailsResponse{paymentInstrumentDetailsResponse},
 		}
 	)
@@ -872,18 +842,13 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 		entityId            = "ent_1234"
 		paymentInstrumentId = "1234"
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		instrumentDocument = InstrumentDocument{
 			Type:   "bank_statement",
 			FileId: "file_wxglze3wwywujg4nna5fb7ldli",
 		}
 
 		paymentInstrumentDetailsResponse = PaymentInstrumentDetailsResponse{
-			HttpMetadata:       httpMetadata,
+			HttpMetadata:       mocks.HttpMetadataStatusOk,
 			Id:                 "ppi_qn4nis4k3ykpzzu7cvtuvhqqga",
 			Status:             "verified",
 			InstrumentId:       "src_pdasnoaxrtoevpyh3opgaxcrti",
@@ -1023,13 +988,8 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 
 func TestGetPayoutSchedule(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		schedule = PayoutSchedule{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Currency: map[common.Currency]CurrencySchedule{
 				common.USD: {
 					Enabled:    true,
@@ -1121,13 +1081,8 @@ func TestGetPayoutSchedule(t *testing.T) {
 
 func TestUpdatePayoutSchedule(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		idResponse = common.IdResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Links: map[string]common.Link{
 				"self": {
 					HRef: &[]string{"https://www.test-link.com"}[0],

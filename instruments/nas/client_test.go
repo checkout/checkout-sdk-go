@@ -44,11 +44,6 @@ var (
 
 func TestCreate(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		token = CreateTokenInstrumentResponse{
 			Type:             instruments.Card,
 			Id:               "src_wmlfc3zyhqzehihu7giusaaawu",
@@ -59,7 +54,7 @@ func TestCreate(t *testing.T) {
 		}
 
 		createTokenResponse = CreateInstrumentResponse{
-			HttpMetadata:                  httpMetadata,
+			HttpMetadata:                  mocks.HttpMetadataStatusCreated,
 			CreateTokenInstrumentResponse: &token,
 		}
 
@@ -74,7 +69,7 @@ func TestCreate(t *testing.T) {
 		}
 
 		createBankAccountResponse = CreateInstrumentResponse{
-			HttpMetadata:                        httpMetadata,
+			HttpMetadata:                        mocks.HttpMetadataStatusCreated,
 			CreateBankAccountInstrumentResponse: &bankAccount,
 		}
 	)
@@ -220,11 +215,6 @@ func getCreateBankAccountInstrumentRequest() *createBankAccountInstrumentRequest
 
 func TestGet(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		cardInstrument = GetCardInstrumentResponse{
 			Type:        instruments.Card,
 			Id:          "src_wmlfc3zyhqzehihu7giusaaawu",
@@ -234,7 +224,7 @@ func TestGet(t *testing.T) {
 		}
 
 		response = GetInstrumentResponse{
-			HttpMetadata:              httpMetadata,
+			HttpMetadata:              mocks.HttpMetadataStatusOk,
 			GetCardInstrumentResponse: &cardInstrument,
 		}
 	)
@@ -331,11 +321,6 @@ func TestGet(t *testing.T) {
 
 func TestClientGetBankAccountFieldFormatting(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		allowOption = InstrumentSectionFieldAllowedOption{
 			Id:      "1234",
 			Display: "1234",
@@ -371,7 +356,7 @@ func TestClientGetBankAccountFieldFormatting(t *testing.T) {
 		}
 
 		response = GetBankAccountFieldFormattingResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Sections:     []InstrumentSection{section},
 		}
 	)
@@ -486,18 +471,13 @@ func TestClientGetBankAccountFieldFormatting(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
 		updateCardResponse = UpdateCardInstrumentResponse{
 			Type:        instruments.Card,
 			Fingerprint: "smoua2sbuqhupeofwbe77n5nsm",
 		}
 
 		response = UpdateInstrumentResponse{
-			HttpMetadata:                 httpMetadata,
+			HttpMetadata:                 mocks.HttpMetadataStatusNoContent,
 			UpdateCardInstrumentResponse: &updateCardResponse,
 		}
 	)
@@ -625,12 +605,7 @@ func TestUpdate(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
-		response = common.MetadataResponse{HttpMetadata: httpMetadata}
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
 	)
 
 	cases := []struct {

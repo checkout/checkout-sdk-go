@@ -39,13 +39,8 @@ func TestRequestPayment(t *testing.T) {
 			Capture:     false,
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		paymentResponse = PaymentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Amount:       amount,
 			Id:           paymentId,
 			Currency:     currency,
@@ -158,11 +153,6 @@ func TestRequestPayment(t *testing.T) {
 
 func TestRequestPaymentList(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		queryRequest = payments.QueryRequest{
 			Limit:     1,
 			Skip:      0,
@@ -170,7 +160,7 @@ func TestRequestPaymentList(t *testing.T) {
 		}
 
 		paymentResponse = GetPaymentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Id:           paymentId,
 			Amount:       amount,
 			Currency:     currency,
@@ -183,7 +173,7 @@ func TestRequestPaymentList(t *testing.T) {
 		}
 
 		paymentListResponse = GetPaymentListResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Limit:        1,
 			Skip:         0,
 			TotalCount:   1,
@@ -299,13 +289,8 @@ func TestRequestPayout(t *testing.T) {
 			Capture:     false,
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		paymentResponse = PaymentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Amount:       amount,
 			Id:           paymentId,
 			Currency:     currency,
@@ -412,13 +397,8 @@ func TestRequestPayout(t *testing.T) {
 
 func TestGetPaymentDetails(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		paymentResponse = GetPaymentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Id:           paymentId,
 			Amount:       amount,
 			Currency:     currency,
@@ -533,13 +513,8 @@ func TestGetPaymentActions(t *testing.T) {
 
 		paymentActions = []PaymentAction{auth, capture}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: 200,
-		}
-
 		paymentActionsResponse = GetPaymentActionsResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Actions:      paymentActions,
 		}
 	)
@@ -641,13 +616,8 @@ func TestCapturePayment(t *testing.T) {
 			Reference: reference,
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "202 Accepted",
-			StatusCode: http.StatusAccepted,
-		}
-
 		captureResponse = payments.CaptureResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusAccepted,
 			ActionId:     actionId,
 			Reference:    reference,
 		}
@@ -802,13 +772,8 @@ func TestRefundPayment(t *testing.T) {
 			Reference: reference,
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "202 Accepted",
-			StatusCode: http.StatusAccepted,
-		}
-
 		refundResponse = payments.RefundResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusAccepted,
 			ActionId:     actionId,
 			Reference:    reference,
 		}
@@ -959,13 +924,8 @@ func TestVoidPayment(t *testing.T) {
 			Reference: reference,
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "202 Accepted",
-			StatusCode: http.StatusAccepted,
-		}
-
 		voidResponse = payments.VoidResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusAccepted,
 			ActionId:     actionId,
 			Reference:    reference,
 		}

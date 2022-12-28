@@ -7,18 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/mocks"
 )
 
 func TestGetInfo(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		infoLinks = InfoLinks{
 			Curies: []CuriesLink{
 				{
@@ -30,7 +24,7 @@ func TestGetInfo(t *testing.T) {
 		}
 
 		response = IdealInfo{
-			HttpMetadata:   httpMetadata,
+			HttpMetadata:   mocks.HttpMetadataStatusOk,
 			IdealInfoLinks: infoLinks,
 		}
 	)

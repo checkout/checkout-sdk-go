@@ -1,15 +1,14 @@
 package events
 
 import (
-	"github.com/checkout/checkout-sdk-go/errors"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
+	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/mocks"
 )
 
@@ -26,13 +25,8 @@ func TestRetrieveAllEventTypes(t *testing.T) {
 			},
 		}
 
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: 200,
-		}
-
 		response = EventTypesResponse{
-			HttpResponse: httpMetadata,
+			HttpResponse: mocks.HttpMetadataStatusOk,
 			EventTypes:   eventTypes,
 		}
 	)
@@ -62,7 +56,6 @@ func TestRetrieveAllEventTypes(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpResponse.StatusCode)
-				assert.Equal(t, httpMetadata, response.HttpResponse)
 				assert.Equal(t, eventTypes, response.EventTypes)
 
 			},

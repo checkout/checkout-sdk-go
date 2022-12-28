@@ -28,13 +28,8 @@ var (
 
 func TestCreate(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		instrumentResponse = CreateInstrumentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Type:         instrumentType,
 			Id:           instrumentId,
 			Customer:     &customer,
@@ -145,13 +140,8 @@ func TestCreate(t *testing.T) {
 
 func TestGet(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 OK",
-			StatusCode: http.StatusOK,
-		}
-
 		instrument = GetInstrumentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Type:         instrumentType,
 			Id:           instrumentId,
 			Customer: &instruments.InstrumentCustomerResponse{
@@ -253,13 +243,8 @@ func TestGet(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
 		updateResponse = UpdateInstrumentResponse{
-			HttpMetadata: httpMetadata,
+			HttpMetadata: mocks.HttpMetadataStatusNoContent,
 			Type:         instrumentType,
 		}
 	)
@@ -392,12 +377,7 @@ func TestUpdate(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "204 No Content",
-			StatusCode: http.StatusNoContent,
-		}
-
-		response = common.MetadataResponse{HttpMetadata: httpMetadata}
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
 	)
 
 	cases := []struct {

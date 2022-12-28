@@ -16,13 +16,8 @@ import (
 
 func TestRequestQuote(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "200 Ok",
-			StatusCode: http.StatusOK,
-		}
-
 		response = CardMetadataResponse{
-			HttpMetadata:      httpMetadata,
+			HttpMetadata:      mocks.HttpMetadataStatusOk,
 			Bin:               "45434720",
 			Scheme:            "visa",
 			SchemeLocal:       CartesBancaires,

@@ -16,13 +16,8 @@ import (
 
 func TestRequestQuote(t *testing.T) {
 	var (
-		httpMetadata = common.HttpMetadata{
-			Status:     "201 Created",
-			StatusCode: http.StatusCreated,
-		}
-
 		quote = QuoteResponse{
-			HttpMetadata:        httpMetadata,
+			HttpMetadata:        mocks.HttpMetadataStatusOk,
 			Id:                  "qte_id",
 			SourceCurrency:      common.GBP,
 			SourceAmount:        30000,

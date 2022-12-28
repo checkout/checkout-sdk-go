@@ -25,7 +25,7 @@ func NewClient(
 }
 
 func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 }
 
 func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityRespo
 }
 
 func (c *Client) GetEntity(entityId string) (*OnboardEntityDetails, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) UpdateEntity(
 	entityId string,
 	request OnboardEntityRequest,
 ) (*OnboardEntityResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (c *Client) CreatePaymentInstruments(
 	entityId string,
 	request PaymentInstrument,
 ) (*common.MetadataResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *Client) CreatePaymentInstrument(
 	entityId string,
 	request PaymentInstrumentRequest,
 ) (*common.IdResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (c *Client) QueryPaymentInstruments(
 	entityId string,
 	query PaymentInstrumentsQuery,
 ) (*PaymentInstrumentQueryResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (c *Client) RetrievePaymentInstrumentDetails(
 	entityId string,
 	paymentInstrumentId string,
 ) (*PaymentInstrumentDetailsResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func (c *Client) RetrievePaymentInstrumentDetails(
 }
 
 func (c *Client) RetrievePayoutSchedule(entityId string) (*PayoutSchedule, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +242,7 @@ func (c *Client) UpdatePayoutSchedule(
 	currency common.Currency,
 	updateSchedule CurrencySchedule,
 ) (*common.IdResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}

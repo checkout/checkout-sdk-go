@@ -1,38 +1,79 @@
 package customers
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/checkout/checkout-sdk-go"
-	"github.com/checkout/checkout-sdk-go/httpclient"
+	"github.com/checkout/checkout-sdk-go/client"
+	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/configuration"
 )
 
-const path = "customers"
-
-// Client ...
 type Client struct {
-	API checkout.HTTPClient
+	configuration *configuration.Configuration
+	apiClient     client.HttpClient
 }
 
-// NewClient ...
-func NewClient(config checkout.Config) *Client {
+func NewClient(configuration *configuration.Configuration, apiClient client.HttpClient) *Client {
 	return &Client{
-		API: httpclient.NewClient(config),
+		configuration: configuration,
+		apiClient:     apiClient,
 	}
 }
 
-// Update customer details
-func (c *Client) Update(customerID string, request *Request) (*Response, error) {
-	resp, err := c.API.Patch(fmt.Sprintf("/%v/%v", path, customerID), request)
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) Create(request CustomerRequest) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusNoContent {
-		return response, err
+
+	var response common.IdResponse
+	err = c.apiClient.Post(common.BuildPath(Path), auth, request, &response, nil)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	return &response, nil
+}
+
+func (c *Client) Get(customerId string) (*GetCustomerResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response GetCustomerResponse
+	err = c.apiClient.Get(common.BuildPath(common.BuildPath(Path), customerId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) Update(customerId string, request CustomerRequest) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Patch(common.BuildPath(Path, customerId), auth, request, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) Delete(customerId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Delete(common.BuildPath(Path, customerId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }

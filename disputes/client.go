@@ -1,127 +1,182 @@
 package disputes
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-
-	"github.com/checkout/checkout-sdk-go"
-	"github.com/checkout/checkout-sdk-go/httpclient"
-	"github.com/google/go-querystring/query"
+	"github.com/checkout/checkout-sdk-go/client"
+	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/configuration"
 )
 
-const path = "disputes"
-
-// Client ...
 type Client struct {
-	API checkout.HTTPClient
+	configuration *configuration.Configuration
+	apiClient     client.HttpClient
 }
 
-// NewClient ...
-func NewClient(config checkout.Config) *Client {
+func NewClient(configuration *configuration.Configuration, apiClient client.HttpClient) *Client {
 	return &Client{
-		API: httpclient.NewClient(config),
+		configuration: configuration,
+		apiClient:     apiClient,
 	}
 }
 
-// GetDisputes ...
-func (c *Client) GetDisputes(request *Request) (*Response, error) {
-	value, _ := query.Values(request.QueryParameter)
-	var query string = value.Encode()
-	var urlPath string = "/" + path + "?"
-	resp, err := c.API.Get(urlPath + query)
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) Query(queryFilter QueryFilter) (*QueryResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusOK {
-		var disputes Disputes
-		err = json.Unmarshal(resp.ResponseBody, &disputes)
-		response.Disputes = &disputes
-		return response, err
+
+	url, err := common.BuildQueryPath(disputes, queryFilter)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	var response QueryResponse
+	err = c.apiClient.Get(url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }
 
-// GetDispute ...
-func (c *Client) GetDispute(disputeID string) (*Response, error) {
-	resp, err := c.API.Get(fmt.Sprintf("/%v/%v", path, disputeID))
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) GetDisputeDetails(disputeId string) (*DisputeResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusOK {
-		var dispute Dispute
-		err = json.Unmarshal(resp.ResponseBody, &dispute)
-		response.Dispute = &dispute
-		return response, err
+
+	var response DisputeResponse
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId), auth, &response)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	return &response, nil
 }
 
-// AcceptDispute -
-func (c *Client) AcceptDispute(disputeID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/accept", path, disputeID), nil, nil)
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) Accept(disputeId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusNoContent {
-		return response, err
+
+	var response common.MetadataResponse
+	err = c.apiClient.Post(
+		common.BuildPath(disputes, disputeId, accept),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	return &response, nil
 }
 
-// ProvideDisputeEvidence ...
-func (c *Client) ProvideDisputeEvidence(disputeID string, request *Request) (*Response, error) {
-	resp, err := c.API.Put(fmt.Sprintf("/%v/%v/evidence", path, disputeID), request)
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) PutEvidence(disputeId string, evidenceRequest Evidence) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusNoContent {
-		return response, err
+
+	var response common.MetadataResponse
+	err = c.apiClient.Put(
+		common.BuildPath(disputes, disputeId, evidence),
+		auth,
+		evidenceRequest,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	return &response, nil
 }
 
-// GetDisputeEvidence ...
-func (c *Client) GetDisputeEvidence(disputeID string) (*Response, error) {
-	resp, err := c.API.Get(fmt.Sprintf("/%v/%v/evidence", path, disputeID))
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) GetEvidence(disputeId string) (*EvidenceResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusOK {
-		var evidences DisputeEvidence
-		err = json.Unmarshal(resp.ResponseBody, &evidences)
-		response.Evidences = &evidences
-		return response, err
+
+	var response EvidenceResponse
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, evidence), auth, &response)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	return &response, nil
 }
 
-// SubmitDisputeEvidence -
-func (c *Client) SubmitDisputeEvidence(disputeID string) (*Response, error) {
-	resp, err := c.API.Post(fmt.Sprintf("/%v/%v/evidence", path, disputeID), nil, nil)
-	response := &Response{
-		StatusResponse: resp,
-	}
+func (c *Client) SubmitEvidence(disputeId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
-		return response, err
+		return nil, err
 	}
-	if resp.StatusCode == http.StatusNoContent {
-		return response, err
+
+	var response common.MetadataResponse
+	err = c.apiClient.Post(
+		common.BuildPath(disputes, disputeId, evidence),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
 	}
-	return response, err
+
+	return &response, nil
+}
+
+func (c *Client) UploadFile(file common.File) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := common.BuildFileUploadRequest(&file)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.IdResponse
+	err = c.apiClient.Upload(common.BuildPath(files), auth, req, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetFileDetails(fileId string) (*common.FileResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.FileResponse
+	err = c.apiClient.Get(common.BuildPath(files, fileId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetDisputeSchemeFiles(disputeId string) (*SchemeFilesResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response SchemeFilesResponse
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, schemeFiles), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
 }

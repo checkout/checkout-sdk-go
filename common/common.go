@@ -123,6 +123,11 @@ type (
 		HttpMetadata HttpMetadata
 	}
 
+	ContentResponse struct {
+		HttpMetadata HttpMetadata
+		Content      string `json:"content,omitempty"`
+	}
+
 	HttpMetadata struct {
 		Status       string     `json:"status,omitempty"`
 		StatusCode   int        `json:"status_code,omitempty"`

@@ -1,0 +1,37 @@
+name: build-master
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    if: "!contains(github.event.commits[0].message, 'Release')"
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        go:
+          - "1.14"
+          - "1.18"
+    steps:
+      - uses: actions/checkout@v2
+      - id: setup-go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go }}
+      - id: build-and-test
+        env:
+          CHECKOUT_PREVIOUS_SECRET_KEY: ${{ secrets.IT_CHECKOUT_PREVIOUS_SECRET_KEY }}
+          CHECKOUT_PREVIOUS_PUBLIC_KEY: ${{ secrets.IT_CHECKOUT_PREVIOUS_PUBLIC_KEY }}
+          CHECKOUT_DEFAULT_SECRET_KEY: ${{ secrets.IT_CHECKOUT_DEFAULT_SECRET_KEY }}
+          CHECKOUT_DEFAULT_PUBLIC_KEY: ${{ secrets.IT_CHECKOUT_DEFAULT_PUBLIC_KEY }}
+          CHECKOUT_DEFAULT_OAUTH_CLIENT_ID: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_CLIENT_ID }}
+          CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET }}
+          CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID }}
+          CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET }}
+          CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_ID: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_ID }}
+          CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET: ${{ secrets.IT_CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET }}
+        run:
+          go build && go test -v -timeout 5m ./...
+

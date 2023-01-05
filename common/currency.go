@@ -1,482 +1,166 @@
 package common
 
+type Currency string
+
 const (
-	// ALL - Lek
-	ALL string = "ALL"
-
-	// STN - Dobra
-	STN string = "STN"
-
-	// EEK - Kroon
-	EEK string = "EEK"
-
-	// BHD - Bahraini Dinar
-	BHD string = "BHD"
-
-	// SCR - Seychelles Rupee
-	SCR string = "SCR"
-
-	// DJF - Djibouti Franc
-	DJF string = "DJF"
-
-	// EGP - Egyptian Pound
-	EGP string = "EGP"
-
-	// MDL - Moldovan Leu
-	MDL string = "MDL"
-
-	// MZN - Metical
-	MZN string = "MZN"
-
-	// BND - Brunei Dollar
-	BND string = "BND"
-
-	// ZMK - Zambian Kwacha
-	ZMK string = "ZMK"
-
-	// SHP - Saint Helena Pound
-	SHP string = "SHP"
-
-	// LBP - Lebanese Pound
-	LBP string = "LBP"
-
-	// AWG - Aruban Guilder
-	AWG string = "AWG"
-
-	// JMD - Jamaican Dollar
-	JMD string = "JMD"
-
-	// KES - Kenyan Shilling
-	KES string = "KES"
-
-	// BYN - Belarussian Ruble
-	BYN string = "BYN"
-
-	// KHR - Riel
-	KHR string = "KHR"
-
-	// LAK - Kip
-	LAK string = "LAK"
-
-	// MVR - Rufiyaa
-	MVR string = "MVR"
-
-	// AOA - Kwanza
-	AOA string = "AOA"
-
-	// TJS - Somoni
-	TJS string = "TJS"
-
-	// SVC - El Salvador Colon
-	SVC string = "SVC"
-
-	// GNF - Guinea Franc
-	GNF string = "GNF"
-
-	// BRL - Brazilian Real
-	BRL string = "BRL"
-
-	// MOP - Pataca
-	MOP string = "MOP"
-
-	// BOB - Boliviano
-	BOB string = "BOB"
-
-	// CDF - Congolese Franc
-	CDF string = "CDF"
-
-	// NAD - Namibia Dollar
-	NAD string = "NAD"
-
-	// LYD - Libyan Dinar
-	LYD string = "LYD"
-
-	// VUV - Vatu
-	VUV string = "VUV"
-
-	// QAR - Qatari Rial
-	QAR string = "QAR"
-
-	// CLP - Chilean Peso
-	CLP string = "CLP"
-
-	// HRK - Croatian Kuna
-	HRK string = "HRK"
-
-	// ISK - Iceland Krona
-	ISK string = "ISK"
-
-	// FKP - Falkland Islands Pound
-	FKP string = "FKP"
-
-	// XCD - East Caribbean Dollar
-	XCD string = "XCD"
-
-	// NOK - Norwegian Krone
-	NOK string = "NOK"
-
-	// CUP - Cuban Peso
-	CUP string = "CUP"
-
-	// VND - Dong
-	VND string = "VND"
-
-	// PEN - Nuevo Sol
-	PEN string = "PEN"
-
-	// KMF - Comoro Franc
-	KMF string = "KMF"
-
-	// LVL - Latvian Lats
-	LVL string = "LVL"
-
-	// MMK - Kyat
-	MMK string = "MMK"
-
-	// TRY - Turkish Lira
-	TRY string = "TRY"
-
-	// VEF - Bolivar Fuerte
-	VEF string = "VEF"
-
-	// AUD - Australian Dollar
-	AUD string = "AUD"
-
-	// TWD - New Taiwan Dollar
-	TWD string = "TWD"
-
-	// PKR - Pakistan Rupee
-	PKR string = "PKR"
-
-	// SLL - Leone
-	SLL string = "SLL"
-
-	// BGN - Bulgarian Lev
-	BGN string = "BGN"
-
-	// LRD - Liberian Dollar
-	LRD string = "LRD"
-
-	// LKR - Sri Lanka Rupee
-	LKR string = "LKR"
-
-	// XAF - CFA Franc BEAC
-	XAF string = "XAF"
-
-	// JOD - Jordanian Dinar
-	JOD string = "JOD"
-
-	// ANG - Netherlands Antillian Guilder
-	ANG string = "ANG"
-
-	// BSD - Bahamian Dollar
-	BSD string = "BSD"
-
-	// CAD - Canadian Dollar
-	CAD string = "CAD"
-
-	// GIP - Gibraltar Pound
-	GIP string = "GIP"
-
-	// MNT - Tugrik
-	MNT string = "MNT"
-
-	// LTL - Lithuanian Litas
-	LTL string = "LTL"
-
-	// BBD - Barbados Dollar
-	BBD string = "BBD"
-
-	// CLF - Unidades de fomento
-	CLF string = "CLF"
-
-	// BWP - Pula
-	BWP string = "BWP"
-
-	// COP - Colombian Peso
-	COP string = "COP"
-
-	// PHP - Philippine Peso
-	PHP string = "PHP"
-
-	// HUF - Forint
-	HUF string = "HUF"
-
-	// FJD - Fiji Dollar
-	FJD string = "FJD"
-
-	// MWK - Kwacha
-	MWK string = "MWK"
-
-	// THB - Baht
-	THB string = "THB"
-
-	// XPF - CFP Franc
-	XPF string = "XPF"
-
-	// RSD - Serbian Dinar
-	RSD string = "RSD"
-
-	// SAR - Saudi Riyal
-	SAR string = "SAR"
-
-	// UYU - Peso Uruguayo
-	UYU string = "UYU"
-
-	// BZD - Belize Dollar
-	BZD string = "BZD"
-
-	// SYP - Syrian Pound
-	SYP string = "SYP"
-
-	// GMD - Dalasi
-	GMD string = "GMD"
-
-	// SZL - Lilangeni
-	SZL string = "SZL"
-
-	// SBD - Solomon Islands Dollar
-	SBD string = "SBD"
-
-	// ETB - Ethiopian Birr
-	ETB string = "ETB"
-
-	// CHF - Swiss Franc
-	CHF string = "CHF"
-
-	// MXN - Mexican Peso
-	MXN string = "MXN"
-
-	// ARS - Argentine Peso
-	ARS string = "ARS"
-
-	// GTQ - Quetzal
-	GTQ string = "GTQ"
-
-	// GHS - Cedi
-	GHS string = "GHS"
-
-	// NIO - Cordoba Oro
-	NIO string = "NIO"
-
-	// JPY - Yen
-	JPY string = "JPY"
-
-	// BDT - Taka
-	BDT string = "BDT"
-
-	// UZS - Uzbekistan Sum
-	UZS string = "UZS"
-
-	// SOS - Somali Shilling
-	SOS string = "SOS"
-
-	// BTN - Ngultrum
-	BTN string = "BTN"
-
-	// NZD - New Zealand Dollar
-	NZD string = "NZD"
-
-	// TZS - Tanzanian Shilling
-	TZS string = "TZS"
-
-	// IQD - Iraqi Dinar
-	IQD string = "IQD"
-
-	// MGA - Malagasy Ariary
-	MGA string = "MGA"
-
-	// DZD - Algerian Dinar
-	DZD string = "DZD"
-
-	// GYD - Guyana Dollar
-	GYD string = "GYD"
-
-	// USD - US Dollar
-	USD string = "USD"
-
-	// KWD - Kuwaiti Dinar
-	KWD string = "KWD"
-
-	// CNY - Yuan Renminbi
-	CNY string = "CNY"
-
-	// PYG - Guarani
-	PYG string = "PYG"
-
-	// SGD - Singapore Dollar
-	SGD string = "SGD"
-
-	// KZT - Tenge
-	KZT string = "KZT"
-
-	// PGK - Kina
-	PGK string = "PGK"
-
-	// AMD - Armenian Dram
-	AMD string = "AMD"
-
-	// GBP - Pound Sterling
-	GBP string = "GBP"
-
-	// AFN - Afghani
-	AFN string = "AFN"
-
-	// CRC - Costa Rican Colon
-	CRC string = "CRC"
-
-	// XOF - CFA Franc BCEAO
-	XOF string = "XOF"
-
-	// YER - Yemeni Rial
-	YER string = "YER"
-
-	// MRU - Ouguiya
-	MRU string = "MRU"
-
-	// DKK - Danish Krone
-	DKK string = "DKK"
-
-	// TOP - Paanga
-	TOP string = "TOP"
-
-	// INR - Indian Rupee
-	INR string = "INR"
-
-	// SDG - Sudanese Pound
-	SDG string = "SDG"
-
-	// DOP - Dominican Peso
-	DOP string = "DOP"
-
-	// ZWL - Zimbabwe Dollar
-	ZWL string = "ZWL"
-
-	// UGX - Uganda Shilling
-	UGX string = "UGX"
-
-	// SEK - Swedish Krona
-	SEK string = "SEK"
-
-	// LSL - Loti
-	LSL string = "LSL"
-
-	// MYR - Malaysian Ringgit
-	MYR string = "MYR"
-
-	// TMT - Manat
-	TMT string = "TMT"
-
-	// OMR - Rial Omani
-	OMR string = "OMR"
-
-	// BMD - Bermudian Dollar
-	BMD string = "BMD"
-
-	// KRW - Won
-	KRW string = "KRW"
-
-	// HKD - Hong Kong Dollar
-	HKD string = "HKD"
-
-	// KGS - Som
-	KGS string = "KGS"
-
-	// BAM - Convertible Marks
-	BAM string = "BAM"
-
-	// NGN - Naira
-	NGN string = "NGN"
-
-	// ILS - New Israeli Sheqel
-	ILS string = "ILS"
-
-	// MUR - Mauritius Rupee
-	MUR string = "MUR"
-
-	// RON - New Leu
-	RON string = "RON"
-
-	// TND - Tunisian Dinar
-	TND string = "TND"
-
-	// AED - UAE Dirham
-	AED string = "AED"
-
-	// PAB - Balboa
-	PAB string = "PAB"
-
-	// NPR - Nepalese Rupee
-	NPR string = "NPR"
-
-	// TTD - Trinidad and Tobago Dollar
-	TTD string = "TTD"
-
-	// RWF - Rwanda Franc
-	RWF string = "RWF"
-
-	// HTG - Gourde
-	HTG string = "HTG"
-
-	// IDR - Rupiah
-	IDR string = "IDR"
-
-	// EUR - Euro
-	EUR string = "EUR"
-
-	// KYD - Cayman Islands Dollar
-	KYD string = "KYD"
-
-	// IRR - Iranian Rial
-	IRR string = "IRR"
-
-	// KPW - North Korean Won
-	KPW string = "KPW"
-
-	// MKD - Denar
-	MKD string = "MKD"
-
-	// SRD - Surinam Dollar
-	SRD string = "SRD"
-
-	// HNL - Lempira
-	HNL string = "HNL"
-
-	// AZN - Azerbaijanian Manat
-	AZN string = "AZN"
-
-	// ERN - Nakfa
-	ERN string = "ERN"
-
-	// CZK - Czech Koruna
-	CZK string = "CZK"
-
-	// CVE - Cape Verde Escudo
-	CVE string = "CVE"
-
-	// BIF - Burundi Franc
-	BIF string = "BIF"
-	// MAD - Moroccan Dirham
-	MAD string = "MAD"
-
-	// RUB - Russian Ruble
-	RUB string = "RUB"
-
-	// UAH - Hryvnia
-	UAH string = "UAH"
-
-	// WST - Tala
-	WST string = "WST"
-
-	// PLN - Zloty
-	PLN string = "PLN"
-
-	// ZAR - Rand
-	ZAR string = "ZAR"
-
-	// GEL - Lari
-	GEL string = "GEL"
-
-	// ZMW - Zambian kwacha
-	ZMW string = "ZMW"
+	AED Currency = "AED"
+	AFN Currency = "AFN"
+	ALL Currency = "ALL"
+	AMD Currency = "AMD"
+	ANG Currency = "ANG"
+	AOA Currency = "AOA"
+	ARS Currency = "ARS"
+	AUD Currency = "AUD"
+	AWG Currency = "AWG"
+	AZN Currency = "AZN"
+	BAM Currency = "BAM"
+	BBD Currency = "BBD"
+	BDT Currency = "BDT"
+	BGN Currency = "BGN"
+	BHD Currency = "BHD"
+	BIF Currency = "BIF"
+	BMD Currency = "BMD"
+	BND Currency = "BND"
+	BOB Currency = "BOB"
+	BRL Currency = "BRL"
+	BSD Currency = "BSD"
+	BTN Currency = "BTN"
+	BWP Currency = "BWP"
+	BYN Currency = "BYN"
+	BZD Currency = "BZD"
+	CAD Currency = "CAD"
+	CDF Currency = "CDF"
+	CHF Currency = "CHF"
+	CLF Currency = "CLF"
+	CLP Currency = "CLP"
+	CNY Currency = "CNY"
+	COP Currency = "COP"
+	CRC Currency = "CRC"
+	CUP Currency = "CUP"
+	CVE Currency = "CVE"
+	CZK Currency = "CZK"
+	DJF Currency = "DJF"
+	DKK Currency = "DKK"
+	DOP Currency = "DOP"
+	DZD Currency = "DZD"
+	EEK Currency = "EEK"
+	EGP Currency = "EGP"
+	ERN Currency = "ERN"
+	ETB Currency = "ETB"
+	EUR Currency = "EUR"
+	FJD Currency = "FJD"
+	FKP Currency = "FKP"
+	GBP Currency = "GBP"
+	GEL Currency = "GEL"
+	GHS Currency = "GHS"
+	GIP Currency = "GIP"
+	GMD Currency = "GMD"
+	GNF Currency = "GNF"
+	GTQ Currency = "GTQ"
+	GYD Currency = "GYD"
+	HKD Currency = "HKD"
+	HNL Currency = "HNL"
+	HRK Currency = "HRK"
+	HTG Currency = "HTG"
+	HUF Currency = "HUF"
+	IDR Currency = "IDR"
+	ILS Currency = "ILS"
+	INR Currency = "INR"
+	IQD Currency = "IQD"
+	IRR Currency = "IRR"
+	ISK Currency = "ISK"
+	JMD Currency = "JMD"
+	JOD Currency = "JOD"
+	JPY Currency = "JPY"
+	KES Currency = "KES"
+	KGS Currency = "KGS"
+	KHR Currency = "KHR"
+	KMF Currency = "KMF"
+	KPW Currency = "KPW"
+	KRW Currency = "KRW"
+	KWD Currency = "KWD"
+	KYD Currency = "KYD"
+	KZT Currency = "KZT"
+	LAK Currency = "LAK"
+	LBP Currency = "LBP"
+	LKR Currency = "LKR"
+	LRD Currency = "LRD"
+	LSL Currency = "LSL"
+	LTL Currency = "LTL"
+	LVL Currency = "LVL"
+	LYD Currency = "LYD"
+	MAD Currency = "MAD"
+	MDL Currency = "MDL"
+	MGA Currency = "MGA"
+	MKD Currency = "MKD"
+	MMK Currency = "MMK"
+	MNT Currency = "MNT"
+	MOP Currency = "MOP"
+	MRU Currency = "MRU"
+	MUR Currency = "MUR"
+	MVR Currency = "MVR"
+	MWK Currency = "MWK"
+	MXN Currency = "MXN"
+	MYR Currency = "MYR"
+	MZN Currency = "MZN"
+	NAD Currency = "NAD"
+	NGN Currency = "NGN"
+	NIO Currency = "NIO"
+	NOK Currency = "NOK"
+	NPR Currency = "NPR"
+	NZD Currency = "NZD"
+	OMR Currency = "OMR"
+	PAB Currency = "PAB"
+	PEN Currency = "PEN"
+	PGK Currency = "PGK"
+	PHP Currency = "PHP"
+	PKR Currency = "PKR"
+	PLN Currency = "PLN"
+	PYG Currency = "PYG"
+	QAR Currency = "QAR"
+	RON Currency = "RON"
+	RSD Currency = "RSD"
+	RUB Currency = "RUB"
+	RWF Currency = "RWF"
+	SAR Currency = "SAR"
+	SBD Currency = "SBD"
+	SCR Currency = "SCR"
+	SDG Currency = "SDG"
+	SEK Currency = "SEK"
+	SGD Currency = "SGD"
+	SHP Currency = "SHP"
+	SLL Currency = "SLL"
+	SOS Currency = "SOS"
+	SRD Currency = "SRD"
+	STN Currency = "STN"
+	SVC Currency = "SVC"
+	SYP Currency = "SYP"
+	SZL Currency = "SZL"
+	THB Currency = "THB"
+	TJS Currency = "TJS"
+	TMT Currency = "TMT"
+	TND Currency = "TND"
+	TOP Currency = "TOP"
+	TRY Currency = "TRY"
+	TTD Currency = "TTD"
+	TWD Currency = "TWD"
+	TZS Currency = "TZS"
+	UAH Currency = "UAH"
+	UGX Currency = "UGX"
+	USD Currency = "USD"
+	UYU Currency = "UYU"
+	UZS Currency = "UZS"
+	VEF Currency = "VEF"
+	VND Currency = "VND"
+	VUV Currency = "VUV"
+	WST Currency = "WST"
+	XAF Currency = "XAF"
+	XCD Currency = "XCD"
+	XOF Currency = "XOF"
+	XPF Currency = "XPF"
+	YER Currency = "YER"
+	ZAR Currency = "ZAR"
+	ZMK Currency = "ZMK"
+	ZMW Currency = "ZMW"
+	ZWL Currency = "ZWL"
 )

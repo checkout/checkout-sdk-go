@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"reflect"
+	"strings"
 )
 
 type (
@@ -26,8 +27,12 @@ func Unmarshal(metadata *HttpMetadata, responseMapping interface{}) error {
 		return nil
 	}
 
-	if err := json.Unmarshal(metadata.ResponseBody, &responseMapping); err != nil {
-		return err
+	if isContentTypeText(metadata) {
+		addContent(metadata.ResponseBody, responseMapping)
+	} else {
+		if err := json.Unmarshal(metadata.ResponseBody, &responseMapping); err != nil {
+			return err
+		}
 	}
 
 	addHttpMetadata(metadata, responseMapping)
@@ -40,4 +45,15 @@ func addHttpMetadata(metadata *HttpMetadata, response interface{}) {
 	if v.IsValid() {
 		v.Set(reflect.ValueOf(*metadata))
 	}
+}
+
+func addContent(content []byte, response interface{}) {
+	v := reflect.ValueOf(response).Elem().FieldByName("Content")
+	if v.IsValid() {
+		v.Set(reflect.ValueOf(string(content)))
+	}
+}
+
+func isContentTypeText(metadata *HttpMetadata) bool {
+	return strings.HasPrefix(metadata.Headers.Header.Get("Content-Type"), "text/csv")
 }

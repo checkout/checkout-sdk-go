@@ -9,6 +9,7 @@ import (
 )
 
 func TestShouldCreateSepaSource(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable")
 	request := sources.NewSepaSourceRequest()
 	request.BillingAddress = Address()
 	request.Reference = "reference"

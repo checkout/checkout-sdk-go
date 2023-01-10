@@ -8,45 +8,57 @@ import (
 )
 
 type (
-	RequestCardDestination struct {
-		Type           payments.PaymentDestinationType `json:"type,omitempty"`
-		Number         string                          `json:"number,omitempty"`
-		ExpiryMonth    int                             `json:"expiry_month,omitempty"`
-		ExpiryYear     int                             `json:"expiry_year,omitempty"`
-		FirstName      string                          `json:"first_name,omitempty"`
-		LastName       string                          `json:"last_name,omitempty"`
-		Name           string                          `json:"name,omitempty"`
-		BillingAddress *common.Address                 `json:"billing_address,omitempty"`
-		Phone          *common.Phone                   `json:"phone,omitempty"`
+	requestCardDestination struct {
+		Type           payments.DestinationType `json:"type,omitempty"`
+		Number         string                   `json:"number,omitempty"`
+		ExpiryMonth    int                      `json:"expiry_month,omitempty"`
+		ExpiryYear     int                      `json:"expiry_year,omitempty"`
+		FirstName      string                   `json:"first_name,omitempty"`
+		LastName       string                   `json:"last_name,omitempty"`
+		Name           string                   `json:"name,omitempty"`
+		BillingAddress *common.Address          `json:"billing_address,omitempty"`
+		Phone          *common.Phone            `json:"phone,omitempty"`
 	}
 
-	RequestIdDestination struct {
-		Type      payments.PaymentDestinationType `json:"type,omitempty"`
-		Id        string                          `json:"id,omitempty"`
-		FirstName string                          `json:"first_name,omitempty"`
-		LastName  string                          `json:"last_name,omitempty"`
+	requestIdDestination struct {
+		Type      payments.DestinationType `json:"type,omitempty"`
+		Id        string                   `json:"id,omitempty"`
+		FirstName string                   `json:"first_name,omitempty"`
+		LastName  string                   `json:"last_name,omitempty"`
 	}
 
-	RequestTokenDestination struct {
-		Type           payments.PaymentDestinationType `json:"type,omitempty"`
-		Token          string                          `json:"token,omitempty"`
-		FirstName      string                          `json:"first_name,omitempty"`
-		LastName       string                          `json:"last_name,omitempty"`
-		BillingAddress *common.Address                 `json:"billing_address,omitempty"`
-		Phone          *common.Phone                   `json:"phone,omitempty"`
+	requestTokenDestination struct {
+		Type           payments.DestinationType `json:"type,omitempty"`
+		Token          string                   `json:"token,omitempty"`
+		FirstName      string                   `json:"first_name,omitempty"`
+		LastName       string                   `json:"last_name,omitempty"`
+		BillingAddress *common.Address          `json:"billing_address,omitempty"`
+		Phone          *common.Phone            `json:"phone,omitempty"`
 	}
 )
 
-func NewRequestCardDestination() *RequestCardDestination {
-	return &RequestCardDestination{Type: payments.CardDestination}
+func NewRequestCardDestination() *requestCardDestination {
+	return &requestCardDestination{Type: payments.CardDestination}
 }
 
-func NewRequestIdDestination() *RequestIdDestination {
-	return &RequestIdDestination{Type: payments.IdDestination}
+func NewRequestIdDestination() *requestIdDestination {
+	return &requestIdDestination{Type: payments.IdDestination}
 }
 
-func NewRequestTokenDestination() *RequestTokenDestination {
-	return &RequestTokenDestination{Type: payments.TokenDestination}
+func NewRequestTokenDestination() *requestTokenDestination {
+	return &requestTokenDestination{Type: payments.TokenDestination}
+}
+
+func (d *requestCardDestination) GetType() payments.DestinationType {
+	return d.Type
+}
+
+func (d *requestIdDestination) GetType() payments.DestinationType {
+	return d.Type
+}
+
+func (d *requestTokenDestination) GetType() payments.DestinationType {
+	return d.Type
 }
 
 type (

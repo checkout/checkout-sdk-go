@@ -112,8 +112,8 @@ func getCardSourceRequest() *sources.RequestCardSource {
 	return cardSource
 }
 
-func getPaymentIndividualSender() *nas.PaymentIndividualSender {
-	paymentIndividualSender := nas.NewPaymentIndividualSender()
+func getPaymentIndividualSender() *nas.IndividualSender {
+	paymentIndividualSender := nas.NewRequestIndividualSender()
 	paymentIndividualSender.FirstName = FirstName
 	paymentIndividualSender.LastName = LastName
 	paymentIndividualSender.Address = Address()

@@ -8,18 +8,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
-type FundTransferType string
-
-const (
-	AA FundTransferType = "AA"
-	PP FundTransferType = "PP"
-	FT FundTransferType = "FT"
-	FD FundTransferType = "FD"
-	PD FundTransferType = "PD"
-	LO FundTransferType = "LO"
-	OG FundTransferType = "OG"
-)
-
 // Request
 type (
 	PaymentRequest struct {
@@ -47,9 +35,9 @@ type (
 	}
 
 	PayoutRequest struct {
-		Destination       interface{}                 `json:"destination,omitempty"`
-		Amount            int                         `json:"amount,omitempty"`
-		FundTransferType  FundTransferType            `json:"fund_transfer_type,omitempty"`
+		Destination       payments.Destination        `json:"destination,omitempty"`
+		Amount            int64                       `json:"amount,omitempty"`
+		FundTransferType  payments.FundTransferType   `json:"fund_transfer_type,omitempty"`
 		Currency          common.Currency             `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType        `json:"payment_type,omitempty"`
 		Reference         string                      `json:"reference,omitempty"`
@@ -59,6 +47,7 @@ type (
 		Customer          *common.CustomerRequest     `json:"customer,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor `json:"billing_descriptor,omitempty"`
 		ShippingDetails   *payments.ShippingDetails   `json:"shipping,omitempty"`
+		ThreeDsRequest    *payments.ThreeDsRequest    `json:"3ds,omitempty"`
 		PreviousPaymentId string                      `json:"previous_payment_id,omitempty"`
 		Risk              *payments.RiskRequest       `json:"risk,omitempty"`
 		SuccessUrl        string                      `json:"success_url,omitempty"`

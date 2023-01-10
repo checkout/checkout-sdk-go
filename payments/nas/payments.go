@@ -6,6 +6,7 @@ import (
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/payments/nas/sources"
 )
 
 type AuthorizationType string
@@ -45,14 +46,14 @@ type (
 	}
 
 	PaymentInstruction struct {
-		Purpose           string             `json:"purpose,omitempty"`
-		ChargeBearer      string             `json:"charge_bearer,omitempty"`
-		Repair            bool               `json:"repair"`
-		Scheme            *InstructionScheme `json:"scheme,omitempty"`
-		QuoteId           string             `json:"quote_id,omitempty"`
-		SkipExpiry        string             `json:"skip_expiry,omitempty"`
-		FundsTransferType string             `json:"funds_transfer_type,omitempty"`
-		Mvv               string             `json:"mvv,omitempty"`
+		Purpose           string                    `json:"purpose,omitempty"`
+		ChargeBearer      string                    `json:"charge_bearer,omitempty"`
+		Repair            bool                      `json:"repair"`
+		Scheme            *InstructionScheme        `json:"scheme,omitempty"`
+		QuoteId           string                    `json:"quote_id,omitempty"`
+		SkipExpiry        string                    `json:"skip_expiry,omitempty"`
+		FundsTransferType payments.FundTransferType `json:"funds_transfer_type,omitempty"`
+		Mvv               string                    `json:"mvv,omitempty"`
 	}
 
 	PaymentResponseBalances struct {
@@ -110,13 +111,13 @@ type (
 	}
 
 	PayoutRequest struct {
-		Source              interface{}              `json:"source,omitempty"`
-		Destination         interface{}              `json:"destination,omitempty"`
-		Amount              int                      `json:"amount,omitempty"`
+		Source              sources.PayoutSource     `json:"source,omitempty"`
+		Destination         payments.Destination     `json:"destination,omitempty"`
+		Amount              int64                    `json:"amount,omitempty"`
 		Currency            common.Currency          `json:"currency,omitempty"`
 		Reference           string                   `json:"reference,omitempty"`
 		BillingDescriptor   *PayoutBillingDescriptor `json:"billing_descriptor,omitempty"`
-		Sender              interface{}              `json:"sender,omitempty"`
+		Sender              Sender                   `json:"sender,omitempty"`
 		Instruction         *PaymentInstruction      `json:"instruction,omitempty"`
 		ProcessingChannelId string                   `json:"processing_channel_id,omitempty"`
 		Metadata            map[string]interface{}   `json:"metadata,omitempty"`

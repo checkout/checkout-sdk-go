@@ -45,27 +45,18 @@ const (
 	Dana               SourceType = "dana"
 	Kakaopay           SourceType = "kakaopay"
 	Truemoney          SourceType = "truemoney"
-	Tng                           = "tng"
-	Afterpay                      = "afterpay"
-	Benefit                       = "benefit"
-	Mbway                         = "mbway"
-	Postfinance                   = "postfinance"
-	Stcpay                        = "stcpay"
-	Alma                          = "alma"
+	Tng                SourceType = "tng"
+	Afterpay           SourceType = "afterpay"
+	Benefit            SourceType = "benefit"
+	Mbway              SourceType = "mbway"
+	Postfinance        SourceType = "postfinance"
+	Stcpay             SourceType = "stcpay"
+	Alma               SourceType = "alma"
 
 	BankAccountSource     SourceType = "bank_account"
 	ProviderTokenSource   SourceType = "provider_token"
 	CurrencyAccountSource SourceType = "currency_account"
 	TamaraSource          SourceType = "tamara"
-)
-
-type PaymentDestinationType string
-
-const (
-	BankAccountDestination PaymentDestinationType = "bank_account"
-	CardDestination        PaymentDestinationType = "card"
-	IdDestination          PaymentDestinationType = "id"
-	TokenDestination       PaymentDestinationType = "token"
 )
 
 type PaymentType string
@@ -195,6 +186,22 @@ type UserAction string
 const (
 	PayNow   UserAction = "PAY_NOW"
 	Continue UserAction = "CONTINUE"
+)
+
+type FundTransferType string
+
+const (
+	AA  FundTransferType = "AA"
+	PP  FundTransferType = "PP"
+	FT  FundTransferType = "FT"
+	FD  FundTransferType = "FD"
+	PD  FundTransferType = "PD"
+	LO  FundTransferType = "LO"
+	OG  FundTransferType = "OG"
+	CO4 FundTransferType = "CO4"
+	CO7 FundTransferType = "CO7"
+	C52 FundTransferType = "C52"
+	C55 FundTransferType = "C55"
 )
 
 type (

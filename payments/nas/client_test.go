@@ -280,7 +280,7 @@ func TestRequestPaymentList(t *testing.T) {
 func TestRequestPayout(t *testing.T) {
 	var (
 		payoutRequest = PayoutRequest{
-			Amount:    amount,
+			Amount:    100,
 			Currency:  currency,
 			Reference: reference,
 		}

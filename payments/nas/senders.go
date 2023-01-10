@@ -7,57 +7,87 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
-type PaymentSenderType string
+type SenderType string
 
 const (
-	IndividualSender PaymentSenderType = "individual"
-	CorporateSender  PaymentSenderType = "corporate"
-	InstrumentSender PaymentSenderType = "instrument"
-	Government       PaymentSenderType = "government"
+	Individual SenderType = "individual"
+	Corporate  SenderType = "corporate"
+	Instrument SenderType = "instrument"
+	Government SenderType = "government"
 )
 
 type (
-	PaymentCorporateSender struct {
-		Type           PaymentSenderType                   `json:"type,omitempty"`
+	Sender interface {
+		GetType() SenderType
+	}
+
+	CorporateSender struct {
+		Type           SenderType                          `json:"type,omitempty"`
 		CompanyName    string                              `json:"company_name,omitempty"`
 		Address        *common.Address                     `json:"address,omitempty"`
+		Reference      string                              `json:"reference,omitempty"`
 		ReferenceType  string                              `json:"reference_type,omitempty"`
 		SourceOfFunds  string                              `json:"source_of_funds,omitempty"`
 		Identification *common.AccountHolderIdentification `json:"identification,omitempty"`
 	}
 
-	PaymentIndividualSender struct {
-		Type           PaymentSenderType `json:"type,omitempty"`
-		FirstName      string            `json:"first_name,omitempty"`
-		LastName       string            `json:"last_name,omitempty"`
-		Address        *common.Address   `json:"address,omitempty"`
-		Identification *Identification   `json:"identification,omitempty"`
+	IndividualSender struct {
+		Type           SenderType      `json:"type,omitempty"`
+		FirstName      string          `json:"first_name,omitempty"`
+		MiddleName     string          `json:"middle_name,omitempty"`
+		LastName       string          `json:"last_name,omitempty"`
+		Dob            string          `json:"dob,omitempty"`
+		DateOfBirth    string          `json:"date_of_birth,omitempty"`
+		Address        *common.Address `json:"address,omitempty"`
+		Identification *Identification `json:"identification,omitempty"`
+		Reference      string          `json:"reference,omitempty"`
+		ReferenceType  string          `json:"reference_type,omitempty"`
+		SourceOfFunds  string          `json:"source_of_funds,omitempty"`
+		CountryOfBirth common.Country  `json:"country_of_birth,omitempty"`
+		Nationality    common.Country  `json:"nationality,omitempty"`
 	}
 
-	PaymentInstrumentSender struct {
-		Type PaymentSenderType `json:"type,omitempty"`
+	InstrumentSender struct {
+		Type      SenderType `json:"type,omitempty"`
+		Reference string     `json:"reference,omitempty"`
 	}
 )
 
-func NewPaymentCorporateSender() *PaymentCorporateSender {
-	return &PaymentCorporateSender{Type: CorporateSender}
+func NewRequestCorporateSender() *CorporateSender {
+	return &CorporateSender{Type: Corporate}
 }
 
-func NewPaymentIndividualSender() *PaymentIndividualSender {
-	return &PaymentIndividualSender{Type: IndividualSender}
+func NewRequestGovernmentSender() *CorporateSender {
+	return &CorporateSender{Type: Government}
 }
 
-func NewPaymentInstrumentSender() *PaymentInstrumentSender {
-	return &PaymentInstrumentSender{Type: InstrumentSender}
+func NewRequestIndividualSender() *IndividualSender {
+	return &IndividualSender{Type: Individual}
+}
+
+func NewRequestInstrumentSender() *InstrumentSender {
+	return &InstrumentSender{Type: Instrument}
+}
+
+func (s *CorporateSender) GetType() SenderType {
+	return s.Type
+}
+
+func (s *IndividualSender) GetType() SenderType {
+	return s.Type
+}
+
+func (s *InstrumentSender) GetType() SenderType {
+	return s.Type
 }
 
 type (
 	SenderResponse struct {
 		HttpMetadata            common.HttpMetadata
-		PaymentCorporateSender  *PaymentCorporateSender
-		PaymentGovernmentSender *PaymentCorporateSender
-		PaymentIndividualSender *PaymentIndividualSender
-		PaymentInstrumentSender *PaymentInstrumentSender
+		PaymentCorporateSender  *CorporateSender
+		PaymentGovernmentSender *CorporateSender
+		PaymentIndividualSender *IndividualSender
+		PaymentInstrumentSender *InstrumentSender
 		AlternativeResponse     *common.AlternativeResponse
 	}
 )
@@ -69,26 +99,26 @@ func (s *SenderResponse) UnmarshalJSON(data []byte) error {
 	}
 
 	switch typeMapping.Sender {
-	case string(IndividualSender):
-		var typeMapping PaymentIndividualSender
+	case string(Individual):
+		var typeMapping IndividualSender
 		if err := json.Unmarshal(data, &typeMapping); err != nil {
 			return err
 		}
 		s.PaymentIndividualSender = &typeMapping
-	case string(CorporateSender):
-		var typeMapping PaymentCorporateSender
+	case string(Corporate):
+		var typeMapping CorporateSender
 		if err := json.Unmarshal(data, &typeMapping); err != nil {
 			return err
 		}
 		s.PaymentCorporateSender = &typeMapping
 	case string(Government):
-		var typeMapping PaymentCorporateSender
+		var typeMapping CorporateSender
 		if err := json.Unmarshal(data, &typeMapping); err != nil {
 			return err
 		}
 		s.PaymentGovernmentSender = &typeMapping
-	case string(InstrumentSender):
-		var typeMapping PaymentInstrumentSender
+	case string(Instrument):
+		var typeMapping InstrumentSender
 		if err := json.Unmarshal(data, &typeMapping); err != nil {
 			return err
 		}

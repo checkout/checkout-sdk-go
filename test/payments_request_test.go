@@ -346,7 +346,7 @@ func makeCardPayment(t *testing.T, shouldCapture bool, amount int) *nas.PaymentR
 		Phone: Phone(),
 	}
 
-	paymentIndividualSender := nas.NewPaymentIndividualSender()
+	paymentIndividualSender := nas.NewRequestIndividualSender()
 	paymentIndividualSender.FirstName = FirstName
 	paymentIndividualSender.LastName = LastName
 	paymentIndividualSender.Address = Address()
@@ -408,7 +408,7 @@ func make3dsCardPayment(t *testing.T, attemptN3d bool) *nas.PaymentResponse {
 		Phone: Phone(),
 	}
 
-	paymentCorporateSender := nas.NewPaymentCorporateSender()
+	paymentCorporateSender := nas.NewRequestCorporateSender()
 	paymentCorporateSender.CompanyName = Name
 	paymentCorporateSender.Address = Address()
 
@@ -450,7 +450,7 @@ func makeCardTokenPayment(t *testing.T) *nas.PaymentResponse {
 			City:      "London",
 			Reference: Reference,
 		},
-		Sender: nas.NewPaymentInstrumentSender(),
+		Sender: nas.NewRequestInstrumentSender(),
 	}
 
 	response, err := DefaultApi().Payments.RequestPayment(paymentRequest, nil)

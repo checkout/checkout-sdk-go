@@ -103,13 +103,21 @@ func NewRequestCustomerSource() *RequestCustomerSource {
 }
 
 type (
-	PayoutRequestSource struct {
+	PayoutSource interface {
+		GetType() payments.SourceType
+	}
+
+	payoutRequestSource struct {
 		Type   payments.SourceType `json:"type,omitempty"`
 		Id     string              `json:"id,omitempty"`
-		Amount int                 `json:"amount,omitempty"`
+		Amount int64               `json:"amount,omitempty"`
 	}
 )
 
-func NewPayoutRequestSource() *PayoutRequestSource {
-	return &PayoutRequestSource{Type: payments.CurrencyAccountSource}
+func NewPayoutRequestSource() *payoutRequestSource {
+	return &payoutRequestSource{Type: payments.CurrencyAccountSource}
+}
+
+func (s *payoutRequestSource) GetType() payments.SourceType {
+	return s.Type
 }

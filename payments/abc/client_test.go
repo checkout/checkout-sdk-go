@@ -282,7 +282,7 @@ func TestRequestPayout(t *testing.T) {
 
 		payoutRequest = PayoutRequest{
 			Destination: cardDestination,
-			Amount:      amount,
+			Amount:      100,
 			Currency:    currency,
 			Reference:   reference,
 			Description: description,

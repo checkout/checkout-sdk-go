@@ -11,8 +11,8 @@ import (
 // Request
 type (
 	PaymentRequest struct {
-		Source            interface{}                 `json:"source,omitempty"`
-		Amount            int                         `json:"amount,omitempty"`
+		Source            payments.PaymentSource      `json:"source,omitempty"`
+		Amount            int64                       `json:"amount,omitempty"`
 		Currency          common.Currency             `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType        `json:"payment_type,omitempty"`
 		MerchantInitiated bool                        `json:"merchant_initiated"`

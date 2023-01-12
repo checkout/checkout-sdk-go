@@ -32,7 +32,7 @@ func TestRequestPayment(t *testing.T) {
 	var (
 		paymentRequest = PaymentRequest{
 			Source:      sources.NewRequestCardSource(),
-			Amount:      amount,
+			Amount:      100,
 			Currency:    currency,
 			Reference:   reference,
 			Description: description,

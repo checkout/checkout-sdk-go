@@ -318,7 +318,7 @@ func TestMakePaymentsIdempotentlyPrevious(t *testing.T) {
 
 }
 
-func makeCardPaymentPrevious(t *testing.T, shouldCapture bool, amount int) *abc.PaymentResponse {
+func makeCardPaymentPrevious(t *testing.T, shouldCapture bool, amount int64) *abc.PaymentResponse {
 
 	cardSource := sources.NewRequestCardSource()
 	cardSource.Name = Name

@@ -8,11 +8,11 @@ import (
 )
 
 type (
-	RequestAlipaySource struct {
+	requestAlipaySource struct {
 		Type payments.SourceType `json:"type,omitempty"`
 	}
 
-	RequestBancontactSource struct {
+	requestBancontactSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		PaymentCountry    common.Country      `json:"payment_country,omitempty"`
 		AccountHolderName string              `json:"account_holder_name,omitempty"`
@@ -20,12 +20,12 @@ type (
 		Language          string              `json:"language,omitempty"`
 	}
 
-	RequestBenefitPaySource struct {
+	requestBenefitPaySource struct {
 		Type            payments.SourceType `json:"type,omitempty"`
 		IntegrationType IntegrationType     `json:"integration_type,omitempty"`
 	}
 
-	RequestBoletoSource struct {
+	requestBoletoSource struct {
 		Type            payments.SourceType `json:"type,omitempty"`
 		IntegrationType IntegrationType     `json:"integration_type,omitempty"`
 		Country         common.Country      `json:"country,omitempty"`
@@ -33,13 +33,13 @@ type (
 		Payer           *payments.Payer     `json:"payer,omitempty"`
 	}
 
-	RequestEpsSource struct {
+	requestEpsSource struct {
 		Type    payments.SourceType `json:"type,omitempty"`
 		Purpose string              `json:"purpose,omitempty"`
 		Bic     string              `json:"bic,omitempty"`
 	}
 
-	RequestFawrySource struct {
+	requestFawrySource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Description       string              `json:"description,omitempty"`
 		CustomerProfileId string              `json:"customer_profile_id,omitempty"`
@@ -49,21 +49,21 @@ type (
 		Products          []FawryProduct      `json:"products,omitempty"`
 	}
 
-	RequestGiropaySource struct {
+	requestGiropaySource struct {
 		Type       payments.SourceType `json:"type,omitempty"`
 		Purpose    string              `json:"purpose,omitempty"`
 		Bic        string              `json:"bic,omitempty"`
 		InfoFields []InfoFields        `json:"info_fields,omitempty"`
 	}
 
-	RequestIdealSource struct {
+	requestIdealSource struct {
 		Type        payments.SourceType `json:"type,omitempty"`
 		Description string              `json:"description,omitempty"`
 		Bic         string              `json:"bic,omitempty"`
 		Language    string              `json:"language,omitempty"`
 	}
 
-	RequestKlarnaSource struct {
+	requestKlarnaSource struct {
 		Type                   payments.SourceType      `json:"type,omitempty"`
 		AuthorizationToken     string                   `json:"authorization_token,omitempty"`
 		Locale                 string                   `json:"locale,omitempty"`
@@ -81,7 +81,7 @@ type (
 		CustomPaymentMethodIds []map[string]string      `json:"custom_payment_method_ids,omitempty"`
 	}
 
-	RequestKnetSource struct {
+	requestKnetSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Language          string              `json:"language,omitempty"`
 		UserDefinedField1 string              `json:"user_defined_field1,omitempty"`
@@ -93,14 +93,14 @@ type (
 		Ptlf              string              `json:"ptlf,omitempty"`
 	}
 
-	RequestMultiBancoSource struct {
+	requestMultiBancoSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		PaymentCountry    common.Country      `json:"payment_country,omitempty"`
 		AccountHolderName string              `json:"account_holder_name,omitempty"`
 		BillingDescriptor string              `json:"billing_descriptor,omitempty"`
 	}
 
-	RequestOxxoSource struct {
+	requestOxxoSource struct {
 		Type            payments.SourceType `json:"type,omitempty"`
 		IntegrationType IntegrationType     `json:"integration_type,omitempty"`
 		Country         common.Country      `json:"country,omitempty"`
@@ -108,7 +108,7 @@ type (
 		Payer           *payments.Payer     `json:"payer,omitempty"`
 	}
 
-	RequestP24Source struct {
+	requestP24Source struct {
 		Type               payments.SourceType `json:"type,omitempty"`
 		PaymentCountry     common.Country      `json:"payment_country,omitempty"`
 		AccountHolderName  string              `json:"account_holder_name,omitempty"`
@@ -116,7 +116,7 @@ type (
 		BillingDescriptor  string              `json:"billing_descriptor,omitempty"`
 	}
 
-	RequestPagoFacilSource struct {
+	requestPagoFacilSource struct {
 		Type            payments.SourceType `json:"type,omitempty"`
 		IntegrationType IntegrationType     `json:"integration_type,omitempty"`
 		Country         common.Country      `json:"country,omitempty"`
@@ -124,7 +124,7 @@ type (
 		Payer           *payments.Payer     `json:"payer,omitempty"`
 	}
 
-	RequestPayPalSource struct {
+	requestPayPalSource struct {
 		Type          payments.SourceType    `json:"type,omitempty"`
 		InvoiceNumber string                 `json:"invoice_number,omitempty"`
 		RecipientName string                 `json:"recipient_name,omitempty"`
@@ -132,11 +132,11 @@ type (
 		Stc           map[string]interface{} `json:"stc,omitempty"`
 	}
 
-	RequestPoliSource struct {
+	requestPoliSource struct {
 		Type payments.SourceType `json:"type,omitempty"`
 	}
 
-	RequestQPaySource struct {
+	requestQPaySource struct {
 		Type        payments.SourceType `json:"type,omitempty"`
 		Quantity    int                 `json:"quantity,omitempty"`
 		Description string              `json:"description,omitempty"`
@@ -144,7 +144,7 @@ type (
 		NationalId  string              `json:"national_id,omitempty"`
 	}
 
-	RequestRapiPagoSource struct {
+	requestRapiPagoSource struct {
 		Type            payments.SourceType `json:"type,omitempty"`
 		IntegrationType IntegrationType     `json:"integration_type,omitempty"`
 		Country         common.Country      `json:"country,omitempty"`
@@ -152,115 +152,195 @@ type (
 		Payer           *payments.Payer     `json:"payer,omitempty"`
 	}
 
-	RequestSepaSource struct {
+	requestSepaSource struct {
 		Type payments.SourceType `json:"type,omitempty"`
 		Id   string              `json:"id,omitempty"`
 	}
 
-	RequestSofortSource struct {
+	requestSofortSource struct {
 		Type         payments.SourceType `json:"type,omitempty"`
 		CountryCode  common.Country      `json:"countryCode,omitempty"`
 		LanguageCode string              `json:"languageCode,omitempty"`
 	}
 )
 
-func NewRequestAlipaySource() *RequestAlipaySource {
-	return &RequestAlipaySource{Type: payments.AlipaySource}
+func NewRequestAlipaySource() *requestAlipaySource {
+	return &requestAlipaySource{Type: payments.AlipaySource}
 }
 
-func NewRequestBancontactSource() *RequestBancontactSource {
-	return &RequestBancontactSource{
+func NewRequestBancontactSource() *requestBancontactSource {
+	return &requestBancontactSource{
 		Type: payments.BancontactSource,
 	}
 }
 
-func NewRequestBenefitPaySource() *RequestBenefitPaySource {
-	return &RequestBenefitPaySource{
+func NewRequestBenefitPaySource() *requestBenefitPaySource {
+	return &requestBenefitPaySource{
 		Type:            payments.BenefitPaySource,
 		IntegrationType: Mobile,
 	}
 }
 
-func NewRequestBoletoSource() *RequestBoletoSource {
-	return &RequestBoletoSource{
+func NewRequestBoletoSource() *requestBoletoSource {
+	return &requestBoletoSource{
 		Type: payments.BoletoSource,
 	}
 }
 
-func NewRequestEpsSource() *RequestEpsSource {
-	return &RequestEpsSource{Type: payments.EpsSource}
+func NewRequestEpsSource() *requestEpsSource {
+	return &requestEpsSource{Type: payments.EpsSource}
 }
 
-func NewRequestFawrySource() *RequestFawrySource {
-	return &RequestFawrySource{Type: payments.FawrySource}
+func NewRequestFawrySource() *requestFawrySource {
+	return &requestFawrySource{Type: payments.FawrySource}
 }
 
-func NewRequestGiropaySource() *RequestGiropaySource {
-	return &RequestGiropaySource{Type: payments.GiropaySource}
+func NewRequestGiropaySource() *requestGiropaySource {
+	return &requestGiropaySource{Type: payments.GiropaySource}
 }
 
-func NewRequestIdealSource() *RequestIdealSource {
-	return &RequestIdealSource{Type: payments.IdealSource}
+func NewRequestIdealSource() *requestIdealSource {
+	return &requestIdealSource{Type: payments.IdealSource}
 }
 
-func NewRequestKlarnaSource() *RequestKlarnaSource {
-	return &RequestKlarnaSource{Type: payments.KlarnaSource}
+func NewRequestKlarnaSource() *requestKlarnaSource {
+	return &requestKlarnaSource{Type: payments.KlarnaSource}
 }
 
-func NewRequestKnetSource() *RequestKnetSource {
-	return &RequestKnetSource{Type: payments.KnetSource}
+func NewRequestKnetSource() *requestKnetSource {
+	return &requestKnetSource{Type: payments.KnetSource}
 }
 
-func NewRequestMultiBancoSource() *RequestMultiBancoSource {
-	return &RequestMultiBancoSource{
+func NewRequestMultiBancoSource() *requestMultiBancoSource {
+	return &requestMultiBancoSource{
 		Type: payments.MultiBancoSource,
 	}
 }
 
-func NewRequestOxxoSource() *RequestOxxoSource {
-	return &RequestOxxoSource{
+func NewRequestOxxoSource() *requestOxxoSource {
+	return &requestOxxoSource{
 		Type: payments.OxxoSource,
 	}
 }
 
-func NewRequestP24Source() *RequestP24Source {
-	return &RequestP24Source{
+func NewRequestP24Source() *requestP24Source {
+	return &requestP24Source{
 		Type: payments.P24Source,
 	}
 }
 
-func NewRequestPagoFacilSource() *RequestPagoFacilSource {
-	return &RequestPagoFacilSource{
+func NewRequestPagoFacilSource() *requestPagoFacilSource {
+	return &requestPagoFacilSource{
 		Type:            payments.PagoFacilSource,
 		IntegrationType: Redirect,
 	}
 }
 
-func NewRequestPayPalSource() *RequestPayPalSource {
-	return &RequestPayPalSource{Type: payments.PayPalSource}
+func NewRequestPayPalSource() *requestPayPalSource {
+	return &requestPayPalSource{Type: payments.PayPalSource}
 }
 
-func NewRequestPoliSource() *RequestPoliSource {
-	return &RequestPoliSource{Type: payments.PoliSource}
+func NewRequestPoliSource() *requestPoliSource {
+	return &requestPoliSource{Type: payments.PoliSource}
 }
 
-func NewRequestQPaySource() *RequestQPaySource {
-	return &RequestQPaySource{Type: payments.QPaySource}
+func NewRequestQPaySource() *requestQPaySource {
+	return &requestQPaySource{Type: payments.QPaySource}
 }
 
-func NewRequestRapiPagoSource() *RequestRapiPagoSource {
-	return &RequestRapiPagoSource{
+func NewRequestRapiPagoSource() *requestRapiPagoSource {
+	return &requestRapiPagoSource{
 		Type:            payments.RapiPagoSource,
 		IntegrationType: Redirect,
 	}
 }
 
-func NewRequestSepaSource() *RequestSepaSource {
-	return &RequestSepaSource{Type: payments.SepaSource}
+func NewRequestSepaSource() *requestSepaSource {
+	return &requestSepaSource{Type: payments.SepaSource}
 }
 
-func NewRequestSofortSource() *RequestSofortSource {
-	return &RequestSofortSource{Type: payments.SofortSource}
+func NewRequestSofortSource() *requestSofortSource {
+	return &requestSofortSource{Type: payments.SofortSource}
+}
+
+func (s *requestAlipaySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestBancontactSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestBenefitPaySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestBoletoSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestEpsSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestFawrySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestGiropaySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestIdealSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestKlarnaSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestKnetSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestMultiBancoSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestOxxoSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestP24Source) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestPagoFacilSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestPayPalSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestPoliSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestQPaySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestRapiPagoSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestSepaSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestSofortSource) GetType() payments.SourceType {
+	return s.Type
 }
 
 type IntegrationType string

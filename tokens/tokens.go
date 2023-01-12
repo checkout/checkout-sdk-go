@@ -29,9 +29,14 @@ type (
 	}
 
 	WalletTokenRequest struct {
-		Type TokenType `json:"type" binding:"required"`
-		//ApplePayTokenData or GooglePayTokenData
-		TokenData interface{} `json:"token_data" binding:"required"`
+		Type      TokenType `json:"type" binding:"required"`
+		TokenData TokenData `json:"token_data" binding:"required"`
+	}
+)
+
+type (
+	TokenData interface {
+		GetType() TokenType
 	}
 
 	ApplePayTokenData struct {
@@ -47,6 +52,14 @@ type (
 		SignedMessage   string `json:"signedMessage,omitempty"`
 	}
 )
+
+func (t *ApplePayTokenData) GetType() TokenType {
+	return ApplePay
+}
+
+func (t *GooglePayTokenData) GetType() TokenType {
+	return GooglePay
+}
 
 type (
 	CardTokenResponse struct {

@@ -99,7 +99,7 @@ func TestRequestPaymentWithOAuthSdk(t *testing.T) {
 
 }
 
-func getCardSourceRequest() *sources.RequestCardSource {
+func getCardSourceRequest() payments.PaymentSource {
 	cardSource := sources.NewRequestCardSource()
 	cardSource.Name = Name
 	cardSource.Number = CardNumber

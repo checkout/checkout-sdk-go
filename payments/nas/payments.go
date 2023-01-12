@@ -82,8 +82,8 @@ type (
 //Request
 type (
 	PaymentRequest struct {
-		Source              interface{}                  `json:"source,omitempty"`
-		Amount              int                          `json:"amount,omitempty"`
+		Source              payments.PaymentSource       `json:"source,omitempty"`
+		Amount              int64                        `json:"amount,omitempty"`
 		Currency            common.Currency              `json:"currency,omitempty"`
 		PaymentType         payments.PaymentType         `json:"payment_type,omitempty"`
 		MerchantInitiated   bool                         `json:"merchant_initiated"`
@@ -102,7 +102,7 @@ type (
 		SuccessUrl          string                       `json:"success_url,omitempty"`
 		FailureUrl          string                       `json:"failure_url,omitempty"`
 		PaymentIp           string                       `json:"payment_ip,omitempty"`
-		Sender              interface{}                  `json:"sender,omitempty"`
+		Sender              Sender                       `json:"sender,omitempty"`
 		Recipient           *payments.PaymentRecipient   `json:"recipient,omitempty"`
 		Marketplace         *common.MarketplaceData      `json:"marketplace,omitempty"`
 		Processing          *payments.ProcessingSettings `json:"processing,omitempty"`

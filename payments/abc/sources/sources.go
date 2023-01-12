@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	RequestCardSource struct {
+	requestCardSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Number            string              `json:"number,omitempty"`
 		ExpiryMonth       int                 `json:"expiry_month,omitempty"`
@@ -19,7 +19,7 @@ type (
 		Phone             *common.Phone       `json:"phone,omitempty"`
 	}
 
-	RequestIdSource struct {
+	requestIdSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Id                string              `json:"id,omitempty"`
 		Cvv               string              `json:"cvv,omitempty"`
@@ -27,12 +27,12 @@ type (
 		StoreForFutureUse *bool               `json:"storeForFutureUse,omitempty"`
 	}
 
-	RequestCustomerSource struct {
+	requestCustomerSource struct {
 		Type payments.SourceType `json:"type,omitempty"`
 		Id   string              `json:"number,omitempty"`
 	}
 
-	RequestTokenSource struct {
+	requestTokenSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Token             string              `json:"token,omitempty"`
 		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
@@ -41,7 +41,7 @@ type (
 		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
 	}
 
-	RequestNetworkTokenSource struct {
+	requestNetworkTokenSource struct {
 		Type           payments.SourceType       `json:"type,omitempty"`
 		Token          string                    `json:"token,omitempty"`
 		ExpiryMonth    int                       `json:"expiry_month,omitempty"`
@@ -56,7 +56,7 @@ type (
 		Phone          *common.Phone             `json:"phone,omitempty"`
 	}
 
-	RequestDLocalSource struct {
+	requestDLocalSource struct {
 		Type           payments.SourceType `json:"type,omitempty"`
 		Number         string              `json:"number,omitempty"`
 		ExpiryMonth    int                 `json:"expiry_month,omitempty"`
@@ -69,26 +69,50 @@ type (
 	}
 )
 
-func NewRequestCardSource() *RequestCardSource {
-	return &RequestCardSource{Type: payments.CardSource}
+func NewRequestCardSource() *requestCardSource {
+	return &requestCardSource{Type: payments.CardSource}
 }
 
-func NewRequestIdSource() *RequestIdSource {
-	return &RequestIdSource{Type: payments.IdSource}
+func NewRequestIdSource() *requestIdSource {
+	return &requestIdSource{Type: payments.IdSource}
 }
 
-func NewRequestCustomerSource() *RequestCustomerSource {
-	return &RequestCustomerSource{Type: payments.CustomerSource}
+func NewRequestCustomerSource() *requestCustomerSource {
+	return &requestCustomerSource{Type: payments.CustomerSource}
 }
 
-func NewRequestTokenSource() *RequestTokenSource {
-	return &RequestTokenSource{Type: payments.TokenSource}
+func NewRequestTokenSource() *requestTokenSource {
+	return &requestTokenSource{Type: payments.TokenSource}
 }
 
-func NewRequestNetworkTokenSource() *RequestNetworkTokenSource {
-	return &RequestNetworkTokenSource{Type: payments.NetworkTokenSource}
+func NewRequestNetworkTokenSource() *requestNetworkTokenSource {
+	return &requestNetworkTokenSource{Type: payments.NetworkTokenSource}
 }
 
-func NewRequestDLocalSource() *RequestDLocalSource {
-	return &RequestDLocalSource{Type: payments.DLocalSource}
+func NewRequestDLocalSource() *requestDLocalSource {
+	return &requestDLocalSource{Type: payments.DLocalSource}
+}
+
+func (s *requestCardSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestIdSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestCustomerSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestTokenSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestNetworkTokenSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestDLocalSource) GetType() payments.SourceType {
+	return s.Type
 }

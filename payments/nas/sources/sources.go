@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	RequestCardSource struct {
+	requestCardSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Number            string              `json:"number,omitempty"`
 		ExpiryMonth       int                 `json:"expiry_month,omitempty"`
@@ -19,7 +19,7 @@ type (
 		Phone             *common.Phone       `json:"phone,omitempty"`
 	}
 
-	RequestIdSource struct {
+	requestIdSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Id                string              `json:"id,omitempty"`
 		Cvv               string              `json:"cvv,omitempty"`
@@ -28,7 +28,7 @@ type (
 		StoreForFutureUse *bool               `json:"storeForFutureUse,omitempty"`
 	}
 
-	RequestTokenSource struct {
+	requestTokenSource struct {
 		Type              payments.SourceType `json:"type,omitempty"`
 		Token             string              `json:"token,omitempty"`
 		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
@@ -37,14 +37,14 @@ type (
 		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
 	}
 
-	RequestProviderTokenSource struct {
+	requestProviderTokenSource struct {
 		Type          payments.SourceType   `json:"type,omitempty"`
 		PaymentMethod string                `json:"payment_method,omitempty"`
 		Token         string                `json:"token,omitempty"`
 		AccountHolder *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
-	RequestNetworkTokenSource struct {
+	requestNetworkTokenSource struct {
 		Type           payments.SourceType       `json:"type,omitempty"`
 		ExpiryMonth    int                       `json:"expiry_month,omitempty"`
 		ExpiryYear     int                       `json:"expiry_year,omitempty"`
@@ -58,7 +58,7 @@ type (
 		Phone          *common.Phone             `json:"phone,omitempty"`
 	}
 
-	RequestBankAccountSource struct {
+	requestBankAccountSource struct {
 		Type          payments.SourceType  `json:"type,omitempty"`
 		PaymentMethod string               `json:"payment_method,omitempty"`
 		AccountType   string               `json:"account_type,omitempty"`
@@ -68,38 +68,66 @@ type (
 		AccountHolder common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
-	RequestCustomerSource struct {
+	requestCustomerSource struct {
 		Type payments.SourceType `json:"type,omitempty"`
 		Id   string              `json:"number,omitempty"`
 	}
 )
 
-func NewRequestCardSource() *RequestCardSource {
-	return &RequestCardSource{Type: payments.CardSource}
+func NewRequestCardSource() *requestCardSource {
+	return &requestCardSource{Type: payments.CardSource}
 }
 
-func NewRequestIdSource() *RequestIdSource {
-	return &RequestIdSource{Type: payments.IdSource}
+func NewRequestIdSource() *requestIdSource {
+	return &requestIdSource{Type: payments.IdSource}
 }
 
-func NewRequestTokenSource() *RequestTokenSource {
-	return &RequestTokenSource{Type: payments.TokenSource}
+func NewRequestTokenSource() *requestTokenSource {
+	return &requestTokenSource{Type: payments.TokenSource}
 }
 
-func NewRequestProviderTokenSource() *RequestProviderTokenSource {
-	return &RequestProviderTokenSource{Type: payments.ProviderTokenSource}
+func NewRequestProviderTokenSource() *requestProviderTokenSource {
+	return &requestProviderTokenSource{Type: payments.ProviderTokenSource}
 }
 
-func NewRequestNetworkTokenSource() *RequestNetworkTokenSource {
-	return &RequestNetworkTokenSource{Type: payments.NetworkTokenSource}
+func NewRequestNetworkTokenSource() *requestNetworkTokenSource {
+	return &requestNetworkTokenSource{Type: payments.NetworkTokenSource}
 }
 
-func NewRequestBankAccountSource() *RequestBankAccountSource {
-	return &RequestBankAccountSource{Type: payments.BankAccountSource}
+func NewRequestBankAccountSource() *requestBankAccountSource {
+	return &requestBankAccountSource{Type: payments.BankAccountSource}
 }
 
-func NewRequestCustomerSource() *RequestCustomerSource {
-	return &RequestCustomerSource{Type: payments.CustomerSource}
+func NewRequestCustomerSource() *requestCustomerSource {
+	return &requestCustomerSource{Type: payments.CustomerSource}
+}
+
+func (s *requestCardSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestIdSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestTokenSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestProviderTokenSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestNetworkTokenSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestBankAccountSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestCustomerSource) GetType() payments.SourceType {
+	return s.Type
 }
 
 type (

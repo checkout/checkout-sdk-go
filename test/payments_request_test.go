@@ -329,7 +329,7 @@ func TestMakePaymentsIdempotently(t *testing.T) {
 
 }
 
-func makeCardPayment(t *testing.T, shouldCapture bool, amount int) *nas.PaymentResponse {
+func makeCardPayment(t *testing.T, shouldCapture bool, amount int64) *nas.PaymentResponse {
 
 	cardSource := sources.NewRequestCardSource()
 	cardSource.Name = Name

@@ -35,8 +35,8 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 			request: TransferRequest{
 				Reference:    "reference",
 				TransferType: Commission,
-				Source:       TransferSourceRequest{},
-				Destination:  TransferDestinationRequest{},
+				Source:       &TransferSourceRequest{},
+				Destination:  &TransferDestinationRequest{},
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).

@@ -15,6 +15,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments/links"
 	"github.com/checkout/checkout-sdk-go/sources"
 	"github.com/checkout/checkout-sdk-go/tokens"
+	webhooks "github.com/checkout/checkout-sdk-go/webhooks/abc"
 )
 
 type Api struct {
@@ -27,6 +28,7 @@ type Api struct {
 	Payments    *payments.Client
 	Sources     *sources.Client
 	Tokens      *tokens.Client
+	Webhooks    *webhooks.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -46,6 +48,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Payments = payments.NewClient(configuration, apiClient)
 	api.Sources = sources.NewClient(configuration, apiClient)
 	api.Tokens = tokens.NewClient(configuration, apiClient)
+	api.Webhooks = webhooks.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

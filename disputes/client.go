@@ -24,7 +24,7 @@ func (c *Client) Query(queryFilter QueryFilter) (*QueryResponse, error) {
 		return nil, err
 	}
 
-	url, err := common.BuildQueryPath(disputes, queryFilter)
+	url, err := common.BuildQueryPath(common.BuildPath(disputes), queryFilter)
 	if err != nil {
 		return nil, err
 	}

@@ -41,7 +41,7 @@ func (c *Client) RetrieveAllEventTypesQuery(
 		return nil, err
 	}
 
-	url, err := common.BuildQueryPath(eventTypes, query)
+	url, err := common.BuildQueryPath(common.BuildPath(eventTypes), query)
 
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (c *Client) RetrieveEventsQuery(query QueryRetrieveEvents) (*EventsPageResp
 		return nil, err
 	}
 
-	url, err := common.BuildQueryPath(events, query)
+	url, err := common.BuildQueryPath(common.BuildPath(events), query)
 
 	if err != nil {
 		return nil, err

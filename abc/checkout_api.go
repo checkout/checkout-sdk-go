@@ -13,22 +13,24 @@ import (
 	payments "github.com/checkout/checkout-sdk-go/payments/abc"
 	"github.com/checkout/checkout-sdk-go/payments/hosted"
 	"github.com/checkout/checkout-sdk-go/payments/links"
+	"github.com/checkout/checkout-sdk-go/reconciliation"
 	"github.com/checkout/checkout-sdk-go/sources"
 	"github.com/checkout/checkout-sdk-go/tokens"
 	webhooks "github.com/checkout/checkout-sdk-go/webhooks/abc"
 )
 
 type Api struct {
-	Customers   *customers.Client
-	Disputes    *disputes.Client
-	Events      *events.Client
-	Hosted      *hosted.Client
-	Instruments *abc.Client
-	Links       *links.Client
-	Payments    *payments.Client
-	Sources     *sources.Client
-	Tokens      *tokens.Client
-	Webhooks    *webhooks.Client
+	Customers      *customers.Client
+	Disputes       *disputes.Client
+	Events         *events.Client
+	Hosted         *hosted.Client
+	Instruments    *abc.Client
+	Links          *links.Client
+	Payments       *payments.Client
+	Reconciliation *reconciliation.Client
+	Sources        *sources.Client
+	Tokens         *tokens.Client
+	Webhooks       *webhooks.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -46,6 +48,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Instruments = abc.NewClient(configuration, apiClient)
 	api.Links = links.NewClient(configuration, apiClient)
 	api.Payments = payments.NewClient(configuration, apiClient)
+	api.Reconciliation = reconciliation.NewClient(configuration, apiClient)
 	api.Sources = sources.NewClient(configuration, apiClient)
 	api.Tokens = tokens.NewClient(configuration, apiClient)
 	api.Webhooks = webhooks.NewClient(configuration, apiClient)

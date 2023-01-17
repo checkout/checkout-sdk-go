@@ -4,7 +4,7 @@ import "github.com/checkout/checkout-sdk-go/common"
 
 const Path = "instruments"
 
-const ValidationPath = "/validation/bank-accounts/"
+const ValidationPath = "validation/bank-accounts"
 
 type InstrumentType string
 

@@ -24,7 +24,7 @@ func (c *Client) GetAllReports(query QueryFilter) (*QueryResponse, error) {
 		return nil, err
 	}
 
-	url, err := common.BuildQueryPath(reports, query)
+	url, err := common.BuildQueryPath(common.BuildPath(reports), query)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package common
 
 import (
 	"net/http"
+	"time"
 )
 
 type AccountType string
@@ -232,5 +233,12 @@ type (
 	Commission struct {
 		Amount     int64   `json:"amount,omitempty"`
 		Percentage float32 `json:"percentage,omitempty"`
+	}
+)
+
+type (
+	DateRangeQuery struct {
+		From time.Time `url:"from,omitempty" layout:"2006-01-02T15:04:05Z"`
+		To   time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
 	}
 )

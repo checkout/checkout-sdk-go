@@ -46,7 +46,7 @@ func (c *Client) RequestPaymentList(request payments.QueryRequest) (*GetPaymentL
 		return nil, err
 	}
 
-	url, err := common.BuildQueryPath(payments.PathPayments, request)
+	url, err := common.BuildQueryPath(common.BuildPath(payments.PathPayments), request)
 	if err != nil {
 		return nil, err
 	}

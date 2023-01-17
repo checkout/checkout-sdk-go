@@ -40,7 +40,7 @@ func (c *Client) Get(customerId string) (*GetCustomerResponse, error) {
 	}
 
 	var response GetCustomerResponse
-	err = c.apiClient.Get(common.BuildPath(common.BuildPath(Path), customerId), auth, &response)
+	err = c.apiClient.Get(common.BuildPath(Path, customerId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

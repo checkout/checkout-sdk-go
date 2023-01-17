@@ -26,7 +26,7 @@ func BuildQueryPath(path string, queryValues interface{}) (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("/%s?%s", path, values.Encode()), nil
+	return fmt.Sprintf("%s?%s", path, values.Encode()), nil
 }
 
 func EscapeQuotes(s string) string {

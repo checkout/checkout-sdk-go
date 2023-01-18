@@ -224,13 +224,13 @@ type (
 
 	AmountAllocations struct {
 		Id         string      `json:"id,omitempty"`
-		Amount     int         `json:"amount,omitempty"`
+		Amount     int64       `json:"amount,omitempty"`
 		Reference  string      `json:"reference,omitempty"`
 		Commission *Commission `json:"commission,omitempty"`
 	}
 
 	Commission struct {
-		Amount     int     `json:"amount,omitempty"`
+		Amount     int64   `json:"amount,omitempty"`
 		Percentage float32 `json:"percentage,omitempty"`
 	}
 )

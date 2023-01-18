@@ -36,7 +36,7 @@ const (
 type (
 	SessionRequest struct {
 		Source                        sources.SessionSource      `json:"source,omitempty"`
-		Amount                        int                        `json:"amount,omitempty"`
+		Amount                        int64                      `json:"amount,omitempty"`
 		Currency                      common.Currency            `json:"currency,omitempty"`
 		ProcessingChannelId           string                     `json:"processing_channel_id,omitempty"`
 		Marketplace                   *SessionMarketplaceData    `json:"marketplace,omitempty"`

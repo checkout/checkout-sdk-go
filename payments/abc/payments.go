@@ -59,7 +59,7 @@ type (
 	}
 
 	CaptureRequest struct {
-		Amount    int                    `json:"amount,omitempty"`
+		Amount    int64                  `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}
@@ -70,7 +70,7 @@ type (
 	PaymentResponse struct {
 		HttpMetadata    common.HttpMetadata
 		ActionId        string                      `json:"action_id,omitempty"`
-		Amount          int                         `json:"amount,omitempty"`
+		Amount          int64                       `json:"amount,omitempty"`
 		Approved        bool                        `json:"approved,omitempty"`
 		AuthCode        string                      `json:"auth_code,omitempty"`
 		Id              string                      `json:"id,omitempty"`
@@ -96,7 +96,7 @@ type (
 		RequestedOn       time.Time                       `json:"requested_on,omitempty"`
 		Source            interface{}                     `json:"source,omitempty"`
 		Destination       interface{}                     `json:"destination,omitempty"`
-		Amount            int                             `json:"amount,omitempty"`
+		Amount            int64                           `json:"amount,omitempty"`
 		Currency          common.Currency                 `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType            `json:"payment_type,omitempty"`
 		Reference         string                          `json:"reference,omitempty"`
@@ -126,7 +126,7 @@ type (
 		Id              string                 `json:"id,omitempty"`
 		Type            payments.ActionType    `json:"type,omitempty"`
 		ProcessedOn     time.Time              `json:"processed_on,omitempty"`
-		Amount          int                    `json:"amount,omitempty"`
+		Amount          int64                  `json:"amount,omitempty"`
 		Approved        bool                   `json:"approved,omitempty"`
 		AuthCode        string                 `json:"auth_code,omitempty"`
 		ResponseCode    string                 `json:"response_code,omitempty"`

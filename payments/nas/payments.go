@@ -57,13 +57,13 @@ type (
 	}
 
 	PaymentResponseBalances struct {
-		TotalAuthorized    int `json:"total_authorized,omitempty"`
-		TotalVoided        int `json:"total_voided,omitempty"`
-		AvailableToVoid    int `json:"available_to_void"`
-		TotalCaptured      int `json:"total_captured,omitempty"`
-		AvailableToCapture int `json:"available_to_capture,omitempty"`
-		TotalRefunded      int `json:"total_refunded,omitempty"`
-		AvailableToRefund  int `json:"available_to_refund,omitempty"`
+		TotalAuthorized    int64 `json:"total_authorized,omitempty"`
+		TotalVoided        int64 `json:"total_voided,omitempty"`
+		AvailableToVoid    int64 `json:"available_to_void"`
+		TotalCaptured      int64 `json:"total_captured,omitempty"`
+		AvailableToCapture int64 `json:"available_to_capture,omitempty"`
+		TotalRefunded      int64 `json:"total_refunded,omitempty"`
+		AvailableToRefund  int64 `json:"available_to_refund,omitempty"`
 	}
 
 	PaymentInstructionResponse struct {
@@ -124,7 +124,7 @@ type (
 	}
 
 	CaptureRequest struct {
-		Amount            int                          `json:"amount,omitempty"`
+		Amount            int64                        `json:"amount,omitempty"`
 		CaptureType       CaptureType                  `json:"capture_type,omitempty"`
 		Reference         string                       `json:"reference,omitempty"`
 		Customer          *common.CustomerRequest      `json:"customer,omitempty"`
@@ -144,7 +144,7 @@ type (
 	PaymentResponse struct {
 		HttpMetadata    common.HttpMetadata
 		ActionId        string                      `json:"action_id,omitempty"`
-		Amount          int                         `json:"amount,omitempty"`
+		Amount          int64                       `json:"amount,omitempty"`
 		Approved        bool                        `json:"approved,omitempty"`
 		AuthCode        string                      `json:"auth_code,omitempty"`
 		Id              string                      `json:"id,omitempty"`
@@ -181,7 +181,7 @@ type (
 		Source            *SourceResponse                 `json:"source,omitempty"`
 		Destination       *DestinationResponse            `json:"destination,omitempty"`
 		Sender            *SenderResponse                 `json:"sender,omitempty"`
-		Amount            int                             `json:"amount,omitempty"`
+		Amount            int64                           `json:"amount,omitempty"`
 		Currency          common.Currency                 `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType            `json:"payment_type,omitempty"`
 		Reference         string                          `json:"reference,omitempty"`
@@ -218,7 +218,7 @@ type (
 		Id                string                       `json:"id,omitempty"`
 		Type              payments.ActionType          `json:"type,omitempty"`
 		ProcessedOn       time.Time                    `json:"processed_on,omitempty"`
-		Amount            int                          `json:"amount,omitempty"`
+		Amount            int64                        `json:"amount,omitempty"`
 		Approved          bool                         `json:"approved,omitempty"`
 		AuthCode          string                       `json:"auth_code,omitempty"`
 		ResponseCode      string                       `json:"response_code,omitempty"`

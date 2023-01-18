@@ -37,13 +37,13 @@ func TestCaptureCardPayment(t *testing.T) {
 	payment, err := DefaultApi().Payments.GetPaymentDetails(paymentResponse.Id)
 
 	assert.NotEmpty(t, payment.Balances)
-	assert.Equal(t, 10, payment.Balances.TotalAuthorized)
-	assert.Equal(t, 5, payment.Balances.TotalCaptured)
-	assert.Equal(t, 0, payment.Balances.TotalRefunded)
-	assert.Equal(t, 0, payment.Balances.TotalVoided)
-	assert.Equal(t, 0, payment.Balances.AvailableToCapture)
-	assert.Equal(t, 5, payment.Balances.AvailableToRefund)
-	assert.Equal(t, 0, payment.Balances.AvailableToVoid)
+	assert.Equal(t, int64(10), payment.Balances.TotalAuthorized)
+	assert.Equal(t, int64(5), payment.Balances.TotalCaptured)
+	assert.Equal(t, int64(0), payment.Balances.TotalRefunded)
+	assert.Equal(t, int64(0), payment.Balances.TotalVoided)
+	assert.Equal(t, int64(0), payment.Balances.AvailableToCapture)
+	assert.Equal(t, int64(5), payment.Balances.AvailableToRefund)
+	assert.Equal(t, int64(0), payment.Balances.AvailableToVoid)
 
 }
 

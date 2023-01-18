@@ -16,7 +16,8 @@ import (
 )
 
 var (
-	amount      = 100
+	amount int64 = 100
+
 	currency    = common.GBP
 	reference   = "reference"
 	description = "description"
@@ -32,7 +33,7 @@ func TestRequestPayment(t *testing.T) {
 	var (
 		paymentRequest = PaymentRequest{
 			Source:      sources.NewRequestCardSource(),
-			Amount:      100,
+			Amount:      amount,
 			Currency:    currency,
 			Reference:   reference,
 			Description: description,
@@ -282,7 +283,7 @@ func TestRequestPayout(t *testing.T) {
 
 		payoutRequest = PayoutRequest{
 			Destination: cardDestination,
-			Amount:      100,
+			Amount:      amount,
 			Currency:    currency,
 			Reference:   reference,
 			Description: description,

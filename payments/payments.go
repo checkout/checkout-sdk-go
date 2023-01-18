@@ -366,7 +366,7 @@ type (
 //Request
 type (
 	RefundRequest struct {
-		Amount    int                    `json:"amount,omitempty"`
+		Amount    int64                  `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}

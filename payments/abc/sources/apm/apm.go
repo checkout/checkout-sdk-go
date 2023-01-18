@@ -71,7 +71,7 @@ type (
 		AutoCapture            bool                     `json:"auto_capture,omitempty"`
 		BillingAddress         *common.Address          `json:"billing_address,omitempty"`
 		ShippingAddress        map[string]interface{}   `json:"shipping_address,omitempty"`
-		TaxAmount              int                      `json:"tax_amount,omitempty"`
+		TaxAmount              int64                    `json:"tax_amount,omitempty"`
 		Products               []map[string]interface{} `json:"products,omitempty"`
 		Customer               map[string]interface{}   `json:"customer,omitempty"`
 		MerchantReference1     string                   `json:"merchant_reference1,omitempty"`

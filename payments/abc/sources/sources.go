@@ -57,15 +57,16 @@ type (
 	}
 
 	requestDLocalSource struct {
-		Type           payments.SourceType `json:"type,omitempty"`
-		Number         string              `json:"number,omitempty"`
-		ExpiryMonth    int                 `json:"expiry_month,omitempty"`
-		ExpiryYear     int                 `json:"expiry_year,omitempty"`
-		Name           string              `json:"name,omitempty"`
-		Cvv            string              `json:"cvv,omitempty"`
-		Stored         bool                `json:"stored"`
-		BillingAddress *common.Address     `json:"billing_address,omitempty"`
-		Phone          *common.Phone       `json:"phone,omitempty"`
+		Type              payments.SourceType `json:"type,omitempty"`
+		Number            string              `json:"number,omitempty"`
+		ExpiryMonth       int                 `json:"expiry_month,omitempty"`
+		ExpiryYear        int                 `json:"expiry_year,omitempty"`
+		Name              string              `json:"name,omitempty"`
+		Cvv               string              `json:"cvv,omitempty"`
+		Stored            bool                `json:"stored"`
+		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
+		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
+		Phone             *common.Phone       `json:"phone,omitempty"`
 	}
 )
 

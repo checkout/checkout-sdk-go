@@ -46,6 +46,7 @@ type (
 
 	requestNetworkTokenSource struct {
 		Type           payments.SourceType       `json:"type,omitempty"`
+		Token          string                    `json:"token,omitempty"`
 		ExpiryMonth    int                       `json:"expiry_month,omitempty"`
 		ExpiryYear     int                       `json:"expiry_year,omitempty"`
 		TokenType      payments.NetworkTokenType `json:"token_type,omitempty"`
@@ -142,8 +143,12 @@ type (
 	}
 )
 
-func NewPayoutRequestSource() *payoutRequestSource {
+func NewPayoutCurrencyAccountSource() *payoutRequestSource {
 	return &payoutRequestSource{Type: payments.CurrencyAccountSource}
+}
+
+func NewPayoutEntitySource() *payoutRequestSource {
+	return &payoutRequestSource{Type: payments.EntitySource}
 }
 
 func (s *payoutRequestSource) GetType() payments.SourceType {

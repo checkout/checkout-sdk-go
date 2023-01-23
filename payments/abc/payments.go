@@ -11,51 +11,51 @@ import (
 // Request
 type (
 	PaymentRequest struct {
-		Source            payments.PaymentSource      `json:"source,omitempty"`
-		Amount            int64                       `json:"amount,omitempty"`
-		Currency          common.Currency             `json:"currency,omitempty"`
-		PaymentType       payments.PaymentType        `json:"payment_type,omitempty"`
-		MerchantInitiated bool                        `json:"merchant_initiated"`
-		Reference         string                      `json:"reference,omitempty"`
-		Description       string                      `json:"description,omitempty"`
-		Capture           bool                        `json:"capture"`
-		CaptureOn         time.Time                   `json:"capture_on,omitempty"`
-		Customer          *common.CustomerRequest     `json:"customer,omitempty"`
-		BillingDescriptor *payments.BillingDescriptor `json:"billing_descriptor,omitempty"`
-		ShippingDetails   *payments.ShippingDetails   `json:"shipping,omitempty"`
-		PreviousPaymentId string                      `json:"previous_payment_id,omitempty"`
-		Risk              *payments.RiskRequest       `json:"risk,omitempty"`
-		SuccessUrl        string                      `json:"success_url,omitempty"`
-		FailureUrl        string                      `json:"failure_url,omitempty"`
-		PaymentIp         string                      `json:"payment_ip,omitempty"`
-		ThreeDsRequest    *payments.ThreeDsRequest    `json:"3ds,omitempty"`
-		PaymentRecipient  *payments.PaymentRecipient  `json:"recipient,omitempty"`
-		Metadata          map[string]interface{}      `json:"metadata,omitempty"`
-		Processing        map[string]interface{}      `json:"processing,omitempty"`
+		Source            payments.PaymentSource       `json:"source,omitempty"`
+		Amount            int64                        `json:"amount,omitempty"`
+		Currency          common.Currency              `json:"currency,omitempty"`
+		PaymentType       payments.PaymentType         `json:"payment_type,omitempty"`
+		MerchantInitiated bool                         `json:"merchant_initiated"`
+		Reference         string                       `json:"reference,omitempty"`
+		Description       string                       `json:"description,omitempty"`
+		Capture           bool                         `json:"capture"`
+		CaptureOn         time.Time                    `json:"capture_on,omitempty"`
+		Customer          *common.CustomerRequest      `json:"customer,omitempty"`
+		BillingDescriptor *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
+		ShippingDetails   *payments.ShippingDetails    `json:"shipping,omitempty"`
+		PreviousPaymentId string                       `json:"previous_payment_id,omitempty"`
+		Risk              *payments.RiskRequest        `json:"risk,omitempty"`
+		SuccessUrl        string                       `json:"success_url,omitempty"`
+		FailureUrl        string                       `json:"failure_url,omitempty"`
+		PaymentIp         string                       `json:"payment_ip,omitempty"`
+		ThreeDsRequest    *payments.ThreeDsRequest     `json:"3ds,omitempty"`
+		PaymentRecipient  *payments.PaymentRecipient   `json:"recipient,omitempty"`
+		Processing        *payments.ProcessingSettings `json:"processing,omitempty"`
+		Metadata          map[string]interface{}       `json:"metadata,omitempty"`
 	}
 
 	PayoutRequest struct {
-		Destination       payments.Destination        `json:"destination,omitempty"`
-		Amount            int64                       `json:"amount,omitempty"`
-		FundTransferType  payments.FundTransferType   `json:"fund_transfer_type,omitempty"`
-		Currency          common.Currency             `json:"currency,omitempty"`
-		PaymentType       payments.PaymentType        `json:"payment_type,omitempty"`
-		Reference         string                      `json:"reference,omitempty"`
-		Description       string                      `json:"description,omitempty"`
-		Capture           bool                        `json:"capture"`
-		CaptureOn         time.Time                   `json:"capture_on,omitempty"`
-		Customer          *common.CustomerRequest     `json:"customer,omitempty"`
-		BillingDescriptor *payments.BillingDescriptor `json:"billing_descriptor,omitempty"`
-		ShippingDetails   *payments.ShippingDetails   `json:"shipping,omitempty"`
-		ThreeDsRequest    *payments.ThreeDsRequest    `json:"3ds,omitempty"`
-		PreviousPaymentId string                      `json:"previous_payment_id,omitempty"`
-		Risk              *payments.RiskRequest       `json:"risk,omitempty"`
-		SuccessUrl        string                      `json:"success_url,omitempty"`
-		FailureUrl        string                      `json:"failure_url,omitempty"`
-		PaymentIp         string                      `json:"payment_ip,omitempty"`
-		PaymentRecipient  *payments.PaymentRecipient  `json:"recipient,omitempty"`
-		Metadata          map[string]interface{}      `json:"metadata,omitempty"`
-		Processing        map[string]interface{}      `json:"processing,omitempty"`
+		Destination       payments.Destination         `json:"destination,omitempty"`
+		Amount            int64                        `json:"amount,omitempty"`
+		FundTransferType  payments.FundTransferType    `json:"fund_transfer_type,omitempty"`
+		Currency          common.Currency              `json:"currency,omitempty"`
+		PaymentType       payments.PaymentType         `json:"payment_type,omitempty"`
+		Reference         string                       `json:"reference,omitempty"`
+		Description       string                       `json:"description,omitempty"`
+		Capture           bool                         `json:"capture"`
+		CaptureOn         time.Time                    `json:"capture_on,omitempty"`
+		Customer          *common.CustomerRequest      `json:"customer,omitempty"`
+		BillingDescriptor *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
+		ShippingDetails   *payments.ShippingDetails    `json:"shipping,omitempty"`
+		ThreeDsRequest    *payments.ThreeDsRequest     `json:"3ds,omitempty"`
+		PreviousPaymentId string                       `json:"previous_payment_id,omitempty"`
+		Risk              *payments.RiskRequest        `json:"risk,omitempty"`
+		SuccessUrl        string                       `json:"success_url,omitempty"`
+		FailureUrl        string                       `json:"failure_url,omitempty"`
+		PaymentIp         string                       `json:"payment_ip,omitempty"`
+		PaymentRecipient  *payments.PaymentRecipient   `json:"recipient,omitempty"`
+		Processing        *payments.ProcessingSettings `json:"processing,omitempty"`
+		Metadata          map[string]interface{}       `json:"metadata,omitempty"`
 	}
 
 	CaptureRequest struct {

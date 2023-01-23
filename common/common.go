@@ -156,12 +156,14 @@ type (
 		Type           AccountHolderIdentificationType `json:"type,omitempty"`
 		Number         string                          `json:"number,omitempty"`
 		IssuingCountry Country                         `json:"issuing_country,omitempty"`
-		DateOfExpiry   AccountHolderType               `json:"date_of_expiry,omitempty"`
+		DateOfExpiry   string                          `json:"date_of_expiry,omitempty"`
 	}
 
 	AccountHolder struct {
 		Type              AccountHolderType            `json:"type,omitempty"`
+		Title             string                       `json:"title,omitempty"`
 		FirstName         string                       `json:"first_name,omitempty"`
+		MiddleName        string                       `json:"middle_name,omitempty"`
 		LastName          string                       `json:"last_name,omitempty"`
 		CompanyName       string                       `json:"company_name,omitempty"`
 		TaxId             string                       `json:"tax_id,omitempty"`

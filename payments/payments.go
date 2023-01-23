@@ -241,44 +241,49 @@ type (
 	}
 
 	PaymentRecipient struct {
-		DateOfBirth   string         `json:"dob,omitempty"`
-		AccountNumber string         `json:"account_number,omitempty"`
-		CountryCode   common.Country `json:"country_code,omitempty"`
-		Zip           string         `json:"zip,omitempty"`
-		FirstName     string         `json:"first_name,omitempty"`
-		LastName      string         `json:"last_name,omitempty"`
+		DateOfBirth   string          `json:"dob,omitempty"`
+		AccountNumber string          `json:"account_number,omitempty"`
+		Address       *common.Address `json:"address,omitempty"`
+		CountryCode   common.Country  `json:"country_code,omitempty"`
+		Zip           string          `json:"zip,omitempty"`
+		FirstName     string          `json:"first_name,omitempty"`
+		LastName      string          `json:"last_name,omitempty"`
 	}
 
 	ProcessingSettings struct {
-		OrderId                 string                    `json:"order_id,omitempty"`
-		TaxAmount               int64                     `json:"tax_amount,omitempty"`
-		DiscountAmount          int64                     `json:"discount_amount,omitempty"`
-		DutyAmount              int64                     `json:"duty_amount,omitempty"`
-		ShippingAmount          int64                     `json:"shipping_amount,omitempty"`
-		ShippingTaxAmount       int64                     `json:"shipping_tax_amount,omitempty"`
-		Aft                     bool                      `json:"aft,omitempty"`
-		PreferredScheme         PreferredSchema           `json:"preferred_scheme,omitempty"`
-		MerchantInitiatedReason MerchantInitiatedReason   `json:"merchant_initiated_reason,omitempty"`
-		CampaignId              int64                     `json:"campaign_id,omitempty"`
-		ProductType             ProductType               `json:"product_type,omitempty"`
-		OpenId                  string                    `json:"open_id,omitempty"`
-		OriginalOrderAmount     int64                     `json:"original_order_amount,omitempty"`
-		ReceiptId               string                    `json:"receipt_id,omitempty"`
-		TerminalType            TerminalType              `json:"terminal_type,omitempty"`
-		OsType                  OsType                    `json:"os_type,omitempty"`
-		InvoiceId               string                    `json:"invoice_id,omitempty"`
-		BrandName               string                    `json:"brand_name,omitempty"`
-		Locale                  string                    `json:"locale,omitempty"`
-		ShippingPreference      ShippingPreference        `json:"shipping_preference,omitempty"`
-		UserAction              UserAction                `json:"user_action,omitempty"`
-		SetTransactionContext   []map[string]string       `json:"set_transaction_context,omitempty"`
-		AirlineData             []AirlineData             `json:"airline_data,omitempty"`
-		OtpValue                string                    `json:"otp_value,omitempty"`
-		PurchaseCountry         common.Country            `json:"purchase_country,omitempty"`
-		CustomPaymentMethodIds  []string                  `json:"custom_payment_method_ids,omitempty"`
-		ShippingDelay           int64                     `json:"shipping_delay,omitempty"`
-		ShippingInfo            string                    `json:"shipping_info,omitempty"`
-		Dlocal                  *DLocalProcessingSettings `json:"dlocal,omitempty"`
+		OrderId                 string                  `json:"order_id,omitempty"`
+		TaxAmount               int64                   `json:"tax_amount,omitempty"`
+		DiscountAmount          int64                   `json:"discount_amount,omitempty"`
+		DutyAmount              int64                   `json:"duty_amount,omitempty"`
+		ShippingAmount          int64                   `json:"shipping_amount,omitempty"`
+		ShippingTaxAmount       int64                   `json:"shipping_tax_amount,omitempty"`
+		Aft                     bool                    `json:"aft,omitempty"`
+		PreferredScheme         PreferredSchema         `json:"preferred_scheme,omitempty"`
+		MerchantInitiatedReason MerchantInitiatedReason `json:"merchant_initiated_reason,omitempty"`
+		CampaignId              int64                   `json:"campaign_id,omitempty"`
+		ProductType             ProductType             `json:"product_type,omitempty"`
+		OpenId                  string                  `json:"open_id,omitempty"`
+		OriginalOrderAmount     int64                   `json:"original_order_amount,omitempty"`
+		ReceiptId               string                  `json:"receipt_id,omitempty"`
+		TerminalType            TerminalType            `json:"terminal_type,omitempty"`
+		OsType                  OsType                  `json:"os_type,omitempty"`
+		InvoiceId               string                  `json:"invoice_id,omitempty"`
+		BrandName               string                  `json:"brand_name,omitempty"`
+		Locale                  string                  `json:"locale,omitempty"`
+		ShippingPreference      ShippingPreference      `json:"shipping_preference,omitempty"`
+		UserAction              UserAction              `json:"user_action,omitempty"`
+		SetTransactionContext   []map[string]string     `json:"set_transaction_context,omitempty"`
+		AirlineData             []AirlineData           `json:"airline_data,omitempty"`
+		OtpValue                string                  `json:"otp_value,omitempty"`
+		PurchaseCountry         common.Country          `json:"purchase_country,omitempty"`
+		CustomPaymentMethodIds  []string                `json:"custom_payment_method_ids,omitempty"`
+		MerchantCallbackUrl     string                  `json:"merchant_callback_url,omitempty"`
+		ShippingDelay           int64                   `json:"shipping_delay,omitempty"`
+		ShippingInfo            string                  `json:"shipping_info,omitempty"`
+		// Only available on Previous
+		SenderInformation *SenderInformation        `json:"senderInformation,omitempty"`
+		Purpose           string                    `json:"purpose,omitempty"`
+		Dlocal            *DLocalProcessingSettings `json:"dlocal,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {
@@ -332,6 +337,20 @@ type (
 
 	Installments struct {
 		Count string `json:"count,omitempty"`
+	}
+
+	SenderInformation struct {
+		Reference     string         `json:"reference,omitempty"`
+		FirstName     string         `json:"firstName,omitempty"`
+		LastName      string         `json:"lastName,omitempty"`
+		Dob           string         `json:"dob,omitempty"`
+		Address       string         `json:"address,omitempty"`
+		City          string         `json:"city,omitempty"`
+		State         string         `json:"state,omitempty"`
+		Country       common.Country `json:"country,omitempty"`
+		PostalCode    string         `json:"postalCode,omitempty"`
+		SourceOfFunds string         `json:"sourceOfFunds,omitempty"`
+		Purpose       string         `json:"purpose,omitempty"`
 	}
 
 	DLocalProcessingSettings struct {

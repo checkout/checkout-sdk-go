@@ -105,6 +105,7 @@ type (
 		Sender              Sender                       `json:"sender,omitempty"`
 		Recipient           *payments.PaymentRecipient   `json:"recipient,omitempty"`
 		Marketplace         *common.MarketplaceData      `json:"marketplace,omitempty"`
+		AmountAllocations   []common.AmountAllocations   `json:"amount_allocations,omitempty"`
 		Processing          *payments.ProcessingSettings `json:"processing,omitempty"`
 		Items               []payments.Product           `json:"items,omitempty"`
 		Metadata            map[string]interface{}       `json:"metadata,omitempty"`

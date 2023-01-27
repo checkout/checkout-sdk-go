@@ -68,7 +68,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 1000, response.Amount)
+				assert.Equal(t, int64(1000), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -126,7 +126,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -454,7 +454,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 	}
 }
 
-func getIdealSourceRequest() *apm.RequestIdealSource {
+func getIdealSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestIdealSource()
 	source.Description = "ORD50234E89"
 	source.Bic = "INGBNL2A"
@@ -463,21 +463,21 @@ func getIdealSourceRequest() *apm.RequestIdealSource {
 	return source
 }
 
-func getAfterPaySourceRequest() *apm.RequestAfterPaySource {
+func getAfterPaySourceRequest() payments.PaymentSource {
 	source := apm.NewRequestAfterPaySource()
 	source.AccountHolder = AccountHolder()
 
 	return source
 }
 
-func getTamaraSourceRequest() *apm.RequestTamaraSource {
+func getTamaraSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestTamaraSource()
 	source.BillingAddress = Address()
 
 	return source
 }
 
-func getQPaySource() *apm.RequestQPaySource {
+func getQPaySource() payments.PaymentSource {
 	source := apm.NewRequestQPaySource()
 	source.Description = "QPay Demo Payment"
 	source.Language = "en"
@@ -487,21 +487,21 @@ func getQPaySource() *apm.RequestQPaySource {
 	return source
 }
 
-func getEpsSource() *apm.RequestEpsSource {
+func getEpsSource() payments.PaymentSource {
 	source := apm.NewRequestEpsSource()
 	source.Purpose = "Mens black t-shirt L"
 
 	return source
 }
 
-func getGiropaySource() *apm.RequestGiropaySource {
+func getGiropaySource() payments.PaymentSource {
 	source := apm.NewRequestGiropaySource()
 	source.Purpose = "Mens black t-shirt L"
 
 	return source
 }
 
-func getP24Source() *apm.RequestP24Source {
+func getP24Source() payments.PaymentSource {
 	source := apm.NewRequestP24Source()
 	source.PaymentCountry = common.PL
 	source.AccountHolderName = "Bruce Wayne"
@@ -511,14 +511,14 @@ func getP24Source() *apm.RequestP24Source {
 	return source
 }
 
-func getKnetSource() *apm.RequestKnetSource {
+func getKnetSource() payments.PaymentSource {
 	source := apm.NewRequestKnetSource()
 	source.Language = "en"
 
 	return source
 }
 
-func getBancontactSource() *apm.RequestBancontactSource {
+func getBancontactSource() payments.PaymentSource {
 	source := apm.NewRequestBancontactSource()
 	source.PaymentCountry = common.BE
 	source.AccountHolderName = "Bruce Wayne"
@@ -527,7 +527,7 @@ func getBancontactSource() *apm.RequestBancontactSource {
 	return source
 }
 
-func getMultiBancoSource() *apm.RequestMultiBancoSource {
+func getMultiBancoSource() payments.PaymentSource {
 	source := apm.NewRequestMultiBancoSource()
 	source.PaymentCountry = common.PT
 	source.AccountHolderName = "Bruce Wayne"
@@ -536,7 +536,7 @@ func getMultiBancoSource() *apm.RequestMultiBancoSource {
 	return source
 }
 
-func getPostFinanceSource() *apm.RequestPostFinanceSource {
+func getPostFinanceSource() payments.PaymentSource {
 	source := apm.NewRequestPostFinanceSource()
 	source.PaymentCountry = common.CH
 	source.AccountHolderName = "Bruce Wayne"
@@ -545,21 +545,21 @@ func getPostFinanceSource() *apm.RequestPostFinanceSource {
 	return source
 }
 
-func getAlmaSource() *apm.RequestAlmaSource {
+func getAlmaSource() payments.PaymentSource {
 	source := apm.NewRequestAlmaSource()
 	source.BillingAddress = Address()
 
 	return source
 }
 
-func getKlarnaSource() *apm.RequestKlarnaSource {
+func getKlarnaSource() payments.PaymentSource {
 	source := apm.NewRequestKlarnaSource()
 	source.AccountHolder = AccountHolder()
 
 	return source
 }
 
-func getFawrySource() *apm.RequestFawrySource {
+func getFawrySource() payments.PaymentSource {
 	source := apm.NewRequestFawrySource()
 	source.Description = "Fawry Demo Payment"
 	source.CustomerMobile = "01058375055"

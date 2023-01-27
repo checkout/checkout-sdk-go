@@ -8,23 +8,11 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments"
 )
 
-type FundTransferType string
-
-const (
-	AA FundTransferType = "AA"
-	PP FundTransferType = "PP"
-	FT FundTransferType = "FT"
-	FD FundTransferType = "FD"
-	PD FundTransferType = "PD"
-	LO FundTransferType = "LO"
-	OG FundTransferType = "OG"
-)
-
 // Request
 type (
 	PaymentRequest struct {
-		Source            interface{}                 `json:"source,omitempty"`
-		Amount            int                         `json:"amount,omitempty"`
+		Source            payments.PaymentSource      `json:"source,omitempty"`
+		Amount            int64                       `json:"amount,omitempty"`
 		Currency          common.Currency             `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType        `json:"payment_type,omitempty"`
 		MerchantInitiated bool                        `json:"merchant_initiated"`
@@ -47,9 +35,9 @@ type (
 	}
 
 	PayoutRequest struct {
-		Destination       interface{}                 `json:"destination,omitempty"`
-		Amount            int                         `json:"amount,omitempty"`
-		FundTransferType  FundTransferType            `json:"fund_transfer_type,omitempty"`
+		Destination       payments.Destination        `json:"destination,omitempty"`
+		Amount            int64                       `json:"amount,omitempty"`
+		FundTransferType  payments.FundTransferType   `json:"fund_transfer_type,omitempty"`
 		Currency          common.Currency             `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType        `json:"payment_type,omitempty"`
 		Reference         string                      `json:"reference,omitempty"`
@@ -59,6 +47,7 @@ type (
 		Customer          *common.CustomerRequest     `json:"customer,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor `json:"billing_descriptor,omitempty"`
 		ShippingDetails   *payments.ShippingDetails   `json:"shipping,omitempty"`
+		ThreeDsRequest    *payments.ThreeDsRequest    `json:"3ds,omitempty"`
 		PreviousPaymentId string                      `json:"previous_payment_id,omitempty"`
 		Risk              *payments.RiskRequest       `json:"risk,omitempty"`
 		SuccessUrl        string                      `json:"success_url,omitempty"`
@@ -70,7 +59,7 @@ type (
 	}
 
 	CaptureRequest struct {
-		Amount    int                    `json:"amount,omitempty"`
+		Amount    int64                  `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}
@@ -81,7 +70,7 @@ type (
 	PaymentResponse struct {
 		HttpMetadata    common.HttpMetadata
 		ActionId        string                      `json:"action_id,omitempty"`
-		Amount          int                         `json:"amount,omitempty"`
+		Amount          int64                       `json:"amount,omitempty"`
 		Approved        bool                        `json:"approved,omitempty"`
 		AuthCode        string                      `json:"auth_code,omitempty"`
 		Id              string                      `json:"id,omitempty"`
@@ -107,7 +96,7 @@ type (
 		RequestedOn       time.Time                       `json:"requested_on,omitempty"`
 		Source            interface{}                     `json:"source,omitempty"`
 		Destination       interface{}                     `json:"destination,omitempty"`
-		Amount            int                             `json:"amount,omitempty"`
+		Amount            int64                           `json:"amount,omitempty"`
 		Currency          common.Currency                 `json:"currency,omitempty"`
 		PaymentType       payments.PaymentType            `json:"payment_type,omitempty"`
 		Reference         string                          `json:"reference,omitempty"`
@@ -137,7 +126,7 @@ type (
 		Id              string                 `json:"id,omitempty"`
 		Type            payments.ActionType    `json:"type,omitempty"`
 		ProcessedOn     time.Time              `json:"processed_on,omitempty"`
-		Amount          int                    `json:"amount,omitempty"`
+		Amount          int64                  `json:"amount,omitempty"`
 		Approved        bool                   `json:"approved,omitempty"`
 		AuthCode        string                 `json:"auth_code,omitempty"`
 		ResponseCode    string                 `json:"response_code,omitempty"`

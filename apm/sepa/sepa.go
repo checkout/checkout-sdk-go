@@ -3,6 +3,7 @@ package sepa
 import "github.com/checkout/checkout-sdk-go/common"
 
 const (
+	apmsPath         = "apms"
 	sepaMandatesPath = "sepa/mandates"
 	pproPath         = "ppro"
 	cancelPath       = "cancel"

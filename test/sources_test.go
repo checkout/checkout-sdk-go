@@ -9,7 +9,7 @@ import (
 )
 
 func TestShouldCreateSepaSource(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
+	t.Skip("skipping because it responds with 502 in sandbox env")
 	request := sources.NewSepaSourceRequest()
 	request.BillingAddress = Address()
 	request.Reference = "reference"

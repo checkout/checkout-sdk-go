@@ -24,7 +24,7 @@ func TestRequestPayoutPrevious(t *testing.T) {
 
 	payoutRequest := abc.PayoutRequest{
 		Destination:      cardDestination,
-		FundTransferType: abc.AA,
+		FundTransferType: payments.AA,
 		Currency:         common.GBP,
 		Reference:        Reference,
 		Description:      Description,

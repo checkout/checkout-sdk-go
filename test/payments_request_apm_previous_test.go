@@ -48,7 +48,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 0, response.Amount)
+				assert.Equal(t, int64(0), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.USD, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -79,7 +79,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -211,7 +211,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -241,7 +241,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 1000, response.Amount)
+				assert.Equal(t, int64(1000), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EGP, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -271,7 +271,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 1000, response.Amount)
+				assert.Equal(t, int64(1000), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -301,7 +301,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 1000, response.Amount)
+				assert.Equal(t, int64(1000), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -333,7 +333,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.KWD, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -469,7 +469,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.PLN, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -570,7 +570,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -601,7 +601,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.AUD, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -632,7 +632,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.QAR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -699,7 +699,7 @@ func TestRequestPaymentsAPMPrevious(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Amount)
-				assert.Equal(t, 100, response.Amount)
+				assert.Equal(t, int64(100), response.Amount)
 				assert.NotNil(t, response.Currency)
 				assert.Equal(t, common.EUR, response.Currency)
 				assert.NotNil(t, response.Reference)
@@ -735,11 +735,11 @@ var (
 	}
 )
 
-func getAlipaySourceRequest() *apm.RequestAlipaySource {
+func getAlipaySourceRequest() payments.PaymentSource {
 	return apm.NewRequestAlipaySource()
 }
 
-func getBancontactSourceRequest() *apm.RequestBancontactSource {
+func getBancontactSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestBancontactSource()
 	source.AccountHolderName = "Bruce Wayne"
 	source.BillingDescriptor = "Bancontact test payment"
@@ -748,11 +748,11 @@ func getBancontactSourceRequest() *apm.RequestBancontactSource {
 	return source
 }
 
-func getBenefitPaySourceRequest() *apm.RequestBenefitPaySource {
+func getBenefitPaySourceRequest() payments.PaymentSource {
 	return apm.NewRequestBenefitPaySource()
 }
 
-func getBoletoSourceRequest(i apm.IntegrationType) *apm.RequestBoletoSource {
+func getBoletoSourceRequest(i apm.IntegrationType) payments.PaymentSource {
 	source := apm.NewRequestBoletoSource()
 	source.IntegrationType = i
 	source.Description = "boleto test payment"
@@ -762,14 +762,14 @@ func getBoletoSourceRequest(i apm.IntegrationType) *apm.RequestBoletoSource {
 	return source
 }
 
-func getEpsSourceRequest() *apm.RequestEpsSource {
+func getEpsSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestEpsSource()
 	source.Purpose = "purpose"
 
 	return source
 }
 
-func getFawrySourceRequest() *apm.RequestFawrySource {
+func getFawrySourceRequest() payments.PaymentSource {
 	source := apm.NewRequestFawrySource()
 	source.Description = "Fawry test payment"
 	source.CustomerEmail = "bruce@wayne-enterprises.com"
@@ -786,14 +786,14 @@ func getFawrySourceRequest() *apm.RequestFawrySource {
 	return source
 }
 
-func getGiropaySourceRequest() *apm.RequestGiropaySource {
+func getGiropaySourceRequest() payments.PaymentSource {
 	source := apm.NewRequestGiropaySource()
 	source.Purpose = "Giropay test payment"
 
 	return source
 }
 
-func getIdealSourceRequestPrevious() *apm.RequestIdealSource {
+func getIdealSourceRequestPrevious() payments.PaymentSource {
 	source := apm.NewRequestIdealSource()
 	source.Description = "ORD50234E89"
 	source.Bic = "INGBNL2A"
@@ -802,7 +802,7 @@ func getIdealSourceRequestPrevious() *apm.RequestIdealSource {
 	return source
 }
 
-func getKlarnaSourceRequest() *apm.RequestKlarnaSource {
+func getKlarnaSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestKlarnaSource()
 	source.AuthorizationToken = "b4bd3423-24e3"
 	source.PurchaseCountry = string(common.GB)
@@ -827,13 +827,13 @@ func getKlarnaSourceRequest() *apm.RequestKlarnaSource {
 	return source
 }
 
-func getKnetSourceRequest() *apm.RequestKnetSource {
+func getKnetSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestKnetSource()
 	source.Language = "en"
 	return source
 }
 
-func getMultiBancoSourceRequest() *apm.RequestMultiBancoSource {
+func getMultiBancoSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestMultiBancoSource()
 	source.AccountHolderName = "Bruce Wayne"
 	source.BillingDescriptor = "MultiBanco test payment"
@@ -842,7 +842,7 @@ func getMultiBancoSourceRequest() *apm.RequestMultiBancoSource {
 	return source
 }
 
-func getOxxoSourceRequest(i apm.IntegrationType) *apm.RequestOxxoSource {
+func getOxxoSourceRequest(i apm.IntegrationType) payments.PaymentSource {
 	source := apm.NewRequestOxxoSource()
 	source.IntegrationType = i
 	source.Description = "ORD50234E89"
@@ -852,7 +852,7 @@ func getOxxoSourceRequest(i apm.IntegrationType) *apm.RequestOxxoSource {
 	return source
 }
 
-func getP24SourceRequest() *apm.RequestP24Source {
+func getP24SourceRequest() payments.PaymentSource {
 	source := apm.NewRequestP24Source()
 	source.AccountHolderName = "Bruce Wayne"
 	source.AccountHolderEmail = "bruce@wayne-enterprises.com"
@@ -862,7 +862,7 @@ func getP24SourceRequest() *apm.RequestP24Source {
 	return source
 }
 
-func getPagoFacilSourceRequest(i apm.IntegrationType) *apm.RequestPagoFacilSource {
+func getPagoFacilSourceRequest(i apm.IntegrationType) payments.PaymentSource {
 	source := apm.NewRequestPagoFacilSource()
 	source.IntegrationType = i
 	source.Description = "PagoFacil test payment"
@@ -872,7 +872,7 @@ func getPagoFacilSourceRequest(i apm.IntegrationType) *apm.RequestPagoFacilSourc
 	return source
 }
 
-func getPayPalSourceRequestPrevious() *apm.RequestPayPalSource {
+func getPayPalSourceRequestPrevious() payments.PaymentSource {
 	source := apm.NewRequestPayPalSource()
 	source.InvoiceNumber = "CKO00001"
 	source.LogoUrl = "https://www.example.com/logo.jpg"
@@ -880,11 +880,11 @@ func getPayPalSourceRequestPrevious() *apm.RequestPayPalSource {
 	return source
 }
 
-func getPoliSourceRequest() *apm.RequestPoliSource {
+func getPoliSourceRequest() payments.PaymentSource {
 	return apm.NewRequestPoliSource()
 }
 
-func getQPaySourceRequest() *apm.RequestQPaySource {
+func getQPaySourceRequest() payments.PaymentSource {
 	source := apm.NewRequestQPaySource()
 	source.Description = "QPay test payment"
 	source.NationalId = "070AYY010BU234M"
@@ -894,7 +894,7 @@ func getQPaySourceRequest() *apm.RequestQPaySource {
 	return source
 }
 
-func getRapiPagoSourceRequest() *apm.RequestRapiPagoSource {
+func getRapiPagoSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestRapiPagoSource()
 	source.Description = "RapiPago test payment"
 	source.Country = common.AR
@@ -903,13 +903,13 @@ func getRapiPagoSourceRequest() *apm.RequestRapiPagoSource {
 	return source
 }
 
-func getSepaSourceRequest() *apm.RequestSepaSource {
+func getSepaSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestSepaSource()
 	source.Id = "1"
 
 	return source
 }
 
-func getSofortSourceRequestPrevious() *apm.RequestSofortSource {
+func getSofortSourceRequestPrevious() payments.PaymentSource {
 	return apm.NewRequestSofortSource()
 }

@@ -16,25 +16,72 @@ const (
 )
 
 type (
-	PaymentRequestBankAccountDestination struct {
-		Type          payments.PaymentDestinationType `json:"type,omitempty"`
-		AccountType   AccountType                     `json:"account_type,omitempty"`
-		AccountNumber string                          `json:"account_number,omitempty"`
-		BankCode      string                          `json:"bank_code,omitempty"`
-		BranchCode    string                          `json:"branch_code,omitempty"`
-		Iban          string                          `json:"iban,omitempty"`
-		Bban          string                          `json:"bban,omitempty"`
-		SwiftBic      string                          `json:"swift_bic,omitempty"`
-		Country       common.Country                  `json:"country,omitempty"`
-		AccountHolder *common.AccountHolder           `json:"account_holder,omitempty"`
-		Bank          *common.BankDetails             `json:"bank,omitempty"`
+	requestBankAccountDestination struct {
+		Type          payments.DestinationType `json:"type,omitempty"`
+		AccountType   AccountType              `json:"account_type,omitempty"`
+		AccountNumber string                   `json:"account_number,omitempty"`
+		BankCode      string                   `json:"bank_code,omitempty"`
+		BranchCode    string                   `json:"branch_code,omitempty"`
+		Iban          string                   `json:"iban,omitempty"`
+		Bban          string                   `json:"bban,omitempty"`
+		SwiftBic      string                   `json:"swift_bic,omitempty"`
+		Country       common.Country           `json:"country,omitempty"`
+		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
+		Bank          *common.BankDetails      `json:"bank,omitempty"`
 	}
 
-	RequestIdDestination struct {
-		Type payments.PaymentDestinationType `json:"type,omitempty"`
-		Id   string                          `json:"id,omitempty"`
+	requestCardDestination struct {
+		Type          payments.DestinationType `json:"type,omitempty"`
+		Number        string                   `json:"number,omitempty"`
+		ExpiryMonth   int                      `json:"expiry_month,omitempty"`
+		ExpiryYear    int                      `json:"expiry_year,omitempty"`
+		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
+	}
+
+	requestIdDestination struct {
+		Type          payments.DestinationType `json:"type,omitempty"`
+		Id            string                   `json:"id,omitempty"`
+		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
+	}
+
+	requestTokenDestination struct {
+		Type          payments.DestinationType `json:"type,omitempty"`
+		Token         string                   `json:"token,omitempty"`
+		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
 	}
 )
+
+func NewRequestBankAccountDestination() *requestBankAccountDestination {
+	return &requestBankAccountDestination{Type: payments.BankAccountDestination}
+}
+
+func NewRequestCardDestination() *requestCardDestination {
+	return &requestCardDestination{Type: payments.CardDestination}
+}
+
+func NewRequestIdDestination() *requestIdDestination {
+	return &requestIdDestination{Type: payments.IdDestination}
+}
+
+func NewRequestTokenDestination() *requestTokenDestination {
+	return &requestTokenDestination{Type: payments.TokenDestination}
+}
+
+func (d *requestBankAccountDestination) GetType() payments.DestinationType {
+	return d.Type
+}
+
+func (d *requestIdDestination) GetType() payments.DestinationType {
+	return d.Type
+}
+
+func (d *requestTokenDestination) GetType() payments.DestinationType {
+	return d.Type
+}
+
+func (d *requestCardDestination) GetType() payments.DestinationType {
+	return d.Type
+}
 
 type (
 	DestinationResponse struct {
@@ -44,19 +91,19 @@ type (
 	}
 
 	ResponseBankAccountDestination struct {
-		Type          payments.PaymentDestinationType `json:"type,omitempty"`
-		ExpiryMonth   int                             `json:"expiry_month,omitempty"`
-		ExpiryYear    int                             `json:"expiry_year,omitempty"`
-		Name          string                          `json:"name,omitempty"`
-		Last4         string                          `json:"last4,omitempty"`
-		Fingerprint   string                          `json:"fingerprint,omitempty"`
-		Bin           string                          `json:"bin,omitempty"`
-		CardType      common.CardType                 `json:"card_type,omitempty"`
-		CardCategory  common.CardCategory             `json:"card_category,omitempty"`
-		Issuer        string                          `json:"issuer,omitempty"`
-		IssuerCountry common.Country                  `json:"issuer_country,omitempty"`
-		ProductId     string                          `json:"product_id,omitempty"`
-		ProductType   string                          `json:"product_type,omitempty"`
+		Type          payments.DestinationType `json:"type,omitempty"`
+		ExpiryMonth   int                      `json:"expiry_month,omitempty"`
+		ExpiryYear    int                      `json:"expiry_year,omitempty"`
+		Name          string                   `json:"name,omitempty"`
+		Last4         string                   `json:"last4,omitempty"`
+		Fingerprint   string                   `json:"fingerprint,omitempty"`
+		Bin           string                   `json:"bin,omitempty"`
+		CardType      common.CardType          `json:"card_type,omitempty"`
+		CardCategory  common.CardCategory      `json:"card_category,omitempty"`
+		Issuer        string                   `json:"issuer,omitempty"`
+		IssuerCountry common.Country           `json:"issuer_country,omitempty"`
+		ProductId     string                   `json:"product_id,omitempty"`
+		ProductType   string                   `json:"product_type,omitempty"`
 	}
 )
 

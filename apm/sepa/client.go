@@ -61,7 +61,7 @@ func (c *Client) GetMandateViaPpro(mandateId string) (*MandateResponse, error) {
 	}
 
 	var response MandateResponse
-	err = c.apiClient.Get(common.BuildPath(pproPath, sepaMandatesPath, mandateId), auth, &response)
+	err = c.apiClient.Get(common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *Client) CancelMandateViaPpro(mandateId string) (*SepaResource, error) {
 
 	var response SepaResource
 	err = c.apiClient.Post(
-		common.BuildPath(pproPath, sepaMandatesPath, mandateId, cancelPath),
+		common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId, cancelPath),
 		auth,
 		nil,
 		&response,

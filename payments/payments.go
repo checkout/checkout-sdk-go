@@ -8,66 +8,6 @@ import (
 
 const PathPayments = "payments"
 
-type SourceType string
-
-const (
-	CardSource         SourceType = "card"
-	IdSource           SourceType = "id"
-	CustomerSource     SourceType = "customer"
-	NetworkTokenSource SourceType = "network_token"
-	TokenSource        SourceType = "token"
-	DLocalSource       SourceType = "dLocal"
-	AlipaySource       SourceType = "alipay"
-	BenefitPaySource   SourceType = "benefitpay"
-	BoletoSource       SourceType = "boleto"
-	EpsSource          SourceType = "eps"
-	GiropaySource      SourceType = "giropay"
-	IdealSource        SourceType = "ideal"
-	KlarnaSource       SourceType = "klarna"
-	KnetSource         SourceType = "knet"
-	OxxoSource         SourceType = "oxxo"
-	P24Source          SourceType = "p24"
-	PagoFacilSource    SourceType = "pagofacil"
-	PayPalSource       SourceType = "paypal"
-	PoliSource         SourceType = "poli"
-	RapiPagoSource     SourceType = "rapipago"
-	BancontactSource   SourceType = "bancontact"
-	FawrySource        SourceType = "fawry"
-	QPaySource         SourceType = "qpay"
-	MultiBancoSource   SourceType = "multibanco"
-	SepaSource         SourceType = "sepa"
-	SofortSource       SourceType = "sofort"
-	AlipayHk           SourceType = "alipay_hk"
-	AlipayCn           SourceType = "alipay_cn"
-	AlipayPlus         SourceType = "alipay_plus"
-	Gcash              SourceType = "gcash"
-	Wechatpay          SourceType = "wechatpay"
-	Dana               SourceType = "dana"
-	Kakaopay           SourceType = "kakaopay"
-	Truemoney          SourceType = "truemoney"
-	Tng                           = "tng"
-	Afterpay                      = "afterpay"
-	Benefit                       = "benefit"
-	Mbway                         = "mbway"
-	Postfinance                   = "postfinance"
-	Stcpay                        = "stcpay"
-	Alma                          = "alma"
-
-	BankAccountSource     SourceType = "bank_account"
-	ProviderTokenSource   SourceType = "provider_token"
-	CurrencyAccountSource SourceType = "currency_account"
-	TamaraSource          SourceType = "tamara"
-)
-
-type PaymentDestinationType string
-
-const (
-	BankAccountDestination PaymentDestinationType = "bank_account"
-	CardDestination        PaymentDestinationType = "card"
-	IdDestination          PaymentDestinationType = "id"
-	TokenDestination       PaymentDestinationType = "token"
-)
-
 type PaymentType string
 
 const (
@@ -195,6 +135,22 @@ type UserAction string
 const (
 	PayNow   UserAction = "PAY_NOW"
 	Continue UserAction = "CONTINUE"
+)
+
+type FundTransferType string
+
+const (
+	AA  FundTransferType = "AA"
+	PP  FundTransferType = "PP"
+	FT  FundTransferType = "FT"
+	FD  FundTransferType = "FD"
+	PD  FundTransferType = "PD"
+	LO  FundTransferType = "LO"
+	OG  FundTransferType = "OG"
+	CO4 FundTransferType = "CO4"
+	CO7 FundTransferType = "CO7"
+	C52 FundTransferType = "C52"
+	C55 FundTransferType = "C55"
 )
 
 type (
@@ -410,7 +366,7 @@ type (
 //Request
 type (
 	RefundRequest struct {
-		Amount    int                    `json:"amount,omitempty"`
+		Amount    int64                  `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}

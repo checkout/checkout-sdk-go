@@ -24,7 +24,7 @@ func TestRequestCardPayment(t *testing.T) {
 	assert.NotEmpty(t, paymentResponse.SchemeId)
 	assert.NotEmpty(t, paymentResponse.ResponseSummary)
 	assert.Equal(t, payments.Authorized, paymentResponse.Status)
-	assert.Equal(t, 10, paymentResponse.Amount)
+	assert.Equal(t, int64(10), paymentResponse.Amount)
 	assert.True(t, paymentResponse.Approved)
 	assert.NotEmpty(t, paymentResponse.AuthCode)
 	assert.NotEmpty(t, paymentResponse.Currency)
@@ -65,7 +65,7 @@ func TestMakeCardVerification(t *testing.T) {
 	assert.NotEmpty(t, paymentResponse.SchemeId)
 	assert.NotEmpty(t, paymentResponse.ResponseSummary)
 	assert.Equal(t, payments.CardVerified, paymentResponse.Status)
-	assert.Equal(t, 0, paymentResponse.Amount)
+	assert.Equal(t, int64(0), paymentResponse.Amount)
 	assert.True(t, paymentResponse.Approved)
 	assert.NotEmpty(t, paymentResponse.AuthCode)
 	assert.NotEmpty(t, paymentResponse.Currency)
@@ -104,13 +104,13 @@ func TestMakeCardVerification(t *testing.T) {
 
 	//Balances
 	assert.NotNil(t, paymentResponse.Balances)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalAuthorized)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalCaptured)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalRefunded)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalVoided)
-	assert.Equal(t, 0, paymentResponse.Balances.AvailableToCapture)
-	assert.Equal(t, 0, paymentResponse.Balances.AvailableToRefund)
-	assert.Equal(t, 0, paymentResponse.Balances.AvailableToVoid)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalAuthorized)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalCaptured)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalRefunded)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalVoided)
+	assert.Equal(t, int64(0), paymentResponse.Balances.AvailableToCapture)
+	assert.Equal(t, int64(0), paymentResponse.Balances.AvailableToRefund)
+	assert.Equal(t, int64(0), paymentResponse.Balances.AvailableToVoid)
 
 	//Links
 	assert.NotEmpty(t, paymentResponse.Links["self"])
@@ -185,7 +185,7 @@ func TestMakeCardN3dPayment(t *testing.T) {
 	assert.NotEmpty(t, paymentResponse.SchemeId)
 	assert.Equal(t, "Approved", paymentResponse.ResponseSummary)
 	assert.Equal(t, payments.Authorized, paymentResponse.Status)
-	assert.Equal(t, 10, paymentResponse.Amount)
+	assert.Equal(t, int64(10), paymentResponse.Amount)
 	assert.True(t, paymentResponse.Approved)
 	assert.NotEmpty(t, paymentResponse.AuthCode)
 	assert.NotEmpty(t, paymentResponse.Currency)
@@ -247,7 +247,7 @@ func TestRequestCardTokenPayment(t *testing.T) {
 	assert.NotEmpty(t, paymentResponse.SchemeId)
 	assert.NotEmpty(t, paymentResponse.ResponseSummary)
 	assert.Equal(t, payments.Authorized, paymentResponse.Status)
-	assert.Equal(t, 10, paymentResponse.Amount)
+	assert.Equal(t, int64(10), paymentResponse.Amount)
 	assert.True(t, paymentResponse.Approved)
 	assert.NotEmpty(t, paymentResponse.AuthCode)
 	assert.NotEmpty(t, paymentResponse.Currency)
@@ -329,7 +329,7 @@ func TestMakePaymentsIdempotently(t *testing.T) {
 
 }
 
-func makeCardPayment(t *testing.T, shouldCapture bool, amount int) *nas.PaymentResponse {
+func makeCardPayment(t *testing.T, shouldCapture bool, amount int64) *nas.PaymentResponse {
 
 	cardSource := sources.NewRequestCardSource()
 	cardSource.Name = Name
@@ -346,7 +346,7 @@ func makeCardPayment(t *testing.T, shouldCapture bool, amount int) *nas.PaymentR
 		Phone: Phone(),
 	}
 
-	paymentIndividualSender := nas.NewPaymentIndividualSender()
+	paymentIndividualSender := nas.NewRequestIndividualSender()
 	paymentIndividualSender.FirstName = FirstName
 	paymentIndividualSender.LastName = LastName
 	paymentIndividualSender.Address = Address()
@@ -408,7 +408,7 @@ func make3dsCardPayment(t *testing.T, attemptN3d bool) *nas.PaymentResponse {
 		Phone: Phone(),
 	}
 
-	paymentCorporateSender := nas.NewPaymentCorporateSender()
+	paymentCorporateSender := nas.NewRequestCorporateSender()
 	paymentCorporateSender.CompanyName = Name
 	paymentCorporateSender.Address = Address()
 
@@ -450,7 +450,7 @@ func makeCardTokenPayment(t *testing.T) *nas.PaymentResponse {
 			City:      "London",
 			Reference: Reference,
 		},
-		Sender: nas.NewPaymentInstrumentSender(),
+		Sender: nas.NewRequestInstrumentSender(),
 	}
 
 	response, err := DefaultApi().Payments.RequestPayment(paymentRequest, nil)
@@ -499,13 +499,13 @@ func paymentCommonAssertions(t *testing.T, paymentResponse *nas.PaymentResponse)
 
 	//Balances
 	assert.NotEmpty(t, paymentResponse.Balances)
-	assert.Equal(t, 10, paymentResponse.Balances.TotalAuthorized)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalCaptured)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalRefunded)
-	assert.Equal(t, 0, paymentResponse.Balances.TotalVoided)
-	assert.Equal(t, 10, paymentResponse.Balances.AvailableToCapture)
-	assert.Equal(t, 0, paymentResponse.Balances.AvailableToRefund)
-	assert.Equal(t, 10, paymentResponse.Balances.AvailableToVoid)
+	assert.Equal(t, int64(10), paymentResponse.Balances.TotalAuthorized)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalCaptured)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalRefunded)
+	assert.Equal(t, int64(0), paymentResponse.Balances.TotalVoided)
+	assert.Equal(t, int64(10), paymentResponse.Balances.AvailableToCapture)
+	assert.Equal(t, int64(0), paymentResponse.Balances.AvailableToRefund)
+	assert.Equal(t, int64(10), paymentResponse.Balances.AvailableToVoid)
 
 	//Links
 	assert.NotEmpty(t, paymentResponse.Links["self"])

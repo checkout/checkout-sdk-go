@@ -18,7 +18,7 @@ type (
 		Currency        common.Currency          `json:"currency,omitempty"`
 		Locale          string                   `json:"locale,omitempty"`
 		Amount          int64                    `json:"amount,omitempty"`
-		TaxAmount       int                      `json:"tax_amount,omitempty"`
+		TaxAmount       int64                    `json:"tax_amount,omitempty"`
 		Products        []map[string]interface{} `json:"products,omitempty"`
 	}
 
@@ -49,7 +49,7 @@ type (
 		Currency        string                   `json:"currency,omitempty"`
 		Locale          string                   `json:"locale,omitempty"`
 		Amount          int64                    `json:"amount,omitempty"`
-		TaxAmount       int                      `json:"tax_amount,omitempty"`
+		TaxAmount       int64                    `json:"tax_amount,omitempty"`
 		Products        []map[string]interface{} `json:"products,omitempty"`
 	}
 )

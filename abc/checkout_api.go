@@ -8,7 +8,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/customers"
 	"github.com/checkout/checkout-sdk-go/disputes"
-	"github.com/checkout/checkout-sdk-go/events"
+	events "github.com/checkout/checkout-sdk-go/events/abc"
 	"github.com/checkout/checkout-sdk-go/instruments/abc"
 	payments "github.com/checkout/checkout-sdk-go/payments/abc"
 	"github.com/checkout/checkout-sdk-go/payments/hosted"

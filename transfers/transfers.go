@@ -30,10 +30,10 @@ type (
 	}
 
 	TransferRequest struct {
-		Reference    string                     `json:"reference,omitempty"`
-		TransferType TransferType               `json:"transfer_type,omitempty"`
-		Source       TransferSourceRequest      `json:"source,omitempty"`
-		Destination  TransferDestinationRequest `json:"destination,omitempty"`
+		Reference    string                      `json:"reference,omitempty"`
+		TransferType TransferType                `json:"transfer_type,omitempty"`
+		Source       *TransferSourceRequest      `json:"source,omitempty"`
+		Destination  *TransferDestinationRequest `json:"destination,omitempty"`
 	}
 )
 

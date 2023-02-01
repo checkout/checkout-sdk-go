@@ -26,11 +26,11 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 			request: transfers.TransferRequest{
 				Reference:    "reference",
 				TransferType: transfers.Commission,
-				Source: transfers.TransferSourceRequest{
+				Source: &transfers.TransferSourceRequest{
 					Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
 					Amount: 100,
 				},
-				Destination: transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 			},
 			checker: func(response *transfers.TransferResponse, err error) {
 				assert.Nil(t, err)
@@ -45,11 +45,11 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 			request: transfers.TransferRequest{
 				Reference:    "reference",
 				TransferType: transfers.Commission,
-				Source: transfers.TransferSourceRequest{
+				Source: &transfers.TransferSourceRequest{
 					Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
 					Amount: 100,
 				},
-				Destination: transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 			},
 			idempotencyKey: &idempotencyKey,
 			checker: func(response *transfers.TransferResponse, err error) {
@@ -120,11 +120,11 @@ func createTransferOfFounds(t *testing.T) *transfers.TransferResponse {
 	req := transfers.TransferRequest{
 		Reference:    "reference",
 		TransferType: transfers.Commission,
-		Source: transfers.TransferSourceRequest{
+		Source: &transfers.TransferSourceRequest{
 			Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
 			Amount: 100,
 		},
-		Destination: transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+		Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 	}
 
 	response, err := OAuthApi().Transfers.InitiateTransferOfFounds(req, nil)

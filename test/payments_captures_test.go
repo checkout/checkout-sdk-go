@@ -1,19 +1,18 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/payments/nas"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/payments/nas"
 )
 
 func TestCaptureCardPayment(t *testing.T) {
-
 	paymentResponse := makeCardPayment(t, false, 10)
-
-	Wait(time.Duration(3))
 
 	metadata := make(map[string]interface{})
 	metadata["TestCaptureCardPayment"] = "metadata"
@@ -24,34 +23,52 @@ func TestCaptureCardPayment(t *testing.T) {
 		Amount:    5,
 	}
 
-	response, err := DefaultApi().Payments.CapturePayment(paymentResponse.Id, captureRequest, nil)
-	assert.Nil(t, err)
-	assert.NotNil(t, response)
-	assert.NotEmpty(t, response.Reference)
-	assert.NotEmpty(t, response.ActionId)
-	assert.NotEmpty(t, response.Links)
-	assert.NotEmpty(t, response.Links["payment"])
+	cases := []struct {
+		name           string
+		paymentId      string
+		captureRequest nas.CaptureRequest
+		checkerOne     func(*payments.CaptureResponse, error)
+		checkerTwo     func(*nas.GetPaymentResponse, error)
+	}{
+		{
+			name:           "when get a capture payment request then return a response",
+			paymentId:      paymentResponse.Id,
+			captureRequest: captureRequest,
+			checkerOne: func(response *payments.CaptureResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotEmpty(t, response.Reference)
+				assert.NotEmpty(t, response.ActionId)
+				assert.NotEmpty(t, response.Links)
+				assert.NotEmpty(t, response.Links["payment"])
+			},
+			checkerTwo: func(response *nas.GetPaymentResponse, err error) {
+				assert.NotEmpty(t, response.Balances)
+				assert.Equal(t, int64(10), response.Balances.TotalAuthorized)
+				assert.Equal(t, int64(5), response.Balances.TotalCaptured)
+				assert.Equal(t, int64(0), response.Balances.TotalRefunded)
+				assert.Equal(t, int64(0), response.Balances.TotalVoided)
+				assert.Equal(t, int64(0), response.Balances.AvailableToCapture)
+				assert.Equal(t, int64(5), response.Balances.AvailableToRefund)
+				assert.Equal(t, int64(0), response.Balances.AvailableToVoid)
+			},
+		},
+	}
 
-	Wait(time.Duration(3))
+	client := DefaultApi().Payments
 
-	payment, err := DefaultApi().Payments.GetPaymentDetails(paymentResponse.Id)
-
-	assert.NotEmpty(t, payment.Balances)
-	assert.Equal(t, int64(10), payment.Balances.TotalAuthorized)
-	assert.Equal(t, int64(5), payment.Balances.TotalCaptured)
-	assert.Equal(t, int64(0), payment.Balances.TotalRefunded)
-	assert.Equal(t, int64(0), payment.Balances.TotalVoided)
-	assert.Equal(t, int64(0), payment.Balances.AvailableToCapture)
-	assert.Equal(t, int64(5), payment.Balances.AvailableToRefund)
-	assert.Equal(t, int64(0), payment.Balances.AvailableToVoid)
-
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			Wait(time.Duration(3))
+			tc.checkerOne(client.CapturePayment(tc.paymentId, tc.captureRequest, nil))
+			Wait(time.Duration(3))
+			tc.checkerTwo(client.GetPaymentDetails(tc.paymentId))
+		})
+	}
 }
 
 func TestCaptureCardPaymentIdempotently(t *testing.T) {
-
 	paymentResponse := makeCardPayment(t, false, 10)
-
-	Wait(time.Duration(3))
 
 	metadata := make(map[string]interface{})
 	metadata["TestCaptureCardPayment"] = "metadata"
@@ -61,16 +78,69 @@ func TestCaptureCardPaymentIdempotently(t *testing.T) {
 		Metadata:  metadata,
 	}
 
-	idempotencyKey := uuid.New().String()
+	idempotencyKeyRandom1 := uuid.New().String()
 
-	response1, err := DefaultApi().Payments.CapturePayment(paymentResponse.Id, captureRequest, &idempotencyKey)
-	assert.Nil(t, err)
-	assert.NotNil(t, response1)
+	idempotencyKeyRandom2 := uuid.New().String()
 
-	response2, err := DefaultApi().Payments.CapturePayment(paymentResponse.Id, captureRequest, &idempotencyKey)
-	assert.Nil(t, err)
-	assert.NotNil(t, response2)
+	cases := []struct {
+		name                  string
+		paymentId             string
+		captureRequest        nas.CaptureRequest
+		idempotencyKeyRandom1 string
+		idempotencyKeyRandom2 string
+		checker               func(interface{}, error, interface{}, error)
+	}{
+		{
+			name:                  "when request is valid then capture payment idempotently",
+			paymentId:             paymentResponse.Id,
+			captureRequest:        captureRequest,
+			idempotencyKeyRandom1: idempotencyKeyRandom1,
+			idempotencyKeyRandom2: idempotencyKeyRandom1,
+			checker: func(response1 interface{}, err1 error, response2 interface{}, err2 error) {
+				assert.Nil(t, err1)
+				assert.NotNil(t, response1)
+				assert.Nil(t, err2)
+				assert.NotNil(t, response2)
+				assert.Equal(t, response1.(*payments.CaptureResponse).ActionId, response2.(*payments.CaptureResponse).ActionId)
+			},
+		},
+		{
+			name:                  "when request is valid then capture payment idempotently error",
+			paymentId:             paymentResponse.Id,
+			captureRequest:        captureRequest,
+			idempotencyKeyRandom1: idempotencyKeyRandom1,
+			idempotencyKeyRandom2: idempotencyKeyRandom2,
+			checker: func(response1 interface{}, err1 error, response2 interface{}, err2 error) {
+				assert.Nil(t, err1)
+				assert.NotNil(t, response1)
+				assert.NotNil(t, err2)
+			},
+		},
+	}
 
-	assert.Equal(t, response1.ActionId, response2.ActionId)
+	client := DefaultApi().Payments
 
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			processOne := func() (interface{}, error) {
+				return client.CapturePayment(tc.paymentId, tc.captureRequest, &tc.idempotencyKeyRandom1)
+			}
+			predicateOne := func(data interface{}) bool {
+				response := data.(*payments.CaptureResponse)
+				return response.Links != nil && len(response.Links) >= 0
+			}
+
+			processTwo := func() (interface{}, error) {
+				return client.CapturePayment(tc.paymentId, tc.captureRequest, &tc.idempotencyKeyRandom2)
+			}
+			predicateTwo := func(data interface{}) bool {
+				response := data.(*payments.CaptureResponse)
+				return response.Links != nil && len(response.Links) >= 0
+			}
+
+			retriableOne, errOne := retriable(processOne, predicateOne, 2)
+			retriableTwo, errTwo := retriable(processTwo, predicateTwo, 2)
+			tc.checker(retriableOne, errOne, retriableTwo, errTwo)
+		})
+	}
 }

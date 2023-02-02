@@ -1,101 +1,145 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/instruments/abc"
 	"github.com/checkout/checkout-sdk-go/tokens"
 )
 
-func TestCreateAndGetInstrumentPrevious(t *testing.T) {
-
+func TestGetInstrumentPrevious(t *testing.T) {
 	cardTokenResponse := RequestCardTokenPrevious(t)
-
 	createResponse := createTokenInstrumentPrevious(t, cardTokenResponse)
-	assert.Equal(t, instruments.Card, createResponse.Type)
-	assert.NotEmpty(t, createResponse.Id)
-	assert.NotEmpty(t, createResponse.Fingerprint)
-	assert.NotEmpty(t, createResponse.ExpiryMonth)
-	assert.NotEmpty(t, createResponse.ExpiryYear)
-	assert.NotEmpty(t, createResponse.Scheme)
-	assert.NotEmpty(t, createResponse.Last4)
-	assert.NotEmpty(t, createResponse.Bin)
-	assert.NotEmpty(t, createResponse.CardType)
-	assert.NotEmpty(t, createResponse.CardCategory)
-	assert.NotEmpty(t, createResponse.ProductId)
-	assert.NotEmpty(t, createResponse.ProductType)
-	assert.NotEmpty(t, createResponse.Customer)
-	assert.NotEmpty(t, createResponse.Customer.Id)
-	assert.NotEmpty(t, createResponse.Customer.Name)
-	assert.NotEmpty(t, createResponse.Customer.Email)
 
-	getResponse, err := PreviousApi().Instruments.Get(createResponse.Id)
-	assert.Nil(t, err)
-	assert.NotNil(t, getResponse)
-	assert.Equal(t, instruments.Card, getResponse.Type)
-	assert.NotEmpty(t, getResponse.Id)
-	assert.NotEmpty(t, getResponse.Fingerprint)
-	assert.NotEmpty(t, getResponse.ExpiryMonth)
-	assert.NotEmpty(t, getResponse.ExpiryYear)
-	assert.NotEmpty(t, getResponse.Scheme)
-	assert.NotEmpty(t, getResponse.Last4)
-	assert.NotEmpty(t, getResponse.Bin)
-	assert.NotEmpty(t, getResponse.CardType)
-	assert.NotEmpty(t, getResponse.CardCategory)
-	assert.NotEmpty(t, getResponse.ProductId)
-	assert.NotEmpty(t, getResponse.ProductType)
-	assert.NotEmpty(t, getResponse.Customer)
-	assert.NotEmpty(t, getResponse.Customer.Id)
-	assert.NotEmpty(t, getResponse.Customer.Name)
-	assert.NotEmpty(t, getResponse.Customer.Email)
+	cases := []struct {
+		name       string
+		responseId string
+		checker    func(*abc.GetInstrumentResponse, error)
+	}{
+		{
+			name:       "when the request is valid then response is not nil",
+			responseId: createResponse.Id,
+			checker: func(response *abc.GetInstrumentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, instruments.Card, response.Type)
+				assert.NotEmpty(t, response.Id)
+				assert.NotEmpty(t, response.Fingerprint)
+				assert.NotEmpty(t, response.ExpiryMonth)
+				assert.NotEmpty(t, response.ExpiryYear)
+				assert.NotEmpty(t, response.Scheme)
+				assert.NotEmpty(t, response.Last4)
+				assert.NotEmpty(t, response.Bin)
+				assert.NotEmpty(t, response.CardType)
+				assert.NotEmpty(t, response.CardCategory)
+				assert.NotEmpty(t, response.ProductId)
+				assert.NotEmpty(t, response.ProductType)
+				assert.NotEmpty(t, response.Customer)
+				assert.NotEmpty(t, response.Customer.Id)
+				assert.NotEmpty(t, response.Customer.Name)
+				assert.NotEmpty(t, response.Customer.Email)
+			},
+		},
+	}
+
+	client := PreviousApi().Instruments
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.Get(tc.responseId))
+		})
+	}
 }
 
-func TestCreateAndUpdateInstrumentPrevious(t *testing.T) {
-
+func TestUpdateInstrumentPrevious(t *testing.T) {
 	cardTokenResponse := RequestCardTokenPrevious(t)
 	createResponse := createTokenInstrumentPrevious(t, cardTokenResponse)
-
 	updateRequest := abc.UpdateInstrumentRequest{
 		ExpiryMonth: 12,
 		ExpiryYear:  2026,
 		Name:        "New Name",
 	}
 
-	updateResponse, err := PreviousApi().Instruments.Update(createResponse.Id, updateRequest)
-	assert.Nil(t, err)
-	assert.NotNil(t, updateResponse)
-	assert.Equal(t, instruments.Card, updateResponse.Type)
-	assert.NotEmpty(t, updateResponse.Fingerprint)
+	cases := []struct {
+		name          string
+		responseId    string
+		updateRequest abc.UpdateInstrumentRequest
+		checkerUpdate func(*abc.UpdateInstrumentResponse, error)
+		checkerGet    func(*abc.GetInstrumentResponse, error)
+	}{
+		{
+			name:          "when update instrument request then this request is updated",
+			responseId:    createResponse.Id,
+			updateRequest: updateRequest,
+			checkerUpdate: func(response *abc.UpdateInstrumentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, instruments.Card, response.Type)
+				assert.NotEmpty(t, response.Fingerprint)
+			},
+			checkerGet: func(response *abc.GetInstrumentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, instruments.Card, response.Type)
+				assert.Equal(t, 12, response.ExpiryMonth)
+				assert.Equal(t, 2026, response.ExpiryYear)
+				assert.Equal(t, "New Name", response.Name)
+			},
+		},
+	}
 
-	getResponse, err := PreviousApi().Instruments.Get(createResponse.Id)
-	assert.Nil(t, err)
-	assert.NotNil(t, getResponse)
-	assert.Equal(t, instruments.Card, getResponse.Type)
-	assert.Equal(t, 12, getResponse.ExpiryMonth)
-	assert.Equal(t, 2026, getResponse.ExpiryYear)
-	assert.Equal(t, "New Name", getResponse.Name)
+	client := PreviousApi().Instruments
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checkerUpdate(client.Update(tc.responseId, tc.updateRequest))
+			tc.checkerGet(client.Get(tc.responseId))
+		})
+	}
 }
 
-func TestCreateAndDeleteInstrumentPrevious(t *testing.T) {
-
+func TestDeleteInstrumentPrevious(t *testing.T) {
 	cardTokenResponse := RequestCardTokenPrevious(t)
 	createResponse := createTokenInstrumentPrevious(t, cardTokenResponse)
 
-	deleteResponse, err := PreviousApi().Instruments.Delete(createResponse.Id)
-	assert.Nil(t, err)
-	assert.NotNil(t, deleteResponse)
-	assert.Equal(t, 204, deleteResponse.HttpMetadata.StatusCode)
+	cases := []struct {
+		name          string
+		responseId    string
+		checkerDelete func(*common.MetadataResponse, error)
+		checkerGet    func(*abc.GetInstrumentResponse, error)
+	}{
+		{
+			name:       "when delete a instrument request then return 204",
+			responseId: createResponse.Id,
+			checkerDelete: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, 204, response.HttpMetadata.StatusCode)
+			},
+			checkerGet: func(response *abc.GetInstrumentResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
 
-	getResponse, err := PreviousApi().Instruments.Get(createResponse.Id)
-	assert.Nil(t, getResponse)
-	assert.NotNil(t, err)
-	chkErr := err.(errors.CheckoutAPIError)
-	assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+	client := PreviousApi().Instruments
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checkerDelete(client.Delete(tc.responseId))
+			tc.checkerGet(client.Get(tc.responseId))
+		})
+	}
 }
 
 func createTokenInstrumentPrevious(t *testing.T, token *tokens.CardTokenResponse) *abc.CreateInstrumentResponse {
@@ -110,7 +154,32 @@ func createTokenInstrumentPrevious(t *testing.T, token *tokens.CardTokenResponse
 		},
 	}
 	response, err := PreviousApi().Instruments.Create(request)
+
+	testCreateInstrument(t, err, response)
+
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating token instrument - %s", err.Error()))
+	}
+	return response
+}
+
+func testCreateInstrument(t *testing.T, err error, response *abc.CreateInstrumentResponse) {
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
-	return response
+	assert.Equal(t, instruments.Card, response.Type)
+	assert.NotEmpty(t, response.Id)
+	assert.NotEmpty(t, response.Fingerprint)
+	assert.NotEmpty(t, response.ExpiryMonth)
+	assert.NotEmpty(t, response.ExpiryYear)
+	assert.NotEmpty(t, response.Scheme)
+	assert.NotEmpty(t, response.Last4)
+	assert.NotEmpty(t, response.Bin)
+	assert.NotEmpty(t, response.CardType)
+	assert.NotEmpty(t, response.CardCategory)
+	assert.NotEmpty(t, response.ProductId)
+	assert.NotEmpty(t, response.ProductType)
+	assert.NotEmpty(t, response.Customer)
+	assert.NotEmpty(t, response.Customer.Id)
+	assert.NotEmpty(t, response.Customer.Name)
+	assert.NotEmpty(t, response.Customer.Email)
 }

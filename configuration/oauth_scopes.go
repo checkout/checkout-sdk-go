@@ -39,7 +39,7 @@ const (
 	MiddlewarePaymentContext    = "middleware:payment-context"
 	MiddlewareMerchantsSecret   = "middleware:merchants-secret"
 	MiddlewareMerchantsPublic   = "middleware:merchants-public"
-	Reporting                   = "reporting"
-	ReportingView               = "reporting:view"
+	Reports                     = "reports"
+	ReportsView                 = "reports:view"
 	VaultCardMetadata           = "vault:card-metadata"
 )

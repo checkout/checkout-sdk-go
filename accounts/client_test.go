@@ -986,6 +986,129 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 	}
 }
 
+func TestUpdatePaymentInstrumentDetails(t *testing.T) {
+	var (
+		idResponse = common.IdResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Links: map[string]common.Link{
+				"self": {
+					HRef: &[]string{"https://www.test-link.com"}[0],
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		instrumentId     string
+		request          UpdatePaymentInstrumentRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPut           func(*mock.Mock) mock.Call
+		checker          func(*common.IdResponse, error)
+	}{
+		{
+			name:         "when request is correct then update entity",
+			entityId:     "ent_1234",
+			instrumentId: "ppi_1234",
+			request: UpdatePaymentInstrumentRequest{
+				Label:   "new label",
+				Default: true,
+			},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*common.IdResponse)
+						*respMapping = idResponse
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Links)
+				assert.Equal(t, idResponse.Links, response.Links)
+			},
+		},
+		{
+			name:         "when entity not_found then return error",
+			entityId:     "not_found",
+			instrumentId: "ppi_1234",
+			request: UpdatePaymentInstrumentRequest{
+				Label:   "new label",
+				Default: true,
+			},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:         "when entity not_found then return error",
+			entityId:     "ent_1234",
+			instrumentId: "not_found",
+			request: UpdatePaymentInstrumentRequest{
+				Label:   "new label",
+				Default: true,
+			},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPut(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.UpdatePaymentInstrumentDetails(tc.entityId, tc.instrumentId, tc.request))
+		})
+	}
+}
+
 func TestGetPayoutSchedule(t *testing.T) {
 	var (
 		schedule = PayoutSchedule{

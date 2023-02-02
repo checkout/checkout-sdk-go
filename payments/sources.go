@@ -49,6 +49,9 @@ const (
 	CurrencyAccountSource SourceType = "currency_account"
 	EntitySource          SourceType = "entity"
 	TamaraSource          SourceType = "tamara"
+	CvConnectSource       SourceType = "cvconnect"
+	IllicadoSource        SourceType = "illicado"
+	TrustlySource         SourceType = "trustly"
 )
 
 type (

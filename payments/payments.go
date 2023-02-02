@@ -426,17 +426,24 @@ type (
 	}
 
 	ProcessingData struct {
-		PreferredScheme                 PreferredSchema                  `json:"preferred_scheme,omitempty"`
-		AppId                           string                           `json:"app_id,omitempty"`
-		PartnerCustomerId               string                           `json:"partner_customer_id,omitempty"`
-		PartnerPaymentId                string                           `json:"partner_payment_id,omitempty"`
-		TaxAmount                       int64                            `json:"tax_amount,omitempty"`
-		PurchaseCountry                 common.Country                   `json:"purchase_country,omitempty"`
-		Locale                          string                           `json:"locale,omitempty"`
-		PartnerOrderId                  string                           `json:"partner_order_id,omitempty"`
-		FraudStatus                     string                           `json:"fraud_status,omitempty"`
-		ProviderAuthorizedPaymentMethod *ProviderAuthorizedPaymentMethod `json:"provider_authorized_payment_method,omitempty"`
-		CustomPaymentMethodIds          []string                         `json:"custom_payment_method_ids,omitempty"`
+		PreferredScheme                  PreferredSchema                  `json:"preferred_scheme,omitempty"`
+		AppId                            string                           `json:"app_id,omitempty"`
+		PartnerCustomerId                string                           `json:"partner_customer_id,omitempty"`
+		PartnerPaymentId                 string                           `json:"partner_payment_id,omitempty"`
+		TaxAmount                        int64                            `json:"tax_amount,omitempty"`
+		PurchaseCountry                  common.Country                   `json:"purchase_country,omitempty"`
+		Locale                           string                           `json:"locale,omitempty"`
+		RetrievalReferenceNumber         string                           `json:"retrieval_reference_number,omitempty"`
+		PartnerOrderId                   string                           `json:"partner_order_id,omitempty"`
+		PartnerStatus                    string                           `json:"partner_status,omitempty"`
+		PartnerTransactionId             string                           `json:"partner_transaction_id,omitempty"`
+		PartnerErrorCodes                string                           `json:"partner_error_codes,omitempty"`
+		PartnerErrorMessage              string                           `json:"partner_error_message,omitempty"`
+		PartnerAuthorizationCode         string                           `json:"partner_authorization_code,omitempty"`
+		PartnerAuthorizationResponseCode string                           `json:"partner_authorization_response_code,omitempty"`
+		FraudStatus                      string                           `json:"fraud_status,omitempty"`
+		ProviderAuthorizedPaymentMethod  *ProviderAuthorizedPaymentMethod `json:"provider_authorized_payment_method,omitempty"`
+		CustomPaymentMethodIds           []string                         `json:"custom_payment_method_ids,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {

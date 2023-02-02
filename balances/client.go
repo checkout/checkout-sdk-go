@@ -19,7 +19,7 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) RetrieveEntityBalances(entityId string, query QueryFilter) (*QueryResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}

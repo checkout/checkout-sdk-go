@@ -218,6 +218,29 @@ func (c *Client) RetrievePaymentInstrumentDetails(
 	return &response, nil
 }
 
+func (c *Client) UpdatePaymentInstrumentDetails(
+	entityId, instrumentId string,
+	request UpdatePaymentInstrumentRequest,
+) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.IdResponse
+	err = c.apiClient.Patch(
+		common.BuildPath(accountsPath, entitiesPath, entityId, paymentInstrumentsPath, instrumentId),
+		auth,
+		request,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) RetrievePayoutSchedule(entityId string) (*PayoutSchedule, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

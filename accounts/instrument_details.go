@@ -58,6 +58,11 @@ type (
 	PaymentInstrumentsQuery struct {
 		Status InstrumentStatus `json:"status,omitempty"`
 	}
+
+	UpdatePaymentInstrumentRequest struct {
+		Label   string `json:"label,omitempty"`
+		Default bool   `json:"default,omitempty"`
+	}
 )
 
 func (s *InstrumentDetailsFasterPayments) GetType() string {

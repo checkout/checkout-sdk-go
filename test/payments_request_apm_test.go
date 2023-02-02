@@ -48,6 +48,26 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			},
 		},
 		{
+			name: "test CvConnect source for request payment",
+			request: nas.PaymentRequest{
+				Source:      apm.NewRequestCvConnectSource(),
+				Amount:      100,
+				Currency:    common.EUR,
+				Capture:     true,
+				Reference:   Reference,
+				Description: Description,
+				SuccessUrl:  SuccessUrl,
+				FailureUrl:  FailureUrl,
+			},
+			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				ckoErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
+				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+			},
+		},
+		{
 			name: "test Ideal source for request payment",
 			request: nas.PaymentRequest{
 				Source:      getIdealSourceRequest(),
@@ -76,6 +96,26 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.NotNil(t, response.Description)
 				assert.Equal(t, Description, response.Description)
 				assert.NotNil(t, response.Customer)
+			},
+		},
+		{
+			name: "test Illicado source for request payment",
+			request: nas.PaymentRequest{
+				Source:      apm.NewRequestIllicadoSource(),
+				Amount:      100,
+				Currency:    common.EUR,
+				Capture:     true,
+				Reference:   Reference,
+				Description: Description,
+				SuccessUrl:  SuccessUrl,
+				FailureUrl:  FailureUrl,
+			},
+			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				ckoErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
+				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{
@@ -154,6 +194,26 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				},
 				SuccessUrl: SuccessUrl,
 				FailureUrl: FailureUrl,
+			},
+			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				ckoErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
+				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+			},
+		},
+		{
+			name: "test Trustly source for request payment",
+			request: nas.PaymentRequest{
+				Source:      apm.NewRequestTrustlySource(),
+				Amount:      100,
+				Currency:    common.EUR,
+				Capture:     true,
+				Reference:   Reference,
+				Description: Description,
+				SuccessUrl:  SuccessUrl,
+				FailureUrl:  FailureUrl,
 			},
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)

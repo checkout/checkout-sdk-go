@@ -66,6 +66,11 @@ type (
 		Type payments.SourceType `json:"type,omitempty"`
 	}
 
+	requestCvConnectSource struct {
+		Type           payments.SourceType `json:"type,omitempty"`
+		BillingAddress *common.Address     `json:"billing_address,omitempty"`
+	}
+
 	requestEpsSource struct {
 		Type    payments.SourceType `json:"type,omitempty"`
 		Purpose string              `json:"purpose,omitempty"`
@@ -92,6 +97,11 @@ type (
 		Description string              `json:"description,omitempty"`
 		Bic         string              `json:"bic,omitempty"`
 		Language    string              `json:"language,omitempty"`
+	}
+
+	requestIllicadoSource struct {
+		Type           payments.SourceType `json:"type,omitempty"`
+		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 	}
 
 	requestKlarnaSource struct {
@@ -165,6 +175,11 @@ type (
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 	}
 
+	requestTrustlySource struct {
+		Type           payments.SourceType `json:"type,omitempty"`
+		BillingAddress *common.Address     `json:"billing_address,omitempty"`
+	}
+
 	requestWeChatPaySource struct {
 		Type           payments.SourceType `json:"type,omitempty"`
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
@@ -219,6 +234,10 @@ func NewRequestBenefitSource() *requestBenefitSource {
 	return &requestBenefitSource{Type: payments.Benefit}
 }
 
+func NewRequestCvConnectSource() *requestCvConnectSource {
+	return &requestCvConnectSource{Type: payments.CvConnectSource}
+}
+
 func NewRequestEpsSource() *requestEpsSource {
 	return &requestEpsSource{Type: payments.EpsSource}
 }
@@ -233,6 +252,10 @@ func NewRequestGiropaySource() *requestGiropaySource {
 
 func NewRequestIdealSource() *requestIdealSource {
 	return &requestIdealSource{Type: payments.IdealSource}
+}
+
+func NewRequestIllicadoSource() *requestIllicadoSource {
+	return &requestIllicadoSource{Type: payments.IllicadoSource}
 }
 
 func NewRequestKlarnaSource() *requestKlarnaSource {
@@ -279,6 +302,10 @@ func NewRequestTamaraSource() *requestTamaraSource {
 	return &requestTamaraSource{Type: payments.TamaraSource}
 }
 
+func NewRequestTrustlySource() *requestTrustlySource {
+	return &requestTrustlySource{Type: payments.TrustlySource}
+}
+
 func NewRequestWeChatPaySource() *requestWeChatPaySource {
 	return &requestWeChatPaySource{Type: payments.Wechatpay}
 }
@@ -303,6 +330,10 @@ func (s *requestBenefitSource) GetType() payments.SourceType {
 	return s.Type
 }
 
+func (s *requestCvConnectSource) GetType() payments.SourceType {
+	return s.Type
+}
+
 func (s *requestEpsSource) GetType() payments.SourceType {
 	return s.Type
 }
@@ -316,6 +347,10 @@ func (s *requestGiropaySource) GetType() payments.SourceType {
 }
 
 func (s *requestIdealSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestIllicadoSource) GetType() payments.SourceType {
 	return s.Type
 }
 
@@ -360,6 +395,10 @@ func (s *requestStcPaySource) GetType() payments.SourceType {
 }
 
 func (s *requestTamaraSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestTrustlySource) GetType() payments.SourceType {
 	return s.Type
 }
 

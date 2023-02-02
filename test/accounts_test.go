@@ -349,6 +349,96 @@ func TestRetrievePaymentInstrumentsDetails(t *testing.T) {
 	}
 }
 
+func TestUpdatePaymentInstrumentDetails(t *testing.T) {
+	t.Skip("returns 428 status when updating")
+	var (
+		entityId = createEntityCompany(t)
+
+		file = accounts.File{
+			File:    "./checkout.pdf",
+			Purpose: common.BankVerification,
+		}
+
+		requestFileId = submitFile(t, file)
+
+		instrumentId = paymentInstrumentRequest(t, entityId, requestFileId)
+	)
+
+	cases := []struct {
+		name         string
+		entityId     string
+		instrumentId string
+		request      accounts.UpdatePaymentInstrumentRequest
+		checker      func(*common.IdResponse, error)
+	}{
+		{
+			name:         "when updating existing entity and instrument then modify data",
+			entityId:     entityId,
+			instrumentId: instrumentId,
+			request: accounts.UpdatePaymentInstrumentRequest{
+				Label:   "new label",
+				Default: true,
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, instrumentId, response.Id)
+			},
+		},
+		{
+			name:         "when entity doesn't exists then return error",
+			entityId:     "not_found",
+			instrumentId: instrumentId,
+			request: accounts.UpdatePaymentInstrumentRequest{
+				Label:   "new label",
+				Default: true,
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:         "when instrument doesn't exists then return error",
+			entityId:     entityId,
+			instrumentId: "not_found",
+			request: accounts.UpdatePaymentInstrumentRequest{
+				Label:   "new label",
+				Default: true,
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:         "when request invalid then return error",
+			entityId:     entityId,
+			instrumentId: instrumentId,
+			request:      accounts.UpdatePaymentInstrumentRequest{},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildAccountClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.UpdatePaymentInstrumentDetails(tc.entityId, tc.instrumentId, tc.request))
+		})
+	}
+}
+
 func TestUpdatePayoutSchedule(t *testing.T) {
 	var (
 		entityId = "ent_t2jwrwxhxdas5755cnctu7iwmm"

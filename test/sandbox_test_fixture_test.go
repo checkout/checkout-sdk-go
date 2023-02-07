@@ -118,14 +118,21 @@ func getOAuthScopes() []string {
 		configuration.Marketplace, configuration.SessionsApp, configuration.SessionsBrowser,
 		configuration.Vault, configuration.PayoutsBankDetails, configuration.Disputes,
 		configuration.TransfersCreate, configuration.TransfersView, configuration.Balances,
-		configuration.VaultCardMetadata}
+		configuration.VaultCardMetadata, configuration.FinancialActions}
 }
 
-func retriable(callback func() (interface{}, error), predicate func(interface{}) bool, seconds time.Duration) (response interface{}, err error) {
+func retriable(
+	callback func() (interface{}, error),
+	predicate func(interface{}) bool,
+	seconds time.Duration,
+) (response interface{}, err error) {
 	attempt := 1
 	for attempt <= MaxRetryAttemps {
 		response, err = callback()
-		if response != nil && err == nil && predicate(response) {
+		if err != nil {
+			return nil, err
+		}
+		if response != nil && predicate(response) {
 			return response, nil
 		}
 		attempt++

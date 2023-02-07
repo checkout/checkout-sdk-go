@@ -10,6 +10,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/customers"
 	"github.com/checkout/checkout-sdk-go/disputes"
+	"github.com/checkout/checkout-sdk-go/financial"
 	"github.com/checkout/checkout-sdk-go/forex"
 	instruments "github.com/checkout/checkout-sdk-go/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/metadata"
@@ -28,6 +29,7 @@ type Api struct {
 	Balances    *balances.Client
 	Customers   *customers.Client
 	Disputes    *disputes.Client
+	Financial   *financial.Client
 	Forex       *forex.Client
 	Hosted      *hosted.Client
 	Instruments *instruments.Client
@@ -54,6 +56,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Customers = customers.NewClient(configuration, apiClient)
 	api.Disputes = disputes.NewClient(configuration, apiClient)
 	api.Instruments = instruments.NewClient(configuration, apiClient)
+	api.Financial = financial.NewClient(configuration, apiClient)
 	api.Forex = forex.NewClient(configuration, apiClient)
 	api.Hosted = hosted.NewClient(configuration, apiClient)
 	api.Links = links.NewClient(configuration, apiClient)

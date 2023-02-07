@@ -42,4 +42,6 @@ const (
 	Reports                     = "reports"
 	ReportsView                 = "reports:view"
 	VaultCardMetadata           = "vault:card-metadata"
+	FinancialActions            = "financial-actions"
+	FinancialActionsView        = "financial-actions:view"
 )

@@ -298,15 +298,21 @@ type (
 	}
 
 	PaymentProcessing struct {
-		RetrievalReferenceNumber string `json:"retrieval_reference_number,omitempty"`
-		AcquirerTransactionId    string `json:"acquirer_transaction_id,omitempty"`
-		RecommendationCode       string `json:"recommendation_code,omitempty"`
-		PartnerOrderId           string `json:"partner_order_id,omitempty"`
-		PartnerSessionId         string `json:"partner_session_id,omitempty"`
-		PartnerClientToken       string `json:"partner_client_token,omitempty"`
-		PartnerPaymentId         string `json:"partner_payment_id,omitempty"`
-		ContinuationPayload      string `json:"continuation_payload,omitempty"`
-		Pun                      string `json:"pun,omitempty"`
+		RetrievalReferenceNumber         string   `json:"retrieval_reference_number,omitempty"`
+		AcquirerTransactionId            string   `json:"acquirer_transaction_id,omitempty"`
+		RecommendationCode               string   `json:"recommendation_code,omitempty"`
+		PartnerOrderId                   string   `json:"partner_order_id,omitempty"`
+		PartnerSessionId                 string   `json:"partner_session_id,omitempty"`
+		PartnerClientToken               string   `json:"partner_client_token,omitempty"`
+		PartnerPaymentId                 string   `json:"partner_payment_id,omitempty"`
+		ContinuationPayload              string   `json:"continuation_payload,omitempty"`
+		Pun                              string   `json:"pun,omitempty"`
+		PartnerStatus                    string   `json:"partner_status,omitempty"`
+		PartnerTransactionId             string   `json:"partner_transaction_id,omitempty"`
+		PartnerErrorCodes                []string `json:"partner_error_codes,omitempty"`
+		PartnerErrorMessage              string   `json:"partner_error_message,omitempty"`
+		PartnerAuthorizationCode         string   `json:"partner_authorization_code,omitempty"`
+		PartnerAuthorizationResponseCode string   `json:"partner_authorization_response_code,omitempty"`
 	}
 
 	ThreeDsData struct {

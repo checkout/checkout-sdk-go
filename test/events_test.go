@@ -56,7 +56,6 @@ func TestRetrieveEvents(t *testing.T) {
 
 	cases := []struct {
 		name    string
-		eventId string
 		checker func(interface{}, error)
 	}{
 		{
@@ -87,13 +86,17 @@ func TestRetrieveEvents(t *testing.T) {
 func TestRetrieveEvent(t *testing.T) {
 	makeCardPaymentPrevious(t, false, 10)
 
-	allEvents, _ := retriableEventsCallback(
-		func() (interface{}, error) {
-			return PreviousApi().Events.RetrieveEventsQuery(
-				events.QueryRetrieveEvents{},
-			)
-		},
-	)
+	allEvents, _ := PreviousApi().Events.RetrieveEvents()
+
+	var eventId = "evt_zzzzzzzzzzzzzzzzzzzzzzz"
+
+	for _, event := range allEvents.Data {
+		eventNotifications, _ := PreviousApi().Events.RetrieveEvent(event.Id)
+		if len(eventNotifications.Notifications) > 0 {
+			eventId = event.Id
+			break
+		}
+	}
 
 	cases := []struct {
 		name    string
@@ -102,7 +105,7 @@ func TestRetrieveEvent(t *testing.T) {
 	}{
 		{
 			name:    "when retrieve events then return events",
-			eventId: allEvents.(*events.EventsPageResponse).Data[0].Id,
+			eventId: eventId,
 			checker: func(response interface{}, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -115,34 +118,28 @@ func TestRetrieveEvent(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc.checker(
-			retriableEventsCallback(
-				func() (interface{}, error) {
-					return PreviousApi().Events.RetrieveEvent(tc.eventId)
-				},
-			),
-		)
+		tc.checker(PreviousApi().Events.RetrieveEvent(tc.eventId))
 	}
 }
 
 func TestRetrieveEventNotification(t *testing.T) {
-	makeCardPaymentPrevious(t, false, 10)
+	makeCardPaymentPrevious(t, false, 20)
 
-	allEvents, _ := retriableEventsCallback(
-		func() (interface{}, error) {
-			return PreviousApi().Events.RetrieveEventsQuery(
-				events.QueryRetrieveEvents{},
-			)
-		},
+	allEvents, _ := PreviousApi().Events.RetrieveEventsQuery(events.QueryRetrieveEvents{})
+
+	var (
+		eventId        = "evt_zzzzzzzzzzzzzzzzzzzzzzzz"
+		notificationId = "ntf_zzzzzzzzzzzzzzzzzzzzzzzz"
 	)
 
-	oneEvents, _ := retriableEventsCallback(
-		func() (interface{}, error) {
-			return PreviousApi().Events.RetrieveEvent(
-				allEvents.(*events.EventsPageResponse).Data[0].Id,
-			)
-		},
-	)
+	for _, event := range allEvents.Data {
+		eventNotifications, _ := PreviousApi().Events.RetrieveEvent(event.Id)
+		if len(eventNotifications.Notifications) > 0 {
+			eventId = event.Id
+			notificationId = eventNotifications.Notifications[0].Id
+			break
+		}
+	}
 
 	cases := []struct {
 		name           string
@@ -152,15 +149,15 @@ func TestRetrieveEventNotification(t *testing.T) {
 	}{
 		{
 			name:           "when retrieve event notification then return event notification data",
-			eventId:        allEvents.(*events.EventsPageResponse).Data[0].Id,
-			notificationId: oneEvents.(*events.EventResponse).Notifications[0].Id,
+			eventId:        eventId,
+			notificationId: notificationId,
 			checker: func(response interface{}, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(
 					t,
 					response.(*events.EventNotificationResponse).Id,
-					oneEvents.(*events.EventResponse).Notifications[0].Id,
+					notificationId,
 				)
 				assert.NotNil(t, response.(*events.EventNotificationResponse).Attempts)
 			},
@@ -193,7 +190,7 @@ func retriableEventsCallback(callback func() (interface{}, error)) (interface{},
 			return response.Data != nil && len(response.Data) > 0
 		case *events.EventResponse:
 			response := data.(*events.EventResponse)
-			return response.Data != nil
+			return response.Notifications != nil && len(response.Notifications) > 0
 		case *events.EventNotificationResponse:
 			response := data.(*events.EventNotificationResponse)
 			return response.Attempts != nil && len(response.Attempts) > 0

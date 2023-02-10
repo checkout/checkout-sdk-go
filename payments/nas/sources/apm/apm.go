@@ -184,6 +184,17 @@ type (
 		Type           payments.SourceType `json:"type,omitempty"`
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 	}
+
+	requestSepaSource struct {
+		Type            payments.SourceType   `json:"type,omitempty"`
+		Country         common.Country        `json:"country,omitempty"`
+		AccountNumber   string                `json:"account_number,omitempty"`
+		BankCode        string                `json:"bank_code,omitempty"`
+		Currency        common.Currency       `json:"currency,omitempty"`
+		MandateId       string                `json:"mandate_id,omitempty"`
+		DateOfSignature string                `json:"date_of_signature,omitempty"`
+		AccountHolder   *common.AccountHolder `json:"account_holder,omitempty"`
+	}
 )
 
 func NewRequestAfterPaySource() *requestAfterPaySource {
@@ -310,6 +321,10 @@ func NewRequestWeChatPaySource() *requestWeChatPaySource {
 	return &requestWeChatPaySource{Type: payments.Wechatpay}
 }
 
+func NewRequestSepaSource() *requestSepaSource {
+	return &requestSepaSource{Type: payments.SepaSource}
+}
+
 func (s *requestAfterPaySource) GetType() payments.SourceType {
 	return s.Type
 }
@@ -403,5 +418,9 @@ func (s *requestTrustlySource) GetType() payments.SourceType {
 }
 
 func (s *requestWeChatPaySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func (s *requestSepaSource) GetType() payments.SourceType {
 	return s.Type
 }

@@ -497,6 +497,24 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
 			},
 		},
+		{
+			name: "test Sepa source for request payment",
+			request: nas.PaymentRequest{
+				Source:     getSepaSource(),
+				Amount:     10,
+				Currency:   common.EUR,
+				Reference:  Reference,
+				SuccessUrl: SuccessUrl,
+				FailureUrl: FailureUrl,
+			},
+			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				ckoErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
+				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+			},
+		},
 	}
 
 	client := DefaultApi().Payments
@@ -630,6 +648,19 @@ func getFawrySource() payments.PaymentSource {
 		Price:       10,
 		Description: "Fawry Demo Product",
 	}}
+
+	return source
+}
+
+func getSepaSource() payments.PaymentSource {
+	source := apm.NewRequestSepaSource()
+	source.Currency = common.EUR
+	source.Country = common.ES
+	source.AccountNumber = "HU93116000060000000012345676"
+	source.BankCode = "37040044"
+	source.MandateId = "man_12321233211"
+	source.DateOfSignature = "2023-01-01"
+	source.AccountHolder = AccountHolder()
 
 	return source
 }

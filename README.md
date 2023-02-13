@@ -15,11 +15,11 @@
 ### Module installer
 Make sure your project is using Go Modules:
 ```sh
-go get github.com/checkout-sdk-go@{version}
+go get github.com/checkout/checkout-sdk-go@{version}
 ```
 Then import the library into your code:
 ```sh
-import "github.com/checkout-sdk-go"
+import "github.com/checkout/checkout-sdk-go"
 ```
 
 ### :rocket: Please check in [GitHub releases](https://github.com/checkout/checkout-sdk-go/releases) for all the versions available.

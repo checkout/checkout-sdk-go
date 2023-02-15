@@ -21,7 +21,7 @@ type (
 	}
 
 	EntityEmailAddresses struct {
-		Primary []string `json:"primary,omitempty"`
+		Primary string `json:"primary,omitempty"`
 	}
 
 	Profile struct {

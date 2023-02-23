@@ -88,16 +88,6 @@ func TestRetrieveEvent(t *testing.T) {
 
 	allEvents, _ := PreviousApi().Events.RetrieveEvents()
 
-	var eventId = "evt_zzzzzzzzzzzzzzzzzzzzzzz"
-
-	for _, event := range allEvents.Data {
-		eventNotifications, _ := PreviousApi().Events.RetrieveEvent(event.Id)
-		if len(eventNotifications.Notifications) > 0 {
-			eventId = event.Id
-			break
-		}
-	}
-
 	cases := []struct {
 		name    string
 		eventId string
@@ -105,7 +95,7 @@ func TestRetrieveEvent(t *testing.T) {
 	}{
 		{
 			name:    "when retrieve events then return events",
-			eventId: eventId,
+			eventId: allEvents.Data[0].Id,
 			checker: func(response interface{}, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -125,7 +115,9 @@ func TestRetrieveEvent(t *testing.T) {
 func TestRetrieveEventNotification(t *testing.T) {
 	makeCardPaymentPrevious(t, false, 20)
 
-	allEvents, _ := PreviousApi().Events.RetrieveEventsQuery(events.QueryRetrieveEvents{})
+	allEvents, _ := PreviousApi().Events.RetrieveEventsQuery(events.QueryRetrieveEvents{
+		Limit: 20,
+	})
 
 	var (
 		eventId        = "evt_zzzzzzzzzzzzzzzzzzzzzzzz"

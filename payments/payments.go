@@ -280,6 +280,7 @@ type (
 		MerchantCallbackUrl     string                  `json:"merchant_callback_url,omitempty"`
 		ShippingDelay           int64                   `json:"shipping_delay,omitempty"`
 		ShippingInfo            string                  `json:"shipping_info,omitempty"`
+		LineOfBusiness          string                  `json:"line_of_business,omitempty"`
 		// Only available on Previous
 		SenderInformation *SenderInformation        `json:"senderInformation,omitempty"`
 		Purpose           string                    `json:"purpose,omitempty"`
@@ -325,6 +326,7 @@ type (
 		Xid                    string    `json:"xid,omitempty"`
 		Version                string    `json:"version,omitempty"`
 		Exemption              Exemption `json:"exemption,omitempty"`
+		ExemptionApplied       string    `json:"exemption_applied,omitempty"`
 		Challenged             bool      `json:"challenged,omitempty"`
 	}
 
@@ -394,6 +396,8 @@ type (
 		Amount    int64                  `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
+		// Not available on Previous
+		AmountAllocations []common.AmountAllocations `json:"amount_allocations,omitempty"`
 	}
 
 	VoidRequest struct {
@@ -450,6 +454,9 @@ type (
 		FraudStatus                      string                           `json:"fraud_status,omitempty"`
 		ProviderAuthorizedPaymentMethod  *ProviderAuthorizedPaymentMethod `json:"provider_authorized_payment_method,omitempty"`
 		CustomPaymentMethodIds           []string                         `json:"custom_payment_method_ids,omitempty"`
+		Aft                              bool                             `json:"aft,omitempty"`
+		MerchantCategoryCode             string                           `json:"merchant_category_code,omitempty"`
+		SchemeMerchantId                 string                           `json:"scheme_merchant_id,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {

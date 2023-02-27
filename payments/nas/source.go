@@ -9,7 +9,6 @@ import (
 
 type (
 	SourceResponse struct {
-		HttpMetadata                  common.HttpMetadata
 		ResponseCardSource            *ResponseCardSource
 		ResponseCurrencyAccountSource *ResponseCurrencyAccountSource
 		AlternativeResponse           *common.AlternativeResponse

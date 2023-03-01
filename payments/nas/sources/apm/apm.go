@@ -87,9 +87,7 @@ type (
 	}
 
 	requestGiropaySource struct {
-		Type       payments.SourceType `json:"type,omitempty"`
-		Purpose    string              `json:"purpose,omitempty"`
-		InfoFields []InfoFields        `json:"info_fields,omitempty"`
+		Type payments.SourceType `json:"type,omitempty"`
 	}
 
 	requestIdealSource struct {

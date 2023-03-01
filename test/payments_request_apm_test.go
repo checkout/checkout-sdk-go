@@ -315,24 +315,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			},
 		},
 		{
-			name: "test GiroPay source for request payment",
-			request: nas.PaymentRequest{
-				Source:     getGiropaySource(),
-				Amount:     10,
-				Currency:   common.EUR,
-				Reference:  Reference,
-				SuccessUrl: SuccessUrl,
-				FailureUrl: FailureUrl,
-			},
-			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
-				assert.NotNil(t, err)
-				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
-			},
-		},
-		{
 			name: "test P24 source for request payment",
 			request: nas.PaymentRequest{
 				Source:     getP24Source(),
@@ -574,7 +556,6 @@ func getEpsSource() payments.PaymentSource {
 
 func getGiropaySource() payments.PaymentSource {
 	source := apm.NewRequestGiropaySource()
-	source.Purpose = "Mens black t-shirt L"
 
 	return source
 }

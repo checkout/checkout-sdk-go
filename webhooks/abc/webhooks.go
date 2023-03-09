@@ -13,7 +13,6 @@ type ContentType string
 
 const (
 	Json ContentType = "json"
-	Xml  ContentType = "xml"
 )
 
 type (

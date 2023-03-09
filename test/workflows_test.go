@@ -41,6 +41,38 @@ var (
 	processingChannel = []string{"pc_5jp2az55l3cuths25t5p3xhwru"}
 )
 
+func TestGetWorkflows(t *testing.T) {
+	createWorkflow(t)
+
+	cases := []struct {
+		name    string
+		checker func(*workflows.GetWorkflowsResponse, error)
+	}{
+		{
+			name: "when retrieving all workflows then it returns existing workflows",
+			checker: func(response *workflows.GetWorkflowsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotNil(t, response.Workflows)
+				assert.NotEmpty(t, response.Workflows)
+				for _, workflow := range response.Workflows {
+					assert.NotNil(t, workflow.Id)
+					assert.NotNil(t, workflow.Name)
+					assert.True(t, workflow.Active)
+				}
+			},
+		},
+	}
+
+	client := DefaultApi().WorkFlows
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetWorkflows())
+		})
+	}
+}
+
 func TestCreateWorkflow(t *testing.T) {
 	cases := []struct {
 		name    string
@@ -58,7 +90,7 @@ func TestCreateWorkflow(t *testing.T) {
 					getProcessingChannelCondition(),
 				},
 				Actions: []actions.ActionsRequest{
-					getWebhookAction(),
+					getWorkflowAction(),
 				},
 			},
 			checker: func(response *common.IdResponse, err error) {
@@ -74,7 +106,7 @@ func TestCreateWorkflow(t *testing.T) {
 				Name:   "Test",
 				Active: true,
 				Actions: []actions.ActionsRequest{
-					getWebhookAction(),
+					getWorkflowAction(),
 				},
 			},
 			checker: func(response *common.IdResponse, err error) {
@@ -119,38 +151,6 @@ func TestCreateWorkflow(t *testing.T) {
 					assert.Fail(t, fmt.Sprintf("Failed to remove workflow: %s", err.Error()))
 				}
 			}
-		})
-	}
-}
-
-func TestGetWorkflows(t *testing.T) {
-	createWorkflow(t)
-
-	cases := []struct {
-		name    string
-		checker func(*workflows.GetWorkflowsResponse, error)
-	}{
-		{
-			name: "when retrieving all workflows then it returns existing workflows",
-			checker: func(response *workflows.GetWorkflowsResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.NotNil(t, response.Workflows)
-				assert.NotEmpty(t, response.Workflows)
-				for _, workflow := range response.Workflows {
-					assert.NotNil(t, workflow.Id)
-					assert.NotNil(t, workflow.Name)
-					assert.True(t, workflow.Active)
-				}
-			},
-		},
-	}
-
-	client := DefaultApi().WorkFlows
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetWorkflows())
 		})
 	}
 }
@@ -224,6 +224,42 @@ func TestGetWorkflow(t *testing.T) {
 	}
 }
 
+func TestRemoveWorkflow(t *testing.T) {
+	cases := []struct {
+		name       string
+		workflowId string
+		checker    func(*common.MetadataResponse, error)
+	}{
+		{
+			name:       "when workflow exists then delete workflow",
+			workflowId: createWorkflow(t).Id,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:       "when workflow is inexistent then return error",
+			workflowId: "not_found",
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				errChk := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, errChk.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().WorkFlows
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.RemoveWorkflow(tc.workflowId))
+		})
+	}
+}
+
 func TestUpdateWorkflow(t *testing.T) {
 	workflow := createWorkflow(t)
 
@@ -266,6 +302,67 @@ func TestUpdateWorkflow(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.checker(client.UpdateWorkflow(tc.workflowId, tc.request))
+		})
+	}
+}
+
+func TestAddWorkflowAction(t *testing.T) {
+	workflow := createWorkflow(t)
+
+	webhookActionRequest := actions.NewWebhookActionRequest()
+	webhookActionRequest.Url = "https://new-url.com"
+	webhookActionRequest.Headers = map[string]string{}
+	webhookActionRequest.Signature = &actions.WebhookSignature{
+		Method: "HMACSHA256",
+		Key:    "8V8x0dLK%AyD*DNS8JJr",
+	}
+
+	cases := []struct {
+		name       string
+		workflowId string
+		request    actions.ActionsRequest
+		checker    func(*common.IdResponse, error)
+	}{
+		{
+			name:       "when request is valid then add workflow action",
+			workflowId: workflow.Id,
+			request:    webhookActionRequest,
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+			},
+		},
+		{
+			name:       "when workflow not_found then return error",
+			workflowId: "not_found",
+			request:    webhookActionRequest,
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:       "when request invalid then return error",
+			workflowId: workflow.Id,
+			request:    actions.NewWebhookActionRequest(),
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().WorkFlows
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.AddWorkflowAction(tc.workflowId, tc.request))
 		})
 	}
 }
@@ -357,6 +454,59 @@ func TestUpdateWorkflowAction(t *testing.T) {
 			tc.putChecker(client.UpdateWorkflowAction(tc.workflowId, tc.actionId, tc.request))
 
 			tc.getChecker(client.GetWorkflow(tc.workflowId))
+		})
+	}
+}
+
+func TestRemoveWorkflowActions(t *testing.T) {
+	workflow := createWorkflow(t)
+	action := addWorkflowAction(t, workflow.Id)
+
+	cases := []struct {
+		name       string
+		workflowId string
+		actionId   string
+		checker    func(*common.MetadataResponse, error)
+	}{
+		{
+			name:       "when workflow and action exists then delete workflow action",
+			workflowId: workflow.Id,
+			actionId:   action.Id,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:       "when workflow not_found then return error",
+			workflowId: "not_found",
+			actionId:   action.Id,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:       "when action not_found then return error",
+			workflowId: workflow.Id,
+			actionId:   "not_found",
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().WorkFlows
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.RemoveWorkflowAction(tc.workflowId, tc.actionId))
 		})
 	}
 }
@@ -471,6 +621,66 @@ func TestUpdateWorkflowConditions(t *testing.T) {
 			tc.putChecker(client.UpdateWorkflowCondition(tc.workflowId, tc.conditionId, tc.request))
 
 			tc.getChecker(client.GetWorkflow(tc.workflowId))
+		})
+	}
+}
+
+func TestRemoveWorkflowConditions(t *testing.T) {
+	t.Skip("Skipping because it returns http 405 status")
+	workflow := getWorkflow(t, createWorkflow(t).Id)
+
+	var eventConditionId string
+	for _, condition := range workflow.Conditions {
+		if condition.Type == conditions.Event {
+			eventConditionId = condition.Id
+		}
+	}
+
+	cases := []struct {
+		name        string
+		workflowId  string
+		conditionId string
+		checker     func(*common.MetadataResponse, error)
+	}{
+		{
+			name:        "when workflow and condition exists then delete workflow condition",
+			workflowId:  workflow.Id,
+			conditionId: eventConditionId,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:        "when workflow not_found then return error",
+			workflowId:  "not_found",
+			conditionId: eventConditionId,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:        "when action not_found then return error",
+			workflowId:  workflow.Id,
+			conditionId: "not_found",
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().WorkFlows
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.RemoveWorkflowCondition(tc.workflowId, tc.conditionId))
 		})
 	}
 }
@@ -870,42 +1080,6 @@ func TestReflow(t *testing.T) {
 	}
 }
 
-func TestRemoveWorkflow(t *testing.T) {
-	cases := []struct {
-		name       string
-		workflowId string
-		checker    func(*common.MetadataResponse, error)
-	}{
-		{
-			name:       "when workflow exists then delete workflow",
-			workflowId: createWorkflow(t).Id,
-			checker: func(response *common.MetadataResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
-			},
-		},
-		{
-			name:       "when workflow is inexistent then return error",
-			workflowId: "not_found",
-			checker: func(response *common.MetadataResponse, err error) {
-				assert.Nil(t, response)
-				assert.NotNil(t, err)
-				errChk := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusNotFound, errChk.StatusCode)
-			},
-		},
-	}
-
-	client := DefaultApi().WorkFlows
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.RemoveWorkflow(tc.workflowId))
-		})
-	}
-}
-
 func TestGetActionInvocations(t *testing.T) {
 	t.Skip("Skipping tests because this suite is unstable")
 	workflow := getWorkflow(t, createWorkflow(t).Id)
@@ -991,30 +1165,26 @@ func getProcessingChannelCondition() conditions.ConditionsRequest {
 	return processingChannelCondition
 }
 
-func getWebhookAction() actions.ActionsRequest {
-	webhookAction := actions.NewWebhookActionRequest()
-	webhookAction.Url = "https://google.com/fail"
-	webhookAction.Headers = map[string]string{}
-	webhookAction.Signature = &actions.WebhookSignature{
-		Method: "HMACSHA256",
-		Key:    "8V8x0dLK%AyD*DNS8JJr",
+func getAllConditions() []conditions.ConditionsRequest {
+	return []conditions.ConditionsRequest{
+		getEntityCondition(),
+		getEventCondition(),
+		getProcessingChannelCondition(),
 	}
+}
 
-	return webhookAction
+func getAllActions() []actions.ActionsRequest {
+	return []actions.ActionsRequest{
+		getWorkflowAction(),
+	}
 }
 
 func createWorkflow(t *testing.T) *common.IdResponse {
 	request := workflows.CreateWorkflowRequest{
-		Name:   "Test",
-		Active: true,
-		Conditions: []conditions.ConditionsRequest{
-			getEntityCondition(),
-			getEventCondition(),
-			getProcessingChannelCondition(),
-		},
-		Actions: []actions.ActionsRequest{
-			getWebhookAction(),
-		},
+		Name:       "Test",
+		Active:     true,
+		Conditions: getAllConditions(),
+		Actions:    getAllActions(),
 	}
 
 	response, err := DefaultApi().WorkFlows.CreateWorkflow(request)
@@ -1038,6 +1208,35 @@ func getWorkflow(t *testing.T, workflowId string) *workflows.GetWorkflowResponse
 	}
 
 	return response
+}
+
+func addWorkflowAction(t *testing.T, workflowId string) *common.IdResponse {
+	webhookActionRequest := actions.NewWebhookActionRequest()
+	webhookActionRequest.Url = "https://new-url.com"
+	webhookActionRequest.Headers = map[string]string{}
+	webhookActionRequest.Signature = &actions.WebhookSignature{
+		Method: "HMACSHA256",
+		Key:    "8V8x0dLK%AyD*DNS8JJr",
+	}
+
+	response, err := DefaultApi().WorkFlows.AddWorkflowAction(workflowId, webhookActionRequest)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error adding workflow action - %s", err.Error()))
+	}
+
+	return response
+}
+
+func getWorkflowAction() actions.ActionsRequest {
+	webhookAction := actions.NewWebhookActionRequest()
+	webhookAction.Url = "https://google.com/fail"
+	webhookAction.Headers = map[string]string{}
+	webhookAction.Signature = &actions.WebhookSignature{
+		Method: "HMACSHA256",
+		Key:    "8V8x0dLK%AyD*DNS8JJr",
+	}
+
+	return webhookAction
 }
 
 func getSubjectEvents(t *testing.T, subjectId string, eventsQuantity int) []events.SubjectEvent {

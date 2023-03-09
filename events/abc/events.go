@@ -56,8 +56,6 @@ type (
 		Reference string `url:"reference,omitempty"`
 		Skip      int    `url:"skip,omitempty"`
 		Limit     int    `url:"limit,omitempty"`
-		From      string `url:"from,omitempty"`
-		To        string `url:"to,omitempty"`
 	}
 
 	EventsSummaryResponse struct {
@@ -72,8 +70,6 @@ type (
 		TotalCount   int                     `json:"total_count,omitempty"`
 		Limit        int                     `json:"limit,omitempty"`
 		Skip         int                     `json:"skip,omitempty"`
-		From         string                  `json:"from,omitempty"`
-		To           string                  `json:"to,omitempty"`
 		Data         []EventsSummaryResponse `json:"data,omitempty"`
 	}
 )

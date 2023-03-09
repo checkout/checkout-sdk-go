@@ -22,21 +22,6 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 	}
 }
 
-func (c *Client) CreateWorkflow(request CreateWorkflowRequest) (*common.IdResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-
-	var response common.IdResponse
-	err = c.apiClient.Post(common.BuildPath(WorkflowsPath), auth, request, &response, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}
-
 func (c *Client) GetWorkflows() (*GetWorkflowsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
@@ -45,6 +30,21 @@ func (c *Client) GetWorkflows() (*GetWorkflowsResponse, error) {
 
 	var response GetWorkflowsResponse
 	err = c.apiClient.Get(common.BuildPath(WorkflowsPath), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) CreateWorkflow(request CreateWorkflowRequest) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.IdResponse
+	err = c.apiClient.Post(common.BuildPath(WorkflowsPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -67,6 +67,21 @@ func (c *Client) GetWorkflow(workflowId string) (*GetWorkflowResponse, error) {
 	return &response, nil
 }
 
+func (c *Client) RemoveWorkflow(workflowId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Delete(common.BuildPath(WorkflowsPath, workflowId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) UpdateWorkflow(workflowId string, request UpdateWorkflowRequest) (*UpdateWorkflowResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
@@ -82,14 +97,23 @@ func (c *Client) UpdateWorkflow(workflowId string, request UpdateWorkflowRequest
 	return &response, nil
 }
 
-func (c *Client) RemoveWorkflow(workflowId string) (*common.MetadataResponse, error) {
+func (c *Client) AddWorkflowAction(
+	workflowId string,
+	request actions.ActionsRequest,
+) (*common.IdResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
-	var response common.MetadataResponse
-	err = c.apiClient.Delete(common.BuildPath(WorkflowsPath, workflowId), auth, &response)
+	var response common.IdResponse
+	err = c.apiClient.Post(
+		common.BuildPath(WorkflowsPath, workflowId, ActionsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +145,49 @@ func (c *Client) UpdateWorkflowAction(
 	return &response, nil
 }
 
+func (c *Client) RemoveWorkflowAction(workflowId, actionId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Delete(
+		common.BuildPath(WorkflowsPath, workflowId, ActionsPath, actionId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) AddWorkflowCondition(
+	workflowId string,
+	request conditions.ConditionsRequest,
+) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.IdResponse
+	err = c.apiClient.Post(
+		common.BuildPath(WorkflowsPath, workflowId, ConditionsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) UpdateWorkflowCondition(
 	workflowId, conditionId string,
 	request conditions.ConditionsRequest,
@@ -137,6 +204,25 @@ func (c *Client) UpdateWorkflowCondition(
 		request,
 		&response,
 		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) RemoveWorkflowCondition(workflowId, conditionId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Delete(
+		common.BuildPath(WorkflowsPath, workflowId, ConditionsPath, conditionId),
+		auth,
+		&response,
 	)
 	if err != nil {
 		return nil, err
@@ -175,14 +261,14 @@ func (c *Client) GetEvent(eventId string) (*events.EventResponse, error) {
 	return &response, nil
 }
 
-func (c *Client) GetSubjectEvents(subjectId string) (*events.SubjectEventsResponse, error) {
+func (c *Client) GetActionInvocations(eventId, actionId string) (*actions.ActionInvocationsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
-	var response events.SubjectEventsResponse
-	err = c.apiClient.Get(common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId), auth, &response)
+	var response actions.ActionInvocationsResponse
+	err = c.apiClient.Get(common.BuildPath(WorkflowsPath, EventsPath, eventId, ActionsPath, actionId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -199,27 +285,6 @@ func (c *Client) ReflowByEvent(eventId string) (*common.MetadataResponse, error)
 	var response common.MetadataResponse
 	err = c.apiClient.Post(
 		common.BuildPath(WorkflowsPath, EventsPath, eventId, ReflowPath),
-		auth,
-		nil,
-		&response,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}
-
-func (c *Client) ReflowBySubject(subjectId string) (*common.MetadataResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-
-	var response common.MetadataResponse
-	err = c.apiClient.Post(
-		common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId, ReflowPath),
 		auth,
 		nil,
 		&response,
@@ -253,27 +318,6 @@ func (c *Client) ReflowByEventAndWorkflow(eventId, workflowId string) (*common.M
 	return &response, nil
 }
 
-func (c *Client) ReflowBySubjectAndWorkflow(subjectId, workflowId string) (*common.MetadataResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-
-	var response common.MetadataResponse
-	err = c.apiClient.Post(
-		common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId, WorkflowPath, workflowId, ReflowPath),
-		auth,
-		nil,
-		&response,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}
-
 func (c *Client) Reflow(request reflows.ReflowRequest) (*common.MetadataResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
@@ -295,14 +339,56 @@ func (c *Client) Reflow(request reflows.ReflowRequest) (*common.MetadataResponse
 	return &response, nil
 }
 
-func (c *Client) GetActionInvocations(eventId, actionId string) (*actions.ActionInvocationsResponse, error) {
+func (c *Client) GetSubjectEvents(subjectId string) (*events.SubjectEventsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
-	var response actions.ActionInvocationsResponse
-	err = c.apiClient.Get(common.BuildPath(WorkflowsPath, EventsPath, eventId, ActionsPath, actionId), auth, &response)
+	var response events.SubjectEventsResponse
+	err = c.apiClient.Get(common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) ReflowBySubject(subjectId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Post(
+		common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId, ReflowPath),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) ReflowBySubjectAndWorkflow(subjectId, workflowId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Post(
+		common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId, WorkflowPath, workflowId, ReflowPath),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}

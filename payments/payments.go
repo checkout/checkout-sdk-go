@@ -15,6 +15,7 @@ const (
 	Recurring   PaymentType = "Recurring"
 	MOTO        PaymentType = "MOTO"
 	Installment PaymentType = "Installment"
+	Unscheduled PaymentType = "Unscheduled"
 )
 
 type PaymentStatus string

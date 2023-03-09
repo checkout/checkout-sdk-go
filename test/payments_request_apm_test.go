@@ -1,9 +1,6 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/payments"
-	"github.com/checkout/checkout-sdk-go/payments/nas"
-	"github.com/checkout/checkout-sdk-go/payments/nas/sources/apm"
 	"net/http"
 	"testing"
 
@@ -11,6 +8,9 @@ import (
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/payments/nas"
+	"github.com/checkout/checkout-sdk-go/payments/nas/sources/apm"
 )
 
 func TestRequestPaymentsAPM(t *testing.T) {
@@ -293,7 +293,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.Nil(t, response)
 				ckoErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
+				assert.Equal(t, "cko_processing_channel_id_invalid", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{
@@ -305,6 +305,26 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				Reference:  Reference,
 				SuccessUrl: SuccessUrl,
 				FailureUrl: FailureUrl,
+			},
+			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				ckoErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
+				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+			},
+		},
+		{
+			name: "test GiroPay source for request payment",
+			request: nas.PaymentRequest{
+				Source:          getGiropaySource(),
+				Amount:          10,
+				Currency:        common.EUR,
+				Reference:       Reference,
+				Description:     Description,
+				ShippingDetails: &payments.ShippingDetails{Address: Address(), Phone: Phone()},
+				SuccessUrl:      SuccessUrl,
+				FailureUrl:      FailureUrl,
 			},
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)

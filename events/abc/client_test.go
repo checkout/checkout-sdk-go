@@ -140,8 +140,6 @@ func TestRetrieveEvents(t *testing.T) {
 			TotalCount:   1,
 			Limit:        5,
 			Skip:         0,
-			From:         "2021-06-11T09:41:21Z",
-			To:           "2021-06-25T09:40:12Z",
 			Data: []EventsSummaryResponse{
 				{
 					Id:        "evt_3nup2pts3emebenhtw6ky4frim",
@@ -184,8 +182,6 @@ func TestRetrieveEvents(t *testing.T) {
 				assert.NotNil(t, response.TotalCount)
 				assert.NotNil(t, response.Limit)
 				assert.NotNil(t, response.Skip)
-				assert.NotNil(t, response.From)
-				assert.NotNil(t, response.To)
 				assert.NotNil(t, response.Data)
 			},
 		},

@@ -414,6 +414,7 @@ type (
 		DOB           string `json:"dob"`
 		AccountNumber string `json:"account_number"`
 		ZIP           string `json:"zip"`
+		FirstName     string `json:"first_name"`
 		LastName      string `json:"last_name"`
 	}
 

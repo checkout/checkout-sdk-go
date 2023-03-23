@@ -77,6 +77,7 @@ type (
 		Card                   *CardInfo                 `json:"card,omitempty"`
 		Recurring              *Recurring                `json:"recurring,omitempty"`
 		Installment            *Installment              `json:"installment,omitempty"`
+		CustomerIp             string                    `json:"customer_ip,omitempty"`
 		AuthenticationDate     time.Time                 `json:"authentication_date,omitempty"`
 		Exemption              *ThreeDsExemption         `json:"exemption,omitempty"`
 		FlowType               common.ThreeDsFlowType    `json:"flow_type,omitempty"`
@@ -153,11 +154,12 @@ type (
 		ReferenceNumber           string                `json:"reference_number,omitempty"`
 		TransactionId             string                `json:"transaction_id,omitempty"`
 		OperatorId                string                `json:"operator_id,omitempty"`
+		Url                       string                `json:"url,omitempty"`
 		SignedContent             string                `json:"signed_content,omitempty"`
 		ChallengeMandated         bool                  `json:"challenge_mandated,omitempty"`
 		AuthenticationType        string                `json:"authentication_type,omitempty"`
 		ChallengeCancelReason     ChallengeCancelReason `json:"challenge_cancel_reason,omitempty"`
-		SessionInterface          SessionInterface      `json:"session_interface,omitempty"`
+		Interface                 SessionInterface      `json:"interface,omitempty"`
 		UiTemplate                channels.UIElements   `json:"ui_template,omitempty"`
 		ChallengeCancelReasonCode string                `json:"challenge_cancel_reason_code,omitempty"`
 	}

@@ -32,3 +32,23 @@ func (c *Client) RequestQuote(request QuoteRequest) (*QuoteResponse, error) {
 
 	return &response, nil
 }
+
+func (c *Client) GetRates(queryFilter RatesQuery) (*RatesResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(common.BuildPath(forex, rates), queryFilter)
+	if err != nil {
+		return nil, err
+	}
+
+	var response RatesResponse
+	err = c.apiClient.Get(url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

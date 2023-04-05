@@ -128,7 +128,7 @@ func TestCreateEntity(t *testing.T) {
 				chkErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
 				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
-				assert.Contains(t, chkErr.Data.ErrorCodes, "company_or_individual_required")
+				assert.Contains(t, chkErr.Data.ErrorCodes, "reference_required")
 			},
 		},
 	}

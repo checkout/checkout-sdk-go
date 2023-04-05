@@ -56,3 +56,49 @@ func TestRequestQuote(t *testing.T) {
 		})
 	}
 }
+
+func TestGetRates(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable")
+	cases := []struct {
+		name    string
+		request forex.RatesQuery
+		checker func(*forex.RatesResponse, error)
+	}{
+		{
+			name: "when request is correct then should request quote",
+			request: forex.RatesQuery{
+				Product:             "card_payouts",
+				Source:              forex.Visa,
+				CurrencyPairs:       "GBPEUR,USDNOK,JPNCAD",
+				ProcessingChannelId: "pc_a6dabcfa2o3ejghb3sjuotdzzy",
+			},
+			checker: func(response *forex.RatesResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotNil(t, response.Product)
+				assert.NotNil(t, response.Source)
+				assert.NotNil(t, response.Rates)
+			},
+		},
+		{
+			name:    "when request is not correct then return error",
+			request: forex.RatesQuery{},
+			checker: func(response *forex.RatesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "processing_error", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "product_required")
+			},
+		},
+	}
+
+	client := OAuthApi().Forex
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetRates(tc.request))
+		})
+	}
+}

@@ -22,6 +22,7 @@ type (
 	QueryFilter struct {
 		PaymentId       string `url:"payment_id,omitempty"`
 		ActionId        string `url:"action_id,omitempty"`
+		Reference       string `json:"reference,omitempty"`
 		Limit           int    `url:"limit,omitempty"`
 		PaginationToken string `url:"pagination_token,omitempty"`
 	}

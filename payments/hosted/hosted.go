@@ -44,7 +44,6 @@ type (
 		CaptureOn           time.Time                    `json:"capture_on,omitempty"`
 		//Not available on previous
 		ProcessingChannelId string                     `json:"processing_channel_id,omitempty"`
-		Marketplace         *common.MarketplaceData    `json:"marketplace,omitempty"`
 		AmountAllocations   []common.AmountAllocations `json:"amount_allocations,omitempty"`
 	}
 )

@@ -9,6 +9,14 @@ import (
 const (
 	forex  = "forex"
 	quotes = "quotes"
+	rates  = "rates"
+)
+
+type Source string
+
+const (
+	Visa       Source = "visa"
+	MasterCard Source = "mastercard"
 )
 
 type (
@@ -32,3 +40,24 @@ type (
 		IsSingleUse         bool                `json:"is_single_use,omitempty"`
 	}
 )
+
+type (
+	RatesQuery struct {
+		Product             string `url:"product,omitempty"`
+		Source              Source `url:"source,omitempty"`
+		CurrencyPairs       string `url:"currency_pairs,omitempty"`
+		ProcessingChannelId string `url:"processing_channel_id,omitempty"`
+	}
+
+	RatesResponse struct {
+		Product              string   `json:"product,omitempty"`
+		Source               Source   `json:"source,omitempty"`
+		Rates                []Rate   `json:"currency_pairs,omitempty"`
+		InvalidCurrencyPairs []string `json:"invalid_currency_pairs,omitempty"`
+	}
+)
+
+type Rate struct {
+	ExchangeRate float64 `json:"exchange_rate,omitempty"`
+	CurrencyPair string  `json:"currency_pair,omitempty"`
+}

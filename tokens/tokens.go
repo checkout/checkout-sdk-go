@@ -47,7 +47,7 @@ type (
 	}
 
 	GooglePayTokenData struct {
-		Signature       string `json:"data,omitempty"`
+		Signature       string `json:"signature,omitempty"`
 		ProtocolVersion string `json:"protocolVersion,omitempty"`
 		SignedMessage   string `json:"signedMessage,omitempty"`
 	}

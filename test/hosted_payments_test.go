@@ -145,7 +145,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 			{
 				Name:     "Gold Necklace",
 				Quantity: 1,
-				Price:    200,
+				Price:    1000,
 			},
 		},
 		Risk:       &payments.RiskRequest{Enabled: false},

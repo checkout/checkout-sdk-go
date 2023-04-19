@@ -19,7 +19,7 @@ var (
 	instrumentId   = "src_wmlfc3zyhqzehihu7giusaaawu"
 	email          = "bruce@wayne-enterprises.com"
 	name           = "Bruce Wayne"
-	instrumentType = instruments.Card
+	instrumentType = common.Card
 	customer       = common.CustomerResponse{
 		Email: email,
 		Name:  name,
@@ -46,7 +46,7 @@ func TestCreate(t *testing.T) {
 		{
 			name: "when request is correct then create instrument",
 			request: CreateInstrumentRequest{
-				Type:  instruments.Card,
+				Type:  common.Card,
 				Token: tokenId,
 				Customer: &InstrumentCustomerRequest{
 					Email: email,

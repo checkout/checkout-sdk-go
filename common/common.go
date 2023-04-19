@@ -178,6 +178,15 @@ type (
 	}
 )
 
+type InstrumentType string
+
+const (
+	Card        InstrumentType = "card"
+	BankAccount InstrumentType = "bank_account"
+	Token       InstrumentType = "token"
+	CardToken   InstrumentType = "card_token"
+)
+
 type (
 	InstrumentDetails struct {
 		Id                         string                      `json:"id,omitempty"`

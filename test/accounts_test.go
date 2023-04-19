@@ -13,7 +13,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/nas"
 )
 
@@ -735,7 +734,7 @@ func paymentInstrumentRequest(t *testing.T, entityId string, fileId string) stri
 
 	paymentInstrument := accounts.PaymentInstrumentRequest{
 		Label:              "Barclays",
-		Type:               instruments.BankAccount,
+		Type:               common.BankAccount,
 		Currency:           common.GBP,
 		Country:            common.GB,
 		DefaultDestination: false,

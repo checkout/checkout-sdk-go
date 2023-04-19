@@ -22,25 +22,6 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 		checker        func(*transfers.TransferResponse, error)
 	}{
 		{
-			name: "when request is correct then create transfer of founds",
-			request: transfers.TransferRequest{
-				Reference:    "reference",
-				TransferType: transfers.Commission,
-				Source: &transfers.TransferSourceRequest{
-					Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-					Amount: 100,
-				},
-				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
-			},
-			checker: func(response *transfers.TransferResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
-				assert.NotNil(t, response.Id)
-				assert.NotNil(t, response.Status)
-			},
-		},
-		{
 			name: "when request is correct then create transfer of founds with idempotency key",
 			request: transfers.TransferRequest{
 				Reference:    "reference",
@@ -61,14 +42,35 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 			},
 		},
 		{
-			name:    "when request invalid then return error",
-			request: transfers.TransferRequest{},
+			name:           "when request invalid then return error",
+			request:        transfers.TransferRequest{},
+			idempotencyKey: &idempotencyKey,
 			checker: func(response *transfers.TransferResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
 				assert.Equal(t, "validation_error", chkErr.Data.ErrorType)
+			},
+		},
+		{
+			name: "when request without idempotency key then return error",
+			request: transfers.TransferRequest{
+				Reference:    "reference",
+				TransferType: transfers.Commission,
+				Source: &transfers.TransferSourceRequest{
+					Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
+					Amount: 100,
+				},
+				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+			},
+			checker: func(response *transfers.TransferResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "validation_error", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "idempotency_key_required")
 			},
 		},
 	}
@@ -127,7 +129,9 @@ func createTransferOfFounds(t *testing.T) *transfers.TransferResponse {
 		Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 	}
 
-	response, err := OAuthApi().Transfers.InitiateTransferOfFounds(req, nil)
+	idempotencyKey := uuid.New().String()
+
+	response, err := OAuthApi().Transfers.InitiateTransferOfFounds(req, &idempotencyKey)
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error creating transfer of founds - %s", err.Error()))
 	}

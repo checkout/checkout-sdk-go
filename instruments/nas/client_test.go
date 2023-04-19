@@ -10,7 +10,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/mocks"
 )
 
@@ -45,7 +44,7 @@ var (
 func TestCreate(t *testing.T) {
 	var (
 		token = CreateTokenInstrumentResponse{
-			Type:             instruments.Card,
+			Type:             common.Card,
 			Id:               "src_wmlfc3zyhqzehihu7giusaaawu",
 			CustomerResponse: &customerResponse,
 			ExpiryMonth:      6,
@@ -59,7 +58,7 @@ func TestCreate(t *testing.T) {
 		}
 
 		bankAccount = CreateBankAccountInstrumentResponse{
-			Type:             instruments.BankAccount,
+			Type:             common.BankAccount,
 			Id:               "src_wmlfc3zyhqzehihu7giusaaawu",
 			CustomerResponse: &customerResponse,
 			BankDetails:      &bank,
@@ -216,7 +215,7 @@ func getCreateBankAccountInstrumentRequest() *createBankAccountInstrumentRequest
 func TestGet(t *testing.T) {
 	var (
 		cardInstrument = GetCardInstrumentResponse{
-			Type:        instruments.Card,
+			Type:        common.Card,
 			Id:          "src_wmlfc3zyhqzehihu7giusaaawu",
 			ExpiryMonth: 6,
 			ExpiryYear:  2025,
@@ -472,7 +471,7 @@ func TestClientGetBankAccountFieldFormatting(t *testing.T) {
 func TestUpdate(t *testing.T) {
 	var (
 		updateCardResponse = UpdateCardInstrumentResponse{
-			Type:        instruments.Card,
+			Type:        common.Card,
 			Fingerprint: "smoua2sbuqhupeofwbe77n5nsm",
 		}
 

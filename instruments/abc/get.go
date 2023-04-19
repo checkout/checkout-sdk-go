@@ -8,7 +8,7 @@ import (
 type (
 	GetInstrumentResponse struct {
 		HttpMetadata  common.HttpMetadata
-		Type          instruments.InstrumentType              `json:"type,omitempty"`
+		Type          common.InstrumentType                   `json:"type,omitempty"`
 		Id            string                                  `json:"id,omitempty"`
 		Fingerprint   string                                  `json:"fingerprint,omitempty"`
 		ExpiryMonth   int                                     `json:"expiry_month,omitempty"`

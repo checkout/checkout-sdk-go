@@ -10,7 +10,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/mocks"
 )
 
@@ -411,7 +410,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 		}
 
 		paymentInstrument = PaymentInstrument{
-			Type:          instruments.Card,
+			Type:          common.Card,
 			Label:         "Peter's Personal Account",
 			AccountType:   common.Cash,
 			AccountNumber: "12345678",
@@ -561,7 +560,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 
 		paymentInstrumentRequest = PaymentInstrumentRequest{
 			Label:              "Bob's Bank Account",
-			Type:               instruments.BankAccount,
+			Type:               common.BankAccount,
 			Currency:           common.GBP,
 			Country:            common.GB,
 			DefaultDestination: true,

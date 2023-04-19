@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/instruments"
 )
 
 type (
 	UpdateInstrumentRequest interface{}
 
 	updateBankAccountInstrumentRequest struct {
-		Type                instruments.InstrumentType       `json:"type" binding:"required"`
+		Type                common.InstrumentType            `json:"type" binding:"required"`
 		AccountType         common.AccountType               `json:"account_type,omitempty"`
 		AccountNumber       string                           `json:"account_number,omitempty"`
 		BankCode            string                           `json:"bank_code,omitempty"`
@@ -28,7 +27,7 @@ type (
 	}
 
 	updateCardInstrumentRequest struct {
-		Type          instruments.InstrumentType    `json:"type" binding:"required"`
+		Type          common.InstrumentType         `json:"type" binding:"required"`
 		ExpiryMonth   int                           `json:"expiry_month" binding:"required"`
 		ExpiryYear    int                           `json:"expiry_year" binding:"required"`
 		Name          string                        `json:"name" binding:"required"`
@@ -37,26 +36,26 @@ type (
 	}
 
 	updateTokenInstrumentRequest struct {
-		Type  instruments.InstrumentType `json:"type" binding:"required"`
-		Token string                     `json:"account_number,omitempty"`
+		Type  common.InstrumentType `json:"type" binding:"required"`
+		Token string                `json:"account_number,omitempty"`
 	}
 )
 
 func NewUpdateBankAccountInstrumentRequest() *updateBankAccountInstrumentRequest {
 	return &updateBankAccountInstrumentRequest{
-		Type: instruments.BankAccount,
+		Type: common.BankAccount,
 	}
 }
 
 func NewUpdateCardInstrumentRequest() *updateCardInstrumentRequest {
 	return &updateCardInstrumentRequest{
-		Type: instruments.Card,
+		Type: common.Card,
 	}
 }
 
 func NewUpdateTokenInstrumentRequest() *updateTokenInstrumentRequest {
 	return &updateTokenInstrumentRequest{
-		Type: instruments.Token,
+		Type: common.Token,
 	}
 }
 
@@ -70,16 +69,16 @@ type (
 
 	// UpdateCardInstrumentResponse TODO review this response struct to check if we need both
 	UpdateCardInstrumentResponse struct {
-		Type        instruments.InstrumentType `json:"type" binding:"required"`
-		Id          string                     `json:"id,omitempty"`
-		Fingerprint string                     `json:"fingerprint,omitempty"`
+		Type        common.InstrumentType `json:"type" binding:"required"`
+		Id          string                `json:"id,omitempty"`
+		Fingerprint string                `json:"fingerprint,omitempty"`
 	}
 
 	// UpdateBankAccountInstrumentResponse TODO review this response struct to check if we need both
 	UpdateBankAccountInstrumentResponse struct {
-		Type        instruments.InstrumentType `json:"type" binding:"required"`
-		Id          string                     `json:"id,omitempty"`
-		Fingerprint string                     `json:"fingerprint,omitempty"`
+		Type        common.InstrumentType `json:"type" binding:"required"`
+		Id          string                `json:"id,omitempty"`
+		Fingerprint string                `json:"fingerprint,omitempty"`
 	}
 )
 
@@ -90,13 +89,13 @@ func (s *UpdateInstrumentResponse) UnmarshalJSON(data []byte) error {
 	}
 
 	switch typeMapping.Type {
-	case string(instruments.BankAccount):
+	case string(common.BankAccount):
 		var response UpdateBankAccountInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
 			return nil
 		}
 		s.UpdateBankAccountInstrumentResponse = &response
-	case string(instruments.Card):
+	case string(common.Card):
 		var response UpdateCardInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
 			return nil

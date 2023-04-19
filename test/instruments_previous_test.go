@@ -9,7 +9,6 @@ import (
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/instruments/abc"
 	"github.com/checkout/checkout-sdk-go/tokens"
 )
@@ -29,7 +28,7 @@ func TestGetInstrumentPrevious(t *testing.T) {
 			checker: func(response *abc.GetInstrumentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
-				assert.Equal(t, instruments.Card, response.Type)
+				assert.Equal(t, common.Card, response.Type)
 				assert.NotEmpty(t, response.Id)
 				assert.NotEmpty(t, response.Fingerprint)
 				assert.NotEmpty(t, response.ExpiryMonth)
@@ -81,13 +80,13 @@ func TestUpdateInstrumentPrevious(t *testing.T) {
 			checkerUpdate: func(response *abc.UpdateInstrumentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
-				assert.Equal(t, instruments.Card, response.Type)
+				assert.Equal(t, common.Card, response.Type)
 				assert.NotEmpty(t, response.Fingerprint)
 			},
 			checkerGet: func(response *abc.GetInstrumentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
-				assert.Equal(t, instruments.Card, response.Type)
+				assert.Equal(t, common.Card, response.Type)
 				assert.Equal(t, 12, response.ExpiryMonth)
 				assert.Equal(t, 2026, response.ExpiryYear)
 				assert.Equal(t, "New Name", response.Name)
@@ -144,7 +143,7 @@ func TestDeleteInstrumentPrevious(t *testing.T) {
 
 func createTokenInstrumentPrevious(t *testing.T, token *tokens.CardTokenResponse) *abc.CreateInstrumentResponse {
 	request := abc.CreateInstrumentRequest{
-		Type:  instruments.Token,
+		Type:  common.Token,
 		Token: token.Token,
 		Customer: &abc.InstrumentCustomerRequest{
 			Email:     Email,
@@ -166,7 +165,7 @@ func createTokenInstrumentPrevious(t *testing.T, token *tokens.CardTokenResponse
 func testCreateInstrument(t *testing.T, err error, response *abc.CreateInstrumentResponse) {
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
-	assert.Equal(t, instruments.Card, response.Type)
+	assert.Equal(t, common.Card, response.Type)
 	assert.NotEmpty(t, response.Id)
 	assert.NotEmpty(t, response.Fingerprint)
 	assert.NotEmpty(t, response.ExpiryMonth)

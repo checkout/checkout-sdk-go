@@ -21,7 +21,7 @@ type (
 	}
 
 	GetCardInstrumentResponse struct {
-		Type          instruments.InstrumentType              `json:"type" binding:"required"`
+		Type          common.InstrumentType                   `json:"type" binding:"required"`
 		Id            string                                  `json:"id,omitempty"`
 		Fingerprint   string                                  `json:"fingerprint,omitempty"`
 		Customer      *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
@@ -43,7 +43,7 @@ type (
 	}
 
 	GetBankAccountInstrumentResponse struct {
-		Type          instruments.InstrumentType              `json:"type" binding:"required"`
+		Type          common.InstrumentType                   `json:"type" binding:"required"`
 		Id            string                                  `json:"id,omitempty"`
 		Fingerprint   string                                  `json:"fingerprint,omitempty"`
 		Customer      *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
@@ -102,13 +102,13 @@ func (s *GetInstrumentResponse) UnmarshalJSON(data []byte) error {
 	}
 
 	switch typeMapping.Type {
-	case string(instruments.BankAccount):
+	case string(common.BankAccount):
 		var response GetBankAccountInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
 			return nil
 		}
 		s.GetBankAccountInstrumentResponse = &response
-	case string(instruments.Card):
+	case string(common.Card):
 		var response GetCardInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
 			return nil

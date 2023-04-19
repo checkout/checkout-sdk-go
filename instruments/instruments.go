@@ -6,14 +6,6 @@ const Path = "instruments"
 
 const ValidationPath = "validation/bank-accounts"
 
-type InstrumentType string
-
-const (
-	Card        InstrumentType = "card"
-	BankAccount InstrumentType = "bank_account"
-	Token       InstrumentType = "token"
-)
-
 type InstrumentCustomerResponse struct {
 	Id      string        `json:"id,omitempty"`
 	Email   string        `json:"email,omitempty"`

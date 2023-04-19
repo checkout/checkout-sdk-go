@@ -8,7 +8,6 @@ import (
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/instruments"
 	"github.com/checkout/checkout-sdk-go/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/tokens"
 )
@@ -29,7 +28,7 @@ func TestCreateAndGetInstrument(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				getCardInstrumentResponse := response.GetCardInstrumentResponse
-				assert.Equal(t, instruments.Card, getCardInstrumentResponse.Type)
+				assert.Equal(t, common.Card, getCardInstrumentResponse.Type)
 				assert.NotEmpty(t, getCardInstrumentResponse.Id)
 				assert.NotEmpty(t, getCardInstrumentResponse.Fingerprint)
 				assert.NotEmpty(t, getCardInstrumentResponse.AccountHolder)
@@ -72,7 +71,7 @@ func TestShouldGetInstrument(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				getCardInstrumentResponse := response.GetCardInstrumentResponse
-				assert.Equal(t, instruments.Card, getCardInstrumentResponse.Type)
+				assert.Equal(t, common.Card, getCardInstrumentResponse.Type)
 				assert.NotEmpty(t, getCardInstrumentResponse.Id)
 				assert.NotEmpty(t, getCardInstrumentResponse.Fingerprint)
 				assert.NotEmpty(t, getCardInstrumentResponse.AccountHolder)
@@ -227,7 +226,7 @@ func createTokenInstrument(t *testing.T, token *tokens.CardTokenResponse) *nas.C
 	response, err := DefaultApi().Instruments.Create(request)
 	assert.Nil(t, err)
 	assert.NotNil(t, response.CreateTokenInstrumentResponse)
-	assert.Equal(t, instruments.Card, response.CreateTokenInstrumentResponse.Type)
+	assert.Equal(t, common.Card, response.CreateTokenInstrumentResponse.Type)
 	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Id)
 	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Fingerprint)
 	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.ExpiryMonth)

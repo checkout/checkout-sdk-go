@@ -2,7 +2,6 @@ package abc
 
 import (
 	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/instruments"
 )
 
 type (
@@ -16,8 +15,8 @@ type (
 
 	UpdateInstrumentResponse struct {
 		HttpMetadata common.HttpMetadata
-		Type         instruments.InstrumentType `json:"type" binding:"required"`
-		Fingerprint  string                     `json:"fingerprint,omitempty"`
+		Type         common.InstrumentType `json:"type" binding:"required"`
+		Fingerprint  string                `json:"fingerprint,omitempty"`
 	}
 )
 

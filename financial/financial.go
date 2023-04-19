@@ -69,7 +69,7 @@ type (
 		ProcessingCurrency                    common.Currency `json:"processing_currency,omitempty"`
 		ProcessingCurrencyAmount              float64         `json:"processing_currency_amount,omitempty"`
 		TransactionCurrency                   common.Currency `json:"transaction_currency,omitempty"`
-		TransactionCurrencyAccount            float64         `json:"transaction_currency_account,omitempty"`
+		TransactionCurrencyAmount             float64         `json:"transaction_currency_amount,omitempty"`
 		ProcessingToTransactionCurrencyFxRate float64         `json:"processing_to_transaction_currency_fx_rate,omitempty"`
 		TransactionToHoldingCurrencyFxRate    float64         `json:"transaction_to_holding_currency_fx_rate,omitempty"`
 		FeeDetail                             string          `json:"fee_detail,omitempty"`

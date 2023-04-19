@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 
 	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/instruments"
 )
 
 type (
 	CreateInstrumentRequest interface{}
 
 	createBankAccountInstrumentRequest struct {
-		Type                instruments.InstrumentType       `json:"type" binding:"required"`
+		Type                common.InstrumentType            `json:"type" binding:"required"`
 		AccountType         common.AccountType               `json:"account_type,omitempty"`
 		AccountNumber       string                           `json:"account_number,omitempty"`
 		BankCode            string                           `json:"bank_code,omitempty"`
@@ -28,7 +27,7 @@ type (
 	}
 
 	createTokenInstrumentRequest struct {
-		Type          instruments.InstrumentType       `json:"type" binding:"required"`
+		Type          common.InstrumentType            `json:"type" binding:"required"`
 		Token         string                           `json:"token" binding:"required"`
 		AccountHolder *common.AccountHolder            `json:"account_holder" binding:"required"`
 		Customer      *CreateCustomerInstrumentRequest `json:"customer,omitempty"`
@@ -37,13 +36,13 @@ type (
 
 func NewCreateBankAccountInstrumentRequest() *createBankAccountInstrumentRequest {
 	return &createBankAccountInstrumentRequest{
-		Type: instruments.BankAccount,
+		Type: common.BankAccount,
 	}
 }
 
 func NewCreateTokenInstrumentRequest() *createTokenInstrumentRequest {
 	return &createTokenInstrumentRequest{
-		Type: instruments.Token,
+		Type: common.Token,
 	}
 }
 
@@ -56,7 +55,7 @@ type (
 	}
 
 	CreateBankAccountInstrumentResponse struct {
-		Type instruments.InstrumentType `json:"type" binding:"required"`
+		Type common.InstrumentType `json:"type" binding:"required"`
 		// common
 		Id               string                   `json:"id,omitempty"`
 		Fingerprint      string                   `json:"fingerprint,omitempty"`
@@ -70,7 +69,7 @@ type (
 	}
 
 	CreateTokenInstrumentResponse struct {
-		Type instruments.InstrumentType `json:"type" binding:"required"`
+		Type common.InstrumentType `json:"type" binding:"required"`
 		// common
 		Id               string                   `json:"id,omitempty"`
 		Fingerprint      string                   `json:"fingerprint,omitempty"`
@@ -98,13 +97,13 @@ func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
 	}
 
 	switch typeMapping.Type {
-	case string(instruments.BankAccount):
+	case string(common.BankAccount):
 		var response CreateBankAccountInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
 			return nil
 		}
 		s.CreateBankAccountInstrumentResponse = &response
-	case string(instruments.Card):
+	case string(common.Card):
 		var response CreateTokenInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
 			return nil

@@ -122,13 +122,15 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 
 func TestRetrieveTransfer(t *testing.T) {
 	var (
+		now = time.Now()
+
 		transferDetails = TransferDetails{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Id:           "tra_y3oqhf46pyzuxjbcn2giaqnb4",
 			Reference:    "superhero1234",
 			Status:       "rejected",
 			TransferType: Commission,
-			RequestedOn:  time.Now(),
+			RequestedOn:  &now,
 			ReasonCodes: []string{"destination_transfers_capability_disabled",
 				"source_and_destination_currency_accounts_must_be_different",
 			},

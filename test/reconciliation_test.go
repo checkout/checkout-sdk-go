@@ -35,8 +35,8 @@ func TestQueryPaymentsReport(t *testing.T) {
 		{
 			name: "when query is correct then return payment reports",
 			query: reconciliation.PaymentReportsQuery{
-				From:  from,
-				To:    to,
+				From:  &from,
+				To:    &to,
 				Limit: 10,
 			},
 			checker: func(response *reconciliation.PaymentReportsResponse, err error) {
@@ -107,8 +107,8 @@ func TestQueryStatementsReport(t *testing.T) {
 		{
 			name: "when query is correct then return statements reports",
 			query: common.DateRangeQuery{
-				From: from,
-				To:   to,
+				From: &from,
+				To:   &to,
 			},
 			checker: func(response *reconciliation.StatementReportsResponse, err error) {
 				assert.Nil(t, err)
@@ -139,8 +139,8 @@ func TestRetrieveCVSPaymentsReport(t *testing.T) {
 		{
 			name: "when query is correct then return payment reports",
 			query: common.DateRangeQuery{
-				From: from,
-				To:   to,
+				From: &from,
+				To:   &to,
 			},
 			checker: func(response *common.ContentResponse, err error) {
 				assert.Nil(t, err)
@@ -200,8 +200,8 @@ func TestRetrieveCVSStatementsReport(t *testing.T) {
 		{
 			name: "when query is correct then return statement reports",
 			query: common.DateRangeQuery{
-				From: from,
-				To:   to,
+				From: &from,
+				To:   &to,
 			},
 			checker: func(response *common.ContentResponse, err error) {
 				assert.Nil(t, err)

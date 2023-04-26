@@ -35,12 +35,15 @@ func TestQuery(t *testing.T) {
 
 		disputesList = []DisputeSummary{dispute}
 
+		from = time.Now().Add(-5 * time.Hour)
+		to   = time.Now()
+
 		queryResponse = QueryResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Limit:        10,
 			Skip:         0,
-			From:         time.Now().Add(-5 * time.Hour),
-			To:           time.Now(),
+			From:         &from,
+			To:           &to,
 			TotalCount:   1,
 			Data:         disputesList,
 		}
@@ -64,8 +67,8 @@ func TestQuery(t *testing.T) {
 			query: QueryFilter{
 				Limit: 10,
 				Skip:  0,
-				From:  time.Now().Add(-5 * time.Hour),
-				To:    time.Now(),
+				From:  &from,
+				To:    &to,
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).

@@ -95,7 +95,7 @@ type (
 		ThreeDs         *payments.ThreeDsEnrollment `json:"3ds,omitempty"`
 		Source          *abc.ResponseCardSource     `json:"source,omitempty"`
 		Customer        *common.CustomerResponse    `json:"customer,omitempty"`
-		ProcessedOn     time.Time                   `json:"processed_on,omitempty"`
+		ProcessedOn     *time.Time                  `json:"processed_on,omitempty"`
 		Reference       string                      `json:"reference,omitempty"`
 		Metadata        map[string]interface{}      `json:"metadata,omitempty"`
 	}

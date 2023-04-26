@@ -40,7 +40,7 @@ type (
 		ReturnUrl           string                       `json:"return_url,omitempty"`
 		Locale              string                       `json:"locale,omitempty"`
 		Capture             bool                         `json:"capture,omitempty"`
-		CaptureOn           time.Time                    `json:"capture_on,omitempty"`
+		CaptureOn           *time.Time                   `json:"capture_on,omitempty"`
 		//Not available on previous
 		ProcessingChannelId string                     `json:"processing_channel_id,omitempty"`
 		AmountAllocations   []common.AmountAllocations `json:"amount_allocations,omitempty"`

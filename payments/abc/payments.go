@@ -19,7 +19,7 @@ type (
 		Reference         string                       `json:"reference,omitempty"`
 		Description       string                       `json:"description,omitempty"`
 		Capture           bool                         `json:"capture"`
-		CaptureOn         time.Time                    `json:"capture_on,omitempty"`
+		CaptureOn         *time.Time                   `json:"capture_on,omitempty"`
 		Customer          *common.CustomerRequest      `json:"customer,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
 		ShippingDetails   *payments.ShippingDetails    `json:"shipping,omitempty"`
@@ -43,7 +43,7 @@ type (
 		Reference         string                       `json:"reference,omitempty"`
 		Description       string                       `json:"description,omitempty"`
 		Capture           bool                         `json:"capture"`
-		CaptureOn         time.Time                    `json:"capture_on,omitempty"`
+		CaptureOn         *time.Time                   `json:"capture_on,omitempty"`
 		Customer          *common.CustomerRequest      `json:"customer,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
 		ShippingDetails   *payments.ShippingDetails    `json:"shipping,omitempty"`
@@ -83,7 +83,7 @@ type (
 		ResponseCode    string                      `json:"response_code,omitempty"`
 		ResponseSummary string                      `json:"response_summary,omitempty"`
 		Risk            *payments.RiskAssessment    `json:"risk,omitempty"`
-		ProcessedOn     time.Time                   `json:"processed_on,omitempty"`
+		ProcessedOn     *time.Time                  `json:"processed_on,omitempty"`
 		Processing      *payments.PaymentProcessing `json:"processing,omitempty"`
 		Eci             string                      `json:"eci,omitempty"`
 		SchemeId        string                      `json:"scheme_id,omitempty"`
@@ -93,7 +93,7 @@ type (
 	GetPaymentResponse struct {
 		HttpMetadata      common.HttpMetadata
 		Id                string                          `json:"id,omitempty"`
-		RequestedOn       time.Time                       `json:"requested_on,omitempty"`
+		RequestedOn       *time.Time                      `json:"requested_on,omitempty"`
 		Source            interface{}                     `json:"source,omitempty"`
 		Destination       interface{}                     `json:"destination,omitempty"`
 		Amount            int64                           `json:"amount,omitempty"`
@@ -125,7 +125,7 @@ type (
 	PaymentAction struct {
 		Id              string                 `json:"id,omitempty"`
 		Type            payments.ActionType    `json:"type,omitempty"`
-		ProcessedOn     time.Time              `json:"processed_on,omitempty"`
+		ProcessedOn     *time.Time             `json:"processed_on,omitempty"`
 		Amount          int64                  `json:"amount,omitempty"`
 		Approved        bool                   `json:"approved,omitempty"`
 		AuthCode        string                 `json:"auth_code,omitempty"`

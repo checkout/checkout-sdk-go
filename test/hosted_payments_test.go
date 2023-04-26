@@ -108,6 +108,8 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 }
 
 func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
+	now = time.Now()
+
 	return &hosted.HostedPaymentRequest{
 		Amount:      1000,
 		Currency:    common.GBP,
@@ -159,6 +161,6 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 			ChallengeIndicator: common.NoChallengeRequested,
 		},
 		Capture:   true,
-		CaptureOn: time.Now(),
+		CaptureOn: &now,
 	}
 }

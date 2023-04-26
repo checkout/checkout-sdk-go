@@ -226,7 +226,7 @@ type (
 		AllowUpgrade       bool                      `json:"allow_upgrade,omitempty"`
 		// Not available on Previous
 		Status                string                 `json:"status,omitempty"`
-		AuthenticationDate    time.Time              `json:"authentication_date,omitempty"`
+		AuthenticationDate    *time.Time             `json:"authentication_date,omitempty"`
 		AuthenticationAmount  float64                `json:"authentication_amount,omitempty"`
 		FlowType              common.ThreeDsFlowType `json:"flow_type,omitempty"`
 		StatusReasonCode      string                 `json:"status_reason_code,omitempty"`
@@ -391,7 +391,7 @@ type (
 	}
 )
 
-//Request
+// Request
 type (
 	RefundRequest struct {
 		Amount    int64                  `json:"amount,omitempty"`
@@ -413,7 +413,7 @@ type (
 	}
 )
 
-//Response
+// Response
 type (
 	CaptureResponse struct {
 		HttpMetadata common.HttpMetadata

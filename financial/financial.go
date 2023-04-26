@@ -56,8 +56,8 @@ type (
 		IssuerCountry        common.Country      `json:"issuer_country,omitempty"`
 		MerchantCategoryCode string              `json:"merchant_category_code,omitempty"`
 		FxTradeId            string              `json:"fx_trade_id,omitempty"`
-		ProcessedOn          time.Time           `json:"processed_on,omitempty"`
-		RequestedOn          time.Time           `json:"requested_on,omitempty"`
+		ProcessedOn          *time.Time          `json:"processed_on,omitempty"`
+		RequestedOn          *time.Time          `json:"requested_on,omitempty"`
 		Breakdown            []ActionBreakdown   `json:"breakdown,omitempty"`
 	}
 
@@ -74,8 +74,8 @@ type (
 		TransactionToHoldingCurrencyFxRate    float64         `json:"transaction_to_holding_currency_fx_rate,omitempty"`
 		FeeDetail                             string          `json:"fee_detail,omitempty"`
 		ReserveRate                           string          `json:"reserve_rate,omitempty"`
-		ReserveReleaseDate                    time.Time       `json:"reserve_release_date,omitempty"`
-		ReserveDeductedDate                   time.Time       `json:"reserve_deducted_date,omitempty"`
+		ReserveReleaseDate                    *time.Time      `json:"reserve_release_date,omitempty"`
+		ReserveDeductedDate                   *time.Time      `json:"reserve_deducted_date,omitempty"`
 		TaxFxRate                             float64         `json:"tax_fx_rate,omitempty"`
 		EntityCountryTaxCurrency              common.Currency `json:"entity_country_tax_currency,omitempty"`
 		TaxCurrencyAmount                     float64         `json:"tax_currency_amount,omitempty"`

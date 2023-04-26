@@ -249,7 +249,7 @@ type (
 
 type (
 	DateRangeQuery struct {
-		From time.Time `url:"from,omitempty" layout:"2006-01-02T15:04:05Z"`
-		To   time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
+		From *time.Time `url:"from,omitempty" layout:"2006-01-02T15:04:05Z"`
+		To   *time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
 	}
 )

@@ -78,7 +78,7 @@ type (
 		Recurring              *Recurring                `json:"recurring,omitempty"`
 		Installment            *Installment              `json:"installment,omitempty"`
 		CustomerIp             string                    `json:"customer_ip,omitempty"`
-		AuthenticationDate     time.Time                 `json:"authentication_date,omitempty"`
+		AuthenticationDate     *time.Time                `json:"authentication_date,omitempty"`
 		Exemption              *ThreeDsExemption         `json:"exemption,omitempty"`
 		FlowType               common.ThreeDsFlowType    `json:"flow_type,omitempty"`
 		ChallengeIndicator     common.ChallengeIndicator `json:"challenge_indicator,omitempty"`

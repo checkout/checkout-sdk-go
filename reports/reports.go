@@ -13,11 +13,11 @@ const (
 
 type (
 	QueryFilter struct {
-		CreatedAfter    time.Time `url:"created_after,omitempty" layout:"2006-01-02"`
-		CreatedBefore   time.Time `url:"created_before,omitempty" layout:"2006-01-02"`
-		EntityId        string    `url:"entity_id,omitempty"`
-		Limit           int       `url:"limit,omitempty"`
-		PaginationToken string    `url:"pagination_token,omitempty"`
+		CreatedAfter    *time.Time `url:"created_after,omitempty" layout:"2006-01-02"`
+		CreatedBefore   *time.Time `url:"created_before,omitempty" layout:"2006-01-02"`
+		EntityId        string     `url:"entity_id,omitempty"`
+		Limit           int        `url:"limit,omitempty"`
+		PaginationToken string     `url:"pagination_token,omitempty"`
 	}
 )
 
@@ -31,8 +31,8 @@ type (
 		Description    string                 `json:"description,omitempty"`
 		Account        *Account               `json:"account,omitempty"`
 		Tags           []string               `json:"tags,omitempty"`
-		From           time.Time              `json:"from,omitempty"`
-		To             time.Time              `json:"to,omitempty"`
+		From           *time.Time             `json:"from,omitempty"`
+		To             *time.Time             `json:"to,omitempty"`
 		Files          []File                 `json:"files,omitempty"`
 		Links          map[string]common.Link `json:"_links"`
 	}

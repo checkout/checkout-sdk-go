@@ -57,15 +57,15 @@ func TestQueryPrevious(t *testing.T) {
 			name: "when disputes match filters then return disputes",
 			request: disputes.QueryFilter{
 				Limit: 10,
-				From:  from,
-				To:    to,
+				From:  &from,
+				To:    &to,
 			},
 			checker: func(response *disputes.QueryResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Data)
-				assert.Equal(t, from, response.From)
-				assert.Equal(t, to, response.To)
+				assert.Equal(t, &from, response.From)
+				assert.Equal(t, &to, response.To)
 			},
 		},
 		{
@@ -523,14 +523,14 @@ func uploadDisputeFilePrevious(t *testing.T, fileRequest common.File) *common.Id
 
 func getDisputesPrevious(t *testing.T) *disputes.QueryResponse {
 	layout := "2006-01-02T15:04:05Z"
-	from, _ := time.Parse(layout, time.Now().AddDate(0, -1, 0).String())
+	from, _ := time.Parse(layout, time.Now().AddDate(0, -5, 0).Format(layout))
 	to, _ := time.Parse(layout, time.Now().Format(layout))
 
 	query := disputes.QueryFilter{
 		Limit:           1,
 		Skip:            0,
-		From:            from,
-		To:              to,
+		From:            &from,
+		To:              &to,
 		ThisChannelOnly: true,
 	}
 

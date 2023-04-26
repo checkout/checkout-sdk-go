@@ -15,10 +15,10 @@ const (
 
 type (
 	PaymentReportsQuery struct {
-		From      time.Time `url:"from,omitempty" layout:"2006-01-02T15:04:05Z"`
-		To        time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
-		Reference string    `url:"reference,omitempty"`
-		Limit     int       `url:"limit,omitempty"`
+		From      *time.Time `url:"from,omitempty" layout:"2006-01-02T15:04:05Z"`
+		To        *time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
+		Reference string     `url:"reference,omitempty"`
+		Limit     int        `url:"limit,omitempty"`
 	}
 
 	PaymentReportsResponse struct {

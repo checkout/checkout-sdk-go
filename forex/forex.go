@@ -36,7 +36,7 @@ type (
 		DestinationCurrency common.Currency     `json:"destination_currency,omitempty"`
 		DestinationAmount   int64               `json:"destination_amount,omitempty"`
 		Rate                float64             `json:"rate,omitempty"`
-		ExpiresOn           time.Time           `json:"expires_on,omitempty"`
+		ExpiresOn           *time.Time          `json:"expires_on,omitempty"`
 		IsSingleUse         bool                `json:"is_single_use,omitempty"`
 	}
 )

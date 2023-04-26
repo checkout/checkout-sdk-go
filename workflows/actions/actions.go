@@ -83,7 +83,7 @@ type WebhookAction struct {
 
 type WorkflowActionInvocation struct {
 	InvocationId string                 `json:"invocation_id,omitempty"`
-	Timestamp    time.Time              `json:"timestamp,omitempty"`
+	Timestamp    *time.Time             `json:"timestamp,omitempty"`
 	Retry        bool                   `json:"retry,omitempty"`
 	Succeeded    bool                   `json:"succeeded,omitempty"`
 	FinalAttempt bool                   `json:"final,omitempty"`

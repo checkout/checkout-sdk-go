@@ -66,7 +66,7 @@ type (
 		HttpMetadata   common.HttpMetadata
 		Type           TokenType           `json:"type,omitempty"`
 		Token          string              `json:"token" binding:"required"`
-		ExpiresOn      time.Time           `json:"expires_on,omitempty"`
+		ExpiresOn      *time.Time          `json:"expires_on,omitempty"`
 		ExpiryMonth    int                 `json:"expiry_month,omitempty"`
 		ExpiryYear     int                 `json:"expiry_year,omitempty"`
 		Scheme         string              `json:"scheme,omitempty"`

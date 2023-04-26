@@ -108,6 +108,8 @@ func TestGetPaymentLink(t *testing.T) {
 }
 
 func getPaymentLinkRequest() *links.PaymentLinkRequest {
+	now = time.Now()
+
 	return &links.PaymentLinkRequest{
 		Amount:      200,
 		Currency:    common.GBP,
@@ -142,7 +144,7 @@ func getPaymentLinkRequest() *links.PaymentLinkRequest {
 		},
 		Processing: &payments.ProcessingSettings{Aft: true},
 		Capture:    true,
-		CaptureOn:  time.Now(),
+		CaptureOn:  &now,
 		Products: []payments.Product{
 			{
 				Name:     "Gold Necklace",

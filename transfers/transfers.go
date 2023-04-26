@@ -62,7 +62,7 @@ type (
 		Reference    string                       `json:"reference,omitempty"`
 		Status       string                       `json:"status,omitempty"`
 		TransferType TransferType                 `json:"transfer_type,omitempty"`
-		RequestedOn  time.Time                    `json:"requested_on,omitempty"`
+		RequestedOn  *time.Time                   `json:"requested_on,omitempty"`
 		ReasonCodes  []string                     `json:"reason_codes,omitempty"`
 		Source       *TransferSourceResponse      `json:"source,omitempty"`
 		Destination  *TransferDestinationResponse `json:"destination,omitempty"`

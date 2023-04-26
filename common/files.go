@@ -51,7 +51,7 @@ type (
 		Filename     string          `json:"filename,omitempty"`
 		Purpose      Purpose         `json:"purpose,omitempty"`
 		Size         uint64          `json:"size,omitempty"`
-		UploadedOn   time.Time       `json:"uploaded_on,omitempty"`
+		UploadedOn   *time.Time      `json:"uploaded_on,omitempty"`
 		Links        map[string]Link `json:"_links"`
 	}
 )

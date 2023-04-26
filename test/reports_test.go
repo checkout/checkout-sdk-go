@@ -38,8 +38,8 @@ func TestGetAllReports(t *testing.T) {
 			name: "when reports match filters then return reports",
 			request: reports.QueryFilter{
 				Limit:         10,
-				CreatedAfter:  from,
-				CreatedBefore: to,
+				CreatedAfter:  &from,
+				CreatedBefore: &to,
 			},
 			checker: func(response *reports.QueryResponse, err error) {
 				assert.Nil(t, err)
@@ -171,8 +171,8 @@ func getReportId(t *testing.T) *reports.ReportResponse {
 	)
 
 	query := reports.QueryFilter{
-		CreatedAfter:  from,
-		CreatedBefore: to,
+		CreatedAfter:  &from,
+		CreatedBefore: &to,
 		Limit:         10,
 	}
 

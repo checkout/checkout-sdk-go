@@ -82,7 +82,7 @@ type (
 		CustomerProfileId string              `json:"customer_profile_id,omitempty"`
 		CustomerEmail     string              `json:"customer_email,omitempty"`
 		CustomerMobile    string              `json:"customer_mobile,omitempty"`
-		ExpiresOn         time.Time           `json:"expires_on,omitempty"`
+		ExpiresOn         *time.Time          `json:"expires_on,omitempty"`
 		Products          []FawryProduct      `json:"Products,omitempty"`
 	}
 

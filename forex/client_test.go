@@ -16,6 +16,8 @@ import (
 
 func TestRequestQuote(t *testing.T) {
 	var (
+		now = time.Now()
+
 		quote = QuoteResponse{
 			HttpMetadata:        mocks.HttpMetadataStatusOk,
 			Id:                  "qte_id",
@@ -24,7 +26,7 @@ func TestRequestQuote(t *testing.T) {
 			DestinationCurrency: common.USD,
 			DestinationAmount:   35700,
 			Rate:                1.19,
-			ExpiresOn:           time.Now(),
+			ExpiresOn:           &now,
 			IsSingleUse:         false,
 		}
 	)

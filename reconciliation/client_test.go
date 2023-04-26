@@ -16,6 +16,9 @@ import (
 
 func TestQueryPaymentsReport(t *testing.T) {
 	var (
+		from = time.Now().Add(-5 * time.Hour)
+		to   = time.Now()
+
 		reportData = PaymentReportData{
 			Id:                 "pay_1234",
 			ProcessingCurrency: common.USD,
@@ -41,8 +44,8 @@ func TestQueryPaymentsReport(t *testing.T) {
 		{
 			name: "when query is correct then return payment reports",
 			query: PaymentReportsQuery{
-				From:      time.Now().Add(-5 * time.Hour),
-				To:        time.Now(),
+				From:      &from,
+				To:        &to,
 				Reference: "ORD-5023-4E89",
 				Limit:     10,
 			},
@@ -208,6 +211,9 @@ func TestGetSinglePaymentReport(t *testing.T) {
 
 func TestQueryStatementsReport(t *testing.T) {
 	var (
+		from = time.Now().Add(-5 * time.Hour)
+		to   = time.Now()
+
 		reportData = StatementReportsData{
 			Id:          "190110B107654",
 			PeriodStart: "2023-01-09T00:00:00.000",
@@ -238,8 +244,8 @@ func TestQueryStatementsReport(t *testing.T) {
 		{
 			name: "when query is correct then return statement reports",
 			query: common.DateRangeQuery{
-				From: time.Now().Add(-5 * time.Hour),
-				To:   time.Now(),
+				From: &from,
+				To:   &to,
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -298,6 +304,9 @@ func TestQueryStatementsReport(t *testing.T) {
 
 func TestRetrieveCVSPaymentsReport(t *testing.T) {
 	var (
+		from = time.Now().Add(-5 * time.Hour)
+		to   = time.Now()
+
 		contentResponse = common.ContentResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Content:      "content",
@@ -314,8 +323,8 @@ func TestRetrieveCVSPaymentsReport(t *testing.T) {
 		{
 			name: "when query is correct then return payment reports content",
 			query: common.DateRangeQuery{
-				From: time.Now().Add(-5 * time.Hour),
-				To:   time.Now(),
+				From: &from,
+				To:   &to,
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -470,6 +479,9 @@ func TestRetrieveCVSSingleStatementReport(t *testing.T) {
 
 func TestRetrieveCVSStatementsReport(t *testing.T) {
 	var (
+		from = time.Now().Add(-5 * time.Hour)
+		to   = time.Now()
+
 		contentResponse = common.ContentResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Content:      "content",
@@ -486,8 +498,8 @@ func TestRetrieveCVSStatementsReport(t *testing.T) {
 		{
 			name: "when query is correct then return statement reports content",
 			query: common.DateRangeQuery{
-				From: time.Now().Add(-5 * time.Hour),
-				To:   time.Now(),
+				From: &from,
+				To:   &to,
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).

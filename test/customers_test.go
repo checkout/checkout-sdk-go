@@ -58,7 +58,9 @@ func TestCreateCustomer(t *testing.T) {
 }
 
 func TestGetCustomer(t *testing.T) {
-	custId := createCustomerDefault()
+	cardTokenResponse := RequestCardToken(t)
+	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
+	custId := createCustomerDefault(tokenInstrument.Id)
 
 	cases := []struct {
 		name       string
@@ -72,6 +74,8 @@ func TestGetCustomer(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Instruments)
+				assert.Equal(t, tokenInstrument.Id, response.Instruments[0].GetCardInstrumentResponse.Id)
 				assert.Equal(t, custId, response.Id)
 			},
 		},
@@ -95,7 +99,9 @@ func TestGetCustomer(t *testing.T) {
 }
 
 func TestUpdateCustomer(t *testing.T) {
-	custId := createCustomerDefault()
+	cardTokenResponse := RequestCardToken(t)
+	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
+	custId := createCustomerDefault(tokenInstrument.Id)
 
 	cases := []struct {
 		name       string
@@ -140,7 +146,9 @@ func TestUpdateCustomer(t *testing.T) {
 }
 
 func TestDeleteCustomer(t *testing.T) {
-	custId := createCustomerDefault()
+	cardTokenResponse := RequestCardToken(t)
+	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
+	custId := createCustomerDefault(tokenInstrument.Id)
 
 	cases := []struct {
 		name       string
@@ -177,11 +185,12 @@ func TestDeleteCustomer(t *testing.T) {
 	}
 }
 
-func createCustomerDefault() string {
+func createCustomerDefault(instrumentId string) string {
 	request := customers.CustomerRequest{
-		Email: GenerateRandomEmail(),
-		Name:  Name,
-		Phone: Phone(),
+		Email:     GenerateRandomEmail(),
+		Name:      Name,
+		Phone:     Phone(),
+		DefaultId: instrumentId,
 	}
 	response, _ := DefaultApi().Customers.Create(request)
 

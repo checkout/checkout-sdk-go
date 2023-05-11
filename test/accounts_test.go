@@ -88,6 +88,11 @@ func TestSubmitFileAccounts(t *testing.T) {
 }
 
 func TestCreateEntity(t *testing.T) {
+	var (
+		reference = GenerateRandomReference()
+		entityId  = createEntity(t, &reference)
+	)
+
 	cases := []struct {
 		name    string
 		request accounts.OnboardEntityRequest
@@ -119,6 +124,34 @@ func TestCreateEntity(t *testing.T) {
 			},
 		},
 		{
+			name: "when entity already exists then return error",
+			request: accounts.OnboardEntityRequest{
+				Reference:      reference,
+				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
+				Profile: &accounts.Profile{
+					Urls: []string{"https://www.superheroexample.com"},
+					Mccs: []string{"0742"},
+				},
+				Individual: &accounts.Individual{
+					FirstName:         "Bruce",
+					LastName:          "Wayne",
+					TradingName:       "Batman's Super Hero Masks",
+					NationalTaxId:     "TAX123456",
+					RegisteredAddress: Address(),
+					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
+					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
+				},
+			},
+			checker: func(response *accounts.OnboardEntityResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusConflict, chkErr.StatusCode)
+				assert.Equal(t, entityId, chkErr.Data.Id)
+				assert.NotNil(t, chkErr.Data.Links)
+			},
+		},
+		{
 			name:    "when request is not correct then return error",
 			request: accounts.OnboardEntityRequest{},
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
@@ -143,7 +176,7 @@ func TestCreateEntity(t *testing.T) {
 
 func TestGetEntity(t *testing.T) {
 	var (
-		entityId = createEntity(t)
+		entityId = createEntity(t, nil)
 	)
 
 	cases := []struct {
@@ -183,7 +216,7 @@ func TestGetEntity(t *testing.T) {
 
 func TestUpdateEntity(t *testing.T) {
 	var (
-		entityId = createEntity(t)
+		entityId = createEntity(t, nil)
 	)
 
 	cases := []struct {
@@ -641,9 +674,16 @@ func TestGetPayoutSchedule(t *testing.T) {
 	}
 }
 
-func createEntity(t *testing.T) string {
+func createEntity(t *testing.T, inputReference *string) string {
+	var reference string
+	if inputReference == nil {
+		reference = GenerateRandomReference()
+	} else {
+		reference = *inputReference
+	}
+
 	r := accounts.OnboardEntityRequest{
-		Reference:      GenerateRandomReference(),
+		Reference:      reference,
 		ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
 		Profile: &accounts.Profile{
 			Urls: []string{"https://www.superheroexample.com"},

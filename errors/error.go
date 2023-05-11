@@ -3,9 +3,11 @@ package errors
 import "fmt"
 
 type ErrorDetails struct {
-	RequestID  string   `json:"request_id,omitempty"`
-	ErrorType  string   `json:"error_type,omitempty"`
-	ErrorCodes []string `json:"error_codes,omitempty"`
+	RequestID  string                 `json:"request_id,omitempty"`
+	ErrorType  string                 `json:"error_type,omitempty"`
+	ErrorCodes []string               `json:"error_codes,omitempty"`
+	Id         string                 `json:"id,omitempty"`
+	Links      map[string]interface{} `json:"_links,omitempty"`
 }
 
 type (

@@ -318,17 +318,18 @@ type (
 	}
 
 	ThreeDsData struct {
-		Downgraded             bool      `json:"downgraded,omitempty"`
-		Enrolled               string    `json:"enrolled,omitempty"`
-		UpgradeReason          string    `json:"upgrade_reason,omitempty"`
-		SignatureValid         string    `json:"signature_valid,omitempty"`
-		AuthenticationResponse string    `json:"authentication_response,omitempty"`
-		Cryptogram             string    `json:"cryptogram,omitempty"`
-		Xid                    string    `json:"xid,omitempty"`
-		Version                string    `json:"version,omitempty"`
-		Exemption              Exemption `json:"exemption,omitempty"`
-		ExemptionApplied       string    `json:"exemption_applied,omitempty"`
-		Challenged             bool      `json:"challenged,omitempty"`
+		Downgraded                 bool      `json:"downgraded,omitempty"`
+		Enrolled                   string    `json:"enrolled,omitempty"`
+		UpgradeReason              string    `json:"upgrade_reason,omitempty"`
+		SignatureValid             string    `json:"signature_valid,omitempty"`
+		AuthenticationResponse     string    `json:"authentication_response,omitempty"`
+		AuthenticationStatusReason string    `json:"authentication_status_reason,omitempty"`
+		Cryptogram                 string    `json:"cryptogram,omitempty"`
+		Xid                        string    `json:"xid,omitempty"`
+		Version                    string    `json:"version,omitempty"`
+		Exemption                  Exemption `json:"exemption,omitempty"`
+		ExemptionApplied           string    `json:"exemption_applied,omitempty"`
+		Challenged                 bool      `json:"challenged,omitempty"`
 	}
 
 	PaymentActionSummary struct {

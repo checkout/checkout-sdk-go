@@ -44,4 +44,8 @@ const (
 	VaultCardMetadata           = "vault:card-metadata"
 	FinancialActions            = "financial-actions"
 	FinancialActionsView        = "financial-actions:view"
+	IssuingClient               = "issuing:client"
+	IssuingCardMgmt             = "issuing:card-mgmt"
+	IssuingControlsRead         = "issuing:controls-read"
+	IssuingControlsWrite        = "issuing:controls-write"
 )

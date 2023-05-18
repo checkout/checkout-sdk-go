@@ -13,22 +13,22 @@ const (
 	paymentInstrumentsPath = "payment-instruments"
 )
 
+type AccountHolderIdentificationType string
+
+const (
+	Passport            AccountHolderIdentificationType = "passport"
+	DrivingLicence      AccountHolderIdentificationType = "driving_licence"
+	NationalId          AccountHolderIdentificationType = "national_id"
+	CompanyRegistration AccountHolderIdentificationType = "company_registration"
+	TaxId               AccountHolderIdentificationType = "tax_id"
+)
+
 type AccountHolderType string
 
 const (
 	IndividualType AccountHolderType = "individual"
 	Corporate      AccountHolderType = "corporate"
 	Government     AccountHolderType = "government"
-)
-
-type AccountHolderIdentificationType string
-
-const (
-	PassportType        AccountHolderIdentificationType = "passport"
-	DrivingLicence      AccountHolderIdentificationType = "driving_licence"
-	NationalId          AccountHolderIdentificationType = "national_id"
-	CompanyRegistration AccountHolderIdentificationType = "company_registration"
-	TaxId               AccountHolderIdentificationType = "tax_id"
 )
 
 type (

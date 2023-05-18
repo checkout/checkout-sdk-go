@@ -65,9 +65,9 @@ type (
 	}
 
 	Document struct {
-		Type  DocumentType `json:"type,omitempty"`
-		Front string       `json:"front,omitempty"`
-		Back  string       `json:"back,omitempty"`
+		Type  common.DocumentType `json:"type,omitempty"`
+		Front string              `json:"front,omitempty"`
+		Back  string              `json:"back,omitempty"`
 	}
 
 	Phone struct {

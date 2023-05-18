@@ -250,10 +250,10 @@ func TestRemoveWebhooks(t *testing.T) {
 
 func registerWebHook(t *testing.T, url string) *webhooks.WebhookResponse {
 	var (
-		eventTypes = []string{"payment_approved", "payment_pending",
-			"payment_declined", "payment_expired", "payment_canceled", "payment_voided", "payment_void_declined",
-			"payment_captured", "payment_capture_declined", "payment_capture_pending", "payment_refunded",
-			"payment_refund_declined", "payment_refund_pending"}
+		eventTypes = []string{"payment_approved", "payment_canceled", "payment_capture_declined",
+			"payment_capture_pending", "payment_captured", "payment_declined", "payment_expired",
+			"payment_pending", "payment_refund_declined", "payment_refund_pending", "payment_refunded",
+			"payment_void_declined", "payment_voided"}
 	)
 
 	webhookRequest := webhooks.WebhookRequest{

@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/checkout/checkout-sdk-go/accounts"
 	"net/http"
 	"time"
 )
@@ -49,14 +50,15 @@ const (
 	ChallengeRequestedMandate ChallengeIndicator = "challenge_requested_mandate"
 )
 
-type AccountHolderIdentificationType string
+type DocumentType string
 
 const (
-	Passport            AccountHolderIdentificationType = "passport"
-	DrivingLicence      AccountHolderIdentificationType = "driving_licence"
-	NationalId          AccountHolderIdentificationType = "national_id"
-	CompanyRegistration AccountHolderIdentificationType = "company_registration"
-	TaxId               AccountHolderIdentificationType = "tax_id"
+	Passport             DocumentType = "passport"
+	NationalIdentityCard DocumentType = "national_identity_card"
+	DrivingLicense       DocumentType = "driving_license"
+	CitizenCard          DocumentType = "citizen_card"
+	ResidencePermit      DocumentType = "residence_permit"
+	ElectoralId          DocumentType = "electoral_id"
 )
 
 type ThreeDsFlowType string
@@ -153,10 +155,10 @@ type (
 
 type (
 	AccountHolderIdentification struct {
-		Type           AccountHolderIdentificationType `json:"type,omitempty"`
-		Number         string                          `json:"number,omitempty"`
-		IssuingCountry Country                         `json:"issuing_country,omitempty"`
-		DateOfExpiry   string                          `json:"date_of_expiry,omitempty"`
+		Type           accounts.AccountHolderIdentificationType `json:"type,omitempty"`
+		Number         string                                   `json:"number,omitempty"`
+		IssuingCountry Country                                  `json:"issuing_country,omitempty"`
+		DateOfExpiry   string                                   `json:"date_of_expiry,omitempty"`
 	}
 
 	AccountHolder struct {

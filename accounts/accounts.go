@@ -13,16 +13,6 @@ const (
 	paymentInstrumentsPath = "payment-instruments"
 )
 
-type AccountHolderIdentificationType string
-
-const (
-	Passport            AccountHolderIdentificationType = "passport"
-	DrivingLicence      AccountHolderIdentificationType = "driving_licence"
-	NationalId          AccountHolderIdentificationType = "national_id"
-	CompanyRegistration AccountHolderIdentificationType = "company_registration"
-	TaxId               AccountHolderIdentificationType = "tax_id"
-)
-
 type AccountHolderType string
 
 const (
@@ -48,8 +38,8 @@ type (
 	}
 
 	AccountHolderIdentification struct {
-		Type           AccountHolderIdentificationType `json:"type,omitempty"`
-		Number         string                          `json:"number,omitempty"`
-		IssuingCountry common.Country                  `json:"issuing_country,omitempty"`
+		Type           common.AccountHolderIdentificationType `json:"type,omitempty"`
+		Number         string                                 `json:"number,omitempty"`
+		IssuingCountry common.Country                         `json:"issuing_country,omitempty"`
 	}
 )

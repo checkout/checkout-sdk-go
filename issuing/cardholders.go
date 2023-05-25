@@ -6,12 +6,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 )
 
-const (
-	issuing     = "issuing"
-	cardholders = "cardholders"
-	cards       = "cards"
-)
-
 type CardholderType string
 
 const (

@@ -1,14 +1,15 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/payments/nas"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/payments/nas"
 )
 
 func TestVoidCardPayment(t *testing.T) {

@@ -5,6 +5,17 @@ import (
 	"github.com/checkout/checkout-sdk-go/configuration"
 )
 
+const (
+	issuing           = "issuing"
+	cardholders       = "cardholders"
+	cards             = "cards"
+	threeDSEnrollment = "3ds-enrollment"
+	activate          = "activate"
+	credentials       = "credentials"
+	revoke            = "revoke"
+	suspend           = "suspend"
+)
+
 type Client struct {
 	configuration *configuration.Configuration
 	apiClient     client.HttpClient

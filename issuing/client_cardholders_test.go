@@ -310,34 +310,33 @@ func TestGetCardholder(t *testing.T) {
 }
 
 func TestGetCardholderCards(t *testing.T) {
-	CardTypeResponse := NewVirtualCardTypeResponse()
-	CardTypeResponse.CardDetailsCardholder = CardDetailsCardholder{
-		Type:             Virtual,
-		Id:               "crd_fa6psq242dcd6fdn5gifcq1491",
-		CardholderId:     "crh_d3ozhf43pcq2xbldn2g45qnb44",
-		CardProductId:    "pro_7syjig3jq3mezlc3vjrdpfitl4",
-		ClientId:         "cli_vkuhvk4vjn2edkps7dfsq6emqm",
-		LastFour:         "1234",
-		ExpiryMonth:      5,
-		ExpiryYear:       2025,
-		Status:           CardActive,
-		DisplayName:      "JOHN KENNEDY",
-		BillingCurrency:  common.USD,
-		IssuingCountry:   common.US,
-		Reference:        "X-123456-N11",
-		CreatedDate:      &createdDate,
-		LastModifiedDate: &lastModifiedDate,
-	}
-	CardTypeResponse.IsSingleUse = true
-
 	var (
-		cardDetailsResponse = CardDetailsResponse{
-			CardTypeResponse: CardTypeResponse,
+		virtualCardResponse = VirtualCardResponse{
+			Type:             Virtual,
+			Id:               "crd_fa6psq242dcd6fdn5gifcq1491",
+			CardholderId:     "crh_d3ozhf43pcq2xbldn2g45qnb44",
+			CardProductId:    "pro_7syjig3jq3mezlc3vjrdpfitl4",
+			ClientId:         "cli_vkuhvk4vjn2edkps7dfsq6emqm",
+			LastFour:         "1234",
+			ExpiryMonth:      5,
+			ExpiryYear:       2025,
+			Status:           CardActive,
+			DisplayName:      "JOHN KENNEDY",
+			BillingCurrency:  common.USD,
+			IssuingCountry:   common.US,
+			Reference:        "X-123456-N11",
+			CreatedDate:      &createdDate,
+			LastModifiedDate: &lastModifiedDate,
+			IsSingleUse:      true,
+		}
+
+		cardResponse = CardDetailsResponse{
+			VirtualCardResponse: &virtualCardResponse,
 		}
 
 		response = CardholderCardsResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
-			Cards:        []CardDetailsResponse{cardDetailsResponse},
+			Cards:        []CardDetailsResponse{cardResponse},
 		}
 	)
 
@@ -367,22 +366,22 @@ func TestGetCardholderCards(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 200, response.HttpMetadata.StatusCode)
-				assert.Equal(t, Virtual, response.Cards[0].GetDetails().(virtualCardTypeResponse).Type)
-				assert.Equal(t, "crd_fa6psq242dcd6fdn5gifcq1491", response.Cards[0].GetDetails().(virtualCardTypeResponse).Id)
-				assert.Equal(t, "crh_d3ozhf43pcq2xbldn2g45qnb44", response.Cards[0].GetDetails().(virtualCardTypeResponse).CardholderId)
-				assert.Equal(t, "pro_7syjig3jq3mezlc3vjrdpfitl4", response.Cards[0].GetDetails().(virtualCardTypeResponse).CardProductId)
-				assert.Equal(t, "cli_vkuhvk4vjn2edkps7dfsq6emqm", response.Cards[0].GetDetails().(virtualCardTypeResponse).ClientId)
-				assert.Equal(t, "1234", response.Cards[0].GetDetails().(virtualCardTypeResponse).LastFour)
-				assert.Equal(t, 5, response.Cards[0].GetDetails().(virtualCardTypeResponse).ExpiryMonth)
-				assert.Equal(t, 2025, response.Cards[0].GetDetails().(virtualCardTypeResponse).ExpiryYear)
-				assert.Equal(t, CardActive, response.Cards[0].GetDetails().(virtualCardTypeResponse).Status)
-				assert.Equal(t, "JOHN KENNEDY", response.Cards[0].GetDetails().(virtualCardTypeResponse).DisplayName)
-				assert.Equal(t, common.USD, response.Cards[0].GetDetails().(virtualCardTypeResponse).BillingCurrency)
-				assert.Equal(t, common.US, response.Cards[0].GetDetails().(virtualCardTypeResponse).IssuingCountry)
-				assert.Equal(t, "X-123456-N11", response.Cards[0].GetDetails().(virtualCardTypeResponse).Reference)
-				assert.NotNil(t, response.Cards[0].GetDetails().(virtualCardTypeResponse).CreatedDate)
-				assert.NotNil(t, response.Cards[0].GetDetails().(virtualCardTypeResponse).LastModifiedDate)
-				assert.Equal(t, true, response.Cards[0].GetDetails().(virtualCardTypeResponse).IsSingleUse)
+				assert.Equal(t, Virtual, response.Cards[0].VirtualCardResponse.Type)
+				assert.Equal(t, "crd_fa6psq242dcd6fdn5gifcq1491", response.Cards[0].VirtualCardResponse.Id)
+				assert.Equal(t, "crh_d3ozhf43pcq2xbldn2g45qnb44", response.Cards[0].VirtualCardResponse.CardholderId)
+				assert.Equal(t, "pro_7syjig3jq3mezlc3vjrdpfitl4", response.Cards[0].VirtualCardResponse.CardProductId)
+				assert.Equal(t, "cli_vkuhvk4vjn2edkps7dfsq6emqm", response.Cards[0].VirtualCardResponse.ClientId)
+				assert.Equal(t, "1234", response.Cards[0].VirtualCardResponse.LastFour)
+				assert.Equal(t, 5, response.Cards[0].VirtualCardResponse.ExpiryMonth)
+				assert.Equal(t, 2025, response.Cards[0].VirtualCardResponse.ExpiryYear)
+				assert.Equal(t, CardActive, response.Cards[0].VirtualCardResponse.Status)
+				assert.Equal(t, "JOHN KENNEDY", response.Cards[0].VirtualCardResponse.DisplayName)
+				assert.Equal(t, common.USD, response.Cards[0].VirtualCardResponse.BillingCurrency)
+				assert.Equal(t, common.US, response.Cards[0].VirtualCardResponse.IssuingCountry)
+				assert.Equal(t, "X-123456-N11", response.Cards[0].VirtualCardResponse.Reference)
+				assert.NotNil(t, response.Cards[0].VirtualCardResponse.CreatedDate)
+				assert.NotNil(t, response.Cards[0].VirtualCardResponse.LastModifiedDate)
+				assert.Equal(t, true, response.Cards[0].VirtualCardResponse.IsSingleUse)
 			},
 		},
 		{

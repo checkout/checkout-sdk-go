@@ -74,33 +74,33 @@ type (
 		ActivateCard  bool         `json:"activate_card,omitempty"`
 	}
 
-	physicalCardTypeRequest struct {
+	physicalCardRequest struct {
 		CardDetailsRequest
 		ShippingInstructions ShippingInstruction `json:"shipping_instructions,omitempty"`
 	}
 
-	virtualCardTypeRequest struct {
+	virtualCardRequest struct {
 		CardDetailsRequest
 		IsSingleUse bool `json:"is_single_use,omitempty"`
 	}
 )
 
-func NewPhysicalCardTypeRequest() *physicalCardTypeRequest {
-	return &physicalCardTypeRequest{
+func NewPhysicalCardRequest() *physicalCardRequest {
+	return &physicalCardRequest{
 		CardDetailsRequest: CardDetailsRequest{Type: Physical},
 	}
 }
 
-func NewVirtualCardTypeRequest() *virtualCardTypeRequest {
-	return &virtualCardTypeRequest{
+func NewVirtualCardRequest() *virtualCardRequest {
+	return &virtualCardRequest{
 		CardDetailsRequest: CardDetailsRequest{Type: Virtual},
 	}
 }
 
-func (c *physicalCardTypeRequest) GetType() CardType {
+func (c *physicalCardRequest) GetType() CardType {
 	return c.Type
 }
 
-func (c *virtualCardTypeRequest) GetType() CardType {
+func (c *virtualCardRequest) GetType() CardType {
 	return c.Type
 }

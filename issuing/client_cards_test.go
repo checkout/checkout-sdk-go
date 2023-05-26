@@ -13,7 +13,7 @@ import (
 )
 
 func TestCreateCard(t *testing.T) {
-	request := NewVirtualCardTypeRequest()
+	request := NewVirtualCardRequest()
 	response := CardResponse{}
 
 	cases := []struct {

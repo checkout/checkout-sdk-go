@@ -9,7 +9,8 @@ import (
 
 type (
 	TypeMapping struct {
-		Type string `json:"type"`
+		Type        string `json:"type"`
+		ControlType string `json:"control_type"`
 	}
 )
 

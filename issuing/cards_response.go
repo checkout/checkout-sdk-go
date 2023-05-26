@@ -30,14 +30,13 @@ type (
 	}
 
 	PhysicalCardResponse struct {
-		Type          CardType `json:"type" binding:"required"`
-		Id            string   `json:"id,omitempty"`
-		CardholderId  string   `json:"cardholder_id,omitempty"`
-		CardProductId string   `json:"card_product_id,omitempty"`
-		ClientId      string   `json:"client_id,omitempty"`
-		LastFour      string   `json:"last_four,omitempty"`
-		ExpiryMonth   int      `json:"expiry_month,omitempty"`
-
+		Type             CardType        `json:"type" binding:"required"`
+		Id               string          `json:"id,omitempty"`
+		CardholderId     string          `json:"cardholder_id,omitempty"`
+		CardProductId    string          `json:"card_product_id,omitempty"`
+		ClientId         string          `json:"client_id,omitempty"`
+		LastFour         string          `json:"last_four,omitempty"`
+		ExpiryMonth      int             `json:"expiry_month,omitempty"`
 		Status           CardStatus      `json:"status,omitempty"`
 		DisplayName      string          `json:"display_name,omitempty"`
 		BillingCurrency  common.Currency `json:"billing_currency,omitempty"`

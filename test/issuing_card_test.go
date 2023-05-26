@@ -13,13 +13,11 @@ import (
 
 func TestCreateCard(t *testing.T) {
 	cases := []struct {
-		name       string
-		cardholder *issuing.CardholderResponse
-		checker    func(*issuing.CardResponse, error)
+		name    string
+		checker func(*issuing.CardResponse, error)
 	}{
 		{
-			name:       "when create a card and this request is correct then should return a response",
-			cardholder: cardholderResponse,
+			name: "when create a card and this request is correct then should return a response",
 			checker: func(response *issuing.CardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -38,7 +36,7 @@ func TestCreateCard(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(cardRequest(tc.cardholder), nil)
+			tc.checker(cardRequest(cardholderResponse), nil)
 		})
 	}
 }

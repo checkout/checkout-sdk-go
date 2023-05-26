@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/checkout/checkout-sdk-go/common"
 	"os"
 
 	"github.com/checkout/checkout-sdk-go"
@@ -24,7 +25,7 @@ var (
 		BillingAddress:   Address(),
 		ResidencyAddress: Address(),
 		Document: &issuing.CardholderDocument{
-			Type:            "national_identity_card",
+			Type:            common.NationalIdentityCard,
 			FrontDocumentId: "file_6lbss42ezvoufcb2beo76rvwly",
 			BackDocumentId:  "file_aaz5pemp6326zbuvevp6qroqu4",
 		},
@@ -34,6 +35,8 @@ var (
 	virtualCardResponse = cardRequest(cardholderResponse)
 
 	virtualCardId = virtualCardResponse.Id
+
+	cardControlResponse = cardControlRequest(virtualCardId)
 )
 
 func buildIssuingClientApi() *nas.Api {
@@ -61,7 +64,7 @@ func cardholderRequest(request issuing.CardholderRequest) *issuing.CardholderRes
 }
 
 func cardRequest(cardholderResponse *issuing.CardholderResponse) *issuing.CardResponse {
-	virtualCard := issuing.NewVirtualCardTypeRequest()
+	virtualCard := issuing.NewVirtualCardRequest()
 	virtualCard.CardDetailsRequest = issuing.CardDetailsRequest{
 		Type:         issuing.Virtual,
 		CardholderId: cardholderResponse.Id,
@@ -74,8 +77,23 @@ func cardRequest(cardholderResponse *issuing.CardholderResponse) *issuing.CardRe
 		DisplayName:   "John Kennedy",
 		ActivateCard:  false,
 	}
-	virtualCard.IsSingleUse = true
+	virtualCard.IsSingleUse = false
 
 	response, _ := buildIssuingClientApi().Issuing.CreateCard(virtualCard)
+	return response
+}
+
+func cardControlRequest(virtualCardId string) *issuing.CardControlResponse {
+	velocityCardControl := issuing.NewVelocityCardControlRequest()
+	velocityCardControl.ControlType = issuing.VelocityLimitType
+	velocityCardControl.Description = "Max spend of 500€ per week for restaurants"
+	velocityCardControl.TargetId = virtualCardId
+	velocityCardControl.VelocityLimit = issuing.VelocityLimit{
+		AmountLimit: 500,
+		VelocityWindow: issuing.VelocityWindow{
+			Type: issuing.Weekly,
+		},
+	}
+	response, _ := buildIssuingClientApi().Issuing.CreateControl(velocityCardControl)
 	return response
 }

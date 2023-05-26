@@ -14,6 +14,9 @@ const (
 	credentials       = "credentials"
 	revoke            = "revoke"
 	suspend           = "suspend"
+	controls          = "controls"
+	simulate          = "simulate"
+	authorizations    = "authorizations"
 )
 
 type Client struct {

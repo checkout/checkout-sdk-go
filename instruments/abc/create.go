@@ -37,5 +37,5 @@ type InstrumentCustomerRequest struct {
 	Email     string        `json:"email,omitempty"`
 	Name      string        `json:"name,omitempty"`
 	Phone     *common.Phone `json:"phone,omitempty"`
-	IsDefault bool          `json:"nas,omitempty"`
+	IsDefault bool          `json:"default,omitempty"`
 }

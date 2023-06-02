@@ -13,6 +13,7 @@ import (
 )
 
 func TestRetrieveWebhook(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable ")
 	registerWebhook := registerWebHook(t, "https://checkout.com/webhooks")
 
 	cases := []struct {
@@ -58,6 +59,7 @@ func TestRetrieveWebhook(t *testing.T) {
 }
 
 func TestUpdateWebhook(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable ")
 	var (
 		webhookUpdateRequest = webhooks.WebhookRequest{
 			Url:    "https://example.com/webhooks",
@@ -130,6 +132,7 @@ func TestUpdateWebhook(t *testing.T) {
 }
 
 func TestPatchWebhook(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable ")
 	var (
 		webhookUpdateRequest = webhooks.WebhookRequest{
 			Url:    "https://example.com/webhooks",

@@ -23,31 +23,9 @@ type (
 		CreatedDate     *time.Time      `json:"created_date,omitempty"`
 	}
 
-	CardDetailsResponse struct {
-		HttpMetadata         common.HttpMetadata
-		PhysicalCardResponse *PhysicalCardResponse
-		VirtualCardResponse  *VirtualCardResponse
-	}
-
-	PhysicalCardResponse struct {
-		Type             CardType        `json:"type" binding:"required"`
-		Id               string          `json:"id,omitempty"`
-		CardholderId     string          `json:"cardholder_id,omitempty"`
-		CardProductId    string          `json:"card_product_id,omitempty"`
-		ClientId         string          `json:"client_id,omitempty"`
-		LastFour         string          `json:"last_four,omitempty"`
-		ExpiryMonth      int             `json:"expiry_month,omitempty"`
-		Status           CardStatus      `json:"status,omitempty"`
-		DisplayName      string          `json:"display_name,omitempty"`
-		BillingCurrency  common.Currency `json:"billing_currency,omitempty"`
-		IssuingCountry   common.Country  `json:"issuing_country,omitempty"`
-		Reference        string          `json:"reference,omitempty"`
-		CreatedDate      *time.Time      `json:"created_date,omitempty"`
-		LastModifiedDate *time.Time      `json:"last_modified_date,omitempty"`
-	}
-
-	VirtualCardResponse struct {
-		Type             CardType        `json:"type" binding:"required"`
+	CardDetailsData struct {
+		HttpMetadata     common.HttpMetadata
+		Type             CardType        `json:"type,omitempty"`
 		Id               string          `json:"id,omitempty"`
 		CardholderId     string          `json:"cardholder_id,omitempty"`
 		CardProductId    string          `json:"card_product_id,omitempty"`
@@ -62,31 +40,46 @@ type (
 		Reference        string          `json:"reference,omitempty"`
 		CreatedDate      *time.Time      `json:"created_date,omitempty"`
 		LastModifiedDate *time.Time      `json:"last_modified_date,omitempty"`
-		IsSingleUse      bool            `json:"is_single_use,omitempty"`
+	}
+
+	VirtualExtraData struct {
+		IsSingleUse bool `json:"is_single_use,omitempty"`
+	}
+
+	CardDetailsResponse struct {
+		CardDetailsData
+		ExtraData ExtraData `json:"limit,omitempty"`
+	}
+
+	ExtraData interface {
+		GetResponseType() CardType
 	}
 )
 
+func (l VirtualExtraData) GetResponseType() CardType {
+	return Virtual
+}
+
 func (s *CardDetailsResponse) UnmarshalJSON(data []byte) error {
-	var typeMapping common.TypeMapping
-	if err := json.Unmarshal(data, &typeMapping); err != nil {
+	var cardDetailsData CardDetailsData
+	if err := json.Unmarshal(data, &cardDetailsData); err != nil {
 		return err
 	}
+	s.CardDetailsData = cardDetailsData
 
-	switch typeMapping.Type {
-	case string(Physical):
-		var response PhysicalCardResponse
-		if err := json.Unmarshal(data, &response); err != nil {
+	switch cardDetailsData.Type {
+	case Physical:
+		s.ExtraData = nil
+	case Virtual:
+		var extraData = struct {
+			VirtualExtraData
+		}{}
+		if err := json.Unmarshal(data, &extraData); err != nil {
 			return nil
 		}
-		s.PhysicalCardResponse = &response
-	case string(Virtual):
-		var response VirtualCardResponse
-		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
-		}
-		s.VirtualCardResponse = &response
+		s.ExtraData = extraData.VirtualExtraData
 	default:
-		return errors.UnsupportedTypeError(fmt.Sprintf("%s unsupported", typeMapping.Type))
+		return errors.UnsupportedTypeError(fmt.Sprintf("%s unsupported", cardDetailsData.Type))
 	}
 	return nil
 }

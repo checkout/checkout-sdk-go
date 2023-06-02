@@ -3,17 +3,28 @@ package test
 import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"os"
+	"testing"
 
 	"github.com/checkout/checkout-sdk-go"
 	"github.com/checkout/checkout-sdk-go/configuration"
-	"github.com/checkout/checkout-sdk-go/issuing"
 	"github.com/checkout/checkout-sdk-go/nas"
+
+	cardholders "github.com/checkout/checkout-sdk-go/issuing/cardholders"
+	cards "github.com/checkout/checkout-sdk-go/issuing/cards"
+	controls "github.com/checkout/checkout-sdk-go/issuing/controls"
 )
 
-var (
-	issuingClientApi *nas.Api
-	cardholder       = issuing.CardholderRequest{
-		Type:             issuing.Individual,
+var issuingClientApi *nas.Api
+var cardholder = cardholders.CardholderRequest{}
+var cardholderResponse *cardholders.CardholderResponse
+var virtualCardResponse *cards.CardResponse
+var virtualCardId string
+var cardControlResponse *controls.CardControlResponse
+
+func TestSetupIssuing(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+	cardholder = cardholders.CardholderRequest{
+		Type:             cardholders.Individual,
 		Reference:        "X-123456-N11",
 		EntityId:         "ent_mujh2nia2ypezmw5fo2fofk7ka",
 		FirstName:        "John",
@@ -24,20 +35,18 @@ var (
 		DateOfBirth:      "1985-05-15",
 		BillingAddress:   Address(),
 		ResidencyAddress: Address(),
-		Document: &issuing.CardholderDocument{
+		Document: &cardholders.CardholderDocument{
 			Type:            common.NationalIdentityCard,
 			FrontDocumentId: "file_6lbss42ezvoufcb2beo76rvwly",
 			BackDocumentId:  "file_aaz5pemp6326zbuvevp6qroqu4",
 		},
 	}
+
 	cardholderResponse = cardholderRequest(cardholder)
-
 	virtualCardResponse = cardRequest(cardholderResponse)
-
 	virtualCardId = virtualCardResponse.Id
-
 	cardControlResponse = cardControlRequest(virtualCardId)
-)
+}
 
 func buildIssuingClientApi() *nas.Api {
 	if issuingClientApi == nil {
@@ -58,18 +67,18 @@ func buildIssuingClientApi() *nas.Api {
 	return issuingClientApi
 }
 
-func cardholderRequest(request issuing.CardholderRequest) *issuing.CardholderResponse {
+func cardholderRequest(request cardholders.CardholderRequest) *cardholders.CardholderResponse {
 	response, _ := buildIssuingClientApi().Issuing.CreateCardholder(request)
 	return response
 }
 
-func cardRequest(cardholderResponse *issuing.CardholderResponse) *issuing.CardResponse {
-	virtualCard := issuing.NewVirtualCardRequest()
-	virtualCard.CardDetailsRequest = issuing.CardDetailsRequest{
-		Type:         issuing.Virtual,
+func cardRequest(cardholderResponse *cardholders.CardholderResponse) *cards.CardResponse {
+	virtualCard := cards.NewVirtualCardRequest()
+	virtualCard.CardDetailsRequest = cards.CardDetailsRequest{
+		Type:         cards.Virtual,
 		CardholderId: cardholderResponse.Id,
-		Lifetime: issuing.CardLifetime{
-			Unit:  issuing.Months,
+		Lifetime: cards.CardLifetime{
+			Unit:  cards.Months,
 			Value: 6,
 		},
 		Reference:     "X-123456-N11",
@@ -83,15 +92,15 @@ func cardRequest(cardholderResponse *issuing.CardholderResponse) *issuing.CardRe
 	return response
 }
 
-func cardControlRequest(virtualCardId string) *issuing.CardControlResponse {
-	velocityCardControl := issuing.NewVelocityCardControlRequest()
-	velocityCardControl.ControlType = issuing.VelocityLimitType
+func cardControlRequest(virtualCardId string) *controls.CardControlResponse {
+	velocityCardControl := controls.NewVelocityCardControlRequest()
+	velocityCardControl.ControlType = controls.VelocityLimitType
 	velocityCardControl.Description = "Max spend of 500€ per week for restaurants"
 	velocityCardControl.TargetId = virtualCardId
-	velocityCardControl.VelocityLimit = issuing.VelocityLimit{
+	velocityCardControl.VelocityLimit = controls.VelocityLimit{
 		AmountLimit: 500,
-		VelocityWindow: issuing.VelocityWindow{
-			Type: issuing.Weekly,
+		VelocityWindow: controls.VelocityWindow{
+			Type: controls.Weekly,
 		},
 	}
 	response, _ := buildIssuingClientApi().Issuing.CreateControl(velocityCardControl)

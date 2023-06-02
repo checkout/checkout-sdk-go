@@ -7,19 +7,21 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/issuing"
+
+	cardholders "github.com/checkout/checkout-sdk-go/issuing/cardholders"
 )
 
 func TestCreateCardholder(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
-		request issuing.CardholderRequest
-		checker func(*issuing.CardholderResponse, error)
+		request cardholders.CardholderRequest
+		checker func(*cardholders.CardholderResponse, error)
 	}{
 		{
 			name:    "when create a cardholder then return it",
 			request: cardholder,
-			checker: func(response *issuing.CardholderResponse, err error) {
+			checker: func(response *cardholders.CardholderResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, response.HttpMetadata.StatusCode, http.StatusCreated)
@@ -33,8 +35,8 @@ func TestCreateCardholder(t *testing.T) {
 		},
 		{
 			name:    "when request don't have the then return error",
-			request: issuing.CardholderRequest{},
-			checker: func(response *issuing.CardholderResponse, err error) {
+			request: cardholders.CardholderRequest{},
+			checker: func(response *cardholders.CardholderResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
@@ -55,15 +57,16 @@ func TestCreateCardholder(t *testing.T) {
 }
 
 func TestGetCardholderDetails(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name         string
 		cardholderId string
-		checker      func(*issuing.CardholderDetailsResponse, error)
+		checker      func(*cardholders.CardholderDetailsResponse, error)
 	}{
 		{
 			name:         "when request a cardholder then return it",
 			cardholderId: cardholderResponse.Id,
-			checker: func(response *issuing.CardholderDetailsResponse, err error) {
+			checker: func(response *cardholders.CardholderDetailsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, response.HttpMetadata.StatusCode, http.StatusOK)
@@ -88,7 +91,7 @@ func TestGetCardholderDetails(t *testing.T) {
 		{
 			name:         "when cardholder id not found the then return error",
 			cardholderId: "crd_not_found",
-			checker: func(response *issuing.CardholderDetailsResponse, err error) {
+			checker: func(response *cardholders.CardholderDetailsResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
@@ -107,15 +110,16 @@ func TestGetCardholderDetails(t *testing.T) {
 }
 
 func TestGetCardholderCards(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name         string
 		cardholderId string
-		checker      func(*issuing.CardholderCardsResponse, error)
+		checker      func(*cardholders.CardholderCardsResponse, error)
 	}{
 		{
 			name:         "when request all cards from a cardholder then return it",
 			cardholderId: cardholderResponse.Id,
-			checker: func(response *issuing.CardholderCardsResponse, err error) {
+			checker: func(response *cardholders.CardholderCardsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, response.HttpMetadata.StatusCode, http.StatusOK)

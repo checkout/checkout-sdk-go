@@ -23,6 +23,6 @@ type (
 type (
 	InstrumentCustomerUpdateRequest struct {
 		Id        string `json:"id,omitempty"`
-		IsDefault bool   `json:"nas,omitempty"`
+		IsDefault bool   `json:"default,omitempty"`
 	}
 )

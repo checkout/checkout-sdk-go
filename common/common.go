@@ -200,7 +200,7 @@ type (
 		Email   string `json:"email,omitempty"`
 		Name    string `json:"name,omitempty"`
 		Phone   *Phone `json:"phone,omitempty"`
-		Default bool   `json:"nas,omitempty"`
+		Default bool   `json:"default,omitempty"`
 	}
 )
 
@@ -223,7 +223,7 @@ type (
 
 	UpdateCustomerRequest struct {
 		Id      string `json:"id,omitempty"`
-		Default bool   `json:"nas,omitempty"`
+		Default bool   `json:"default,omitempty"`
 	}
 )
 

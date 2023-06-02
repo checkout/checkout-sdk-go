@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/common"
+	cards "github.com/checkout/checkout-sdk-go/issuing/cards"
 )
 
 type CardholderType string
@@ -81,6 +82,6 @@ type (
 
 	CardholderCardsResponse struct {
 		HttpMetadata common.HttpMetadata
-		Cards        []CardDetailsResponse `json:"cards,omitempty"`
+		Cards        []cards.CardDetailsResponse `json:"cards,omitempty"`
 	}
 )

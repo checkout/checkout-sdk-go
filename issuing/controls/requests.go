@@ -48,14 +48,14 @@ func (c *mccCardControlRequest) GetControlType() ControlType {
 
 type (
 	CardControlsQuery struct {
-		TargetId string `json:"target_id,omitempty"`
+		TargetId string `url:"target_id,omitempty"`
 	}
 )
 
 type (
 	UpdateCardControlRequest struct {
-		Description   string        `json:"description,omitempty"`
-		VelocityLimit VelocityLimit `json:"velocity_limit"`
-		MccLimit      MccLimit      `json:"mcc_limit"`
+		Description   string         `json:"description,omitempty"`
+		VelocityLimit *VelocityLimit `json:"velocity_limit,omitempty"`
+		MccLimit      *MccLimit      `json:"mcc_limit,omitempty"`
 	}
 )

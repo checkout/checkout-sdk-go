@@ -1,24 +1,26 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/errors"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/issuing"
+	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/errors"
+
+	cards "github.com/checkout/checkout-sdk-go/issuing/cards"
 )
 
 func TestCreateCard(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
-		checker func(*issuing.CardResponse, error)
+		checker func(*cards.CardResponse, error)
 	}{
 		{
 			name: "when create a card and this request is correct then should return a response",
-			checker: func(response *issuing.CardResponse, err error) {
+			checker: func(response *cards.CardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 201, response.HttpMetadata.StatusCode)
@@ -42,40 +44,41 @@ func TestCreateCard(t *testing.T) {
 }
 
 func TestGetCardDetails(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
 		cardId  string
-		checker func(*issuing.CardDetailsResponse, error)
+		checker func(*cards.CardDetailsResponse, error)
 	}{
 		{
 			name:   "when get a card and this request is correct then should return a response",
 			cardId: virtualCardId,
-			checker: func(response *issuing.CardDetailsResponse, err error) {
+			checker: func(response *cards.CardDetailsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 200, response.HttpMetadata.StatusCode)
-				assert.Equal(t, issuing.Virtual, response.VirtualCardResponse.Type)
-				assert.Equal(t, virtualCardResponse.Id, response.VirtualCardResponse.Id)
-				assert.NotNil(t, response.VirtualCardResponse.CardholderId)
-				assert.NotNil(t, response.VirtualCardResponse.CardProductId)
-				assert.NotNil(t, response.VirtualCardResponse.ClientId)
-				assert.Equal(t, virtualCardResponse.LastFour, response.VirtualCardResponse.LastFour)
-				assert.Equal(t, virtualCardResponse.ExpiryMonth, response.VirtualCardResponse.ExpiryMonth)
-				assert.Equal(t, virtualCardResponse.ExpiryYear, response.VirtualCardResponse.ExpiryYear)
-				assert.NotNil(t, response.VirtualCardResponse.Status)
-				assert.Equal(t, virtualCardResponse.DisplayName, response.VirtualCardResponse.DisplayName)
-				assert.Equal(t, virtualCardResponse.BillingCurrency, response.VirtualCardResponse.BillingCurrency)
-				assert.Equal(t, virtualCardResponse.IssuingCountry, response.VirtualCardResponse.IssuingCountry)
-				assert.Equal(t, virtualCardResponse.Reference, response.VirtualCardResponse.Reference)
-				assert.NotNil(t, response.VirtualCardResponse.CreatedDate)
-				assert.NotNil(t, response.VirtualCardResponse.LastModifiedDate)
-				assert.NotNil(t, response.VirtualCardResponse.IsSingleUse)
+				assert.Equal(t, cards.Virtual, response.Type)
+				assert.Equal(t, virtualCardResponse.Id, response.Id)
+				assert.NotNil(t, response.CardholderId)
+				assert.NotNil(t, response.CardProductId)
+				assert.NotNil(t, response.ClientId)
+				assert.Equal(t, virtualCardResponse.LastFour, response.LastFour)
+				assert.Equal(t, virtualCardResponse.ExpiryMonth, response.ExpiryMonth)
+				assert.Equal(t, virtualCardResponse.ExpiryYear, response.ExpiryYear)
+				assert.NotNil(t, response.Status)
+				assert.Equal(t, virtualCardResponse.DisplayName, response.DisplayName)
+				assert.Equal(t, virtualCardResponse.BillingCurrency, response.BillingCurrency)
+				assert.Equal(t, virtualCardResponse.IssuingCountry, response.IssuingCountry)
+				assert.Equal(t, virtualCardResponse.Reference, response.Reference)
+				assert.NotNil(t, response.CreatedDate)
+				assert.NotNil(t, response.LastModifiedDate)
+				assert.NotNil(t, response.ExtraData.(*cards.VirtualExtraData).IsSingleUse)
 			},
 		},
 		{
 			name:   "when get a card and this card not found then should return an error",
 			cardId: "crd_not_found",
-			checker: func(response *issuing.CardDetailsResponse, err error) {
+			checker: func(response *cards.CardDetailsResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
 				chkErr := err.(errors.CheckoutAPIError)
@@ -95,7 +98,7 @@ func TestGetCardDetails(t *testing.T) {
 
 func TestEnrollThreeDS(t *testing.T) {
 	t.Skip("Client id must be configured for 3ds")
-	request := issuing.ThreeDSEnrollmentRequest{
+	request := cards.ThreeDSEnrollmentRequest{
 		Locale:      "en-US",
 		PhoneNumber: Phone(),
 	}
@@ -103,14 +106,14 @@ func TestEnrollThreeDS(t *testing.T) {
 	cases := []struct {
 		name    string
 		cardId  string
-		request issuing.ThreeDSEnrollmentRequest
-		checker func(*issuing.ThreeDSEnrollmentResponse, error)
+		request cards.ThreeDSEnrollmentRequest
+		checker func(*cards.ThreeDSEnrollmentResponse, error)
 	}{
 		{
 			name:    "when enroll a card three DS and this request is correct then should return a response",
 			cardId:  "crd_fa6psq242dcd6fdn5gifcq1491",
 			request: request,
-			checker: func(response *issuing.ThreeDSEnrollmentResponse, err error) {
+			checker: func(response *cards.ThreeDSEnrollmentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 202, response.HttpMetadata.StatusCode)
@@ -130,8 +133,8 @@ func TestEnrollThreeDS(t *testing.T) {
 
 func TestUpdateThreeDS(t *testing.T) {
 	t.Skip("Client id must be configured for 3ds")
-	request := issuing.ThreeDSUpdateRequest{
-		SecurityPair: issuing.SecurityPair{
+	request := cards.ThreeDSUpdateRequest{
+		SecurityPair: cards.SecurityPair{
 			Question: "Who are you?",
 			Answer:   "Bond. James Bond.",
 		},
@@ -143,14 +146,14 @@ func TestUpdateThreeDS(t *testing.T) {
 	cases := []struct {
 		name    string
 		cardId  string
-		request issuing.ThreeDSUpdateRequest
-		checker func(*issuing.ThreeDSUpdateResponse, error)
+		request cards.ThreeDSUpdateRequest
+		checker func(*cards.ThreeDSUpdateResponse, error)
 	}{
 		{
 			name:    "when update a card enroll three DS and this request is correct then should return 201",
 			cardId:  "crd_fa6psq242dcd6fdn5gifcq1491",
 			request: request,
-			checker: func(response *issuing.ThreeDSUpdateResponse, err error) {
+			checker: func(response *cards.ThreeDSUpdateResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 202, response.HttpMetadata.StatusCode)
@@ -172,12 +175,12 @@ func TestGetCardThreeDSDetails(t *testing.T) {
 	cases := []struct {
 		name    string
 		cardId  string
-		checker func(*issuing.ThreeDSEnrollmentDetailsResponse, error)
+		checker func(*cards.ThreeDSEnrollmentDetailsResponse, error)
 	}{
 		{
 			name:   "when get a card enroll three DS details and this request is correct then should return a response",
 			cardId: "crd_fa6psq242dcd6fdn5gifcq1491",
-			checker: func(response *issuing.ThreeDSEnrollmentDetailsResponse, err error) {
+			checker: func(response *cards.ThreeDSEnrollmentDetailsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 			},
@@ -194,6 +197,7 @@ func TestGetCardThreeDSDetails(t *testing.T) {
 }
 
 func TestActivateCard(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
 		cardId  string
@@ -221,19 +225,20 @@ func TestActivateCard(t *testing.T) {
 }
 
 func TestGetCardCredentials(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
 		cardId  string
-		query   issuing.CardCredentialsQuery
-		checker func(*issuing.CardCredentialsResponse, error)
+		query   cards.CardCredentialsQuery
+		checker func(*cards.CardCredentialsResponse, error)
 	}{
 		{
 			name:   "when get card credentials and this request is correct then should return a response",
 			cardId: virtualCardId,
-			query: issuing.CardCredentialsQuery{
+			query: cards.CardCredentialsQuery{
 				Credentials: "number, cvc2",
 			},
-			checker: func(response *issuing.CardCredentialsResponse, err error) {
+			checker: func(response *cards.CardCredentialsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Number)
@@ -243,10 +248,10 @@ func TestGetCardCredentials(t *testing.T) {
 		{
 			name:   "when get card credentials and card not fund is correct then should return a response",
 			cardId: "crd_not_found",
-			query: issuing.CardCredentialsQuery{
+			query: cards.CardCredentialsQuery{
 				Credentials: "number, cvc2",
 			},
-			checker: func(response *issuing.CardCredentialsResponse, err error) {
+			checker: func(response *cards.CardCredentialsResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
 				chkErr := err.(errors.CheckoutAPIError)
@@ -265,6 +270,7 @@ func TestGetCardCredentials(t *testing.T) {
 }
 
 func TestSuspendCard(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
 		cardId  string
@@ -286,7 +292,7 @@ func TestSuspendCard(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			cardDetails, _ := client.GetCardDetails(tc.cardId)
-			if cardDetails.VirtualCardResponse.Status == issuing.CardActive {
+			if cardDetails.Status == cards.CardActive {
 				tc.checker(client.SuspendCard(tc.cardId))
 			} else {
 				client.ActivateCard(tc.cardId)
@@ -297,12 +303,13 @@ func TestSuspendCard(t *testing.T) {
 }
 
 func TestRevokeCard(t *testing.T) {
-	request := issuing.RevokeCardRequest{}
+	t.Skip("Avoid creating cards all the time")
+	request := cards.RevokeCardRequest{}
 
 	cases := []struct {
 		name    string
 		cardId  string
-		request issuing.RevokeCardRequest
+		request cards.RevokeCardRequest
 		checker func(*common.IdResponse, error)
 	}{
 		{

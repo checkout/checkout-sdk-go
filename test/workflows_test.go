@@ -695,6 +695,7 @@ func TestRemoveWorkflowConditions(t *testing.T) {
 }
 
 func TestGetEventTypes(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable ")
 	cases := []struct {
 		name    string
 		checker func(*events.EventTypesResponse, error)

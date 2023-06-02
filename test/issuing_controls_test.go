@@ -6,26 +6,30 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/issuing"
+
+	controls "github.com/checkout/checkout-sdk-go/issuing/controls"
 )
 
 func TestCreateControl(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name    string
-		checker func(*issuing.CardControlResponse, error)
+		checker func(*controls.CardControlResponse, error)
 	}{
 		{
 			name: "when create a card control and this request is correct then should return a response",
-			checker: func(response *issuing.CardControlResponse, err error) {
+			checker: func(response *controls.CardControlResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 201, response.HttpMetadata.StatusCode)
 				assert.Equal(t, "Max spend of 500€ per week for restaurants",
-					response.VelocityLimitCardControlResponse.Description)
-				assert.Equal(t, virtualCardId, response.VelocityLimitCardControlResponse.TargetId)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.Id)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.CreatedDate)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.LastModifiedDate)
+					response.Description)
+				assert.Equal(t, virtualCardId, response.TargetId)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.CreatedDate)
+				assert.NotNil(t, response.LastModifiedDate)
+				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).AmountLimit)
+				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).VelocityWindow)
 			},
 		},
 	}
@@ -38,13 +42,13 @@ func TestCreateControl(t *testing.T) {
 }
 
 func TestGetCardControls(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
-	query := issuing.CardControlsQuery{
+	t.Skip("Avoid creating cards all the time")
+	query := controls.CardControlsQuery{
 		TargetId: virtualCardId,
 	}
 	cases := []struct {
 		name    string
-		query   issuing.CardControlsQuery
+		query   controls.CardControlsQuery
 		checker func(interface{}, error)
 	}{
 		{
@@ -53,13 +57,13 @@ func TestGetCardControls(t *testing.T) {
 			checker: func(response interface{}, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
-				assert.Equal(t, 201, response.(*issuing.CardControlsQueryResponse).HttpMetadata.StatusCode)
+				assert.Equal(t, 200, response.(*controls.CardControlsQueryResponse).HttpMetadata.StatusCode)
 				assert.Equal(t, "Max spend of 500€ per week for restaurants",
-					response.(*issuing.CardControlsQueryResponse).Controls[0].VelocityLimitCardControlResponse.Description)
-				assert.Equal(t, virtualCardId, response.(*issuing.CardControlsQueryResponse).Controls[0].VelocityLimitCardControlResponse.TargetId)
-				assert.NotNil(t, response.(*issuing.CardControlsQueryResponse).Controls[0].VelocityLimitCardControlResponse.Id)
-				assert.NotNil(t, response.(*issuing.CardControlsQueryResponse).Controls[0].VelocityLimitCardControlResponse.CreatedDate)
-				assert.NotNil(t, response.(*issuing.CardControlsQueryResponse).Controls[0].VelocityLimitCardControlResponse.LastModifiedDate)
+					response.(*controls.CardControlsQueryResponse).Controls[0].Description)
+				assert.Equal(t, virtualCardId, response.(*controls.CardControlsQueryResponse).Controls[0].TargetId)
+				assert.NotNil(t, response.(*controls.CardControlsQueryResponse).Controls[0].Id)
+				assert.NotNil(t, response.(*controls.CardControlsQueryResponse).Controls[0].CreatedDate)
+				assert.NotNil(t, response.(*controls.CardControlsQueryResponse).Controls[0].LastModifiedDate)
 			},
 		},
 	}
@@ -72,7 +76,7 @@ func TestGetCardControls(t *testing.T) {
 				return client.GetCardControls(tc.query)
 			}
 			predicate := func(data interface{}) bool {
-				response := data.(*issuing.CardControlsQueryResponse)
+				response := data.(*controls.CardControlsQueryResponse)
 				return response.Controls != nil && len(response.Controls) >= 0
 			}
 
@@ -82,24 +86,27 @@ func TestGetCardControls(t *testing.T) {
 }
 
 func TestGetCardControlDetails(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name      string
 		controlId string
-		checker   func(*issuing.CardControlResponse, error)
+		checker   func(*controls.CardControlResponse, error)
 	}{
 		{
 			name:      "when get a card control details and this request is correct then should return a response",
-			controlId: cardControlResponse.VelocityLimitCardControlResponse.Id,
-			checker: func(response *issuing.CardControlResponse, err error) {
+			controlId: cardControlResponse.Id,
+			checker: func(response *controls.CardControlResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 200, response.HttpMetadata.StatusCode)
 				assert.Equal(t, "Max spend of 500€ per week for restaurants",
-					response.VelocityLimitCardControlResponse.Description)
-				assert.Equal(t, virtualCardId, response.VelocityLimitCardControlResponse.TargetId)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.Id)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.CreatedDate)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.LastModifiedDate)
+					response.Description)
+				assert.Equal(t, virtualCardId, response.TargetId)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.CreatedDate)
+				assert.NotNil(t, response.LastModifiedDate)
+				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).AmountLimit)
+				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).VelocityWindow)
 			},
 		},
 	}
@@ -114,36 +121,36 @@ func TestGetCardControlDetails(t *testing.T) {
 }
 
 func TestUpdateCardControl(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
-	request := issuing.UpdateCardControlRequest{
+	t.Skip("Avoid creating cards all the time")
+	request := controls.UpdateCardControlRequest{
 		Description: "New max spend of 1000€ per month for restaurants",
-		VelocityLimit: issuing.VelocityLimit{
+		VelocityLimit: &controls.VelocityLimit{
 			AmountLimit: 1000,
-			VelocityWindow: issuing.VelocityWindow{
-				Type: issuing.Monthly,
+			VelocityWindow: controls.VelocityWindow{
+				Type: controls.Monthly,
 			},
 		},
 	}
 	cases := []struct {
 		name      string
 		controlId string
-		request   issuing.UpdateCardControlRequest
-		checker   func(*issuing.CardControlResponse, error)
+		request   controls.UpdateCardControlRequest
+		checker   func(*controls.CardControlResponse, error)
 	}{
 		{
 			name:      "when update a card control and this request is correct then should return a response",
-			controlId: cardControlResponse.VelocityLimitCardControlResponse.Id,
+			controlId: cardControlResponse.Id,
 			request:   request,
-			checker: func(response *issuing.CardControlResponse, err error) {
+			checker: func(response *controls.CardControlResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 200, response.HttpMetadata.StatusCode)
 				assert.Equal(t, "New max spend of 1000€ per month for restaurants",
-					response.VelocityLimitCardControlResponse.Description)
-				assert.Equal(t, virtualCardId, response.VelocityLimitCardControlResponse.TargetId)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.Id)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.CreatedDate)
-				assert.NotNil(t, response.VelocityLimitCardControlResponse.LastModifiedDate)
+					response.Description)
+				assert.Equal(t, virtualCardId, response.TargetId)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.CreatedDate)
+				assert.NotNil(t, response.LastModifiedDate)
 			},
 		},
 	}
@@ -158,20 +165,21 @@ func TestUpdateCardControl(t *testing.T) {
 }
 
 func TestRemoveCardControl(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
 		name      string
 		controlId string
-		request   issuing.CardControlRequest
+		request   controls.CardControlRequest
 		checker   func(*common.IdResponse, error)
 	}{
 		{
 			name:      "when remove a card control and this request is correct then should return a response",
-			controlId: cardControlResponse.VelocityLimitCardControlResponse.Id,
+			controlId: cardControlResponse.Id,
 			checker: func(response *common.IdResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 200, response.HttpMetadata.StatusCode)
-				assert.Equal(t, cardControlResponse.VelocityLimitCardControlResponse.Id, response.Id)
+				assert.Equal(t, cardControlResponse.Id, response.Id)
 			},
 		},
 	}

@@ -57,7 +57,7 @@ type (
 	}
 
 	CardRequest interface {
-		GetType() CardType
+		GetRequestType() CardType
 	}
 
 	CardTypeRequest struct {
@@ -97,10 +97,10 @@ func NewVirtualCardRequest() *virtualCardRequest {
 	}
 }
 
-func (c *physicalCardRequest) GetType() CardType {
+func (c *physicalCardRequest) GetRequestType() CardType {
 	return c.Type
 }
 
-func (c *virtualCardRequest) GetType() CardType {
+func (c *virtualCardRequest) GetRequestType() CardType {
 	return c.Type
 }

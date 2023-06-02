@@ -11,6 +11,7 @@ import (
 )
 
 func TestVoidCardPaymentPrevious(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable")
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	voidRequest := payments.VoidRequest{

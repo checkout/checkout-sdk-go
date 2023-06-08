@@ -25,4 +25,8 @@ type (
 		Card        CardSimulation        `json:"card,omitempty"`
 		Transaction TransactionSimulation `json:"transaction,omitempty"`
 	}
+
+	CardSimulationRequest struct {
+		Amount int `json:"amount,omitempty"`
+	}
 )

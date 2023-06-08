@@ -22,6 +22,8 @@ const (
 	controlsPath          = "controls"
 	simulatePath          = "simulate"
 	authorizationsPath    = "authorizations"
+	presentmentsPath      = "presentments"
+	reversalsPath         = "reversals"
 )
 
 type Client struct {
@@ -204,7 +206,10 @@ func (c *Client) GetCardCredentials(
 	}
 
 	var response cards.CardCredentialsResponse
-	url, err := common.BuildQueryPath(common.BuildPath(issuingPath, cardsPath, cardId, credentialsPath), credentialsQuery)
+	url, err := common.BuildQueryPath(
+		common.BuildPath(issuingPath, cardsPath, cardId, credentialsPath),
+		credentialsQuery,
+	)
 	err = c.apiClient.Get(url, auth, &response)
 	if err != nil {
 		return nil, err
@@ -273,7 +278,9 @@ func (c *Client) CreateControl(request controls.CardControlRequest) (*controls.C
 	return &response, nil
 }
 
-func (c *Client) GetCardControls(query controls.CardControlsQuery) (*controls.CardControlsQueryResponse, error) {
+func (c *Client) GetCardControls(
+	query controls.CardControlsQuery,
+) (*controls.CardControlsQueryResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -343,14 +350,94 @@ func (c *Client) RemoveCardControl(controlId string) (*common.IdResponse, error)
 	return &response, nil
 }
 
-func (c *Client) SimulateAuthorization(request testing.CardAuthorizationRequest) (*testing.CardAuthorizationResponse, error) {
+func (c *Client) SimulateAuthorization(
+	request testing.CardAuthorizationRequest,
+) (*testing.CardAuthorizationResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response testing.CardAuthorizationResponse
-	err = c.apiClient.Post(common.BuildPath(issuingPath, simulatePath, authorizationsPath), auth, request, &response, nil)
+	err = c.apiClient.Post(
+		common.BuildPath(issuingPath, simulatePath, authorizationsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) SimulateIncrement(
+	transactionId string,
+	request testing.CardSimulationRequest,
+) (*testing.CardSimulationResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response testing.CardSimulationResponse
+	err = c.apiClient.Post(
+		common.BuildPath(issuingPath, simulatePath, authorizationsPath, transactionId, authorizationsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) SimulateClearing(
+	transactionId string,
+	request testing.CardSimulationRequest,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Post(
+		common.BuildPath(issuingPath, simulatePath, authorizationsPath, transactionId, presentmentsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) SimulateReversal(
+	transactionId string,
+	request testing.CardSimulationRequest,
+) (*testing.CardSimulationResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response testing.CardSimulationResponse
+	err = c.apiClient.Post(
+		common.BuildPath(issuingPath, simulatePath, authorizationsPath, transactionId, reversalsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}

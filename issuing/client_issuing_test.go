@@ -1145,3 +1145,289 @@ func TestSimulateAuthorization(t *testing.T) {
 		})
 	}
 }
+
+func TestSimulateIncrement(t *testing.T) {
+	issuingResponse := issuingTesting.CardSimulationResponse{
+		HttpMetadata: mocks.HttpMetadataStatusCreated,
+		Status:       issuingTesting.Authorized,
+	}
+
+	cases := []struct {
+		name             string
+		transactionId    string
+		request          issuingTesting.CardSimulationRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*issuingTesting.CardSimulationResponse, error)
+	}{
+		{
+			name:          "when simulating an increment authorization with valid request then return response",
+			transactionId: "transaction_id",
+			request:       issuingTesting.CardSimulationRequest{Amount: 100},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*issuingTesting.CardSimulationResponse)
+						*respMapping = issuingResponse
+					})
+			},
+			checker: func(response *issuingTesting.CardSimulationResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, issuingResponse.HttpMetadata.StatusCode, response.HttpMetadata.StatusCode)
+				assert.Equal(t, issuingResponse.Status, response.Status)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *issuingTesting.CardSimulationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:          "when simulating an increment authorization with invalid transactionId then return error",
+			transactionId: "not_found",
+			request:       issuingTesting.CardSimulationRequest{Amount: 100},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *issuingTesting.CardSimulationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.SimulateIncrement(tc.transactionId, tc.request))
+		})
+	}
+}
+
+func TestSimulateClearing(t *testing.T) {
+	issuingResponse := common.MetadataResponse{
+		HttpMetadata: mocks.HttpMetadataStatusAccepted,
+	}
+
+	cases := []struct {
+		name             string
+		transactionId    string
+		request          issuingTesting.CardSimulationRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*common.MetadataResponse, error)
+	}{
+		{
+			name:          "when simulating a clearing authorization with valid request then return response",
+			transactionId: "transaction_id",
+			request:       issuingTesting.CardSimulationRequest{Amount: 100},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*common.MetadataResponse)
+						*respMapping = issuingResponse
+					})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, issuingResponse.HttpMetadata.StatusCode, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:          "when simulating a clearing authorization with invalid transactionId then return error",
+			transactionId: "not_found",
+			request:       issuingTesting.CardSimulationRequest{Amount: 100},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.SimulateClearing(tc.transactionId, tc.request))
+		})
+	}
+}
+
+func TestSimulateReversal(t *testing.T) {
+	issuingResponse := issuingTesting.CardSimulationResponse{
+		HttpMetadata: mocks.HttpMetadataStatusCreated,
+		Status:       issuingTesting.Reversed,
+	}
+
+	cases := []struct {
+		name             string
+		transactionId    string
+		request          issuingTesting.CardSimulationRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*issuingTesting.CardSimulationResponse, error)
+	}{
+		{
+			name:          "when simulating a reversal authorization with valid request then return response",
+			transactionId: "transaction_id",
+			request:       issuingTesting.CardSimulationRequest{Amount: 100},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*issuingTesting.CardSimulationResponse)
+						*respMapping = issuingResponse
+					})
+			},
+			checker: func(response *issuingTesting.CardSimulationResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, issuingResponse.HttpMetadata.StatusCode, response.HttpMetadata.StatusCode)
+				assert.Equal(t, issuingResponse.Status, response.Status)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *issuingTesting.CardSimulationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:          "when simulating an reversal authorization with invalid transactionId then return error",
+			transactionId: "not_found",
+			request:       issuingTesting.CardSimulationRequest{Amount: 100},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *issuingTesting.CardSimulationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.SimulateReversal(tc.transactionId, tc.request))
+		})
+	}
+}

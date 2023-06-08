@@ -15,15 +15,17 @@ type (
 	}
 
 	ResponseCardSource struct {
-		Type                    payments.SourceType `json:"type,omitempty"`
-		Id                      string              `json:"id,omitempty"`
-		BillingAddress          *common.Address     `json:"billing_address,omitempty"`
-		Phone                   *common.Phone       `json:"phone,omitempty"`
-		ExpiryMonth             int                 `json:"expiry_month,omitempty"`
-		ExpiryYear              int                 `json:"expiry_year,omitempty"`
-		Name                    string              `json:"name,omitempty"`
-		Scheme                  string              `json:"scheme,omitempty"`
+		Type           payments.SourceType `json:"type,omitempty"`
+		Id             string              `json:"id,omitempty"`
+		BillingAddress *common.Address     `json:"billing_address,omitempty"`
+		Phone          *common.Phone       `json:"phone,omitempty"`
+		ExpiryMonth    int                 `json:"expiry_month,omitempty"`
+		ExpiryYear     int                 `json:"expiry_year,omitempty"`
+		Name           string              `json:"name,omitempty"`
+		Scheme         string              `json:"scheme,omitempty"`
+		// Deprecated: This property will be removed in the future, and should not be used. Use LocalSchemes instead.
 		SchemeLocal             string              `json:"scheme_local,omitempty"`
+		LocalSchemes            []string            `json:"local_schemes,omitempty"`
 		Last4                   string              `json:"last4,omitempty"`
 		Fingerprint             string              `json:"fingerprint,omitempty"`
 		Bin                     string              `json:"bin,omitempty"`

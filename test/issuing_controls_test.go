@@ -36,7 +36,7 @@ func TestCreateControl(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(cardControlRequest(virtualCardId), nil)
+			tc.checker(cardControlRequest(t, virtualCardId), nil)
 		})
 	}
 }

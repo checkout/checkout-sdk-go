@@ -38,7 +38,7 @@ func TestCreateCard(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(cardRequest(cardholderResponse), nil)
+			tc.checker(cardRequest(t, cardholderResponse), nil)
 		})
 	}
 }
@@ -218,7 +218,6 @@ func TestActivateCard(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			client.SuspendCard(tc.cardId)
 			tc.checker(client.ActivateCard(tc.cardId))
 		})
 	}

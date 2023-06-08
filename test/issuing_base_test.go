@@ -1,12 +1,16 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/common"
+	"fmt"
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/checkout/checkout-sdk-go"
+	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
+	issuingTesting "github.com/checkout/checkout-sdk-go/issuing/testing"
 	"github.com/checkout/checkout-sdk-go/nas"
 
 	cardholders "github.com/checkout/checkout-sdk-go/issuing/cardholders"
@@ -14,38 +18,25 @@ import (
 	controls "github.com/checkout/checkout-sdk-go/issuing/controls"
 )
 
-var issuingClientApi *nas.Api
-var cardholder = cardholders.CardholderRequest{}
-var cardholderResponse *cardholders.CardholderResponse
-var virtualCardResponse *cards.CardResponse
-var virtualCardId string
-var cardControlResponse *controls.CardControlResponse
+var (
+	issuingClientApi *nas.Api
+
+	cardholder          cardholders.CardholderRequest
+	cardholderResponse  *cardholders.CardholderResponse
+	virtualCardResponse *cards.CardResponse
+	cardControlResponse *controls.CardControlResponse
+
+	virtualCardId string
+)
 
 func TestSetupIssuing(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
-	cardholder = cardholders.CardholderRequest{
-		Type:             cardholders.Individual,
-		Reference:        "X-123456-N11",
-		EntityId:         "ent_mujh2nia2ypezmw5fo2fofk7ka",
-		FirstName:        "John",
-		MiddleName:       "Fitzgerald",
-		LastName:         "Kennedy",
-		Email:            "john.kennedy@myemaildomain.com",
-		PhoneNumber:      Phone(),
-		DateOfBirth:      "1985-05-15",
-		BillingAddress:   Address(),
-		ResidencyAddress: Address(),
-		Document: &cardholders.CardholderDocument{
-			Type:            common.NationalIdentityCard,
-			FrontDocumentId: "file_6lbss42ezvoufcb2beo76rvwly",
-			BackDocumentId:  "file_aaz5pemp6326zbuvevp6qroqu4",
-		},
-	}
 
-	cardholderResponse = cardholderRequest(cardholder)
-	virtualCardResponse = cardRequest(cardholderResponse)
+	cardholderResponse = cardholderRequest(t)
+	virtualCardResponse = cardRequest(t, cardholderResponse)
+	cardControlResponse = cardControlRequest(t, virtualCardId)
+
 	virtualCardId = virtualCardResponse.Id
-	cardControlResponse = cardControlRequest(virtualCardId)
 }
 
 func buildIssuingClientApi() *nas.Api {
@@ -67,12 +58,35 @@ func buildIssuingClientApi() *nas.Api {
 	return issuingClientApi
 }
 
-func cardholderRequest(request cardholders.CardholderRequest) *cardholders.CardholderResponse {
-	response, _ := buildIssuingClientApi().Issuing.CreateCardholder(request)
+func cardholderRequest(t *testing.T) *cardholders.CardholderResponse {
+	request := cardholders.CardholderRequest{
+		Type:             cardholders.Individual,
+		Reference:        "X-123456-N11",
+		EntityId:         "ent_mujh2nia2ypezmw5fo2fofk7ka",
+		FirstName:        "John",
+		MiddleName:       "Fitzgerald",
+		LastName:         "Kennedy",
+		Email:            "john.kennedy@myemaildomain.com",
+		PhoneNumber:      Phone(),
+		DateOfBirth:      "1985-05-15",
+		BillingAddress:   Address(),
+		ResidencyAddress: Address(),
+		Document: &cardholders.CardholderDocument{
+			Type:            common.NationalIdentityCard,
+			FrontDocumentId: "file_6lbss42ezvoufcb2beo76rvwly",
+			BackDocumentId:  "file_aaz5pemp6326zbuvevp6qroqu4",
+		},
+	}
+
+	response, err := buildIssuingClientApi().Issuing.CreateCardholder(request)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating cardholder - %s", err.Error()))
+	}
+
 	return response
 }
 
-func cardRequest(cardholderResponse *cardholders.CardholderResponse) *cards.CardResponse {
+func cardRequest(t *testing.T, cardholderResponse *cardholders.CardholderResponse) *cards.CardResponse {
 	virtualCard := cards.NewVirtualCardRequest()
 	virtualCard.CardDetailsRequest = cards.CardDetailsRequest{
 		Type:         cards.Virtual,
@@ -88,11 +102,15 @@ func cardRequest(cardholderResponse *cardholders.CardholderResponse) *cards.Card
 	}
 	virtualCard.IsSingleUse = false
 
-	response, _ := buildIssuingClientApi().Issuing.CreateCard(virtualCard)
+	response, err := buildIssuingClientApi().Issuing.CreateCard(virtualCard)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating card - %s", err.Error()))
+	}
+
 	return response
 }
 
-func cardControlRequest(virtualCardId string) *controls.CardControlResponse {
+func cardControlRequest(t *testing.T, virtualCardId string) *controls.CardControlResponse {
 	velocityCardControl := controls.NewVelocityCardControlRequest()
 	velocityCardControl.ControlType = controls.VelocityLimitType
 	velocityCardControl.Description = "Max spend of 500€ per week for restaurants"
@@ -103,6 +121,32 @@ func cardControlRequest(virtualCardId string) *controls.CardControlResponse {
 			Type: controls.Weekly,
 		},
 	}
-	response, _ := buildIssuingClientApi().Issuing.CreateControl(velocityCardControl)
+	response, err := buildIssuingClientApi().Issuing.CreateControl(velocityCardControl)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating card control - %s", err.Error()))
+	}
+
+	return response
+}
+
+func cardSimulation(t *testing.T, card cards.CardResponse) *issuingTesting.CardAuthorizationResponse {
+	request := issuingTesting.CardAuthorizationRequest{
+		Card: issuingTesting.CardSimulation{
+			Id:          card.Id,
+			ExpiryMonth: card.ExpiryMonth,
+			ExpiryYear:  card.ExpiryYear,
+		},
+		Transaction: issuingTesting.TransactionSimulation{
+			Type:     issuingTesting.Purchase,
+			Amount:   100,
+			Currency: common.GBP,
+		},
+	}
+
+	response, err := buildIssuingClientApi().Issuing.SimulateAuthorization(request)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error authorizing transaction - %s", err.Error()))
+	}
+
 	return response
 }

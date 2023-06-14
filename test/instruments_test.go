@@ -12,10 +12,16 @@ import (
 	"github.com/checkout/checkout-sdk-go/tokens"
 )
 
-func TestCreateAndGetInstrument(t *testing.T) {
-	cardTokenResponse := RequestCardToken(t)
-	response := createTokenInstrument(t, cardTokenResponse)
+var (
+	instrumentToken *nas.CreateTokenInstrumentResponse
+)
 
+func TestSetupInstrument(t *testing.T) {
+	cardTokenResponse := RequestCardToken(t)
+	instrumentToken = createTokenInstrument(t, cardTokenResponse)
+}
+
+func TestCreateAndGetInstrument(t *testing.T) {
 	cases := []struct {
 		name       string
 		responseId string
@@ -23,7 +29,7 @@ func TestCreateAndGetInstrument(t *testing.T) {
 	}{
 		{
 			name:       "when get a created instrument then return it",
-			responseId: response.Id,
+			responseId: instrumentToken.Id,
 			checker: func(response *nas.GetInstrumentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -50,15 +56,12 @@ func TestCreateAndGetInstrument(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.Get(response.Id))
+			tc.checker(client.Get(instrumentToken.Id))
 		})
 	}
 }
 
 func TestShouldGetInstrument(t *testing.T) {
-	token := RequestCardToken(t)
-	createInstrumentResponse := createTokenInstrument(t, token)
-
 	cases := []struct {
 		name       string
 		responseId string
@@ -66,7 +69,7 @@ func TestShouldGetInstrument(t *testing.T) {
 	}{
 		{
 			name:       "when fetching a valid instrument then return instrument data",
-			responseId: createInstrumentResponse.Id,
+			responseId: instrumentToken.Id,
 			checker: func(response *nas.GetInstrumentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -142,8 +145,6 @@ func TestShouldGetBankAccountFields(t *testing.T) {
 }
 
 func TestShouldUpdateInstrument(t *testing.T) {
-	token := RequestCardToken(t)
-	createInstrumentResponse := createTokenInstrument(t, token)
 	cardTokenResponse := RequestCardToken(t)
 	updateTokenInstrumentRequest := nas.NewUpdateTokenInstrumentRequest()
 	updateTokenInstrumentRequest.Token = cardTokenResponse.Token
@@ -156,7 +157,7 @@ func TestShouldUpdateInstrument(t *testing.T) {
 	}{
 		{
 			name:         "when update an instrument then return instrument data",
-			instrumentId: createInstrumentResponse.Id,
+			instrumentId: instrumentToken.Id,
 			request:      updateTokenInstrumentRequest,
 			checker: func(response *nas.UpdateInstrumentResponse, err error) {
 				assert.Nil(t, err)
@@ -177,9 +178,6 @@ func TestShouldUpdateInstrument(t *testing.T) {
 }
 
 func TestShouldDeleteInstrument(t *testing.T) {
-	token := RequestCardToken(t)
-	createInstrumentResponse := createTokenInstrument(t, token)
-
 	cases := []struct {
 		name         string
 		instrumentId string
@@ -188,7 +186,7 @@ func TestShouldDeleteInstrument(t *testing.T) {
 	}{
 		{
 			name:         "when delete an instrument then return 204",
-			instrumentId: createInstrumentResponse.Id,
+			instrumentId: instrumentToken.Id,
 			checkerOne: func(response *common.MetadataResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)

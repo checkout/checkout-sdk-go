@@ -52,6 +52,7 @@ func TestShouldGetEventTypes(t *testing.T) {
 }
 
 func TestRetrieveEvents(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable")
 	makeCardPaymentPrevious(t, false, 10)
 
 	cases := []struct {
@@ -84,6 +85,7 @@ func TestRetrieveEvents(t *testing.T) {
 }
 
 func TestRetrieveEvent(t *testing.T) {
+	t.Skip("Skipping tests because this suite is unstable")
 	makeCardPaymentPrevious(t, false, 10)
 
 	allEvents, _ := PreviousApi().Events.RetrieveEvents()

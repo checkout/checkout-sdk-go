@@ -13,10 +13,16 @@ import (
 	"github.com/checkout/checkout-sdk-go/tokens"
 )
 
-func TestGetInstrumentPrevious(t *testing.T) {
-	cardTokenResponse := RequestCardTokenPrevious(t)
-	createResponse := createTokenInstrumentPrevious(t, cardTokenResponse)
+var (
+	instrumentTokenPrevious *abc.CreateInstrumentResponse
+)
 
+func TestSetupInstrumentsPrevious(t *testing.T) {
+	cardTokenResponse := RequestCardTokenPrevious(t)
+	instrumentTokenPrevious = createTokenInstrumentPrevious(t, cardTokenResponse)
+}
+
+func TestGetInstrumentPrevious(t *testing.T) {
 	cases := []struct {
 		name       string
 		responseId string
@@ -24,7 +30,7 @@ func TestGetInstrumentPrevious(t *testing.T) {
 	}{
 		{
 			name:       "when the request is valid then response is not nil",
-			responseId: createResponse.Id,
+			responseId: instrumentTokenPrevious.Id,
 			checker: func(response *abc.GetInstrumentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -58,8 +64,6 @@ func TestGetInstrumentPrevious(t *testing.T) {
 }
 
 func TestUpdateInstrumentPrevious(t *testing.T) {
-	cardTokenResponse := RequestCardTokenPrevious(t)
-	createResponse := createTokenInstrumentPrevious(t, cardTokenResponse)
 	updateRequest := abc.UpdateInstrumentRequest{
 		ExpiryMonth: 12,
 		ExpiryYear:  2026,
@@ -75,7 +79,7 @@ func TestUpdateInstrumentPrevious(t *testing.T) {
 	}{
 		{
 			name:          "when update instrument request then this request is updated",
-			responseId:    createResponse.Id,
+			responseId:    instrumentTokenPrevious.Id,
 			updateRequest: updateRequest,
 			checkerUpdate: func(response *abc.UpdateInstrumentResponse, err error) {
 				assert.Nil(t, err)
@@ -105,9 +109,6 @@ func TestUpdateInstrumentPrevious(t *testing.T) {
 }
 
 func TestDeleteInstrumentPrevious(t *testing.T) {
-	cardTokenResponse := RequestCardTokenPrevious(t)
-	createResponse := createTokenInstrumentPrevious(t, cardTokenResponse)
-
 	cases := []struct {
 		name          string
 		responseId    string
@@ -116,7 +117,7 @@ func TestDeleteInstrumentPrevious(t *testing.T) {
 	}{
 		{
 			name:       "when delete a instrument request then return 204",
-			responseId: createResponse.Id,
+			responseId: instrumentTokenPrevious.Id,
 			checkerDelete: func(response *common.MetadataResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)

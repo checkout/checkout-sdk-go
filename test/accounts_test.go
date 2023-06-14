@@ -20,7 +20,26 @@ var (
 	oauthAccountsClient     *nas.Api
 	oauthPayoutsScheduleApi *nas.Api
 	oauthFilesApi           *nas.Api
+
+	entityId            string
+	entityCompanyId     string
+	paymentInstrumentId string
+
+	reference = GenerateRandomReference()
 )
+
+func TestSetupAccountsSuite(t *testing.T) {
+	requestFileId := submitFile(
+		t,
+		accounts.File{
+			File:    "./checkout.pdf",
+			Purpose: common.BankVerification,
+		})
+
+	entityId = createEntity(t, &reference)
+	entityCompanyId = createEntityCompany(t)
+	paymentInstrumentId = createPaymentInstrument(t, entityCompanyId, requestFileId)
+}
 
 func TestSubmitFileAccounts(t *testing.T) {
 	cases := []struct {
@@ -88,11 +107,6 @@ func TestSubmitFileAccounts(t *testing.T) {
 }
 
 func TestCreateEntity(t *testing.T) {
-	var (
-		reference = GenerateRandomReference()
-		entityId  = createEntity(t, &reference)
-	)
-
 	cases := []struct {
 		name    string
 		request accounts.OnboardEntityRequest
@@ -175,10 +189,6 @@ func TestCreateEntity(t *testing.T) {
 }
 
 func TestGetEntity(t *testing.T) {
-	var (
-		entityId = createEntity(t, nil)
-	)
-
 	cases := []struct {
 		name     string
 		entityId string
@@ -215,10 +225,6 @@ func TestGetEntity(t *testing.T) {
 }
 
 func TestUpdateEntity(t *testing.T) {
-	var (
-		entityId = createEntity(t, nil)
-	)
-
 	cases := []struct {
 		name     string
 		entityId string
@@ -291,8 +297,7 @@ func TestUpdateEntity(t *testing.T) {
 
 func TestQueryPaymentInstruments(t *testing.T) {
 	var (
-		entityId = createEntityCompany(t)
-		query    = accounts.PaymentInstrumentsQuery{
+		query = accounts.PaymentInstrumentsQuery{
 			Status: accounts.Unverified,
 		}
 	)
@@ -305,7 +310,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 	}{
 		{
 			name:     "when query a payment instrument then return payment instrument data",
-			entityId: entityId,
+			entityId: entityCompanyId,
 			query:    query,
 			checker: func(response *accounts.PaymentInstrumentQueryResponse, err error) {
 				assert.Nil(t, err)
@@ -335,19 +340,6 @@ func TestQueryPaymentInstruments(t *testing.T) {
 }
 
 func TestRetrievePaymentInstrumentsDetails(t *testing.T) {
-	var (
-		entityId = createEntityCompany(t)
-
-		file = accounts.File{
-			File:    "./checkout.pdf",
-			Purpose: common.BankVerification,
-		}
-
-		requestFileId = submitFile(t, file)
-
-		paymentInstrumentId = paymentInstrumentRequest(t, entityId, requestFileId)
-	)
-
 	cases := []struct {
 		name                string
 		entityId            string
@@ -356,7 +348,7 @@ func TestRetrievePaymentInstrumentsDetails(t *testing.T) {
 	}{
 		{
 			name:                "when fetching valid payment instrument details then return payment instrument details",
-			entityId:            entityId,
+			entityId:            entityCompanyId,
 			paymentInstrumentId: paymentInstrumentId,
 			checker: func(response *accounts.PaymentInstrumentDetailsResponse, err error) {
 				assert.Nil(t, err)
@@ -396,18 +388,6 @@ func TestRetrievePaymentInstrumentsDetails(t *testing.T) {
 
 func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 	t.Skip("returns 428 status when updating")
-	var (
-		entityId = createEntityCompany(t)
-
-		file = accounts.File{
-			File:    "./checkout.pdf",
-			Purpose: common.BankVerification,
-		}
-
-		requestFileId = submitFile(t, file)
-
-		instrumentId = paymentInstrumentRequest(t, entityId, requestFileId)
-	)
 
 	cases := []struct {
 		name         string
@@ -418,8 +398,8 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 	}{
 		{
 			name:         "when updating existing entity and instrument then modify data",
-			entityId:     entityId,
-			instrumentId: instrumentId,
+			entityId:     entityCompanyId,
+			instrumentId: paymentInstrumentId,
 			request: accounts.UpdatePaymentInstrumentRequest{
 				Label:   "new label",
 				Default: true,
@@ -428,13 +408,13 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
-				assert.Equal(t, instrumentId, response.Id)
+				assert.Equal(t, paymentInstrumentId, response.Id)
 			},
 		},
 		{
 			name:         "when entity doesn't exists then return error",
 			entityId:     "not_found",
-			instrumentId: instrumentId,
+			instrumentId: paymentInstrumentId,
 			request: accounts.UpdatePaymentInstrumentRequest{
 				Label:   "new label",
 				Default: true,
@@ -464,7 +444,7 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 		{
 			name:         "when request invalid then return error",
 			entityId:     entityId,
-			instrumentId: instrumentId,
+			instrumentId: paymentInstrumentId,
 			request:      accounts.UpdatePaymentInstrumentRequest{},
 			checker: func(response *common.IdResponse, err error) {
 				assert.Nil(t, response)
@@ -761,7 +741,7 @@ func submitFile(t *testing.T, fileRequest accounts.File) string {
 	return file.Id
 }
 
-func paymentInstrumentRequest(t *testing.T, entityId string, fileId string) string {
+func createPaymentInstrument(t *testing.T, entityId string, fileId string) string {
 	instrumentDocument := accounts.InstrumentDocument{
 		Type:   "bank_statement",
 		FileId: fileId,

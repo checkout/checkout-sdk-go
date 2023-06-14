@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -10,6 +11,14 @@ import (
 	"github.com/checkout/checkout-sdk-go/customers"
 	"github.com/checkout/checkout-sdk-go/errors"
 )
+
+var (
+	customerIdPrevious string
+)
+
+func TestSetupCustomersPrevious(t *testing.T) {
+	customerIdPrevious = createCustomerPrevious(t)
+}
 
 func TestCreateCustomerPrevious(t *testing.T) {
 	cases := []struct {
@@ -58,8 +67,6 @@ func TestCreateCustomerPrevious(t *testing.T) {
 }
 
 func TestGetCustomerPrevious(t *testing.T) {
-	custId := createCustomerPrevious()
-
 	cases := []struct {
 		name       string
 		customerId string
@@ -67,12 +74,12 @@ func TestGetCustomerPrevious(t *testing.T) {
 	}{
 		{
 			name:       "when customer exists then return customer info",
-			customerId: custId,
+			customerId: customerIdPrevious,
 			checker: func(response *customers.GetCustomerResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
-				assert.Equal(t, custId, response.Id)
+				assert.Equal(t, customerIdPrevious, response.Id)
 			},
 		},
 		{
@@ -95,8 +102,6 @@ func TestGetCustomerPrevious(t *testing.T) {
 }
 
 func TestUpdateCustomerPrevious(t *testing.T) {
-	custId := createCustomerPrevious()
-
 	cases := []struct {
 		name       string
 		customerId string
@@ -105,7 +110,7 @@ func TestUpdateCustomerPrevious(t *testing.T) {
 	}{
 		{
 			name:       "when customer exists then return 204 Customer updated successfully",
-			customerId: custId,
+			customerId: customerIdPrevious,
 			request: customers.CustomerRequest{
 				Name: "New Name",
 			},
@@ -140,8 +145,6 @@ func TestUpdateCustomerPrevious(t *testing.T) {
 }
 
 func TestDeleteCustomerPrevious(t *testing.T) {
-	custId := createCustomerPrevious()
-
 	cases := []struct {
 		name       string
 		customerId string
@@ -149,7 +152,7 @@ func TestDeleteCustomerPrevious(t *testing.T) {
 	}{
 		{
 			name:       "when customer exists then delete customer and return 204 Customer Deleted Successfully",
-			customerId: custId,
+			customerId: customerIdPrevious,
 			checker: func(response *common.MetadataResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -177,13 +180,16 @@ func TestDeleteCustomerPrevious(t *testing.T) {
 	}
 }
 
-func createCustomerPrevious() string {
+func createCustomerPrevious(t *testing.T) string {
 	request := customers.CustomerRequest{
 		Email: GenerateRandomEmail(),
 		Name:  Name,
 		Phone: Phone(),
 	}
-	response, _ := PreviousApi().Customers.Create(request)
+	response, err := PreviousApi().Customers.Create(request)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("Error creating customer (previous) - %s", err.Error()))
+	}
 
 	return response.Id
 }

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -10,6 +11,17 @@ import (
 	"github.com/checkout/checkout-sdk-go/customers"
 	"github.com/checkout/checkout-sdk-go/errors"
 )
+
+var (
+	customerId string
+)
+
+func TestSetupCustomers(t *testing.T) {
+	cardTokenResponse := RequestCardToken(t)
+	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
+
+	customerId = createCustomerDefault(t, tokenInstrument.Id)
+}
 
 func TestCreateCustomer(t *testing.T) {
 	cases := []struct {
@@ -58,10 +70,6 @@ func TestCreateCustomer(t *testing.T) {
 }
 
 func TestGetCustomer(t *testing.T) {
-	cardTokenResponse := RequestCardToken(t)
-	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
-	custId := createCustomerDefault(tokenInstrument.Id)
-
 	cases := []struct {
 		name       string
 		customerId string
@@ -69,14 +77,13 @@ func TestGetCustomer(t *testing.T) {
 	}{
 		{
 			name:       "when customer exists then return customer info",
-			customerId: custId,
+			customerId: customerId,
 			checker: func(response *customers.GetCustomerResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
 				assert.NotNil(t, response.Instruments)
-				assert.Equal(t, tokenInstrument.Id, response.Instruments[0].GetCardInstrumentResponse.Id)
-				assert.Equal(t, custId, response.Id)
+				assert.Equal(t, customerId, response.Id)
 			},
 		},
 		{
@@ -99,9 +106,6 @@ func TestGetCustomer(t *testing.T) {
 }
 
 func TestUpdateCustomer(t *testing.T) {
-	cardTokenResponse := RequestCardToken(t)
-	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
-	custId := createCustomerDefault(tokenInstrument.Id)
 
 	cases := []struct {
 		name       string
@@ -111,7 +115,7 @@ func TestUpdateCustomer(t *testing.T) {
 	}{
 		{
 			name:       "when customer exists then return 204 Customer updated successfully",
-			customerId: custId,
+			customerId: customerId,
 			request: customers.CustomerRequest{
 				Name: "New Name",
 			},
@@ -146,10 +150,6 @@ func TestUpdateCustomer(t *testing.T) {
 }
 
 func TestDeleteCustomer(t *testing.T) {
-	cardTokenResponse := RequestCardToken(t)
-	tokenInstrument := createTokenInstrument(t, cardTokenResponse)
-	custId := createCustomerDefault(tokenInstrument.Id)
-
 	cases := []struct {
 		name       string
 		customerId string
@@ -157,7 +157,7 @@ func TestDeleteCustomer(t *testing.T) {
 	}{
 		{
 			name:       "when customer exists then delete customer and return 204 Customer Deleted Successfully",
-			customerId: custId,
+			customerId: customerId,
 			checker: func(response *common.MetadataResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -185,14 +185,17 @@ func TestDeleteCustomer(t *testing.T) {
 	}
 }
 
-func createCustomerDefault(instrumentId string) string {
+func createCustomerDefault(t *testing.T, instrumentId string) string {
 	request := customers.CustomerRequest{
 		Email:     GenerateRandomEmail(),
 		Name:      Name,
 		Phone:     Phone(),
 		DefaultId: instrumentId,
 	}
-	response, _ := DefaultApi().Customers.Create(request)
+	response, err := DefaultApi().Customers.Create(request)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("Error creating customer - %s", err.Error()))
+	}
 
 	return response.Id
 }

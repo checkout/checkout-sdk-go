@@ -30,7 +30,7 @@ type PayoutsTransactionsType string
 const (
 	NotSupported PayoutsTransactionsType = "not_supported"
 	Standard     PayoutsTransactionsType = "standard"
-	FastFounds   PayoutsTransactionsType = "fast_founds"
+	FastFunds    PayoutsTransactionsType = "fast_funds"
 	Unknown      PayoutsTransactionsType = "unknown"
 )
 
@@ -63,6 +63,6 @@ type (
 		IssuerCountryName string               `json:"issuer_country_name,omitempty"`
 		ProductId         string               `json:"product_id,omitempty"`
 		ProductType       string               `json:"product_type,omitempty"`
-		CardPayouts       *CardMetadataPayouts `json:"card-payouts,omitempty"`
+		CardPayouts       *CardMetadataPayouts `json:"card_payouts,omitempty"`
 	}
 )

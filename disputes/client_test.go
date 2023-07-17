@@ -125,7 +125,7 @@ func TestQuery(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable Entity",
-							Data:       &pagingError,
+							Data:       pagingError,
 						})
 			},
 			checker: func(response *QueryResponse, err error) {
@@ -134,7 +134,7 @@ func TestQuery(t *testing.T) {
 				chkErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
 				assert.Equal(t, "422 Unprocessable Entity", chkErr.Status)
-				assert.Equal(t, &pagingError, chkErr.Data)
+				assert.Equal(t, pagingError, chkErr.Data)
 			},
 		},
 	}

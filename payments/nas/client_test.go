@@ -117,7 +117,7 @@ func TestRequestPayment(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"payment_source_required",
@@ -353,7 +353,7 @@ func TestRequestPayout(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"payment_source_required",
@@ -723,7 +723,7 @@ func TestCapturePayment(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"payment_source_required",
@@ -876,7 +876,7 @@ func TestRefundPayment(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"payment_source_required",
@@ -1028,7 +1028,7 @@ func TestVoidPayment(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"payment_source_required",

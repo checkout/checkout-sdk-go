@@ -86,7 +86,7 @@ func TestRequestQuote(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "request_invalid",
 								ErrorCodes: []string{"source_currency_required"},
 							},

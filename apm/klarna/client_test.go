@@ -73,7 +73,7 @@ func TestCreateSession(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable Entity",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"amount_required",
@@ -268,7 +268,7 @@ func TestCapturePayment(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable Entity",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"amount_required",
@@ -359,7 +359,7 @@ func TestVoidPayment(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable Entity",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"amount_required",

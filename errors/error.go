@@ -17,7 +17,7 @@ type (
 	CheckoutAPIError struct {
 		StatusCode int
 		Status     string
-		Data       *ErrorDetails
+		Data       ErrorDetails
 	}
 
 	CheckoutOAuthError struct {

@@ -25,7 +25,7 @@ func TestHandleError(t *testing.T) {
 			expectedError: CheckoutAPIError{
 				StatusCode: http.StatusNotFound,
 				Status:     "404 Not Found",
-				Data: &ErrorDetails{
+				Data: ErrorDetails{
 					RequestID:  "12345",
 					ErrorType:  "",
 					ErrorCodes: nil,
@@ -41,7 +41,7 @@ func TestHandleError(t *testing.T) {
 			expectedError: CheckoutAPIError{
 				StatusCode: http.StatusUnprocessableEntity,
 				Status:     "422 Unprocessable Entity",
-				Data: &ErrorDetails{
+				Data: ErrorDetails{
 					RequestID:  "12345",
 					ErrorType:  "request_invalid",
 					ErrorCodes: []string{"invalid"},

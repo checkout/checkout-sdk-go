@@ -88,7 +88,7 @@ func TestCreateWorkflow(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"Name required",
@@ -1531,7 +1531,7 @@ func TestReflow(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"Events required",

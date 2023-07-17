@@ -87,7 +87,7 @@ func TestCreatePaymentLink(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data:       &errors.ErrorDetails{ErrorType: "request_invalid"},
+							Data:       errors.ErrorDetails{ErrorType: "request_invalid"},
 						})
 			},
 			checker: func(response *PaymentLinkResponse, err error) {

@@ -80,7 +80,7 @@ func TestRequestQuote(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "request_invalid",
 								ErrorCodes: []string{"source_currency_required"},
 							},
@@ -208,7 +208,7 @@ func TestGetRates(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable Entity",
-							Data:       &invalidDataError,
+							Data:       invalidDataError,
 						})
 			},
 			checker: func(response *RatesResponse, err error) {
@@ -217,7 +217,7 @@ func TestGetRates(t *testing.T) {
 				chkErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
 				assert.Equal(t, "422 Unprocessable Entity", chkErr.Status)
-				assert.Equal(t, &invalidDataError, chkErr.Data)
+				assert.Equal(t, invalidDataError, chkErr.Data)
 			},
 		},
 	}

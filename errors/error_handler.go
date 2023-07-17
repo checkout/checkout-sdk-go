@@ -28,6 +28,6 @@ func HandleError(statusCode int, status string, requestId string, body []byte) C
 	return CheckoutAPIError{
 		StatusCode: statusCode,
 		Status:     status,
-		Data:       &details,
+		Data:       details,
 	}
 }

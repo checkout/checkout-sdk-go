@@ -86,7 +86,7 @@ func TestCreateEntity(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"company_or_individual_required"},
 							},
@@ -487,7 +487,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"company_or_individual_required"},
 							},
@@ -635,7 +635,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"company_or_individual_required"},
 							},
@@ -784,7 +784,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"company_or_individual_required"},
 							},
@@ -933,7 +933,7 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"company_or_individual_required"},
 							},

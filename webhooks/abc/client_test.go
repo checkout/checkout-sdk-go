@@ -244,7 +244,7 @@ func TestClientRegisterWebhook(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Invalid Request",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType: "request_invalid",
 								ErrorCodes: []string{
 									"email_required",
@@ -559,7 +559,7 @@ func TestClientUpdateWebhook(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"payment_source_required"},
 							},
@@ -753,7 +753,7 @@ func TestClientPartiallyUpdateWebhook(t *testing.T) {
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
 							Status:     "422 Unprocessable",
-							Data: &errors.ErrorDetails{
+							Data: errors.ErrorDetails{
 								ErrorType:  "invalid_request",
 								ErrorCodes: []string{"payment_source_required"},
 							},

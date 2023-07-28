@@ -1,9 +1,13 @@
 # Checkout.com Golang SDK
 
-![build-status](https://github.com/checkout/checkout-sdk-go/workflows/build-master/badge.svg)
-[![Go Reference](https://pkg.go.dev/badge/github.com/checkout/checkout-sdk-go.svg)](https://pkg.go.dev/github.com/checkout/checkout-sdk-go)
-[![GitHub license](https://img.shields.io/github/license/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/blob/master/LICENSE)
+[![build-status](https://github.com/checkout/checkout-sdk-go/workflows/build-master/badge.svg)](https://github.com/checkout/checkout-sdk-go/actions/workflows/build-master.yml)
+![CodeQL](https://github.com/checkout/checkout-sdk-go/workflows/CodeQL/badge.svg)
+
+[![build-status](https://github.com/checkout/checkout-sdk-go/workflows/build-release/badge.svg)](https://github.com/checkout/checkout-sdk-go/actions/workflows/build-release.yml)
 [![GitHub release](https://img.shields.io/github/release/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/releases/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/checkout/checkout-sdk-go.svg)](https://pkg.go.dev/github.com/checkout/checkout-sdk-go)
+
+[![GitHub license](https://img.shields.io/github/license/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/blob/master/LICENSE.md)
 
 ## Getting started
 

@@ -1,6 +1,7 @@
 package mocks
 
 import (
+	"context"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/checkout/checkout-sdk-go/common"
@@ -12,7 +13,11 @@ type (
 )
 
 func (m *ApiClientMock) Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	args := m.Called(path, authorization, responseMapping)
+	return m.GetWithContext(context.Background(), path, authorization, responseMapping)
+}
+
+func (m *ApiClientMock) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
+	args := m.Called(ctx, path, authorization, responseMapping)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)
@@ -22,7 +27,11 @@ func (m *ApiClientMock) Get(path string, authorization *configuration.SdkAuthori
 }
 
 func (m *ApiClientMock) Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
-	args := m.Called(path, authorization, request, responseMapping, idempotencyKey)
+	return m.PostWithContext(context.Background(), path, authorization, request, responseMapping, idempotencyKey)
+}
+
+func (m *ApiClientMock) PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
+	args := m.Called(ctx, path, authorization, request, responseMapping, idempotencyKey)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)
@@ -32,7 +41,11 @@ func (m *ApiClientMock) Post(path string, authorization *configuration.SdkAuthor
 }
 
 func (m *ApiClientMock) Put(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
-	args := m.Called(path, authorization, request, responseMapping, idempotencyKey)
+	return m.PutWithContext(context.Background(), path, authorization, request, responseMapping, idempotencyKey)
+}
+
+func (m *ApiClientMock) PutWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
+	args := m.Called(ctx, path, authorization, request, responseMapping, idempotencyKey)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)
@@ -42,7 +55,11 @@ func (m *ApiClientMock) Put(path string, authorization *configuration.SdkAuthori
 }
 
 func (m *ApiClientMock) Patch(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
-	args := m.Called(path, authorization, request, responseMapping)
+	return m.PatchWithContext(context.Background(), path, authorization, request, responseMapping)
+}
+
+func (m *ApiClientMock) PatchWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	args := m.Called(ctx, path, authorization, request, responseMapping)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)
@@ -52,7 +69,11 @@ func (m *ApiClientMock) Patch(path string, authorization *configuration.SdkAutho
 }
 
 func (m *ApiClientMock) Delete(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	args := m.Called(path, authorization, responseMapping)
+	return m.DeleteWithContext(context.Background(), path, authorization, responseMapping)
+}
+
+func (m *ApiClientMock) DeleteWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
+	args := m.Called(ctx, path, authorization, responseMapping)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)
@@ -62,7 +83,11 @@ func (m *ApiClientMock) Delete(path string, authorization *configuration.SdkAuth
 }
 
 func (m *ApiClientMock) Upload(path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
-	args := m.Called(path, authorization, request, responseMapping)
+	return m.UploadWithContext(context.Background(), path, authorization, request, responseMapping)
+}
+
+func (m *ApiClientMock) UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
+	args := m.Called(ctx, path, authorization, request, responseMapping)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)

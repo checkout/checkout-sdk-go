@@ -1,6 +1,7 @@
 package ideal
 
 import (
+	"context"
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,13 +20,17 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) GetInfo() (*IdealInfo, error) {
+	return c.GetInfoWithContext(context.Background())
+}
+
+func (c *Client) GetInfoWithContext(ctx context.Context) (*IdealInfo, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response IdealInfo
-	err = c.apiClient.Get(common.BuildPath(idealExternalPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idealExternalPath), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +39,17 @@ func (c *Client) GetInfo() (*IdealInfo, error) {
 }
 
 func (c *Client) GetIssuers() (*IssuerResponse, error) {
+	return c.GetIssuersWithContext(context.Background())
+}
+
+func (c *Client) GetIssuersWithContext(ctx context.Context) (*IssuerResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response IssuerResponse
-	err = c.apiClient.Get(common.BuildPath(idealExternalPath, issuersPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idealExternalPath, issuersPath), auth, &response)
 	if err != nil {
 		return nil, err
 	}

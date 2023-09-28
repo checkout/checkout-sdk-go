@@ -398,6 +398,7 @@ func TestGetFileDetails(t *testing.T) {
 }
 
 func TestGetDisputeSchemeFiles(t *testing.T) {
+	t.Skip("not available")
 	dispute := getDisputes(t).Data[0]
 
 	cases := []struct {

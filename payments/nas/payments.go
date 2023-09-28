@@ -124,6 +124,12 @@ type (
 		Metadata            map[string]interface{}   `json:"metadata,omitempty"`
 	}
 
+	IncrementAuthorizationRequest struct {
+		Amount    int64                  `json:"amount,omitempty"`
+		Reference string                 `json:"reference,omitempty"`
+		Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	}
+
 	CaptureRequest struct {
 		Amount            int64                        `json:"amount,omitempty"`
 		CaptureType       CaptureType                  `json:"capture_type,omitempty"`
@@ -238,6 +244,26 @@ type (
 		Skip         int                  `json:"skip,omitempty"`
 		TotalCount   int                  `json:"total_count,omitempty"`
 		Data         []GetPaymentResponse `json:"data,omitempty"`
+	}
+
+	IncrementAuthorizationResponse struct {
+		HttpMetadata    common.HttpMetadata
+		ActionId        string                      `json:"action_id,omitempty"`
+		Amount          int64                       `json:"amount,omitempty"`
+		Currency        common.Currency             `json:"currency,omitempty"`
+		Approved        bool                        `json:"approved,omitempty"`
+		Status          payments.PaymentStatus      `json:"status,omitempty"`
+		AuthCode        string                      `json:"auth_code,omitempty"`
+		ResponseCode    string                      `json:"response_code,omitempty"`
+		ResponseSummary string                      `json:"response_summary,omitempty"`
+		ExpiresOn       *time.Time                  `json:"expires_on,omitempty"`
+		Balances        *PaymentResponseBalances    `json:"balances,omitempty"`
+		ProcessedOn     *time.Time                  `json:"processed_on,omitempty"`
+		Reference       string                      `json:"reference,omitempty"`
+		Processing      *payments.PaymentProcessing `json:"processing,omitempty"`
+		Eci             string                      `json:"eci,omitempty"`
+		SchemeId        string                      `json:"scheme_id,omitempty"`
+		Links           map[string]common.Link      `json:"_links"`
 	}
 )
 

@@ -28,7 +28,7 @@ var (
 	}
 	address = &common.Address{
 		AddressLine1: "Checkout.com",
-		AddressLine2: "90 Tottenham Court Road",
+		AddressLine2: "ABC build",
 		City:         "London",
 		State:        "London",
 		Zip:          "W1T 4TJ",

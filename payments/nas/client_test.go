@@ -3,6 +3,7 @@ package nas
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -598,6 +599,205 @@ func TestGetPaymentActions(t *testing.T) {
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetPaymentActions(tc.paymentId))
+		})
+	}
+}
+
+func TestIncrementAuthorization(t *testing.T) {
+	var (
+		incrementalAuthorizationRequest = IncrementAuthorizationRequest{
+			Amount:    6540,
+			Reference: "ORD-5023-4E89",
+			Metadata: map[string]interface{}{
+				"coupon_code": "NY2018",
+				"partner_id":  123989,
+			},
+		}
+
+		expiresOn   = time.Now().Add(time.Hour * 24 * 5)
+		processedOn = time.Now()
+		balances    = PaymentResponseBalances{
+			TotalAuthorized:    6540,
+			TotalVoided:        0,
+			AvailableToVoid:    6540,
+			TotalCaptured:      0,
+			AvailableToCapture: 6540,
+			TotalRefunded:      0,
+			AvailableToRefund:  0,
+		}
+
+		processing = payments.PaymentProcessing{
+			RetrievalReferenceNumber: "909913440644",
+			AcquirerTransactionId:    "440644309099499894406",
+			RecommendationCode:       "02",
+		}
+
+		incrementalAuthorizationResponse = IncrementAuthorizationResponse{
+			HttpMetadata:    mocks.HttpMetadataStatusCreated,
+			ActionId:        "act_y3oqhf46pyzuxjbcn2giaqnb44",
+			Amount:          6540,
+			Currency:        common.USD,
+			Approved:        true,
+			Status:          payments.Authorized,
+			AuthCode:        "643381",
+			ResponseCode:    "10000",
+			ResponseSummary: "Approved",
+			ExpiresOn:       &expiresOn,
+			Balances:        &balances,
+			ProcessedOn:     &processedOn,
+			Reference:       "ORD-5023-4E89",
+			Processing:      &processing,
+			Eci:             "06",
+			SchemeId:        "489341065491658",
+			Links: map[string]common.Link{
+				"self": {
+					HRef: &[]string{"https://www.test-link.com"}[0],
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		paymentId        string
+		request          IncrementAuthorizationRequest
+		idempotencyKey   *string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*IncrementAuthorizationResponse, error)
+	}{
+		{
+			name:      "when request is correct then increment authorization",
+			paymentId: paymentId,
+			request:   incrementalAuthorizationRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*IncrementAuthorizationResponse)
+						*respMapping = incrementalAuthorizationResponse
+					})
+			},
+			checker: func(response *IncrementAuthorizationResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.Equal(t, incrementalAuthorizationResponse.ActionId, response.ActionId)
+				assert.Equal(t, incrementalAuthorizationResponse.Amount, response.Amount)
+				assert.Equal(t, incrementalAuthorizationResponse.Status, response.Status)
+				assert.Equal(t, incrementalAuthorizationResponse.Reference, response.Reference)
+				assert.Equal(t, incrementalAuthorizationResponse.Eci, response.Eci)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *IncrementAuthorizationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:      "when capture not allowed then return error",
+			paymentId: paymentId,
+			request:   IncrementAuthorizationRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{StatusCode: http.StatusForbidden})
+			},
+			checker: func(response *IncrementAuthorizationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusForbidden, chkErr.StatusCode)
+			},
+		},
+		{
+			name:      "when increment authorization not found then return error",
+			paymentId: "not_found",
+			request:   IncrementAuthorizationRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *IncrementAuthorizationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:      "when request invalid then return error",
+			paymentId: paymentId,
+			request:   IncrementAuthorizationRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Invalid Request",
+							Data: &errors.ErrorDetails{
+								ErrorType: "request_invalid",
+								ErrorCodes: []string{
+									"payment_source_required",
+								},
+							},
+						})
+			},
+			checker: func(response *IncrementAuthorizationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.IncrementAuthorization(tc.paymentId, tc.request, tc.idempotencyKey))
 		})
 	}
 }

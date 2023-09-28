@@ -115,6 +115,31 @@ func (c *Client) GetPaymentActions(paymentId string) (*GetPaymentActionsResponse
 	return &response, nil
 }
 
+func (c *Client) IncrementAuthorization(
+	paymentId string,
+	incrementAuthorizationRequest IncrementAuthorizationRequest,
+	idempotencyKey *string,
+) (*IncrementAuthorizationResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response IncrementAuthorizationResponse
+	err = c.apiClient.Post(
+		common.BuildPath(payments.PathPayments, paymentId, "authorizations"),
+		auth,
+		incrementAuthorizationRequest,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) CapturePayment(
 	paymentId string,
 	captureRequest CaptureRequest,

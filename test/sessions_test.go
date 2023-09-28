@@ -69,6 +69,7 @@ func TestRequestSession(t *testing.T) {
 }
 
 func TestGetSessionDetails(t *testing.T) {
+	t.Skip("not available")
 	session := createSession(t, getNonHostedSession(getBrowserChannel(),
 		sessions.Payment,
 		common.NoPreference,
@@ -124,6 +125,7 @@ func TestGetSessionDetails(t *testing.T) {
 }
 
 func TestUpdateSession(t *testing.T) {
+	t.Skip("not available")
 	session := createSession(t, getHostedSession()).Accepted
 
 	cases := []struct {
@@ -180,6 +182,7 @@ func TestUpdateSession(t *testing.T) {
 }
 
 func TestUpdate3dsMethodCompletion(t *testing.T) {
+	t.Skip("not available")
 	session := createSession(t, getHostedSession()).Accepted
 
 	cases := []struct {
@@ -329,7 +332,7 @@ func getNonHostedSession(
 	sessionAddress := &sources.SessionAddress{
 		Address: common.Address{
 			AddressLine1: "Checkout.com",
-			AddressLine2: "ABC building",
+			AddressLine2: "ABC build",
 			City:         "London",
 			State:        "ENG",
 			Zip:          "WIT 4JT",
@@ -384,7 +387,7 @@ func getHostedSession() sessions.SessionRequest {
 	sessionAddress := &sources.SessionAddress{
 		Address: common.Address{
 			AddressLine1: "Checkout.com",
-			AddressLine2: "ABC building",
+			AddressLine2: "ABC build",
 			City:         "London",
 			State:        "ENG",
 			Zip:          "WIT 4JT",

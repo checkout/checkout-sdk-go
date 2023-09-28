@@ -225,6 +225,9 @@ func TestActivateCard(t *testing.T) {
 
 func TestGetCardCredentials(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
+	query := cards.CardCredentialsQuery{
+		Credentials: "number, cvc2",
+	}
 	cases := []struct {
 		name    string
 		cardId  string
@@ -234,9 +237,7 @@ func TestGetCardCredentials(t *testing.T) {
 		{
 			name:   "when get card credentials and this request is correct then should return a response",
 			cardId: virtualCardId,
-			query: cards.CardCredentialsQuery{
-				Credentials: "number, cvc2",
-			},
+			query:  query,
 			checker: func(response *cards.CardCredentialsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)

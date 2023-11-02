@@ -140,6 +140,30 @@ func (c *Client) CapturePayment(
 	return &response, nil
 }
 
+func (c *Client) CapturePaymentWithoutRequest(
+	paymentId string,
+	idempotencyKey *string,
+) (*payments.CaptureResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var response payments.CaptureResponse
+	err = c.apiClient.Post(
+		common.BuildPath(payments.PathPayments, paymentId, "captures"),
+		auth,
+		nil,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) RefundPayment(
 	paymentId string,
 	refundRequest *payments.RefundRequest,

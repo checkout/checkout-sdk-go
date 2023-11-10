@@ -22,9 +22,10 @@ type (
 	}
 
 	AccountBalance struct {
-		Descriptor      string   `json:"descriptor,omitempty"`
-		HoldingCurrency string   `json:"holding_currency,omitempty"`
-		Balances        Balances `json:"balances,omitempty"`
+		Descriptor        string   `json:"descriptor,omitempty"`
+		CurrencyAccountId string   `json:"currency_account_id,omitempty"`
+		HoldingCurrency   string   `json:"holding_currency,omitempty"`
+		Balances          Balances `json:"balances,omitempty"`
 	}
 
 	QueryResponse struct {

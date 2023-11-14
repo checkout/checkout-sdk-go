@@ -8,7 +8,8 @@ const (
 
 type (
 	QueryFilter struct {
-		Query string `url:"query,omitempty"`
+		Query                 string `url:"query,omitempty"`
+		WithCurrencyAccountId bool   `url:"withCurrencyAccountId,omitempty"`
 	}
 )
 

@@ -138,11 +138,12 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				FailureUrl: FailureUrl,
 			},
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
-				assert.NotNil(t, err)
-				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+			},
+			checkForPaymentInfo: func(response *nas.GetPaymentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
 			},
 		},
 		{
@@ -293,7 +294,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.Nil(t, response)
 				ckoErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "cko_processing_channel_id_invalid", ckoErr.Data.ErrorCodes[0])
+				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{

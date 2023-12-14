@@ -48,4 +48,5 @@ const (
 	IssuingCardMgmt             = "issuing:card-mgmt"
 	IssuingControlsRead         = "issuing:controls-read"
 	IssuingControlsWrite        = "issuing:controls-write"
+	PaymentContexts             = "Payment Contexts"
 )

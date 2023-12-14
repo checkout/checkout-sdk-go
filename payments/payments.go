@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/sessions"
 )
 
 const PathPayments = "payments"
@@ -154,6 +155,15 @@ const (
 	C55 FundTransferType = "C55"
 )
 
+type PaymentContextsShippingMethod string
+
+const (
+	Digital        PaymentContextsShippingMethod = "Digital"
+	PickUp         PaymentContextsShippingMethod = "PickUp"
+	BillingAddress PaymentContextsShippingMethod = "BillingAddress"
+	OtherAddress   PaymentContextsShippingMethod = "OtherAddress"
+)
+
 type (
 	AirlineData struct {
 		Ticket           *Ticket            `json:"ticket,omitempty"`
@@ -202,9 +212,15 @@ type (
 	}
 
 	ShippingDetails struct {
-		Address        *common.Address `json:"address,omitempty"`
-		Phone          *common.Phone   `json:"phone,omitempty"`
-		FromAddressZip string          `json:"from_address_zip,omitempty"`
+		FirstName      string                        `json:"first_name,omitempty"`
+		LastName       string                        `json:"last_name,omitempty"`
+		Email          string                        `json:"email,omitempty"`
+		Address        *common.Address               `json:"address,omitempty"`
+		Phone          *common.Phone                 `json:"phone,omitempty"`
+		FromAddressZip string                        `json:"from_address_zip,omitempty"`
+		Timeframe      sessions.DeliveryTimeframe    `json:"time_frame,omitempty"`
+		Method         PaymentContextsShippingMethod `json:"method,omitempty"`
+		Delay          int                           `json:"delay,omitempty"`
 	}
 
 	BillingDescriptor struct {

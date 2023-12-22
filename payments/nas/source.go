@@ -9,9 +9,10 @@ import (
 
 type (
 	SourceResponse struct {
-		ResponseCardSource            *ResponseCardSource
-		ResponseCurrencyAccountSource *ResponseCurrencyAccountSource
-		AlternativeResponse           *common.AlternativeResponse
+		ResponseCardSource                  *ResponseCardSource
+		ResponseCurrencyAccountSource       *ResponseCurrencyAccountSource
+		PaymentContextsPayPayResponseSource *PaymentContextsPayPayResponseSource
+		AlternativeResponse                 *common.AlternativeResponse
 	}
 
 	ResponseCardSource struct {
@@ -44,6 +45,10 @@ type (
 		Type   payments.SourceType `json:"type,omitempty"`
 		Amount int                 `json:"amount,omitempty"`
 	}
+
+	PaymentContextsPayPayResponseSource struct {
+		Type payments.SourceType `json:"type,omitempty"`
+	}
 )
 
 func (s *SourceResponse) UnmarshalJSON(data []byte) error {
@@ -65,6 +70,12 @@ func (s *SourceResponse) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		s.ResponseCurrencyAccountSource = &typeMapping
+	case string(payments.PayPalSource):
+		var typeMapping PaymentContextsPayPayResponseSource
+		if err := json.Unmarshal(data, &typeMapping); err != nil {
+			return err
+		}
+		s.PaymentContextsPayPayResponseSource = &typeMapping
 	default:
 		var typeMapping common.AlternativeResponse
 		if err := json.Unmarshal(data, &typeMapping); err != nil {

@@ -8,7 +8,8 @@ const (
 
 type (
 	QueryFilter struct {
-		Query string `url:"query,omitempty"`
+		Query                 string `url:"query,omitempty"`
+		WithCurrencyAccountId bool   `url:"withCurrencyAccountId,omitempty"`
 	}
 )
 
@@ -22,9 +23,10 @@ type (
 	}
 
 	AccountBalance struct {
-		Descriptor      string   `json:"descriptor,omitempty"`
-		HoldingCurrency string   `json:"holding_currency,omitempty"`
-		Balances        Balances `json:"balances,omitempty"`
+		Descriptor        string   `json:"descriptor,omitempty"`
+		CurrencyAccountId string   `json:"currency_account_id,omitempty"`
+		HoldingCurrency   string   `json:"holding_currency,omitempty"`
+		Balances          Balances `json:"balances,omitempty"`
 	}
 
 	QueryResponse struct {

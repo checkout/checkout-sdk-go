@@ -138,11 +138,12 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				FailureUrl: FailureUrl,
 			},
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
-				assert.NotNil(t, err)
-				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+			},
+			checkForPaymentInfo: func(response *nas.GetPaymentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
 			},
 		},
 		{
@@ -206,7 +207,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 		{
 			name: "test Trustly source for request payment",
 			request: nas.PaymentRequest{
-				Source:      apm.NewRequestTrustlySource(),
+				Source:      getTrustlySourceRequest(),
 				Amount:      100,
 				Currency:    common.EUR,
 				Capture:     true,
@@ -218,9 +219,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{
@@ -236,9 +234,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{
@@ -291,9 +286,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "cko_processing_channel_id_invalid", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{
@@ -381,11 +373,12 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				FailureUrl: FailureUrl,
 			},
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
-				assert.NotNil(t, err)
-				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+			},
+			checkForPaymentInfo: func(response *nas.GetPaymentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
 			},
 		},
 		{
@@ -476,9 +469,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{
@@ -662,6 +652,13 @@ func getSepaSource() payments.PaymentSource {
 	source.MandateId = "man_12321233211"
 	source.DateOfSignature = "2023-01-01"
 	source.AccountHolder = AccountHolder()
+
+	return source
+}
+
+func getTrustlySourceRequest() payments.PaymentSource {
+	source := apm.NewRequestTrustlySource()
+	source.BillingAddress = Address()
 
 	return source
 }

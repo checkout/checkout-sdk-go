@@ -12,6 +12,7 @@ import (
 )
 
 func TestRequestQuote(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		request forex.QuoteRequest

@@ -223,6 +223,18 @@ type (
 		Delay          int                           `json:"delay,omitempty"`
 	}
 
+	PaymentSegment struct {
+		Brand            string `json:"brand,omitempty"`
+		BusinessCategory string `json:"business_category,omitempty"`
+		Market           string `json:"market,omitempty"`
+	}
+
+	PaymentRetryRequest struct {
+		Enabled      bool `json:"enabled,omitempty"`
+		MaxAttempts  int  `json:"max_attempts,omitempty"`
+		EndAfterDays int  `json:"end_after_days,omitempty"`
+	}
+
 	BillingDescriptor struct {
 		Name string `json:"name,omitempty"`
 		City string `json:"city,omitempty"`
@@ -319,6 +331,9 @@ type (
 		RetrievalReferenceNumber         string   `json:"retrieval_reference_number,omitempty"`
 		AcquirerTransactionId            string   `json:"acquirer_transaction_id,omitempty"`
 		RecommendationCode               string   `json:"recommendation_code,omitempty"`
+		Scheme                           string   `json:"scheme,omitempty"`
+		PartnerMerchantAdviceCode        string   `json:"partner_merchant_advice_code,omitempty"`
+		PartnerResponseCode              string   `json:"partner_response_code,omitempty"`
 		PartnerOrderId                   string   `json:"partner_order_id,omitempty"`
 		PartnerSessionId                 string   `json:"partner_session_id,omitempty"`
 		PartnerClientToken               string   `json:"partner_client_token,omitempty"`
@@ -331,6 +346,12 @@ type (
 		PartnerErrorMessage              string   `json:"partner_error_message,omitempty"`
 		PartnerAuthorizationCode         string   `json:"partner_authorization_code,omitempty"`
 		PartnerAuthorizationResponseCode string   `json:"partner_authorization_response_code,omitempty"`
+	}
+
+	PaymentRetryResponse struct {
+		MaxAttempts   int        `json:"max_attempts,omitempty"`
+		EndsOn        *time.Time `json:"ends_on,omitempty"`
+		NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
 	}
 
 	ThreeDsData struct {

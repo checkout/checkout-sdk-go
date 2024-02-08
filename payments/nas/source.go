@@ -39,6 +39,7 @@ type (
 		AvsCheck                string              `json:"avs_check,omitempty"`
 		CvvCheck                string              `json:"cvv_check,omitempty"`
 		PaymentAccountReference string              `json:"payment_account_reference,omitempty"`
+		EncryptedCardNumber     string              `json:"encrypted_card_number,omitempty"`
 	}
 
 	ResponseCurrencyAccountSource struct {

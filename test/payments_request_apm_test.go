@@ -477,7 +477,7 @@ func TestRequestPaymentsAPM(t *testing.T) {
 				assert.Nil(t, response)
 				ckoErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payment_type_required", ckoErr.Data.ErrorCodes[0])
+				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 	}
@@ -538,7 +538,13 @@ func getEpsSource() payments.PaymentSource {
 }
 
 func getGiropaySource() payments.PaymentSource {
+	accountHolder := common.AccountHolder{
+		FirstName: FirstName,
+		LastName:  LastName,
+	}
+
 	source := apm.NewRequestGiropaySource()
+	source.AccountHolder = &accountHolder
 
 	return source
 }

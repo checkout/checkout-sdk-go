@@ -15,6 +15,11 @@ func (b *CheckoutPreviousSdkBuilder) WithEnvironment(environment configuration.E
 	return b
 }
 
+func (b *CheckoutPreviousSdkBuilder) WithEnvironmentSubdomain(subdomain string) *CheckoutPreviousSdkBuilder {
+	b.EnvironmentSubdomain = configuration.NewEnvironmentSubdomain(b.Environment, subdomain)
+	return b
+}
+
 func (b *CheckoutPreviousSdkBuilder) WithHttpClient(client *http.Client) *CheckoutPreviousSdkBuilder {
 	b.HttpClient = client
 	return b
@@ -47,7 +52,12 @@ func (b *CheckoutPreviousSdkBuilder) Build() (*Api, error) {
 	}
 
 	sdkCredentials := configuration.NewPreviousKeysSdkCredentials(b.SecretKey, b.PublicKey)
+
 	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient, b.Logger)
+
+	if b.EnvironmentSubdomain != nil {
+		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)
+	}
 
 	return CheckoutApi(newConfiguration), nil
 }

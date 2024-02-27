@@ -1,5 +1,10 @@
 package configuration
 
+import (
+	"net/url"
+	"regexp"
+)
+
 type Environment interface {
 	BaseUri() string
 	AuthorizationUri() string
@@ -7,6 +12,32 @@ type Environment interface {
 	TransfersUri() string
 	BalancesUri() string
 	IsSandbox() bool
+}
+
+type EnvironmentSubdomain struct {
+	ApiUrl string
+}
+
+func NewEnvironmentSubdomain(environment Environment, subdomain string) *EnvironmentSubdomain {
+	apiUrl := addSubdomainToApiUrlEnvironment(environment, subdomain)
+	return &EnvironmentSubdomain{ApiUrl: apiUrl}
+}
+
+func addSubdomainToApiUrlEnvironment(environment Environment, subdomain string) string {
+	apiUrl := environment.BaseUri()
+
+	newEnvironment := apiUrl
+
+	regex := regexp.MustCompile("^[0-9a-z]{8}$")
+
+	if regex.MatchString(subdomain) {
+		merchantApiUrl, _ := url.Parse(apiUrl)
+		merchantApiUrl.Host = subdomain + "." + merchantApiUrl.Host
+
+		newEnvironment = merchantApiUrl.String()
+	}
+
+	return newEnvironment
 }
 
 type CheckoutEnv struct {

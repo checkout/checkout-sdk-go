@@ -25,7 +25,8 @@ type (
 
 	nonHostedCompletion struct {
 		CompletionInfo
-		CallbackUrl string `json:"callback_url,omitempty"`
+		CallbackUrl              string `json:"callback_url,omitempty"`
+		ChallengeNotificationUrl string `json:"challenge_notification_url,omitempty"`
 	}
 )
 

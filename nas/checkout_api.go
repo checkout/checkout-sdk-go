@@ -84,6 +84,9 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 }
 
 func buildBaseClient(configuration *configuration.Configuration) client.HttpClient {
+	if configuration.EnvironmentSubdomain != nil {
+		return client.NewApiClient(configuration, configuration.EnvironmentSubdomain.ApiUrl)
+	}
 	return client.NewApiClient(configuration, configuration.Environment.BaseUri())
 }
 

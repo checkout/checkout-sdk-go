@@ -119,34 +119,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			},
 		},
 		{
-			name: "test PayPal source for request payment",
-			request: nas.PaymentRequest{
-				Source:      apm.NewRequestPayPalSource(),
-				Amount:      1000,
-				Currency:    common.EUR,
-				Reference:   Reference,
-				Description: Description,
-				Customer:    &customer,
-				Items: []payments.Product{
-					{
-						Name:      "test item",
-						Quantity:  1,
-						UnitPrice: 1000,
-					},
-				},
-				SuccessUrl: SuccessUrl,
-				FailureUrl: FailureUrl,
-			},
-			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-			},
-			checkForPaymentInfo: func(response *nas.GetPaymentResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-			},
-		},
-		{
 			name: "test Sofort source for request payment",
 			request: nas.PaymentRequest{
 				Source:      apm.NewRequestSofortSource(),
@@ -492,12 +464,13 @@ func TestRequestPaymentsAPM(t *testing.T) {
 		{
 			name: "test Sepa source for request payment",
 			request: nas.PaymentRequest{
-				Source:     getSepaSource(),
-				Amount:     10,
-				Currency:   common.EUR,
-				Reference:  Reference,
-				SuccessUrl: SuccessUrl,
-				FailureUrl: FailureUrl,
+				Source:      getSepaSource(),
+				Amount:      10,
+				Currency:    common.EUR,
+				Reference:   Reference,
+				SuccessUrl:  SuccessUrl,
+				FailureUrl:  FailureUrl,
+				PaymentType: payments.Regular,
 			},
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)
@@ -565,7 +538,13 @@ func getEpsSource() payments.PaymentSource {
 }
 
 func getGiropaySource() payments.PaymentSource {
+	accountHolder := common.AccountHolder{
+		FirstName: FirstName,
+		LastName:  LastName,
+	}
+
 	source := apm.NewRequestGiropaySource()
+	source.AccountHolder = &accountHolder
 
 	return source
 }

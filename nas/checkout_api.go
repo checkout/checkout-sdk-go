@@ -19,6 +19,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments/hosted"
 	"github.com/checkout/checkout-sdk-go/payments/links"
 	payments "github.com/checkout/checkout-sdk-go/payments/nas"
+	"github.com/checkout/checkout-sdk-go/payments/sessions"
 	"github.com/checkout/checkout-sdk-go/reports"
 	"github.com/checkout/checkout-sdk-go/sessions"
 	"github.com/checkout/checkout-sdk-go/tokens"
@@ -27,24 +28,25 @@ import (
 )
 
 type Api struct {
-	Accounts    *accounts.Client
-	Balances    *balances.Client
-	Customers   *customers.Client
-	Disputes    *disputes.Client
-	Financial   *financial.Client
-	Forex       *forex.Client
-	Hosted      *hosted.Client
-	Instruments *instruments.Client
-	Links       *links.Client
-	Metadata    *metadata.Client
-	Payments    *payments.Client
-	Sessions    *sessions.Client
-	Tokens      *tokens.Client
-	Transfers   *transfers.Client
-	WorkFlows   *workflows.Client
-	Reports     *reports.Client
-	Issuing     *issuing.Client
-	Contexts    *contexts.Client
+	Accounts        *accounts.Client
+	Balances        *balances.Client
+	Customers       *customers.Client
+	Disputes        *disputes.Client
+	Financial       *financial.Client
+	Forex           *forex.Client
+	Hosted          *hosted.Client
+	Instruments     *instruments.Client
+	Links           *links.Client
+	Metadata        *metadata.Client
+	Payments        *payments.Client
+	Sessions        *sessions.Client
+	Tokens          *tokens.Client
+	Transfers       *transfers.Client
+	WorkFlows       *workflows.Client
+	Reports         *reports.Client
+	Issuing         *issuing.Client
+	Contexts        *contexts.Client
+	PaymentSessions *payment_sessions.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -73,6 +75,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Reports = reports.NewClient(configuration, apiClient)
 	api.Issuing = issuing.NewClient(configuration, apiClient)
 	api.Contexts = contexts.NewClient(configuration, apiClient)
+	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)
@@ -81,6 +84,9 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 }
 
 func buildBaseClient(configuration *configuration.Configuration) client.HttpClient {
+	if configuration.EnvironmentSubdomain != nil {
+		return client.NewApiClient(configuration, configuration.EnvironmentSubdomain.ApiUrl)
+	}
 	return client.NewApiClient(configuration, configuration.Environment.BaseUri())
 }
 

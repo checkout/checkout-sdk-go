@@ -87,7 +87,8 @@ type (
 	}
 
 	requestGiropaySource struct {
-		Type payments.SourceType `json:"type,omitempty"`
+		Type          payments.SourceType   `json:"type,omitempty"`
+		AccountHolder *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
 	requestIdealSource struct {

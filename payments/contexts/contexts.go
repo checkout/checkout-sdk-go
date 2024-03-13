@@ -126,6 +126,5 @@ type (
 		HttpMetadata    common.HttpMetadata
 		PaymentRequest  *PaymentContextsResponse        `json:"payment_request,omitempty"`
 		PartnerMetadata *PaymentContextsPartnerMetadata `json:"partner_metadata,omitempty"`
-		Customer        map[string]interface{}          `json:"customer,omitempty"`
 	}
 )

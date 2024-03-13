@@ -36,6 +36,11 @@ func (b *CheckoutOAuthSdkBuilder) WithEnvironment(environment configuration.Envi
 	return b
 }
 
+func (b *CheckoutOAuthSdkBuilder) WithEnvironmentSubdomain(subdomain string) *CheckoutOAuthSdkBuilder {
+	b.EnvironmentSubdomain = configuration.NewEnvironmentSubdomain(b.Environment, subdomain)
+	return b
+}
+
 func (b *CheckoutOAuthSdkBuilder) WithHttpClient(client *http.Client) *CheckoutOAuthSdkBuilder {
 	b.HttpClient = client
 	return b
@@ -66,6 +71,10 @@ func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 	}
 
 	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient, b.Logger)
+
+	if b.EnvironmentSubdomain != nil {
+		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)
+	}
 
 	return CheckoutApi(newConfiguration), nil
 }

@@ -48,15 +48,16 @@ type (
 	}
 
 	Representative struct {
-		FirstName      string          `json:"first_name,omitempty"`
-		MiddleName     string          `json:"middle_name,omitempty"`
-		LastName       string          `json:"last_name,omitempty"`
-		Address        *common.Address `json:"address,omitempty"`
-		Identification *Identification `json:"identification,omitempty"`
-		Phone          *Phone          `json:"phone,omitempty"`
-		DateOfBirth    *DateOfBirth    `json:"date_of_birth,omitempty"`
-		PlaceOfBirth   *PlaceOfBirth   `json:"place_of_birth,omitempty"`
-		Roles          []string        `json:"roles,omitempty"`
+		FirstName      string                     `json:"first_name,omitempty"`
+		MiddleName     string                     `json:"middle_name,omitempty"`
+		LastName       string                     `json:"last_name,omitempty"`
+		Address        *common.Address            `json:"address,omitempty"`
+		Identification *Identification            `json:"identification,omitempty"`
+		Phone          *Phone                     `json:"phone,omitempty"`
+		DateOfBirth    *DateOfBirth               `json:"date_of_birth,omitempty"`
+		PlaceOfBirth   *PlaceOfBirth              `json:"place_of_birth,omitempty"`
+		Roles          []string                   `json:"roles,omitempty"`
+		Documents      *OnboardSubEntityDocuments `json:"documents,omitempty"`
 	}
 
 	Identification struct {
@@ -85,15 +86,16 @@ type (
 	}
 
 	Individual struct {
-		FirstName         string          `json:"first_name,omitempty"`
-		MiddleName        string          `json:"middle_name,omitempty"`
-		LastName          string          `json:"last_name,omitempty"`
-		TradingName       string          `json:"trading_name,omitempty"`
-		NationalTaxId     string          `json:"national_tax_id,omitempty"`
-		RegisteredAddress *common.Address `json:"registered_address,omitempty"`
-		DateOfBirth       *DateOfBirth    `json:"date_of_birth,omitempty"`
-		PlaceOfBirth      *PlaceOfBirth   `json:"place_of_birth,omitempty"`
-		Identification    *Identification `json:"identification,omitempty"`
+		FirstName         string                  `json:"first_name,omitempty"`
+		MiddleName        string                  `json:"middle_name,omitempty"`
+		LastName          string                  `json:"last_name,omitempty"`
+		TradingName       string                  `json:"trading_name,omitempty"`
+		NationalTaxId     string                  `json:"national_tax_id,omitempty"`
+		RegisteredAddress *common.Address         `json:"registered_address,omitempty"`
+		DateOfBirth       *DateOfBirth            `json:"date_of_birth,omitempty"`
+		PlaceOfBirth      *PlaceOfBirth           `json:"place_of_birth,omitempty"`
+		Identification    *Identification         `json:"identification,omitempty"`
+		FinancialDetails  *EntityFinancialDetails `json:"financial_details,omitempty"`
 	}
 
 	Capabilities struct {
@@ -133,6 +135,7 @@ type (
 		AverageTransactionValue int64                     `json:"average_transaction_value,omitempty"`
 		HighestTransactionValue int64                     `json:"highest_transaction_value,omitempty"`
 		Documents               *EntityFinancialDocuments `json:"documents,omitempty"`
+		Currency                common.Currency           `json:"currency,omitempty"`
 	}
 
 	EntityFinancialDocuments struct {

@@ -27,13 +27,8 @@ type (
 	}
 
 	PaymentSessionsResponse struct {
-		HttpMetadata   common.HttpMetadata
-		Id             string                  `json:"id,omitempty"`
-		Amount         int64                   `json:"amount,omitempty"`
-		Locale         string                  `json:"locale,omitempty"`
-		Currency       common.Currency         `json:"currency,omitempty"`
-		Customer       *common.CustomerRequest `json:"customer,omitempty"`
-		PaymentMethods []PaymentMethods        `json:"payment_methods,omitempty"`
-		Links          map[string]common.Link  `json:"links,omitempty"`
+		HttpMetadata common.HttpMetadata
+		Id           string                 `json:"id,omitempty"`
+		Links        map[string]common.Link `json:"links,omitempty"`
 	}
 )

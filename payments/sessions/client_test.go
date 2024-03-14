@@ -15,25 +15,9 @@ import (
 
 func TestCreateAPaymentSessions(t *testing.T) {
 	var (
-		paymentMethods = PaymentMethods{
-			Type: "card",
-			CardSchemes: []string{
-				"Visa",
-			},
-		}
 		paymentSessionsResponse = PaymentSessionsResponse{
 			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Id:           "pct_y3oqhf46pyzuxjbcn2giaqnb44",
-			Amount:       2000,
-			Locale:       "en-GB",
-			Currency:     common.GBP,
-			Customer: &common.CustomerRequest{
-				Email: "john.smith@example.com",
-				Name:  "John Smith",
-			},
-			PaymentMethods: []PaymentMethods{
-				paymentMethods,
-			},
 			Links: map[string]common.Link{
 				"self": {
 					HRef: &[]string{"https://api.checkout.com/payment-contexts/pct_y3oqhf46pyzuxjbcn2giaqnb44"}[0],

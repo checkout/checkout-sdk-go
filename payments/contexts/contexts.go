@@ -18,7 +18,9 @@ type (
 		Amount              int64                      `json:"amount,omitempty"`
 		Currency            common.Currency            `json:"currency,omitempty"`
 		PaymentType         payments.PaymentType       `json:"payment_type,omitempty"`
+		AuthorizationType   string                     `json:"authorization_type,omitempty"`
 		Capture             bool                       `json:"capture,omitempty"`
+		Customer            *common.CustomerRequest    `json:"customer,omitempty"`
 		Shipping            *payments.ShippingDetails  `json:"shipping,omitempty"`
 		Processing          *PaymentContextsProcessing `json:"processing,omitempty"`
 		ProcessingChannelId string                     `json:"processing_channel_id,omitempty"`

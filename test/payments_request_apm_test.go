@@ -2,6 +2,7 @@ package test
 
 import (
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -152,12 +153,14 @@ func TestRequestPaymentsAPM(t *testing.T) {
 		{
 			name: "test Tamara source for request payment",
 			request: nas.PaymentRequest{
-				Source:      getTamaraSourceRequest(),
-				Amount:      1000,
-				Currency:    common.SAR,
-				Reference:   Reference,
-				Description: Description,
-				Customer:    &customer,
+				Source:              getTamaraSourceRequest(),
+				Amount:              1000,
+				Currency:            common.GBP,
+				Capture:             true,
+				Reference:           Reference,
+				Description:         Description,
+				Customer:            &customer,
+				ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
 				Items: []payments.Product{
 					{
 						Name:      "test item",
@@ -515,7 +518,14 @@ func getAfterPaySourceRequest() payments.PaymentSource {
 
 func getTamaraSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestTamaraSource()
-	source.BillingAddress = Address()
+	source.BillingAddress = &common.Address{
+		AddressLine1: "Cecilia Chapman",
+		AddressLine2: "711-2880 Nulla St.",
+		City:         "Mankato",
+		State:        "Mississippi",
+		Zip:          "96522",
+		Country:      common.GB,
+	}
 
 	return source
 }

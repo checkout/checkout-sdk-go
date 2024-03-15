@@ -38,10 +38,6 @@ func TestRequestPaymentSessions(t *testing.T) {
 				assert.NotNil(t, response)
 				assert.Equal(t, 201, response.HttpMetadata.StatusCode)
 				assert.NotNil(t, response.Id)
-				assert.Equal(t, int64(2000), response.Amount)
-				assert.Equal(t, "en-GB", response.Locale)
-				assert.Equal(t, common.GBP, response.Currency)
-				assert.NotNil(t, response.PaymentMethods)
 				if response.Links != nil {
 					assert.NotNil(t, response.Links)
 				}

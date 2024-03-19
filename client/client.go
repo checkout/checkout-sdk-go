@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,11 +14,17 @@ import (
 
 type HttpClient interface {
 	Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
+	GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
 	Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
+	PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
 	Put(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
+	PutWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
 	Patch(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error
+	PatchWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error
 	Delete(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
+	DeleteWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
 	Upload(path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error
+	UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error
 }
 
 type ApiClient struct {
@@ -40,30 +47,55 @@ func NewApiClient(configuration *configuration.Configuration, baseUri string) *A
 }
 
 func (a *ApiClient) Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return a.invoke(http.MethodGet, path, authorization, nil, responseMapping, nil)
+	return a.GetWithContext(context.Background(), path, authorization, responseMapping)
+}
+
+func (a *ApiClient) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
+	return a.invoke(ctx, http.MethodGet, path, authorization, nil, responseMapping, nil)
 }
 
 func (a *ApiClient) Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
-	return a.invoke(http.MethodPost, path, authorization, request, responseMapping, idempotencyKey)
+	return a.PostWithContext(context.Background(), path, authorization, request, responseMapping, idempotencyKey)
+}
+
+func (a *ApiClient) PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
+	return a.invoke(ctx, http.MethodPost, path, authorization, request, responseMapping, idempotencyKey)
 }
 
 func (a *ApiClient) Put(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
-	return a.invoke(http.MethodPut, path, authorization, request, responseMapping, idempotencyKey)
+	return a.PutWithContext(context.Background(), path, authorization, request, responseMapping, idempotencyKey)
+}
+
+func (a *ApiClient) PutWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
+	return a.invoke(ctx, http.MethodPut, path, authorization, request, responseMapping, idempotencyKey)
 }
 
 func (a *ApiClient) Patch(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
-	return a.invoke(http.MethodPatch, path, authorization, request, responseMapping, nil)
+	return a.PatchWithContext(context.Background(), path, authorization, request, responseMapping)
+}
+
+func (a *ApiClient) PatchWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	return a.invoke(ctx, http.MethodPatch, path, authorization, request, responseMapping, nil)
 }
 
 func (a *ApiClient) Delete(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return a.invoke(http.MethodDelete, path, authorization, nil, responseMapping, nil)
+	return a.DeleteWithContext(context.Background(), path, authorization, responseMapping)
+}
+
+func (a *ApiClient) DeleteWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
+	return a.invoke(ctx, http.MethodDelete, path, authorization, nil, responseMapping, nil)
 }
 
 func (a *ApiClient) Upload(path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
-	return a.submit(path, authorization, request, responseMapping)
+	return a.UploadWithContext(context.Background(), path, authorization, request, responseMapping)
+}
+
+func (a *ApiClient) UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
+	return a.submit(ctx, path, authorization, request, responseMapping)
 }
 
 func (a *ApiClient) invoke(
+	ctx context.Context,
 	method string,
 	path string,
 	authorization *configuration.SdkAuthorization,
@@ -76,7 +108,7 @@ func (a *ApiClient) invoke(
 		return err
 	}
 
-	req, err := a.buildRequest(method, path, authorization, "application/json", body, idempotencyKey)
+	req, err := a.buildRequest(ctx, method, path, authorization, "application/json", body, idempotencyKey)
 	if err != nil {
 		return err
 	}
@@ -91,12 +123,14 @@ func (a *ApiClient) invoke(
 }
 
 func (a *ApiClient) submit(
+	ctx context.Context,
 	path string,
 	authorization *configuration.SdkAuthorization,
 	request *common.FileUploadRequest,
 	responseMapping interface{},
 ) error {
 	req, err := a.buildRequest(
+		ctx,
 		http.MethodPost,
 		path,
 		authorization,
@@ -118,6 +152,7 @@ func (a *ApiClient) submit(
 }
 
 func (a *ApiClient) buildRequest(
+	ctx context.Context,
 	method string,
 	path string,
 	authorization *configuration.SdkAuthorization,
@@ -125,7 +160,7 @@ func (a *ApiClient) buildRequest(
 	body *bytes.Buffer,
 	idempotencyKey *string,
 ) (*http.Request, error) {
-	req, err := http.NewRequest(method, a.BaseUri+path, body)
+	req, err := http.NewRequestWithContext(ctx, method, a.BaseUri+path, body)
 	if err != nil {
 		return nil, err
 	}

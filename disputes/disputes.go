@@ -10,6 +10,7 @@ const (
 	disputes    = "disputes"
 	accept      = "accept"
 	evidence    = "evidence"
+	submitted   = "submitted"
 	files       = "files"
 	schemeFiles = "schemefiles"
 )
@@ -158,6 +159,16 @@ type (
 	EvidenceResponse struct {
 		HttpMetadata common.HttpMetadata
 		Evidence
+	}
+)
+
+// Submitted
+
+type (
+	DisputeCompiledSubmittedEvidenceResponse struct {
+		HttpMetadata common.HttpMetadata
+		FileId       string                 `json:"file_id,omitempty"`
+		Links        map[string]common.Link `json:"_links,omitempty"`
 	}
 )
 

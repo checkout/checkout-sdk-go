@@ -131,6 +131,21 @@ func (c *Client) SubmitEvidence(disputeId string) (*common.MetadataResponse, err
 	return &response, nil
 }
 
+func (c *Client) GetCompiledSubmittedEvidence(disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response DisputeCompiledSubmittedEvidenceResponse
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, evidence, submitted), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) UploadFile(file common.File) (*common.IdResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

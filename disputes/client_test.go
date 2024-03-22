@@ -638,6 +638,109 @@ func TestSubmitEvidence(t *testing.T) {
 	}
 }
 
+func TestGetCompiledSubmittedEvidence(t *testing.T) {
+	var (
+		compiledSubmittedEvidenceResponse = DisputeCompiledSubmittedEvidenceResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			FileId:       "file_iweu3nxyt6zund3gwhg7wo4fhq",
+			Links: map[string]common.Link{
+				"self": {
+					HRef: &[]string{"https://api.checkout.com/disputes/dsp_f28bcafe073z72ad4a18/evidence/submitted"}[0],
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		disputeId        string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*DisputeCompiledSubmittedEvidenceResponse, error)
+	}{
+		{
+			name:      "when disputeId is correct then return a file",
+			disputeId: disputeId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*DisputeCompiledSubmittedEvidenceResponse)
+						*respMapping = compiledSubmittedEvidenceResponse
+					})
+			},
+			checker: func(response *DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, compiledSubmittedEvidenceResponse.FileId, response.FileId)
+				assert.Equal(t, compiledSubmittedEvidenceResponse.Links["self"].HRef, response.Links["self"].HRef)
+
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:      "when dispute not found then return error",
+			disputeId: "not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+				assert.Equal(t, "404 Not Found", chkErr.Status)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.GetCompiledSubmittedEvidence(tc.disputeId))
+		})
+	}
+}
+
 func TestGetDisputeSchemeFiles(t *testing.T) {
 	var (
 		schemeFilesResponse = SchemeFilesResponse{

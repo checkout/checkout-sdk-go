@@ -23,9 +23,11 @@ const (
 
 	// Accounts
 	BankVerification      Purpose = "bank_verification"
+	Identification        Purpose = "identification"
 	IdentityVerification  Purpose = "identity_verification"
 	CompanyVerification   Purpose = "company_verification"
 	FinancialVerification Purpose = "financial_verification"
+	TaxVerification       Purpose = "tax_verification"
 )
 
 type (

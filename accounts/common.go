@@ -25,9 +25,10 @@ type (
 	}
 
 	Profile struct {
-		Urls                   []string        `json:"urls,omitempty"`
-		Mccs                   []string        `json:"mccs,omitempty"`
-		DefaultHoldingCurrency common.Currency `json:"default_holding_currency,omitempty"`
+		Urls                   []string          `json:"urls,omitempty"`
+		Mccs                   []string          `json:"mccs,omitempty"`
+		DefaultHoldingCurrency common.Currency   `json:"default_holding_currency,omitempty"`
+		HoldingCurrencies      []common.Currency `json:"holding_currencies,omitempty"`
 	}
 
 	Company struct {

@@ -52,7 +52,7 @@ type (
 	RatesResponse struct {
 		Product              string   `json:"product,omitempty"`
 		Source               Source   `json:"source,omitempty"`
-		Rates                []Rate   `json:"currency_pairs,omitempty"`
+		Rates                []Rate   `json:"rates,omitempty"`
 		InvalidCurrencyPairs []string `json:"invalid_currency_pairs,omitempty"`
 	}
 )

@@ -2,6 +2,7 @@ package nas
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/instruments"
@@ -16,6 +17,7 @@ type (
 	GetInstrumentResponse struct {
 		HttpMetadata                     common.HttpMetadata
 		GetCardInstrumentResponse        *GetCardInstrumentResponse
+		GetSepaInstrumentResponse        *GetSepaInstrumentResponse
 		GetBankAccountInstrumentResponse *GetBankAccountInstrumentResponse
 		AlternativeResponse              *common.AlternativeResponse
 	}
@@ -40,6 +42,17 @@ type (
 		IssuerCountry common.Country      `json:"issuer_country,omitempty"`
 		ProductId     string              `json:"product_id,omitempty"`
 		ProductType   string              `json:"product_type,omitempty"`
+	}
+
+	GetSepaInstrumentResponse struct {
+		Type           common.InstrumentType `json:"type" binding:"required"`
+		Id             string                `json:"id,omitempty"`
+		Fingerprint    string                `json:"fingerprint,omitempty"`
+		CreatedOn      *time.Time            `json:"created_on,omitempty"`
+		ModifiedOn     *time.Time            `json:"modified_on,omitempty"`
+		VaultId        string                `json:"vault_id,omitempty"`
+		InstrumentData *InstrumentData       `json:"instrument_data,omitempty"`
+		AccountHolder  *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
 	GetBankAccountInstrumentResponse struct {
@@ -114,6 +127,12 @@ func (s *GetInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.GetCardInstrumentResponse = &response
+	case string(common.Sepa):
+		var response GetSepaInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.GetSepaInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

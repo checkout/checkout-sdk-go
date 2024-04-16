@@ -1,14 +1,14 @@
 package test
 
 import (
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/instruments/nas"
+	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/tokens"
 )
 
@@ -18,6 +18,7 @@ var (
 
 func TestSetupInstrument(t *testing.T) {
 	cardTokenResponse := RequestCardToken(t)
+	_ = createSepaInstrument(t)
 	instrumentToken = createTokenInstrument(t, cardTokenResponse)
 }
 
@@ -209,6 +210,30 @@ func TestShouldDeleteInstrument(t *testing.T) {
 			tc.checkerTwo(client.Get(tc.instrumentId))
 		})
 	}
+}
+
+func createSepaInstrument(t *testing.T) *nas.CreateSepaInstrumentResponse {
+	request := nas.NewCreateSepaInstrumentRequest()
+	request.InstrumentData = &nas.InstrumentData{
+		AccountNumber: "FR7630006000011234567890189",
+		Country:       common.FR,
+		Currency:      common.EUR,
+		PaymentType:   payments.Recurring,
+	}
+	request.AccountHolder = &common.AccountHolder{
+		FirstName:      "Ali",
+		LastName:       "Farid",
+		BillingAddress: Address(),
+		Phone:          Phone(),
+	}
+
+	response, err := DefaultApi().Instruments.Create(request)
+	assert.Nil(t, err)
+	assert.NotNil(t, response.CreateSepaInstrumentResponse)
+	assert.Equal(t, common.Sepa, response.CreateSepaInstrumentResponse.Type)
+	assert.NotEmpty(t, response.CreateSepaInstrumentResponse.Id)
+	assert.NotEmpty(t, response.CreateSepaInstrumentResponse.Fingerprint)
+	return response.CreateSepaInstrumentResponse
 }
 
 func createTokenInstrument(t *testing.T, token *tokens.CardTokenResponse) *nas.CreateTokenInstrumentResponse {

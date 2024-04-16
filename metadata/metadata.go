@@ -79,7 +79,7 @@ type (
 		Scheme       string              `json:"scheme,omitempty"`
 		// Deprecated: This property will be removed in the future, and should not be used. Use LocalSchemes instead.
 		SchemeLocal        SchemeLocalType      `json:"scheme_local,omitempty"`
-		LocalSchemes       SchemeLocalType      `json:"local_schemes,omitempty"`
+		LocalSchemes       []SchemeLocalType    `json:"local_schemes,omitempty"`
 		CardType           common.CardType      `json:"card_type,omitempty"`
 		CardCategory       common.CardCategory  `json:"card_category,omitempty"`
 		Currency           common.Currency      `json:"currency,omitempty"`

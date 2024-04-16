@@ -112,6 +112,7 @@ type (
 		Items               []payments.Product            `json:"items,omitempty"`
 		Retry               *payments.PaymentRetryRequest `json:"retry,omitempty"`
 		Metadata            map[string]interface{}        `json:"metadata,omitempty"`
+		Instruction         *PaymentInstruction           `json:"instruction,omitempty"`
 	}
 
 	PayoutRequest struct {

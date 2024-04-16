@@ -1,7 +1,10 @@
 package nas
 
 import (
+	"time"
+
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 type PaymentNetwork string
@@ -14,6 +17,15 @@ const (
 	Fedwire PaymentNetwork = "fedwire"
 	Swift   PaymentNetwork = "swift"
 )
+
+type InstrumentData struct {
+	AccountNumber   string               `json:"account_number,omitempty"`
+	Country         common.Country       `json:"country,omitempty"`
+	Currency        common.Currency      `json:"currency,omitempty"`
+	PaymentType     payments.PaymentType `json:"payment_type,omitempty"`
+	MandateId       string               `json:"mandate_id,omitempty"`
+	DateOfSignature *time.Time           `json:"date_of_signature,omitempty"`
+}
 
 type CreateCustomerInstrumentRequest struct {
 	Id      string        `json:"id,omitempty"`

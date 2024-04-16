@@ -32,6 +32,12 @@ type (
 		AccountHolder *common.AccountHolder            `json:"account_holder" binding:"required"`
 		Customer      *CreateCustomerInstrumentRequest `json:"customer,omitempty"`
 	}
+
+	createSepaInstrumentRequest struct {
+		Type           common.InstrumentType `json:"type" binding:"required"`
+		InstrumentData *InstrumentData       `json:"instrument_data,omitempty"`
+		AccountHolder  *common.AccountHolder `json:"account_holder" binding:"required"`
+	}
 )
 
 func NewCreateBankAccountInstrumentRequest() *createBankAccountInstrumentRequest {
@@ -46,11 +52,18 @@ func NewCreateTokenInstrumentRequest() *createTokenInstrumentRequest {
 	}
 }
 
+func NewCreateSepaInstrumentRequest() *createSepaInstrumentRequest {
+	return &createSepaInstrumentRequest{
+		Type: common.Sepa,
+	}
+}
+
 type (
 	CreateInstrumentResponse struct {
 		HttpMetadata                        common.HttpMetadata
 		CreateBankAccountInstrumentResponse *CreateBankAccountInstrumentResponse
 		CreateTokenInstrumentResponse       *CreateTokenInstrumentResponse
+		CreateSepaInstrumentResponse        *CreateSepaInstrumentResponse
 		AlternativeResponse                 *common.AlternativeResponse
 	}
 
@@ -88,6 +101,13 @@ type (
 		ProductId     string              `json:"product_id,omitempty"`
 		ProductType   string              `json:"product_type,omitempty"`
 	}
+
+	CreateSepaInstrumentResponse struct {
+		Type common.InstrumentType `json:"type" binding:"required"`
+		// common
+		Id          string `json:"id,omitempty"`
+		Fingerprint string `json:"fingerprint,omitempty"`
+	}
 )
 
 func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
@@ -109,6 +129,12 @@ func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.CreateTokenInstrumentResponse = &response
+	case string(common.Sepa):
+		var response CreateSepaInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.CreateSepaInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

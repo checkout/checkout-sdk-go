@@ -195,6 +195,7 @@ const (
 	Card        InstrumentType = "card"
 	BankAccount InstrumentType = "bank_account"
 	Token       InstrumentType = "token"
+	Sepa        InstrumentType = "sepa"
 	CardToken   InstrumentType = "card_token"
 )
 

@@ -1,24 +1,21 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/payments/sessions"
+	"github.com/checkout/checkout-sdk-go/payments"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/payments/sessions"
 )
 
 var (
 	paymentSessionsRequest = payment_sessions.PaymentSessionsRequest{
-		Amount:    int64(2000),
-		Currency:  common.GBP,
-		Reference: "ORD-123A",
-		Billing:   &payment_sessions.Billing{Address: Address()},
-		Customer: &common.CustomerRequest{
-			Email: "john.smith@example.com",
-			Name:  "John Smith",
-		},
+		Amount:     int64(2000),
+		Currency:   common.GBP,
+		Reference:  "ORD-123A",
+		Billing:    &payments.BillingInformation{Address: Address()},
 		SuccessUrl: "https://example.com/payments/success",
 		FailureUrl: "https://example.com/payments/fail",
 	}

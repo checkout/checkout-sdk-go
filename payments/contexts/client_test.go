@@ -43,7 +43,7 @@ func TestCreateAPaymentContext(t *testing.T) {
 		{
 			name: "when request is correct then create a payment context",
 			request: PaymentContextsRequest{
-				Source:      contexts.NewPaymentContextsPaypalSource(),
+				Source:      contexts.NewPaymentContextsPayPalSource(),
 				Amount:      2000,
 				Currency:    common.EUR,
 				PaymentType: payments.Regular,

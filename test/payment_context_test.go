@@ -1,29 +1,34 @@
 package test
 
 import (
+	"net/http"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/payments/contexts"
 	sources "github.com/checkout/checkout-sdk-go/payments/nas/sources/contexts"
 )
 
 var (
-	paymentContextSource = sources.NewPaymentContextsPaypalSource()
+	paymentContextPayPalSource = sources.NewPaymentContextsPayPalSource()
+
+	paymentContextKlarnaSource = getKlarnaPaymentContextsSource()
 
 	item = contexts.PaymentContextsItems{
-		Name:      "mask",
-		Quantity:  1,
-		UnitPrice: 2000,
+		Name:        "mask",
+		Quantity:    1,
+		UnitPrice:   1000,
+		TotalAmount: 1000,
 	}
 
-	paymentContextsRequest = contexts.PaymentContextsRequest{
-		Source:              paymentContextSource,
-		Amount:              2000,
+	paymentContextsPayPalRequest = contexts.PaymentContextsRequest{
+		Source:              paymentContextPayPalSource,
+		Amount:              1000,
 		Currency:            common.EUR,
 		PaymentType:         payments.Regular,
 		Capture:             true,
@@ -34,9 +39,25 @@ var (
 			item,
 		},
 	}
+
+	processing = contexts.PaymentContextsProcessing{
+		Locale: "en-GB",
+	}
+
+	paymentContextsKlarnaRequest = contexts.PaymentContextsRequest{
+		Source:              paymentContextKlarnaSource,
+		Amount:              1000,
+		Currency:            common.EUR,
+		PaymentType:         payments.Regular,
+		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
+		Items: []contexts.PaymentContextsItems{
+			item,
+		},
+		Processing: &processing,
+	}
 )
 
-func TestRequestPaymentContext(t *testing.T) {
+func TestRequestPaymentContextPayPal(t *testing.T) {
 	cases := []struct {
 		name    string
 		request contexts.PaymentContextsRequest
@@ -44,7 +65,7 @@ func TestRequestPaymentContext(t *testing.T) {
 	}{
 		{
 			name:    "when payment context is valid the return a response",
-			request: paymentContextsRequest,
+			request: paymentContextsPayPalRequest,
 			checker: func(response *contexts.PaymentContextsRequestResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -67,9 +88,48 @@ func TestRequestPaymentContext(t *testing.T) {
 
 }
 
+func TestRequestPaymentContextKlarna(t *testing.T) {
+	cases := []struct {
+		name    string
+		request contexts.PaymentContextsRequest
+		checker func(response *contexts.PaymentContextsRequestResponse, err error)
+	}{
+		{
+			name:    "test Klarna source for request payment contexts",
+			request: paymentContextsKlarnaRequest,
+			checker: func(response *contexts.PaymentContextsRequestResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				ckoErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
+				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
+			},
+		},
+	}
+
+	client := DefaultApi().Contexts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.RequestPaymentContexts(tc.request))
+		})
+	}
+}
+
+func getKlarnaPaymentContextsSource() payments.PaymentSource {
+	source := sources.NewPaymentContextsKlarnaSource()
+	source.AccountHolder = &common.AccountHolder{
+		BillingAddress: &common.Address{
+			Country: common.DE,
+		},
+	}
+
+	return source
+}
+
 func makePaymentContextRequest(t *testing.T) *contexts.PaymentContextsRequestResponse {
 
-	response, err := DefaultApi().Contexts.RequestPaymentContexts(paymentContextsRequest)
+	response, err := DefaultApi().Contexts.RequestPaymentContexts(paymentContextsPayPalRequest)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
@@ -96,13 +156,13 @@ func TestGetPaymentContext(t *testing.T) {
 			checker: func(response *contexts.PaymentContextDetailsResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
-				assert.Equal(t, int64(2000), response.PaymentRequest.Amount)
+				assert.Equal(t, int64(1000), response.PaymentRequest.Amount)
 				assert.Equal(t, common.EUR, response.PaymentRequest.Currency)
 				assert.Equal(t, payments.Regular, response.PaymentRequest.PaymentType)
 				assert.Equal(t, true, response.PaymentRequest.Capture)
 				assert.Equal(t, "mask", response.PaymentRequest.Items[0].Name)
 				assert.Equal(t, 1, response.PaymentRequest.Items[0].Quantity)
-				assert.Equal(t, 2000, response.PaymentRequest.Items[0].UnitPrice)
+				assert.Equal(t, 1000, response.PaymentRequest.Items[0].UnitPrice)
 				assert.Equal(t, "https://example.com/payments/success", response.PaymentRequest.SuccessUrl)
 				assert.Equal(t, "https://example.com/payments/fail", response.PaymentRequest.FailureUrl)
 				assert.NotNil(t, response.PartnerMetadata)

@@ -10,6 +10,13 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments/nas/sources/apm"
 )
 
+type PaymentContextDetailsStatusType string
+
+const (
+	Created  PaymentContextDetailsStatusType = "Created"
+	Approved PaymentContextDetailsStatusType = "Approved"
+)
+
 const PaymentContextsPath = "payment-contexts"
 
 type (
@@ -126,6 +133,7 @@ type (
 
 	PaymentContextDetailsResponse struct {
 		HttpMetadata    common.HttpMetadata
+		Status          PaymentContextDetailsStatusType `json:"status,omitempty"`
 		PaymentRequest  *PaymentContextsResponse        `json:"payment_request,omitempty"`
 		PartnerMetadata *PaymentContextsPartnerMetadata `json:"partner_metadata,omitempty"`
 	}

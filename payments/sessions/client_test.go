@@ -1,6 +1,7 @@
 package payment_sessions
 
 import (
+	"github.com/checkout/checkout-sdk-go/payments"
 	"net/http"
 	"testing"
 
@@ -39,7 +40,7 @@ func TestCreateAPaymentSessions(t *testing.T) {
 				Amount:    2000,
 				Currency:  common.GBP,
 				Reference: "ORD-123A",
-				Billing: &Billing{Address: &common.Address{
+				Billing: &payments.BillingInformation{Address: &common.Address{
 					Country: common.GB,
 				}},
 				Customer: &common.CustomerRequest{

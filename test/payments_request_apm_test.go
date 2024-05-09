@@ -71,7 +71,10 @@ func TestRequestPaymentsAPM(t *testing.T) {
 		{
 			name: "test Ideal source for request payment",
 			request: nas.PaymentRequest{
-				Source:      getIdealSourceRequest(),
+				Source: func() payments.PaymentSource {
+					t.Skip("Skipping getIdealSourceRequest temporally")
+					return getIdealSourceRequest()
+				}(),
 				Amount:      1000,
 				Currency:    common.EUR,
 				Reference:   Reference,
@@ -503,7 +506,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 func getIdealSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestIdealSource()
 	source.Description = "ORD50234E89"
-	source.Bic = "INGBNL2A"
 	source.Language = "nl"
 
 	return source

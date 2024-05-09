@@ -10,8 +10,11 @@ const (
 type AuthenticationType string
 
 const (
-	RegularAuthType   AuthenticationType = "regular"
-	RecurringAuthType AuthenticationType = "recurring"
+	RegularAuthType      AuthenticationType = "regular"
+	RecurringAuthType    AuthenticationType = "recurring"
+	InstallmentAuthType  AuthenticationType = "installment"
+	MaintainCardAuthType AuthenticationType = "maintain_card"
+	AddCardAuthType      AuthenticationType = "add_card"
 )
 
 type Category string

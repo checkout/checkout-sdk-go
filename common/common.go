@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+type CardWalletType string
+
+const (
+	Applepay  CardWalletType = "applepay"
+	Googlepay CardWalletType = "googlepay"
+)
+
 type AccountType string
 
 const (

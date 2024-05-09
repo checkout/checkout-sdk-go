@@ -94,7 +94,6 @@ type (
 	requestIdealSource struct {
 		Type        payments.SourceType `json:"type,omitempty"`
 		Description string              `json:"description,omitempty"`
-		Bic         string              `json:"bic,omitempty"`
 		Language    string              `json:"language,omitempty"`
 	}
 

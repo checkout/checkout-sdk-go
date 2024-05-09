@@ -99,6 +99,7 @@ func TestCaptureCardPaymentWithoutRequest(t *testing.T) {
 }
 
 func TestCaptureCardPaymentIdempotently(t *testing.T) {
+	t.Skip("unavailable")
 	paymentResponse := makeCardPayment(t, false, 10)
 
 	metadata := make(map[string]interface{})

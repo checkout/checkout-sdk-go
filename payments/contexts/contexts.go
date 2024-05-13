@@ -41,8 +41,10 @@ type (
 
 type (
 	PaymentContextsPartnerMetadata struct {
-		OrderId    string `json:"order_id,omitempty"`
-		CustomerId string `json:"customer_id,omitempty"`
+		OrderId     string `json:"order_id,omitempty"`
+		CustomerId  string `json:"customer_id,omitempty"`
+		SessionId   string `json:"session_id,omitempty"`
+		ClientToken string `json:"client_token,omitempty"`
 	}
 
 	PaymentContextsPartnerCustomerRiskData struct {

@@ -142,9 +142,11 @@ type (
 		HttpMetadata HttpMetadata
 	}
 
+	Data interface{}
+
 	ContentResponse struct {
 		HttpMetadata HttpMetadata
-		Content      string `json:"content,omitempty"`
+		Content      Data `json:"content,omitempty"`
 	}
 
 	HttpMetadata struct {

@@ -43,3 +43,53 @@ func TestMarshal(t *testing.T) {
 		})
 	}
 }
+
+func TestUnmarshalJSON(t *testing.T) {
+	responseBody := []byte(`{"type":"example","control_type":"example_control"}`)
+	headers := &Headers{Header: map[string][]string{"Content-Type": {"application/json"}}}
+	metadata := &HttpMetadata{ResponseBody: responseBody, Headers: headers}
+
+	var response TypeMapping
+	err := Unmarshal(metadata, &response)
+	if err != nil {
+		t.Fatalf("Unmarshal failed: %v", err)
+	}
+
+	assert.Equal(t, response, TypeMapping{Type: "example", ControlType: "example_control"})
+}
+
+func TestUnmarshalText(t *testing.T) {
+	responseBody := []byte("name,age\nJohn,30")
+	headers := &Headers{Header: map[string][]string{"Content-Type": {"text/csv"}}}
+	metadata := &HttpMetadata{ResponseBody: responseBody, Headers: headers}
+
+	type Response struct {
+		Content string
+	}
+
+	var response Response
+	err := Unmarshal(metadata, &response)
+	if err != nil {
+		t.Fatalf("Unmarshal failed: %v", err)
+	}
+
+	assert.Equal(t, response.Content, "name,age\nJohn,30")
+}
+
+func TestUnmarshalPDF(t *testing.T) {
+	responseBody := []byte("%PDF-1.4\n%...")
+	headers := &Headers{Header: map[string][]string{"Content-Type": {"application/pdf"}}}
+	metadata := &HttpMetadata{ResponseBody: responseBody, Headers: headers}
+
+	type Response struct {
+		Content []byte
+	}
+
+	var response Response
+	err := Unmarshal(metadata, &response)
+	if err != nil {
+		t.Fatalf("Unmarshal failed: %v", err)
+	}
+
+	assert.Equal(t, response.Content, responseBody)
+}

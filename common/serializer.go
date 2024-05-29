@@ -30,6 +30,8 @@ func Unmarshal(metadata *HttpMetadata, responseMapping interface{}) error {
 
 	if isContentTypeText(metadata) {
 		addContent(metadata.ResponseBody, responseMapping)
+	} else if isContentTypePDF(metadata) {
+		addPdfContent(metadata.ResponseBody, responseMapping)
 	} else {
 		if err := json.Unmarshal(metadata.ResponseBody, &responseMapping); err != nil {
 			return err
@@ -37,7 +39,6 @@ func Unmarshal(metadata *HttpMetadata, responseMapping interface{}) error {
 	}
 
 	addHttpMetadata(metadata, responseMapping)
-
 	return nil
 }
 
@@ -48,6 +49,10 @@ func addHttpMetadata(metadata *HttpMetadata, response interface{}) {
 	}
 }
 
+func isContentTypeText(metadata *HttpMetadata) bool {
+	return strings.HasPrefix(metadata.Headers.Header.Get("Content-Type"), "text/csv")
+}
+
 func addContent(content []byte, response interface{}) {
 	v := reflect.ValueOf(response).Elem().FieldByName("Content")
 	if v.IsValid() {
@@ -55,6 +60,13 @@ func addContent(content []byte, response interface{}) {
 	}
 }
 
-func isContentTypeText(metadata *HttpMetadata) bool {
-	return strings.HasPrefix(metadata.Headers.Header.Get("Content-Type"), "text/csv")
+func isContentTypePDF(metadata *HttpMetadata) bool {
+	return strings.HasPrefix(metadata.Headers.Header.Get("Content-Type"), "application/pdf")
+}
+
+func addPdfContent(content []byte, response interface{}) {
+	v := reflect.ValueOf(response).Elem().FieldByName("Content")
+	if v.IsValid() {
+		v.Set(reflect.ValueOf(content))
+	}
 }

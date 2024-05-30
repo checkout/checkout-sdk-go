@@ -164,6 +164,13 @@ const (
 	OtherAddress   PaymentContextsShippingMethod = "OtherAddress"
 )
 
+type PanProcessedType string
+
+const (
+	FPAN PanProcessedType = "fpan"
+	DPAN PanProcessedType = "dpan"
+)
+
 type (
 	AirlineData struct {
 		Ticket           *Ticket            `json:"ticket,omitempty"`
@@ -328,24 +335,28 @@ type (
 	}
 
 	PaymentProcessing struct {
-		RetrievalReferenceNumber         string   `json:"retrieval_reference_number,omitempty"`
-		AcquirerTransactionId            string   `json:"acquirer_transaction_id,omitempty"`
-		RecommendationCode               string   `json:"recommendation_code,omitempty"`
-		Scheme                           string   `json:"scheme,omitempty"`
-		PartnerMerchantAdviceCode        string   `json:"partner_merchant_advice_code,omitempty"`
-		PartnerResponseCode              string   `json:"partner_response_code,omitempty"`
-		PartnerOrderId                   string   `json:"partner_order_id,omitempty"`
-		PartnerSessionId                 string   `json:"partner_session_id,omitempty"`
-		PartnerClientToken               string   `json:"partner_client_token,omitempty"`
-		PartnerPaymentId                 string   `json:"partner_payment_id,omitempty"`
-		ContinuationPayload              string   `json:"continuation_payload,omitempty"`
-		Pun                              string   `json:"pun,omitempty"`
-		PartnerStatus                    string   `json:"partner_status,omitempty"`
-		PartnerTransactionId             string   `json:"partner_transaction_id,omitempty"`
-		PartnerErrorCodes                []string `json:"partner_error_codes,omitempty"`
-		PartnerErrorMessage              string   `json:"partner_error_message,omitempty"`
-		PartnerAuthorizationCode         string   `json:"partner_authorization_code,omitempty"`
-		PartnerAuthorizationResponseCode string   `json:"partner_authorization_response_code,omitempty"`
+		RetrievalReferenceNumber         string           `json:"retrieval_reference_number,omitempty"`
+		AcquirerTransactionId            string           `json:"acquirer_transaction_id,omitempty"`
+		RecommendationCode               string           `json:"recommendation_code,omitempty"`
+		Scheme                           string           `json:"scheme,omitempty"`
+		PartnerMerchantAdviceCode        string           `json:"partner_merchant_advice_code,omitempty"`
+		PartnerResponseCode              string           `json:"partner_response_code,omitempty"`
+		PartnerOrderId                   string           `json:"partner_order_id,omitempty"`
+		PartnerSessionId                 string           `json:"partner_session_id,omitempty"`
+		PartnerClientToken               string           `json:"partner_client_token,omitempty"`
+		PartnerPaymentId                 string           `json:"partner_payment_id,omitempty"`
+		PanTypeProcessed                 PanProcessedType `json:"pan_type_processed,omitempty"`
+		ContinuationPayload              string           `json:"continuation_payload,omitempty"`
+		Pun                              string           `json:"pun,omitempty"`
+		PartnerStatus                    string           `json:"partner_status,omitempty"`
+		PartnerTransactionId             string           `json:"partner_transaction_id,omitempty"`
+		PartnerErrorCodes                []string         `json:"partner_error_codes,omitempty"`
+		PartnerErrorMessage              string           `json:"partner_error_message,omitempty"`
+		PartnerAuthorizationCode         string           `json:"partner_authorization_code,omitempty"`
+		PartnerAuthorizationResponseCode string           `json:"partner_authorization_response_code,omitempty"`
+		SurchargeAmount                  int64            `json:"surcharge_amount,omitempty"`
+		CkoNetworkTokenAvailable         bool             `json:"cko_network_token_available"`
+		MerchantCategoryCode             string           `json:"merchant_category_code,omitempty"`
 	}
 
 	PaymentRetryResponse struct {

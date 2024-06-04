@@ -438,6 +438,23 @@ type (
 		Address *common.Address `json:"address,omitempty"`
 		Phone   *common.Phone   `json:"phone,omitempty"`
 	}
+
+	Order struct {
+		Name           string     `json:"name,omitempty"`
+		Quantity       int64      `json:"quantity,omitempty"`
+		UnitPrice      int64      `json:"unit_price,omitempty"`
+		Reference      string     `json:"reference,omitempty"`
+		CommodityCode  string     `json:"commodity_code,omitempty"`
+		UnitOfMeasure  string     `json:"unit_of_measure,omitempty"`
+		TotalAmount    int64      `json:"total_amount,omitempty"`
+		TaxAmount      int64      `json:"tax_amount,omitempty"`
+		DiscountAmount int64      `json:"discount_amount,omitempty"`
+		WxpayGoodsId   string     `json:"wxpay_goods_id,omitempty"`
+		ImageUrl       string     `json:"image_url,omitempty"`
+		Url            string     `json:"url,omitempty"`
+		Type           string     `json:"type,omitempty"`
+		ServiceEndsOn  *time.Time `json:"service_ends_on,omitempty"`
+	}
 )
 
 // Request
@@ -448,6 +465,9 @@ type (
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 		// Not available on Previous
 		AmountAllocations []common.AmountAllocations `json:"amount_allocations,omitempty"`
+		CaptureActionId   string                     `json:"capture_action_id,omitempty"`
+		Destination       *common.Destination        `json:"destination,omitempty"`
+		Items             []Order                    `json:"items,omitempty"`
 	}
 
 	VoidRequest struct {

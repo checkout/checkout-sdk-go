@@ -1,6 +1,7 @@
 package test
 
 import (
+	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments/nas"
 	"testing"
 	"time"
@@ -14,8 +15,38 @@ import (
 func TestRefundCardPayment(t *testing.T) {
 	paymentResponse := makeCardPayment(t, true, 10)
 
+	order := payments.Order{
+		Name:        "OrderTest",
+		Quantity:    88,
+		TotalAmount: 99,
+	}
+
+	bank := common.BankDetails{
+		Name:    "Lloyds TSB",
+		Branch:  "Bournemouth",
+		Address: Address(),
+	}
+
+	destination := common.Destination{
+		AccountType:   common.Savings,
+		AccountNumber: "13654567455",
+		BankCode:      "23-456",
+		BranchCode:    "6443",
+		Iban:          "HU93116000060000000012345676",
+		Bban:          "3704 0044 0532 0130 00",
+		SwiftBic:      "37040044",
+		Country:       common.GB,
+		AccountHolder: AccountHolder(),
+		Bank:          &bank,
+	}
+
 	refundRequest := payments.RefundRequest{
+		Amount:    paymentResponse.Amount,
 		Reference: uuid.New().String(),
+		Items: []payments.Order{
+			order,
+		},
+		Destination: &destination,
 	}
 
 	cases := []struct {

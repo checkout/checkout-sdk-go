@@ -274,3 +274,18 @@ type (
 		To   *time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
 	}
 )
+
+type (
+	Destination struct {
+		AccountType   AccountType    `json:"account_type,omitempty"`
+		AccountNumber string         `json:"account_number,omitempty"`
+		BankCode      string         `json:"bank_code,omitempty"`
+		BranchCode    string         `json:"branch_code,omitempty"`
+		Iban          string         `json:"iban,omitempty"`
+		Bban          string         `json:"bban,omitempty"`
+		SwiftBic      string         `json:"swift_bic,omitempty"`
+		Country       Country        `json:"country,omitempty"`
+		AccountHolder *AccountHolder `json:"account_holder,omitempty"`
+		Bank          *BankDetails   `json:"bank,omitempty"`
+	}
+)

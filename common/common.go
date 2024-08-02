@@ -182,9 +182,12 @@ type (
 	AccountHolder struct {
 		Type              AccountHolderType            `json:"type,omitempty"`
 		Title             string                       `json:"title,omitempty"`
+		FullName          string                       `json:"full_name,omitempty"`
 		FirstName         string                       `json:"first_name,omitempty"`
 		MiddleName        string                       `json:"middle_name,omitempty"`
 		LastName          string                       `json:"last_name,omitempty"`
+		Email             string                       `json:"email,omitempty"`
+		Gender            string                       `json:"gender,omitempty"`
 		CompanyName       string                       `json:"company_name,omitempty"`
 		TaxId             string                       `json:"tax_id,omitempty"`
 		DateOfBirth       string                       `json:"date_of_birth,omitempty"`
@@ -193,8 +196,6 @@ type (
 		BillingAddress    *Address                     `json:"billing_address,omitempty"`
 		Phone             *Phone                       `json:"phone,omitempty"`
 		Identification    *AccountHolderIdentification `json:"identification,omitempty"`
-		Email             string                       `json:"email,omitempty"`
-		Gender            string                       `json:"gender,omitempty"`
 	}
 )
 

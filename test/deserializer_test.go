@@ -107,3 +107,44 @@ func TestControlsUnmarshallJson(t *testing.T) {
 		})
 	}
 }
+
+func TestPaymentContextUnmarshallJson(t *testing.T) {
+	paypalResponse, _ := ioutil.ReadFile("resources/payment_context_paypal_details_response.json")
+
+	cases := []struct {
+		name    string
+		json    []byte
+		checker func(*bytes.Buffer, error)
+	}{
+		{
+			name: "when deserializing payment_context_paypal_details_response type must be PayPal",
+			json: paypalResponse,
+			checker: func(serialized *bytes.Buffer, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, serialized)
+
+				var deserialized map[string]interface{}
+				unmErr := json.Unmarshal(serialized.Bytes(), &deserialized)
+
+				assert.Nil(t, unmErr)
+				assert.NotNil(t, deserialized["payment_request"])
+				paymentRequest := deserialized["payment_request"].(map[string]interface{})
+				source := paymentRequest["source"].(map[string]interface{})
+
+				assert.Equal(t, "paypal", source["type"])
+				assert.Contains(t, source, "type")
+				assert.Contains(t, source, "account_holder")
+
+				accountHolder := source["account_holder"].(map[string]interface{})
+				assert.Contains(t, accountHolder, "full_name")
+				assert.Equal(t, "Andrey Young", accountHolder["full_name"])
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(bytes.NewBuffer(tc.json), nil)
+		})
+	}
+}

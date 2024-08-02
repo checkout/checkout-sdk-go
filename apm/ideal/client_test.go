@@ -42,10 +42,10 @@ func TestGetInfo(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*IdealInfo)
+						respMapping := args.Get(3).(*IdealInfo)
 						*respMapping = response
 					})
 			},

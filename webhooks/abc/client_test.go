@@ -57,10 +57,10 @@ func TestClientRetrieveWebhooks(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*WebhooksResponse)
+						respMapping := args.Get(3).(*WebhooksResponse)
 						*respMapping = response
 					})
 			},
@@ -77,10 +77,10 @@ func TestClientRetrieveWebhooks(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*WebhooksResponse)
+						respMapping := args.Get(3).(*WebhooksResponse)
 						*respMapping = WebhooksResponse{
 							HttpResponse: mocks.HttpMetadataStatusNoContent,
 						}
@@ -99,7 +99,7 @@ func TestClientRetrieveWebhooks(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnauthorized,
@@ -198,11 +198,11 @@ func TestClientRegisterWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post",
-					mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext",
+					mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*WebhookResponse)
+						respMapping := args.Get(4).(*WebhookResponse)
 						*respMapping = response
 					})
 			},
@@ -219,8 +219,8 @@ func TestClientRegisterWebhook(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post",
-					mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext",
+					mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *WebhookResponse, err error) {
@@ -238,8 +238,8 @@ func TestClientRegisterWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post",
-					mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext",
+					mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -322,10 +322,10 @@ func TestClientRetrieveWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*WebhookResponse)
+						respMapping := args.Get(3).(*WebhookResponse)
 						*respMapping = response
 					})
 			},
@@ -343,7 +343,7 @@ func TestClientRetrieveWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnauthorized,
@@ -366,7 +366,7 @@ func TestClientRetrieveWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -466,10 +466,10 @@ func TestClientUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiUpdate: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*WebhookResponse)
+						respMapping := args.Get(4).(*WebhookResponse)
 						*respMapping = response
 					})
 			},
@@ -487,7 +487,7 @@ func TestClientUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiUpdate: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnauthorized,
@@ -510,7 +510,7 @@ func TestClientUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiUpdate: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -532,7 +532,7 @@ func TestClientUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiUpdate: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusConflict,
@@ -554,7 +554,7 @@ func TestClientUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiUpdate: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -660,10 +660,10 @@ func TestClientPartiallyUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*WebhookResponse)
+						respMapping := args.Get(4).(*WebhookResponse)
 						*respMapping = response
 					})
 			},
@@ -681,7 +681,7 @@ func TestClientPartiallyUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnauthorized,
@@ -704,7 +704,7 @@ func TestClientPartiallyUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -726,7 +726,7 @@ func TestClientPartiallyUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusConflict,
@@ -748,7 +748,7 @@ func TestClientPartiallyUpdateWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -809,10 +809,10 @@ func TestClientRemoveWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiDelete: func(m *mock.Mock) mock.Call {
-				return *m.On("Delete", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*common.MetadataResponse)
+						respMapping := args.Get(3).(*common.MetadataResponse)
 						*respMapping = response
 					})
 			},
@@ -830,7 +830,7 @@ func TestClientRemoveWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiDelete: func(m *mock.Mock) mock.Call {
-				return *m.On("Delete", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnauthorized,
@@ -853,7 +853,7 @@ func TestClientRemoveWebhook(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiDelete: func(m *mock.Mock) mock.Call {
-				return *m.On("Delete", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,

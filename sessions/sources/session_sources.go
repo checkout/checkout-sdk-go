@@ -16,12 +16,12 @@ const (
 type SessionScheme string
 
 const (
-	Visa            SessionScheme = "visa"
-	Mastercard      SessionScheme = "mastercard"
-	Jcb             SessionScheme = "jcb"
 	Amex            SessionScheme = "amex"
-	Diners          SessionScheme = "diners"
 	CartesBancaires SessionScheme = "cartes_bancaires"
+	Diners          SessionScheme = "diners"
+	Jcb             SessionScheme = "jcb"
+	Mastercard      SessionScheme = "mastercard"
+	Visa            SessionScheme = "visa"
 )
 
 type (
@@ -45,7 +45,7 @@ type (
 		ExpiryMonth       int    `json:"expiry_month,omitempty"`
 		ExpiryYear        int    `json:"expiry_year,omitempty"`
 		Name              string `json:"name,omitempty"`
-		Stored            bool   `json:"stored,omitempty"`
+		Stored            bool   `json:"stored,omitempty" default:"false"`
 		StoreForFutureUse bool   `json:"store_for_future_use,omitempty"`
 	}
 

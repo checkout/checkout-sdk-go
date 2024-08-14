@@ -1,7 +1,6 @@
 package workflows
 
 import (
-	"github.com/checkout/checkout-sdk-go/workflows/reflows"
 	"net/http"
 	"testing"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/workflows/actions"
 	"github.com/checkout/checkout-sdk-go/workflows/conditions"
 	"github.com/checkout/checkout-sdk-go/workflows/events"
+	"github.com/checkout/checkout-sdk-go/workflows/reflows"
 )
 
 func TestCreateWorkflow(t *testing.T) {

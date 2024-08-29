@@ -18,9 +18,10 @@ func TestShouldCreateConfigurationWithSubdomain(t *testing.T) {
 		subdomain   string
 		expectedUrl string
 	}{
-		{"123dmain", "https://123dmain.api.sandbox.checkout.com"},
-		{"123domain", "https://123domain.api.sandbox.checkout.com"},
-		{"1234domain", "https://1234domain.api.sandbox.checkout.com"},
+		{"a", "https://a.api.sandbox.checkout.com"},
+		{"ab", "https://ab.api.sandbox.checkout.com"},
+		{"abc", "https://abc.api.sandbox.checkout.com"},
+		{"abc1", "https://abc1.api.sandbox.checkout.com"},
 		{"12345domain", "https://12345domain.api.sandbox.checkout.com"},
 	}
 
@@ -44,9 +45,10 @@ func TestShouldCreateConfigurationWithBadSubdomain(t *testing.T) {
 		expectedUrl string
 	}{
 		{"", "https://api.sandbox.checkout.com"},
-		{"123", "https://api.sandbox.checkout.com"},
-		{"123bad", "https://api.sandbox.checkout.com"},
-		{"12345domainBad", "https://api.sandbox.checkout.com"},
+		{"  ", "https://api.sandbox.checkout.com"},
+		{" - ", "https://api.sandbox.checkout.com"},
+		{"a b", "https://api.sandbox.checkout.com"},
+		{"ab c1", "https://api.sandbox.checkout.com"},
 	}
 
 	for _, tc := range testCases {

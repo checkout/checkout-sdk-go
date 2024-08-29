@@ -1,3 +1,3 @@
 package client
 
-const SDK_VERSION = "1.2.3"
+const SDK_VERSION = "1.2.4"

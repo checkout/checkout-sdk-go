@@ -28,7 +28,7 @@ func addSubdomainToApiUrlEnvironment(environment Environment, subdomain string) 
 
 	newEnvironment := apiUrl
 
-	regex := regexp.MustCompile("^[0-9a-z]{8,11}$")
+	regex := regexp.MustCompile("^[0-9a-z]+$")
 
 	if regex.MatchString(subdomain) {
 		merchantApiUrl, _ := url.Parse(apiUrl)

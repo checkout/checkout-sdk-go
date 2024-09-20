@@ -3,6 +3,7 @@ package apm
 import (
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/tokens"
 	"time"
 )
 
@@ -108,15 +109,18 @@ type (
 	}
 
 	requestKnetSource struct {
-		Type              payments.SourceType `json:"type,omitempty"`
-		Language          string              `json:"language,omitempty"`
-		UserDefinedField1 string              `json:"user_defined_field1,omitempty"`
-		UserDefinedField2 string              `json:"user_defined_field2,omitempty"`
-		UserDefinedField3 string              `json:"user_defined_field3,omitempty"`
-		UserDefinedField4 string              `json:"user_defined_field4,omitempty"`
-		UserDefinedField5 string              `json:"user_defined_field5,omitempty"`
-		CardToken         string              `json:"card_token,omitempty"`
-		Ptlf              string              `json:"ptlf,omitempty"`
+		Type                 payments.SourceType            `json:"type,omitempty"`
+		Language             string                         `json:"language,omitempty"`
+		UserDefinedField1    string                         `json:"user_defined_field1,omitempty"`
+		UserDefinedField2    string                         `json:"user_defined_field2,omitempty"`
+		UserDefinedField3    string                         `json:"user_defined_field3,omitempty"`
+		UserDefinedField4    string                         `json:"user_defined_field4,omitempty"`
+		UserDefinedField5    string                         `json:"user_defined_field5,omitempty"`
+		CardToken            string                         `json:"card_token,omitempty"`
+		Ptlf                 string                         `json:"ptlf,omitempty"`
+		TokenType            string                         `json:"token_type,omitempty"`
+		TokenData            *tokens.ApplePayTokenData      `json:"token_data,omitempty"`
+		PaymentMethodDetails *payments.PaymentMethodDetails `json:"payment_method_details,omitempty"`
 	}
 
 	requestMbwaySource struct {

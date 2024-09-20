@@ -15,6 +15,7 @@ const (
 	SubjectPath    = "subject"
 	ReflowPath     = "reflow"
 	WorkflowPath   = "workflow"
+	TestPath       = "test"
 )
 
 // Requests
@@ -27,8 +28,10 @@ type (
 	}
 
 	UpdateWorkflowRequest struct {
-		Name   string `json:"name,omitempty"`
-		Active bool   `json:"active,omitempty"`
+		Name       string                         `json:"name,omitempty"`
+		Active     bool                           `json:"active,omitempty"`
+		Conditions []conditions.ConditionsRequest `json:"conditions,omitempty"`
+		Actions    []actions.ActionsRequest       `json:"actions,omitempty"`
 	}
 )
 
@@ -56,7 +59,9 @@ type (
 
 	UpdateWorkflowResponse struct {
 		HttpMetadata common.HttpMetadata
-		Name         string `json:"name,omitempty"`
-		Active       bool   `json:"active,omitempty"`
+		Name         string                          `json:"name,omitempty"`
+		Active       bool                            `json:"active,omitempty"`
+		Conditions   []conditions.ConditionsResponse `json:"conditions,omitempty"`
+		Actions      []actions.ActionsResponse       `json:"actions,omitempty"`
 	}
 )

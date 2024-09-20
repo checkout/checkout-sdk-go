@@ -455,6 +455,12 @@ type (
 		Type           string     `json:"type,omitempty"`
 		ServiceEndsOn  *time.Time `json:"service_ends_on,omitempty"`
 	}
+
+	PaymentMethodDetails struct {
+		DisplayName string `json:"display_name,omitempty"`
+		Type        string `json:"type,omitempty"`
+		Network     string `json:"network,omitempty"`
+	}
 )
 
 // Request

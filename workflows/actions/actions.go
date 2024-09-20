@@ -82,10 +82,12 @@ type WebhookAction struct {
 }
 
 type WorkflowActionInvocation struct {
-	InvocationId string                 `json:"invocation_id,omitempty"`
-	Timestamp    *time.Time             `json:"timestamp,omitempty"`
-	Retry        bool                   `json:"retry,omitempty"`
-	Succeeded    bool                   `json:"succeeded,omitempty"`
-	FinalAttempt bool                   `json:"final,omitempty"`
-	Result       map[string]interface{} `json:"result,omitempty"`
+	InvocationId string     `json:"invocation_id,omitempty"`
+	Timestamp    *time.Time `json:"timestamp,omitempty"`
+	Retry        bool       `json:"retry,omitempty"`
+	Succeeded    bool       `json:"succeeded,omitempty"`
+	FinalAttempt bool       `json:"final,omitempty"`
+	// Deprecated: This property will be removed in the future, and should not be used. Use ResultDetails instead.
+	Result        map[string]interface{} `json:"result,omitempty"`
+	ResultDetails map[string]interface{} `json:"result_details,omitempty"`
 }

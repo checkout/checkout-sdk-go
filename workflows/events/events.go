@@ -73,3 +73,7 @@ type SubjectEvent struct {
 	Timestamp string                 `json:"timestamp,omitempty"`
 	Links     map[string]common.Link `json:"_links,omitempty"`
 }
+
+type EventTypesRequest struct {
+	EventTypes []string `json:"event_types,omitempty"`
+}

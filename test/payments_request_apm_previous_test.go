@@ -832,8 +832,15 @@ func getKlarnaSourceRequest() payments.PaymentSource {
 }
 
 func getKnetSourceRequest() payments.PaymentSource {
+	paymentMethodDetails := payments.PaymentMethodDetails{
+		DisplayName: "name",
+		Type:        "type",
+		Network:     "card_network",
+	}
+
 	source := apm.NewRequestKnetSource()
 	source.Language = "en"
+	source.PaymentMethodDetails = &paymentMethodDetails
 	return source
 }
 

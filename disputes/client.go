@@ -159,6 +159,21 @@ func (c *Client) SubmitEvidenceWithContext(ctx context.Context, disputeId string
 	return &response, nil
 }
 
+func (c *Client) GetCompiledSubmittedEvidence(disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response DisputeCompiledSubmittedEvidenceResponse
+	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, evidence, submitted), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) UploadFile(file common.File) (*common.IdResponse, error) {
 	return c.UploadFileWithContext(context.Background(), file)
 }

@@ -77,41 +77,47 @@ type (
 		IssuingCountry common.Country     `json:"issuing_country,omitempty"`
 		DateOfExpiry   string             `json:"date_of_expiry,omitempty"`
 	}
+
+	PartialAuthorization struct {
+		Enabled bool `json:"enabled,omitempty"`
+	}
 )
 
 // Request
 type (
 	PaymentRequest struct {
-		PaymentContextId    string                        `json:"payment_context_id,omitempty"`
-		Source              payments.PaymentSource        `json:"source,omitempty"`
-		Amount              int64                         `json:"amount,omitempty"`
-		Currency            common.Currency               `json:"currency,omitempty"`
-		PaymentType         payments.PaymentType          `json:"payment_type,omitempty"`
-		MerchantInitiated   bool                          `json:"merchant_initiated"`
-		Reference           string                        `json:"reference,omitempty"`
-		Description         string                        `json:"description,omitempty"`
-		AuthorizationType   AuthorizationType             `json:"authorization_type,omitempty"`
-		Capture             bool                          `json:"capture"`
-		CaptureOn           *time.Time                    `json:"capture_on,omitempty"`
-		Customer            *common.CustomerRequest       `json:"customer,omitempty"`
-		BillingDescriptor   *payments.BillingDescriptor   `json:"billing_descriptor,omitempty"`
-		ShippingDetails     *payments.ShippingDetails     `json:"shipping,omitempty"`
-		Segment             *payments.PaymentSegment      `json:"segment,omitempty"`
-		ThreeDsRequest      *payments.ThreeDsRequest      `json:"3ds,omitempty"`
-		PreviousPaymentId   string                        `json:"previous_payment_id,omitempty"`
-		ProcessingChannelId string                        `json:"processing_channel_id,omitempty"`
-		Risk                *payments.RiskRequest         `json:"risk,omitempty"`
-		SuccessUrl          string                        `json:"success_url,omitempty"`
-		FailureUrl          string                        `json:"failure_url,omitempty"`
-		PaymentIp           string                        `json:"payment_ip,omitempty"`
-		Sender              Sender                        `json:"sender,omitempty"`
-		Recipient           *payments.PaymentRecipient    `json:"recipient,omitempty"`
-		Marketplace         *common.MarketplaceData       `json:"marketplace,omitempty"`
-		AmountAllocations   []common.AmountAllocations    `json:"amount_allocations,omitempty"`
-		Processing          *payments.ProcessingSettings  `json:"processing,omitempty"`
-		Items               []payments.Product            `json:"items,omitempty"`
-		Retry               *payments.PaymentRetryRequest `json:"retry,omitempty"`
-		Metadata            map[string]interface{}        `json:"metadata,omitempty"`
+		PaymentContextId     string                        `json:"payment_context_id,omitempty"`
+		Source               payments.PaymentSource        `json:"source,omitempty"`
+		Amount               int64                         `json:"amount,omitempty"`
+		Currency             common.Currency               `json:"currency,omitempty"`
+		PaymentType          payments.PaymentType          `json:"payment_type,omitempty"`
+		MerchantInitiated    bool                          `json:"merchant_initiated"`
+		Reference            string                        `json:"reference,omitempty"`
+		Description          string                        `json:"description,omitempty"`
+		AuthorizationType    AuthorizationType             `json:"authorization_type,omitempty"`
+		PartialAuthorization *PartialAuthorization         `json:"partial_authorization,omitempty"`
+		Capture              bool                          `json:"capture"`
+		CaptureOn            *time.Time                    `json:"capture_on,omitempty"`
+		Customer             *common.CustomerRequest       `json:"customer,omitempty"`
+		BillingDescriptor    *payments.BillingDescriptor   `json:"billing_descriptor,omitempty"`
+		ShippingDetails      *payments.ShippingDetails     `json:"shipping,omitempty"`
+		Segment              *payments.PaymentSegment      `json:"segment,omitempty"`
+		ThreeDsRequest       *payments.ThreeDsRequest      `json:"3ds,omitempty"`
+		PreviousPaymentId    string                        `json:"previous_payment_id,omitempty"`
+		ProcessingChannelId  string                        `json:"processing_channel_id,omitempty"`
+		Risk                 *payments.RiskRequest         `json:"risk,omitempty"`
+		SuccessUrl           string                        `json:"success_url,omitempty"`
+		FailureUrl           string                        `json:"failure_url,omitempty"`
+		PaymentIp            string                        `json:"payment_ip,omitempty"`
+		Sender               Sender                        `json:"sender,omitempty"`
+		Recipient            *payments.PaymentRecipient    `json:"recipient,omitempty"`
+		Marketplace          *common.MarketplaceData       `json:"marketplace,omitempty"`
+		AmountAllocations    []common.AmountAllocations    `json:"amount_allocations,omitempty"`
+		Processing           *payments.ProcessingSettings  `json:"processing,omitempty"`
+		Items                []payments.Product            `json:"items,omitempty"`
+		Retry                *payments.PaymentRetryRequest `json:"retry,omitempty"`
+		Metadata             map[string]interface{}        `json:"metadata,omitempty"`
+		Instruction          *PaymentInstruction           `json:"instruction,omitempty"`
 	}
 
 	PayoutRequest struct {
@@ -186,38 +192,42 @@ type (
 	}
 
 	GetPaymentResponse struct {
-		HttpMetadata      common.HttpMetadata
-		Id                string                          `json:"id,omitempty"`
-		RequestedOn       *time.Time                      `json:"requested_on,omitempty"`
-		Source            *SourceResponse                 `json:"source,omitempty"`
-		Destination       *DestinationResponse            `json:"destination,omitempty"`
-		Sender            *SenderResponse                 `json:"sender,omitempty"`
-		Amount            int64                           `json:"amount,omitempty"`
-		Currency          common.Currency                 `json:"currency,omitempty"`
-		PaymentType       payments.PaymentType            `json:"payment_type,omitempty"`
-		Reference         string                          `json:"reference,omitempty"`
-		Description       string                          `json:"description,omitempty"`
-		Approved          bool                            `json:"approved,omitempty"`
-		ExpiresOn         *time.Time                      `json:"expires_on,omitempty"`
-		Status            payments.PaymentStatus          `json:"status,omitempty"`
-		Balances          *PaymentResponseBalances        `json:"balances,omitempty"`
-		ThreeDs           *payments.ThreeDsData           `json:"3ds,omitempty"`
-		Risk              *payments.RiskAssessment        `json:"risk,omitempty"`
-		Customer          *common.CustomerResponse        `json:"customer,omitempty"`
-		BillingDescriptor *payments.BillingDescriptor     `json:"billing_descriptor,omitempty"`
-		ShippingDetails   *payments.ShippingDetails       `json:"shipping,omitempty"`
-		PaymentIp         string                          `json:"payment_ip,omitempty"`
-		Marketplace       *common.MarketplaceData         `json:"marketplace,omitempty"`
-		AmountAllocations []common.AmountAllocations      `json:"amount_allocations,omitempty"`
-		Recipient         *payments.PaymentRecipient      `json:"recipient,omitempty"`
-		ProcessingData    *payments.ProcessingData        `json:"processing,omitempty"`
-		Items             []payments.Product              `json:"items,omitempty"`
-		Metadata          map[string]interface{}          `json:"metadata,omitempty"`
-		Eci               string                          `json:"eci,omitempty"`
-		SchemeId          string                          `json:"scheme_id,omitempty"`
-		Actions           []payments.PaymentActionSummary `json:"actions,omitempty"`
-		ProcessedOn       *time.Time                      `json:"processed_on,omitempty"`
-		Links             map[string]common.Link          `json:"_links"`
+		HttpMetadata             common.HttpMetadata
+		Id                       string                          `json:"id,omitempty"`
+		RequestedOn              *time.Time                      `json:"requested_on,omitempty"`
+		Source                   *SourceResponse                 `json:"source,omitempty"`
+		Destination              *DestinationResponse            `json:"destination,omitempty"`
+		Sender                   *SenderResponse                 `json:"sender,omitempty"`
+		Amount                   int64                           `json:"amount,omitempty"`
+		Currency                 common.Currency                 `json:"currency,omitempty"`
+		PaymentType              payments.PaymentType            `json:"payment_type,omitempty"`
+		Reference                string                          `json:"reference,omitempty"`
+		Description              string                          `json:"description,omitempty"`
+		Approved                 bool                            `json:"approved,omitempty"`
+		ExpiresOn                *time.Time                      `json:"expires_on,omitempty"`
+		Status                   payments.PaymentStatus          `json:"status,omitempty"`
+		Balances                 *PaymentResponseBalances        `json:"balances,omitempty"`
+		ThreeDs                  *payments.ThreeDsData           `json:"3ds,omitempty"`
+		Risk                     *payments.RiskAssessment        `json:"risk,omitempty"`
+		Customer                 *common.CustomerResponse        `json:"customer,omitempty"`
+		BillingDescriptor        *payments.BillingDescriptor     `json:"billing_descriptor,omitempty"`
+		ShippingDetails          *payments.ShippingDetails       `json:"shipping,omitempty"`
+		PaymentIp                string                          `json:"payment_ip,omitempty"`
+		Marketplace              *common.MarketplaceData         `json:"marketplace,omitempty"`
+		AmountAllocations        []common.AmountAllocations      `json:"amount_allocations,omitempty"`
+		Recipient                *payments.PaymentRecipient      `json:"recipient,omitempty"`
+		ProcessingData           *payments.ProcessingData        `json:"processing,omitempty"`
+		Items                    []payments.Product              `json:"items,omitempty"`
+		Metadata                 map[string]interface{}          `json:"metadata,omitempty"`
+		Eci                      string                          `json:"eci,omitempty"`
+		SchemeId                 string                          `json:"scheme_id,omitempty"`
+		Actions                  []payments.PaymentActionSummary `json:"actions,omitempty"`
+		Retry                    *payments.PaymentRetryResponse  `json:"retry,omitempty"`
+		PanTypeProcessed         payments.PanProcessedType       `json:"pan_type_processed,omitempty"`
+		CkoNetworkTokenAvailable bool                            `json:"cko_network_token_available,omitempty"`
+		ProcessedOn              *time.Time                      `json:"processed_on,omitempty"`
+		Instruction              *PaymentInstruction             `json:"instruction,omitempty"`
+		Links                    map[string]common.Link          `json:"_links"`
 	}
 
 	GetPaymentActionsResponse struct {

@@ -28,7 +28,7 @@ var (
 )
 
 func TestSetupDefault(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
+	t.Skip("Due the time to expect the dispute, just run as needed")
 	var (
 		cardToken = RequestCardToken(t)
 		payment   = getPaymentRequest(t, cardToken.Token)
@@ -92,7 +92,7 @@ func TestQuery(t *testing.T) {
 }
 
 func TestGetDisputeDetails(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
+	t.Skip("Due the time to expect the dispute, just run as needed")
 	cases := []struct {
 		name      string
 		disputeId string
@@ -132,7 +132,7 @@ func TestGetDisputeDetails(t *testing.T) {
 }
 
 func TestPutEvidence(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
+	t.Skip("Due the time to expect the dispute, just run as needed")
 
 	cases := []struct {
 		name      string
@@ -206,7 +206,7 @@ func TestPutEvidence(t *testing.T) {
 }
 
 func TestSubmitEvidence(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
+	t.Skip("Due the time to expect the dispute, just run as needed")
 
 	cases := []struct {
 		name      string
@@ -246,7 +246,7 @@ func TestSubmitEvidence(t *testing.T) {
 }
 
 func TestGetEvidence(t *testing.T) {
-	t.Skip("Skipping tests because this suite is unstable")
+	t.Skip("Due the time to expect the dispute, just run as needed")
 	cases := []struct {
 		name      string
 		disputeId string
@@ -397,8 +397,47 @@ func TestGetFileDetails(t *testing.T) {
 	}
 }
 
+func TestGetCompiledSubmittedEvidence(t *testing.T) {
+	t.Skip("Due the time to expect the dispute, just run as needed")
+	dispute := getDisputes(t).Data[0]
+
+	cases := []struct {
+		name      string
+		disputeId string
+		checker   func(*disputes.DisputeCompiledSubmittedEvidenceResponse, error)
+	}{
+		{
+			name:      "when dispute has a compiled submitted evidence then return the file",
+			disputeId: dispute.Id,
+			checker: func(response *disputes.DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotEmpty(t, response.FileId)
+			},
+		},
+		{
+			name:      "when dispute does not have a compiled submitted evidence then return error",
+			disputeId: "not_found",
+			checker: func(response *disputes.DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().Disputes
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetCompiledSubmittedEvidence(tc.disputeId))
+		})
+	}
+}
+
 func TestGetDisputeSchemeFiles(t *testing.T) {
-	t.Skip("not available")
+	t.Skip("Due the time to expect the dispute, just run as needed")
 	dispute := getDisputes(t).Data[0]
 
 	cases := []struct {

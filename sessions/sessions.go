@@ -1,5 +1,7 @@
 package sessions
 
+import "time"
+
 const (
 	SessionsPath          = "sessions"
 	CollectDataPath       = "collect-data"
@@ -10,8 +12,11 @@ const (
 type AuthenticationType string
 
 const (
-	RegularAuthType   AuthenticationType = "regular"
-	RecurringAuthType AuthenticationType = "recurring"
+	AddCardAuthType      AuthenticationType = "add_card"
+	InstallmentAuthType  AuthenticationType = "installment"
+	MaintainCardAuthType AuthenticationType = "maintain_card"
+	RecurringAuthType    AuthenticationType = "recurring"
+	RegularAuthType      AuthenticationType = "regular"
 )
 
 type Category string
@@ -24,26 +29,26 @@ const (
 type TransactionType string
 
 const (
-	GoodsService             TransactionType = "goods_service"
-	CheckAcceptance          TransactionType = "check_acceptance"
 	AccountFunding           TransactionType = "account_funding"
-	QuashiCardTransaction    TransactionType = "quashi_card_transaction"
+	CheckAcceptance          TransactionType = "check_acceptance"
+	GoodsService             TransactionType = "goods_service"
 	PrepaidActivationAndLoad TransactionType = "prepaid_activation_and_load"
+	QuashiCardTransaction    TransactionType = "quashi_card_transaction"
 )
 
 type SessionStatus string
 
 const (
-	Pending            SessionStatus = "pending"
-	Processing         SessionStatus = "processing"
-	Challenged         SessionStatus = "challenged"
-	ChallengeAbandoned SessionStatus = "challenge_abandoned"
-	Expired            SessionStatus = "expired"
 	Approved           SessionStatus = "approved"
 	Attempted          SessionStatus = "attempted"
-	Unavailable        SessionStatus = "unavailable"
+	Challenged         SessionStatus = "challenged"
+	ChallengeAbandoned SessionStatus = "challenge_abandoned"
 	Declined           SessionStatus = "declined"
+	Expired            SessionStatus = "expired"
+	Pending            SessionStatus = "pending"
+	Processing         SessionStatus = "processing"
 	Rejected           SessionStatus = "rejected"
+	Unavailable        SessionStatus = "unavailable"
 )
 
 type StatusReason string
@@ -63,21 +68,58 @@ const (
 type NextAction string
 
 const (
-	CollectChannelData  NextAction = "collect_channel_data"
-	IssueFingerprint    NextAction = "issuer_fingerprint"
-	ChallengeCardHolder NextAction = "challenge_cardholder"
-	RedirectCardholder  NextAction = "redirect_cardholder"
-	Complete            NextAction = "complete"
 	Authenticate        NextAction = "authenticate"
+	ChallengeCardHolder NextAction = "challenge_cardholder"
+	CollectChannelData  NextAction = "collect_channel_data"
+	Complete            NextAction = "complete"
+	IssueFingerprint    NextAction = "issuer_fingerprint"
+	RedirectCardholder  NextAction = "redirect_cardholder"
+)
+
+type DeliveryTimeframe string
+
+const (
+	ElectronicDelivery DeliveryTimeframe = "electronic_delivery"
+	SameDay            DeliveryTimeframe = "same_day"
+	Overnight          DeliveryTimeframe = "overnight"
+	TwoDayOrMore       DeliveryTimeframe = "two_day_or_more"
+)
+
+type PreOrderPurchaseIndicatorType string
+
+const (
+	FutureAvailability   PreOrderPurchaseIndicatorType = "future_availability"
+	MerchandiseAvailable PreOrderPurchaseIndicatorType = "merchandise_available"
+)
+
+type ReorderItemsIndicatorType string
+
+const (
+	FirstTimeOrdered ReorderItemsIndicatorType = "first_time_ordered"
+	Reordered        ReorderItemsIndicatorType = "reordered"
 )
 
 type Recurring struct {
-	DaysBetweenPayments int    `json:"days_between_payments,omitempty"`
-	Expiry              string `json:"expiry,omitempty"`
+	DaysBetweenPayments int    `json:"days_between_payments,omitempty" default:"1"`
+	Expiry              string `json:"expiry,omitempty" default:"99991231"`
 }
 
 type Installment struct {
 	NumberOfPayments    int    `json:"number_of_payments,omitempty"`
-	DaysBetweenPayments int    `json:"days_between_payments,omitempty"`
-	Expiry              string `json:"expiry,omitempty"`
+	DaysBetweenPayments int    `json:"days_between_payments,omitempty" default:"1"`
+	Expiry              string `json:"expiry,omitempty" default:"99991231"`
+}
+
+type MerchantRiskInfo struct {
+	DeliveryEmail             string                        `json:"delivery_email,omitempty"`
+	DeliveryTimeframe         DeliveryTimeframe             `json:"delivery_timeframe,omitempty"`
+	IsPreorder                bool                          `json:"is_preorder,omitempty"`
+	IsReorder                 bool                          `json:"is_reorder,omitempty"`
+	ShippingIndicator         ShippingIndicator             `json:"shipping_indicator,omitempty"`
+	ReorderItemsIndicator     ReorderItemsIndicatorType     `json:"reorder_items_indicator,omitempty"`
+	PreOrderPurchaseIndicator PreOrderPurchaseIndicatorType `json:"pre_order_purchase_indicator,omitempty"`
+	PreOrderDate              *time.Time                    `json:"pre_order_date,omitempty"`
+	GiftCardAmount            string                        `json:"gift_card_amount,omitempty"`
+	GiftCardCurrency          string                        `json:"gift_card_currency,omitempty"`
+	GiftCardCount             string                        `json:"gift_card_count,omitempty"`
 }

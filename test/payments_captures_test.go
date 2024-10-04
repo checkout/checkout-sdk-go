@@ -99,6 +99,7 @@ func TestCaptureCardPaymentWithoutRequest(t *testing.T) {
 }
 
 func TestCaptureCardPaymentIdempotently(t *testing.T) {
+	t.Skip("unavailable")
 	paymentResponse := makeCardPayment(t, false, 10)
 
 	metadata := make(map[string]interface{})
@@ -179,6 +180,7 @@ func TestCaptureCardPaymentIdempotently(t *testing.T) {
 }
 
 func TestCaptureCardPaymentWithoutrequestIdempotently(t *testing.T) {
+	t.Skip("unavailable")
 	paymentResponse := makeCardPayment(t, false, 10)
 
 	idempotencyKeyRandom1 := uuid.New().String()

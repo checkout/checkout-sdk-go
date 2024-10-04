@@ -694,6 +694,69 @@ func TestRemoveWorkflowConditions(t *testing.T) {
 	}
 }
 
+func TestTestWorkflow(t *testing.T) {
+	//t.Skip("Skipping because it returns http 422 status")
+	workflow := getWorkflow(t, createWorkflow(t).Id)
+
+	var request = events.EventTypesRequest{
+		[]string{"payment_approved",
+			"payment_declined",
+			"card_verification_declined",
+			"card_verified",
+			"payment_authorization_incremented",
+			"payment_authorization_increment_declined",
+			"payment_capture_declined",
+			"payment_captured",
+			"payment_refund_declined",
+			"payment_refunded",
+			"payment_void_declined",
+			"payment_voided",
+			"dispute_canceled",
+			"dispute_evidence_required",
+			"dispute_expired",
+			"dispute_lost",
+			"dispute_resolved",
+			"dispute_won"},
+	}
+
+	cases := []struct {
+		name       string
+		workflowId string
+		request    events.EventTypesRequest
+		checker    func(*common.MetadataResponse, error)
+	}{
+		{
+			name:       "when workflow and condition exists then delete workflow condition",
+			workflowId: workflow.Id,
+			request:    request,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:       "when workflow not_found then return error",
+			workflowId: "not_found",
+			request:    request,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().WorkFlows
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.TestWorkflow(tc.workflowId, request))
+		})
+	}
+}
+
 func TestGetEventTypes(t *testing.T) {
 	t.Skip("Skipping tests because this suite is unstable ")
 	cases := []struct {

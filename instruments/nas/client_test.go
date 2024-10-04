@@ -3,6 +3,7 @@ package nas
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -11,6 +12,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/mocks"
+	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 const (
@@ -71,6 +73,17 @@ func TestCreate(t *testing.T) {
 			HttpMetadata:                        mocks.HttpMetadataStatusCreated,
 			CreateBankAccountInstrumentResponse: &bankAccount,
 		}
+
+		sepa = CreateSepaInstrumentResponse{
+			Type:        common.Sepa,
+			Id:          "src_wmlfc3zyhqzehihu7giusaaawu",
+			Fingerprint: "vnsdrvikkvre3dtrjjvlm5du4q",
+		}
+
+		createSepaResponse = CreateInstrumentResponse{
+			HttpMetadata:                 mocks.HttpMetadataStatusCreated,
+			CreateSepaInstrumentResponse: &sepa,
+		}
 	)
 
 	cases := []struct {
@@ -124,6 +137,29 @@ func TestCreate(t *testing.T) {
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
 				assert.NotNil(t, response.CreateBankAccountInstrumentResponse)
 				assert.Equal(t, bankAccount.Id, response.CreateBankAccountInstrumentResponse.Id)
+			},
+		},
+		{
+			name:    "when request is for sepa instrument then create sepa instrument",
+			request: getCreateSepaInstrumentRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*CreateInstrumentResponse)
+						*respMapping = createSepaResponse
+					})
+			},
+			checker: func(response *CreateInstrumentResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.CreateSepaInstrumentResponse)
+				assert.Equal(t, sepa.Id, response.CreateSepaInstrumentResponse.Id)
 			},
 		},
 		{
@@ -196,6 +232,21 @@ func getCreateTokenInstrumentRequest() *createTokenInstrumentRequest {
 	r.Token = "tok_asoto22g2fsu7prwomy12sgfsa"
 	r.AccountHolder = &accountHolder
 	r.Customer = &customerRequest
+	return r
+}
+
+func getCreateSepaInstrumentRequest() *createSepaInstrumentRequest {
+	time := time.Now()
+
+	r := NewCreateSepaInstrumentRequest()
+	r.InstrumentData = &InstrumentData{
+		AccountNumber:   "FR2810096000509685512959O86",
+		Country:         common.GB,
+		Currency:        common.GBP,
+		PaymentType:     payments.Recurring,
+		MandateId:       "1234567890",
+		DateOfSignature: &time,
+	}
 	return r
 }
 

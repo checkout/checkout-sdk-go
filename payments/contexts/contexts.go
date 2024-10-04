@@ -10,6 +10,13 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments/nas/sources/apm"
 )
 
+type PaymentContextDetailsStatusType string
+
+const (
+	Created  PaymentContextDetailsStatusType = "Created"
+	Approved PaymentContextDetailsStatusType = "Approved"
+)
+
 const PaymentContextsPath = "payment-contexts"
 
 type (
@@ -18,7 +25,9 @@ type (
 		Amount              int64                      `json:"amount,omitempty"`
 		Currency            common.Currency            `json:"currency,omitempty"`
 		PaymentType         payments.PaymentType       `json:"payment_type,omitempty"`
+		AuthorizationType   string                     `json:"authorization_type,omitempty"`
 		Capture             bool                       `json:"capture,omitempty"`
+		Customer            *common.CustomerRequest    `json:"customer,omitempty"`
 		Shipping            *payments.ShippingDetails  `json:"shipping,omitempty"`
 		Processing          *PaymentContextsProcessing `json:"processing,omitempty"`
 		ProcessingChannelId string                     `json:"processing_channel_id,omitempty"`
@@ -32,8 +41,10 @@ type (
 
 type (
 	PaymentContextsPartnerMetadata struct {
-		OrderId    string `json:"order_id,omitempty"`
-		CustomerId string `json:"customer_id,omitempty"`
+		OrderId     string `json:"order_id,omitempty"`
+		CustomerId  string `json:"customer_id,omitempty"`
+		SessionId   string `json:"session_id,omitempty"`
+		ClientToken string `json:"client_token,omitempty"`
 	}
 
 	PaymentContextsPartnerCustomerRiskData struct {
@@ -124,6 +135,7 @@ type (
 
 	PaymentContextDetailsResponse struct {
 		HttpMetadata    common.HttpMetadata
+		Status          PaymentContextDetailsStatusType `json:"status,omitempty"`
 		PaymentRequest  *PaymentContextsResponse        `json:"payment_request,omitempty"`
 		PartnerMetadata *PaymentContextsPartnerMetadata `json:"partner_metadata,omitempty"`
 	}

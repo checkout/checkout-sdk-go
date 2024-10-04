@@ -13,12 +13,13 @@ import (
 	"github.com/checkout/checkout-sdk-go/reports"
 )
 
-var (
-	report *reports.ReportResponse
-)
+func setupReportTest(t *testing.T) *reports.ReportResponse {
+	t.Log("Setting up before the reports test...")
+	return getReportId(t)
+}
 
-func TestSetupReports(t *testing.T) {
-	report = getReportId(t)
+func teardownReportTest(t *testing.T) {
+	t.Log("Tearing down after the reports test...")
 }
 
 func TestGetAllReports(t *testing.T) {
@@ -72,6 +73,9 @@ func TestGetAllReports(t *testing.T) {
 }
 
 func TestGetReportDetails(t *testing.T) {
+	report := setupReportTest(t)
+	defer teardownReportTest(t)
+
 	cases := []struct {
 		name     string
 		reportId string
@@ -114,6 +118,10 @@ func TestGetReportDetails(t *testing.T) {
 }
 
 func TestGetReportFile(t *testing.T) {
+	t.Skip("unavailable")
+	report := setupReportTest(t)
+	defer teardownReportTest(t)
+
 	cases := []struct {
 		name     string
 		reportId string

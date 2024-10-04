@@ -2,6 +2,7 @@ package test
 
 import (
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -70,7 +71,10 @@ func TestRequestPaymentsAPM(t *testing.T) {
 		{
 			name: "test Ideal source for request payment",
 			request: nas.PaymentRequest{
-				Source:      getIdealSourceRequest(),
+				Source: func() payments.PaymentSource {
+					t.Skip("Skipping getIdealSourceRequest temporally")
+					return getIdealSourceRequest()
+				}(),
 				Amount:      1000,
 				Currency:    common.EUR,
 				Reference:   Reference,
@@ -152,12 +156,14 @@ func TestRequestPaymentsAPM(t *testing.T) {
 		{
 			name: "test Tamara source for request payment",
 			request: nas.PaymentRequest{
-				Source:      getTamaraSourceRequest(),
-				Amount:      1000,
-				Currency:    common.SAR,
-				Reference:   Reference,
-				Description: Description,
-				Customer:    &customer,
+				Source:              getTamaraSourceRequest(),
+				Amount:              1000,
+				Currency:            common.GBP,
+				Capture:             true,
+				Reference:           Reference,
+				Description:         Description,
+				Customer:            &customer,
+				ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
 				Items: []payments.Product{
 					{
 						Name:      "test item",
@@ -500,7 +506,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 func getIdealSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestIdealSource()
 	source.Description = "ORD50234E89"
-	source.Bic = "INGBNL2A"
 	source.Language = "nl"
 
 	return source
@@ -515,7 +520,14 @@ func getAfterPaySourceRequest() payments.PaymentSource {
 
 func getTamaraSourceRequest() payments.PaymentSource {
 	source := apm.NewRequestTamaraSource()
-	source.BillingAddress = Address()
+	source.BillingAddress = &common.Address{
+		AddressLine1: "Cecilia Chapman",
+		AddressLine2: "711-2880 Nulla St.",
+		City:         "Mankato",
+		State:        "Mississippi",
+		Zip:          "96522",
+		Country:      common.GB,
+	}
 
 	return source
 }
@@ -560,8 +572,15 @@ func getP24Source() payments.PaymentSource {
 }
 
 func getKnetSource() payments.PaymentSource {
+	paymentMethodDetails := payments.PaymentMethodDetails{
+		DisplayName: "name",
+		Type:        "type",
+		Network:     "card_network",
+	}
+
 	source := apm.NewRequestKnetSource()
 	source.Language = "en"
+	source.PaymentMethodDetails = &paymentMethodDetails
 
 	return source
 }

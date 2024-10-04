@@ -1,6 +1,7 @@
 package sources
 
 import (
+	"context"
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,13 +20,18 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) CreateSepaSource(request *sepaSourceRequest) (*CreateSepaSourceResponse, error) {
+	return c.CreateSepaSourceWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateSepaSourceWithContext(ctx context.Context, request *sepaSourceRequest) (*CreateSepaSourceResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response CreateSepaSourceResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(path),
 		auth,
 		request,

@@ -1,6 +1,7 @@
 package hosted
 
 import (
+	"context"
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -18,14 +19,18 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 	}
 }
 
-func (c *Client) CreateHostedPaymentsPageSession(request PaymentHostedRequest) (*PaymentHostedResponse, error) {
+func (c *Client) CreateHostedPaymentsPageSession(request HostedPaymentRequest) (*HostedPaymentResponse, error) {
+	return c.CreateHostedPaymentsPageSessionWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateHostedPaymentsPageSessionWithContext(ctx context.Context, request HostedPaymentRequest) (*HostedPaymentResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var response PaymentHostedResponse
-	err = c.apiClient.Post(common.BuildPath(HostedPaymentsPath), auth, request, &response, nil)
+	var response HostedPaymentResponse
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(HostedPaymentsPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -33,14 +38,18 @@ func (c *Client) CreateHostedPaymentsPageSession(request PaymentHostedRequest) (
 	return &response, nil
 }
 
-func (c *Client) GetHostedPaymentsPageDetails(hostedPaymentId string) (*PaymentHostedDetails, error) {
+func (c *Client) GetHostedPaymentsPageDetails(hostedPaymentId string) (*HostedPaymentDetails, error) {
+	return c.GetHostedPaymentsPageDetailsWithContext(context.Background(), hostedPaymentId)
+}
+
+func (c *Client) GetHostedPaymentsPageDetailsWithContext(ctx context.Context, hostedPaymentId string) (*HostedPaymentDetails, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
-	var response PaymentHostedDetails
-	err = c.apiClient.Get(common.BuildPath(HostedPaymentsPath, hostedPaymentId), auth, &response)
+	var response HostedPaymentDetails
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(HostedPaymentsPath, hostedPaymentId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

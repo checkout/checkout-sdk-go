@@ -50,10 +50,10 @@ func TestCreate(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.IdResponse)
+						respMapping := args.Get(4).(*common.IdResponse)
 						*respMapping = idResponse
 					})
 			},
@@ -71,7 +71,7 @@ func TestCreate(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *common.IdResponse, err error) {
@@ -89,7 +89,7 @@ func TestCreate(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -156,10 +156,10 @@ func TestGet(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*GetCustomerResponse)
+						respMapping := args.Get(3).(*GetCustomerResponse)
 						*respMapping = customer
 					})
 			},
@@ -180,7 +180,7 @@ func TestGet(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *GetCustomerResponse, err error) {
@@ -198,7 +198,7 @@ func TestGet(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -259,10 +259,10 @@ func TestUpdate(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.MetadataResponse)
+						respMapping := args.Get(4).(*common.MetadataResponse)
 						*respMapping = response
 					})
 			},
@@ -285,7 +285,7 @@ func TestUpdate(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *common.MetadataResponse, err error) {
@@ -304,7 +304,7 @@ func TestUpdate(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -327,7 +327,7 @@ func TestUpdate(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPatch: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -388,10 +388,10 @@ func TestDelete(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiDelete: func(m *mock.Mock) mock.Call {
-				return *m.On("Delete", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*common.MetadataResponse)
+						respMapping := args.Get(3).(*common.MetadataResponse)
 						*respMapping = response
 					})
 			},
@@ -409,7 +409,7 @@ func TestDelete(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiDelete: func(m *mock.Mock) mock.Call {
-				return *m.On("Delete", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *common.MetadataResponse, err error) {
@@ -427,7 +427,7 @@ func TestDelete(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiDelete: func(m *mock.Mock) mock.Call {
-				return *m.On("Delete", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,

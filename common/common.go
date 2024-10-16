@@ -51,15 +51,10 @@ const (
 type ChallengeIndicator string
 
 const (
-	ChallengeRequested                          ChallengeIndicator = "challenge_requested"
-	ChallengeRequestedMandate                   ChallengeIndicator = "challenge_requested_mandate"
-	ChallengeIndicatorDataShare                 ChallengeIndicator = "data_share"
-	ChallengeIndicatorLowValue                  ChallengeIndicator = "low_value"
-	NoChallengeRequested                        ChallengeIndicator = "no_challenge_requested"
-	NoPreference                                ChallengeIndicator = "no_preference"
-	ChallengeIndicatorTransactionRiskAssessment ChallengeIndicator = "transaction_risk_assessment"
-	ChallengeIndicatorTrustedListing            ChallengeIndicator = "trusted_listing"
-	ChallengeIndicatorTrustedListingPrompt      ChallengeIndicator = "trusted_listing_prompt"
+	ChallengeRequested        ChallengeIndicator = "challenge_requested"
+	ChallengeRequestedMandate ChallengeIndicator = "challenge_requested_mandate"
+	NoChallengeRequested      ChallengeIndicator = "no_challenge_requested"
+	NoPreference              ChallengeIndicator = "no_preference"
 )
 
 type DocumentType string
@@ -105,6 +100,7 @@ const (
 	ThreeDsOutage             Exemption = "3ds_outage"
 	TransactionRiskAssessment Exemption = "transaction_risk_assessment"
 	TrustedListing            Exemption = "trusted_listing"
+	TrustedListingPrompt      Exemption = "trusted_listing_prompt"
 )
 
 type ThreeDsMethodCompletion string

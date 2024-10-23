@@ -2,13 +2,16 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/google/uuid"
 )
 
 type HttpClient interface {
@@ -21,21 +24,26 @@ type HttpClient interface {
 }
 
 type ApiClient struct {
-	HttpClient http.Client
-	BaseUri    string
-	Log        configuration.StdLogger
+	HttpClient          http.Client
+	BaseUri             string
+	EnableTelemetry     bool
+	RequestMetricsQueue common.TelemetryQueue
+	Log                 configuration.StdLogger
 }
 
 const (
-	CkoRequestId = "cko-request-id"
-	CkoVersion   = "cko-version"
+	CkoRequestId       = "cko-request-id"
+	CkoVersion         = "cko-version"
+	CkoTelemetryHeader = "cko-sdk-telemetry"
 )
 
 func NewApiClient(configuration *configuration.Configuration, baseUri string) *ApiClient {
 	return &ApiClient{
-		HttpClient: configuration.HttpClient,
-		BaseUri:    baseUri,
-		Log:        configuration.Logger,
+		HttpClient:          configuration.HttpClient,
+		BaseUri:             baseUri,
+		EnableTelemetry:     configuration.EnableTelemetry,
+		RequestMetricsQueue: *common.NewTelemetryQueue(),
+		Log:                 configuration.Logger,
 	}
 }
 
@@ -109,12 +117,39 @@ func (a *ApiClient) submit(
 	}
 
 	a.Log.Printf("post: %s", path)
-	resp, err := a.HttpClient.Do(req)
-	if err != nil {
-		return err
-	}
+	if a.EnableTelemetry {
+		currentRequestId := uuid.New().String()
+		// add elapsed to a header
+		var lastRequestMetric common.RequestMetrics
+		lastRequestMetric, ok := a.RequestMetricsQueue.Dequeue()
+		if ok {
+			lastRequestMetric.RequestId = currentRequestId
+			lastRequestMetricStr, err := json.Marshal(lastRequestMetric)
+			if err != nil {
+				return err
+			}
+			req.Header.Set(CkoTelemetryHeader, string(lastRequestMetricStr))
+		}
+		start := time.Now()
+		resp, err := a.HttpClient.Do(req)
+		elapsed := time.Since(start)
+		a.Log.Printf("Request took %s", elapsed)
+		if err != nil {
+			return err
+		}
 
-	return a.handleResponse(resp, responseMapping)
+		lastRequestMetric.PrevRequestDuration = int(elapsed.Milliseconds())
+		lastRequestMetric.PrevRequestId = currentRequestId
+		a.RequestMetricsQueue.Enqueue(lastRequestMetric)
+		return a.handleResponse(resp, responseMapping)
+	} else {
+		resp, err := a.HttpClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		return a.handleResponse(resp, responseMapping)
+	}
 }
 
 func (a *ApiClient) buildRequest(

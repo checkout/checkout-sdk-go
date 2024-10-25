@@ -90,12 +90,40 @@ func (a *ApiClient) invoke(
 	}
 
 	a.Log.Printf("%s: %s", method, path)
-	resp, err := a.HttpClient.Do(req)
-	if err != nil {
-		return err
-	}
 
-	return a.handleResponse(resp, responseMapping)
+	if a.EnableTelemetry {
+		currentRequestId := uuid.New().String()
+		// add elapsed to a header
+		var lastRequestMetric common.RequestMetrics
+		lastRequestMetric, ok := a.RequestMetricsQueue.Dequeue()
+		if ok {
+			lastRequestMetric.RequestId = currentRequestId
+			lastRequestMetricStr, err := json.Marshal(lastRequestMetric)
+			if err != nil {
+				return err
+			}
+			req.Header.Set(CkoTelemetryHeader, string(lastRequestMetricStr))
+		}
+		start := time.Now()
+		resp, err := a.HttpClient.Do(req)
+		elapsed := time.Since(start)
+		a.Log.Printf("Request took %s", elapsed)
+		if err != nil {
+			return err
+		}
+
+		lastRequestMetric.PrevRequestDuration = int(elapsed.Milliseconds())
+		lastRequestMetric.PrevRequestId = currentRequestId
+		a.RequestMetricsQueue.Enqueue(lastRequestMetric)
+		return a.handleResponse(resp, responseMapping)
+	} else {
+		resp, err := a.HttpClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		return a.handleResponse(resp, responseMapping)
+	}
 }
 
 func (a *ApiClient) submit(

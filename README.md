@@ -223,11 +223,11 @@ Request telemetry can be disabled by opting out during checkout_sdk_builder buil
 
 ```
 api := checkout.Builder().
-        Previous().
-		WithSecretKey("CHECKOUT_PREVIOUS_SECRET_KEY").
-		WithEnvironment(configuration.Sandbox()).
-        WithEnableTelemetry(false).
-		Build()
+    Previous().
+    WithSecretKey("CHECKOUT_PREVIOUS_SECRET_KEY").
+    WithEnvironment(configuration.Sandbox()).
+    WithEnableTelemetry(false).
+    Build()
 ```
 
 ## Code of Conduct

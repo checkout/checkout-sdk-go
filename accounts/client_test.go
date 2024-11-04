@@ -126,11 +126,12 @@ func TestCreateEntity(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.CreateEntity(tc.request))
@@ -249,11 +250,12 @@ func TestGetEntity(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.GetEntity(tc.entityId))
@@ -369,11 +371,12 @@ func TestUpdateEntity(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.UpdateEntity(tc.entityId, tc.request))
@@ -527,11 +530,12 @@ func TestCreatePaymentInstruments(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.CreatePaymentInstruments(tc.entityId, tc.paymentInstrument))
@@ -675,11 +679,12 @@ func TestCreatePaymentInstrument(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.CreatePaymentInstrument(tc.entityId, tc.paymentInstrumentRequest))
@@ -824,11 +829,12 @@ func TestQueryPaymentInstruments(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.QueryPaymentInstruments(tc.entityId, tc.query))
@@ -973,11 +979,12 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.RetrievePaymentInstrumentDetails(tc.entityId, tc.paymentInstrumentId))
@@ -1096,11 +1103,12 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.UpdatePaymentInstrumentDetails(tc.entityId, tc.instrumentId, tc.request))
@@ -1189,11 +1197,12 @@ func TestGetPayoutSchedule(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.RetrievePayoutSchedule(tc.entityId))
@@ -1283,11 +1292,12 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient, filesClient)
 
 			tc.checker(client.UpdatePayoutSchedule(tc.entityId, tc.currency, tc.request))

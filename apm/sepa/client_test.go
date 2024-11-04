@@ -85,11 +85,12 @@ func TestGetMandate(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetMandate(tc.mandateId))
@@ -147,11 +148,12 @@ func TestCancelMandate(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.CancelMandate(tc.mandateId))

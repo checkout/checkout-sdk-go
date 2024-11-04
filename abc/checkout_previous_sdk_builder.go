@@ -10,6 +10,11 @@ type CheckoutPreviousSdkBuilder struct {
 	configuration.StaticKeysBuilder
 }
 
+func (b *CheckoutPreviousSdkBuilder) WithEnableTelemetry(telemetry bool) *CheckoutPreviousSdkBuilder {
+	b.EnableTelemetry = &telemetry
+	return b
+}
+
 func (b *CheckoutPreviousSdkBuilder) WithEnvironment(environment configuration.Environment) *CheckoutPreviousSdkBuilder {
 	b.Environment = environment
 	return b
@@ -53,7 +58,7 @@ func (b *CheckoutPreviousSdkBuilder) Build() (*Api, error) {
 
 	sdkCredentials := configuration.NewPreviousKeysSdkCredentials(b.SecretKey, b.PublicKey)
 
-	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.Environment, b.HttpClient, b.Logger)
+	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.EnableTelemetry, b.Environment, b.HttpClient, b.Logger)
 
 	if b.EnvironmentSubdomain != nil {
 		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)

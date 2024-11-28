@@ -14,7 +14,7 @@ type (
 		Name              string              `json:"name,omitempty"`
 		Cvv               string              `json:"cvv,omitempty"`
 		Stored            bool                `json:"stored"`
-		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
+		StoreForFutureUse bool                `json:"store_for_future_use"`
 		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
 		Phone             *common.Phone       `json:"phone,omitempty"`
 	}
@@ -25,7 +25,7 @@ type (
 		Cvv               string              `json:"cvv,omitempty"`
 		PaymentMethod     string              `json:"payment_method,omitempty"`
 		Stored            *bool               `json:"stored,omitempty"`
-		StoreForFutureUse *bool               `json:"storeForFutureUse,omitempty"`
+		StoreForFutureUse *bool               `json:"storeForFutureUse"`
 	}
 
 	requestTokenSource struct {
@@ -34,7 +34,7 @@ type (
 		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
 		Phone             *common.Phone       `json:"phone,omitempty"`
 		Stored            *bool               `json:"stored,omitempty"`
-		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
+		StoreForFutureUse bool                `json:"store_for_future_use"`
 	}
 
 	requestProviderTokenSource struct {

@@ -16,12 +16,12 @@ const (
 type SessionScheme string
 
 const (
-	Visa            SessionScheme = "visa"
-	Mastercard      SessionScheme = "mastercard"
-	Jcb             SessionScheme = "jcb"
 	Amex            SessionScheme = "amex"
-	Diners          SessionScheme = "diners"
 	CartesBancaires SessionScheme = "cartes_bancaires"
+	Diners          SessionScheme = "diners"
+	Jcb             SessionScheme = "jcb"
+	Mastercard      SessionScheme = "mastercard"
+	Visa            SessionScheme = "visa"
 )
 
 type (

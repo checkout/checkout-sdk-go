@@ -7,26 +7,43 @@ import (
 type ChannelType string
 
 const (
-	Browser ChannelType = "browser"
-	App     ChannelType = "app"
+	App               ChannelType = "app"
+	Browser           ChannelType = "browser"
+	MerchantInitiated ChannelType = "merchant_initiated"
 )
 
 type SdkInterfaceType string
 
 const (
-	Native SdkInterfaceType = "native"
-	Html   SdkInterfaceType = "html"
 	Both   SdkInterfaceType = "both"
+	Html   SdkInterfaceType = "html"
+	Native SdkInterfaceType = "native"
 )
 
 type UIElements string
 
 const (
-	Text         UIElements = "text"
-	SingleSelect UIElements = "single_select"
+	HtmlOther    UIElements = "html_other"
 	MultiSelect  UIElements = "multi_select"
 	Oob          UIElements = "oob"
-	HtmlOther    UIElements = "html_other"
+	SingleSelect UIElements = "single_select"
+	Text         UIElements = "text"
+)
+
+type RequestType string
+
+const (
+	AccountVerification     RequestType = "account_verification"
+	AddCard                 RequestType = "add_card"
+	InstallmentTransaction  RequestType = "installment_transaction"
+	MailOrder               RequestType = "mail_order"
+	MaintainCardInformation RequestType = "maintain_card_information"
+	OtherPayment            RequestType = "other_payment"
+	RecurringTransaction    RequestType = "recurring_transaction"
+	SplitOrDelayedShipment  RequestType = "split_or_delayed_shipment"
+	TelephoneOrder          RequestType = "telephone_order"
+	TopUp                   RequestType = "top_up"
+	WhitelistStatusCheck    RequestType = "whitelist_status_check"
 )
 
 type (
@@ -52,7 +69,7 @@ type (
 
 	browserSession struct {
 		ChannelData
-		ThreeDsMethodCompletion common.ThreeDsMethodCompletion `json:"three_ds_method_completion,omitempty"`
+		ThreeDsMethodCompletion common.ThreeDsMethodCompletion `json:"three_ds_method_completion,omitempty" default:"u"`
 		AcceptHeader            string                         `json:"accept_header,omitempty"`
 		JavaEnabled             bool                           `json:"java_enabled,omitempty"`
 		JavascriptEnabled       bool                           `json:"javascript_enabled,omitempty"`
@@ -64,6 +81,11 @@ type (
 		UserAgent               string                         `json:"user_agent,omitempty"`
 		IpAddress               string                         `json:"ip_address,omitempty"`
 	}
+
+	merchantInitiatedSession struct {
+		ChannelData
+		RequestType RequestType `json:"request_type,omitempty"`
+	}
 )
 
 func NewAppSession() *appSession {
@@ -74,11 +96,19 @@ func NewBrowserSession() *browserSession {
 	return &browserSession{ChannelData: ChannelData{Channel: Browser}}
 }
 
+func NewMerchantInitiatedSession() *merchantInitiatedSession {
+	return &merchantInitiatedSession{ChannelData: ChannelData{Channel: MerchantInitiated}}
+}
+
 func (s *appSession) GetType() ChannelType {
 	return s.Channel
 }
 
 func (s *browserSession) GetType() ChannelType {
+	return s.Channel
+}
+
+func (s *merchantInitiatedSession) GetType() ChannelType {
 	return s.Channel
 }
 

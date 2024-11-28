@@ -216,6 +216,20 @@ The execution of integration tests require the following environment variables s
 * For default account systems (OAuth): `CHECKOUT_DEFAULT_OAUTH_CLIENT_ID` & `CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET`
 * For Previous account systems (ABC): `CHECKOUT_PREVIOUS_PUBLIC_KEY` & `CHECKOUT_PREVIOUS_SECRET_KEY`
 
+## Telemetry
+Request telementry is enabled by default in the Go SDK. Request latency is included in the telemetry data. Recording the request latency allows Checkout.com to continuously monitor and imporove the merchant experience.
+
+Request telemetry can be disabled by opting out during checkout_sdk_builder builder step:
+
+```
+api := checkout.Builder().
+    Previous().
+    WithSecretKey("CHECKOUT_PREVIOUS_SECRET_KEY").
+    WithEnvironment(configuration.Sandbox()).
+    WithEnableTelemetry(false).
+    Build()
+```
+
 ## Code of Conduct
 
 Please refer to [Code of Conduct](CODE_OF_CONDUCT.md)

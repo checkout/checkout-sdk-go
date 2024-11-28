@@ -1,7 +1,6 @@
 package workflows
 
 import (
-	"github.com/checkout/checkout-sdk-go/workflows/reflows"
 	"net/http"
 	"testing"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/workflows/actions"
 	"github.com/checkout/checkout-sdk-go/workflows/conditions"
 	"github.com/checkout/checkout-sdk-go/workflows/events"
+	"github.com/checkout/checkout-sdk-go/workflows/reflows"
 )
 
 func TestCreateWorkflow(t *testing.T) {
@@ -111,11 +111,12 @@ func TestCreateWorkflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.CreateWorkflow(tc.request))
@@ -188,11 +189,12 @@ func TestGetWorkflows(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetWorkflows())
@@ -292,11 +294,12 @@ func TestGetWorkflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetWorkflow(tc.workflowId))
@@ -395,11 +398,12 @@ func TestUpdateWorkflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPatch(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.UpdateWorkflow(tc.workflowId, tc.request))
@@ -486,11 +490,12 @@ func TestRemoveWorkflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiDelete(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.RemoveWorkflow(tc.workflowId))
@@ -607,11 +612,12 @@ func TestUpdateWorkflowAction(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.UpdateWorkflowAction(tc.workflowId, tc.actionId, tc.request))
@@ -728,14 +734,131 @@ func TestUpdateWorkflowCondition(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.UpdateWorkflowCondition(tc.workflowId, tc.conditionId, tc.request))
+		})
+	}
+}
+
+func TestTestWorkflow(t *testing.T) {
+	var (
+		response = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusOk}
+		request  = events.EventTypesRequest{
+			EventTypes: []string{
+				"payment_approved",
+				"payment_declined",
+				"card_verification_declined",
+				"card_verified",
+				"payment_authorization_incremented",
+				"payment_authorization_increment_declined",
+				"payment_capture_declined",
+				"payment_captured",
+				"payment_refund_declined",
+				"payment_refunded",
+				"payment_void_declined",
+				"payment_voided",
+				"dispute_canceled",
+				"dispute_evidence_required",
+				"dispute_expired",
+				"dispute_lost",
+				"dispute_resolved",
+				"dispute_won"},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		workflowId       string
+		request          events.EventTypesRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*common.MetadataResponse, error)
+	}{
+		{
+			name:       "when request is correct then test workflow",
+			workflowId: "wor_1234",
+			request:    request,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*common.MetadataResponse)
+						*respMapping = response
+					})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:       "when credentials invalid then return error",
+			workflowId: "wor_1234",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:       "when workflowId not found then return error",
+			workflowId: "not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
+
+			tc.checker(client.TestWorkflow(tc.workflowId, tc.request))
 		})
 	}
 }
@@ -807,11 +930,12 @@ func TestGetEventTypes(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetEventTypes())
@@ -911,11 +1035,12 @@ func TestGetEvent(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetEvent(tc.eventId))
@@ -1013,11 +1138,12 @@ func TestGetSubjectEvents(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetSubjectEvents(tc.subjectId))
@@ -1104,11 +1230,12 @@ func TestReflowByEvent(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.ReflowByEvent(tc.eventId))
@@ -1195,11 +1322,12 @@ func TestReflowBySubject(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.ReflowBySubject(tc.subjectId))
@@ -1312,11 +1440,12 @@ func TestReflowByEventAndWorkflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.ReflowByEventAndWorkflow(tc.eventId, tc.workflowId))
@@ -1429,11 +1558,12 @@ func TestReflowBySubjectAndWorkflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.ReflowBySubjectAndWorkflow(tc.subjectId, tc.workflowId))
@@ -1554,11 +1684,12 @@ func TestReflow(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.Reflow(tc.request))
@@ -1686,11 +1817,12 @@ func TestGetActionInvocations(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, environment, &http.Client{}, nil)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
 			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetActionInvocations(tc.eventId, tc.actionId))

@@ -71,8 +71,8 @@ type (
 		ProcessingChannelId        string                        `json:"processing_channel_id,omitempty"`
 		ExpiresOn                  *time.Time                    `json:"expires_on,omitempty"`
 		PaymentMethodConfiguration *PaymentMethodConfiguration   `json:"payment_method_configuration,omitempty"`
-		EnabledPaymentMethods      PaymentMethodsType            `json:"enabled_payment_methods,omitempty"`
-		DisabledPaymentMethods     PaymentMethodsType            `json:"disabled_payment_methods,omitempty"`
+		EnabledPaymentMethods      []PaymentMethodsType          `json:"enabled_payment_methods,omitempty"`
+		DisabledPaymentMethods     []PaymentMethodsType          `json:"disabled_payment_methods,omitempty"`
 		Items                      []payments.Product            `json:"items,omitempty"`
 		AmountAllocations          []common.AmountAllocations    `json:"amount_allocations,omitempty"`
 		Risk                       *payments.RiskRequest         `json:"risk,omitempty"`

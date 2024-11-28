@@ -1,0 +1,50 @@
+{
+  "partner_metadata": {
+    "customer_id": "EWR4HCRWOEIW4",
+    "order_id": "NF89G5J9E5G905E90"
+  },
+  "payment_request": {
+    "amount": 2500,
+    "authorization_type": "Final",
+    "capture": true,
+    "currency": "GBP",
+    "failure_url": "https://url/payment-failed",
+    "items": [
+      {
+        "discount_amount": 0,
+        "name": "£25.00 Voucher",
+        "quantity": 1,
+        "tax_amount": 0,
+        "total_amount": 2500,
+        "unit_price": 2500
+      }
+    ],
+    "payment_type": "Regular",
+    "processing": {
+      "shipping_amount": 0,
+      "user_action": "PAY_NOW"
+    },
+    "processing_channel_id": "pc_strugfrty47ellyymdfg6fzhc4i",
+    "reference": "543454",
+    "shipping": {
+      "address": {
+        "address_line1": "Main Address",
+        "address_line2": "Flor 1",
+        "city": "London",
+        "country": "GB",
+        "state": "State",
+        "zip": "ZIP"
+      },
+      "first_name": "Andrey Young"
+    },
+    "source": {
+      "account_holder": {
+        "email": "ayoung@fakedomain.com",
+        "full_name": "Andrey Young"
+      },
+      "type": "paypal"
+    },
+    "success_url": "https://url/payment-successful"
+  },
+  "status": "Created"
+}

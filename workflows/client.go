@@ -231,6 +231,30 @@ func (c *Client) RemoveWorkflowCondition(workflowId, conditionId string) (*commo
 	return &response, nil
 }
 
+func (c *Client) TestWorkflow(
+	workflowId string,
+	request events.EventTypesRequest,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.Post(
+		common.BuildPath(WorkflowsPath, workflowId, TestPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) GetEventTypes() (*events.EventTypesResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

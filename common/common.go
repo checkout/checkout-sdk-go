@@ -23,19 +23,20 @@ const (
 type CardType string
 
 const (
+	Charge        CardType = "Charge"
 	Credit        CardType = "Credit"
 	Debit         CardType = "Debit"
-	Prepaid       CardType = "Prepaid"
-	Charge        CardType = "Charge"
 	DeferredDebit CardType = "Deferred Debit"
+	Prepaid       CardType = "Prepaid"
 )
 
 type CardCategory string
 
 const (
-	Consumer          CardCategory = "Consumer"
-	Commercial        CardCategory = "Commercial"
 	All               CardCategory = "All"
+	Commercial        CardCategory = "Commercial"
+	Consumer          CardCategory = "Consumer"
+	NotSet            CardCategory = "NotSet"
 	OtherCardCategory CardCategory = "Other"
 )
 
@@ -50,10 +51,10 @@ const (
 type ChallengeIndicator string
 
 const (
-	NoPreference              ChallengeIndicator = "no_preference"
-	NoChallengeRequested      ChallengeIndicator = "no_challenge_requested"
 	ChallengeRequested        ChallengeIndicator = "challenge_requested"
 	ChallengeRequestedMandate ChallengeIndicator = "challenge_requested_mandate"
+	NoChallengeRequested      ChallengeIndicator = "no_challenge_requested"
+	NoPreference              ChallengeIndicator = "no_preference"
 )
 
 type DocumentType string
@@ -88,17 +89,18 @@ const (
 type Exemption string
 
 const (
-	None                      Exemption = "none"
-	LowValue                  Exemption = "low_value"
-	RecurringOperation        Exemption = "recurring_operation"
-	TransactionRiskAssessment Exemption = "transaction_risk_assessment"
-	SecureCorporatePayment    Exemption = "secure_corporate_payment"
-	TrustedListing            Exemption = "trusted_listing"
-	ThreeDsOutage             Exemption = "3ds_outage"
-	ScaDelegation             Exemption = "sca_delegation"
-	OutOfScaScope             Exemption = "out_of_sca_scope"
-	Other                     Exemption = "other"
 	LowRiskProgram            Exemption = "low_risk_program"
+	LowValue                  Exemption = "low_value"
+	None                      Exemption = "none"
+	Other                     Exemption = "other"
+	OutOfScaScope             Exemption = "out_of_sca_scope"
+	RecurringOperation        Exemption = "recurring_operation"
+	ScaDelegation             Exemption = "sca_delegation"
+	SecureCorporatePayment    Exemption = "secure_corporate_payment"
+	ThreeDsOutage             Exemption = "3ds_outage"
+	TransactionRiskAssessment Exemption = "transaction_risk_assessment"
+	TrustedListing            Exemption = "trusted_listing"
+	TrustedListingPrompt      Exemption = "trusted_listing_prompt"
 )
 
 type ThreeDsMethodCompletion string
@@ -142,9 +144,11 @@ type (
 		HttpMetadata HttpMetadata
 	}
 
+	Data interface{}
+
 	ContentResponse struct {
 		HttpMetadata HttpMetadata
-		Content      string `json:"content,omitempty"`
+		Content      Data `json:"content,omitempty"`
 	}
 
 	HttpMetadata struct {
@@ -180,9 +184,12 @@ type (
 	AccountHolder struct {
 		Type              AccountHolderType            `json:"type,omitempty"`
 		Title             string                       `json:"title,omitempty"`
+		FullName          string                       `json:"full_name,omitempty"`
 		FirstName         string                       `json:"first_name,omitempty"`
 		MiddleName        string                       `json:"middle_name,omitempty"`
 		LastName          string                       `json:"last_name,omitempty"`
+		Email             string                       `json:"email,omitempty"`
+		Gender            string                       `json:"gender,omitempty"`
 		CompanyName       string                       `json:"company_name,omitempty"`
 		TaxId             string                       `json:"tax_id,omitempty"`
 		DateOfBirth       string                       `json:"date_of_birth,omitempty"`
@@ -191,8 +198,6 @@ type (
 		BillingAddress    *Address                     `json:"billing_address,omitempty"`
 		Phone             *Phone                       `json:"phone,omitempty"`
 		Identification    *AccountHolderIdentification `json:"identification,omitempty"`
-		Email             string                       `json:"email,omitempty"`
-		Gender            string                       `json:"gender,omitempty"`
 	}
 )
 
@@ -271,4 +276,48 @@ type (
 		From *time.Time `url:"from,omitempty" layout:"2006-01-02T15:04:05Z"`
 		To   *time.Time `url:"to,omitempty" layout:"2006-01-02T15:04:05Z"`
 	}
+)
+
+type (
+	Destination struct {
+		AccountType   AccountType    `json:"account_type,omitempty"`
+		AccountNumber string         `json:"account_number,omitempty"`
+		BankCode      string         `json:"bank_code,omitempty"`
+		BranchCode    string         `json:"branch_code,omitempty"`
+		Iban          string         `json:"iban,omitempty"`
+		Bban          string         `json:"bban,omitempty"`
+		SwiftBic      string         `json:"swift_bic,omitempty"`
+		Country       Country        `json:"country,omitempty"`
+		AccountHolder *AccountHolder `json:"account_holder,omitempty"`
+		Bank          *BankDetails   `json:"bank,omitempty"`
+	}
+)
+
+type CardholderAccountAgeIndicatorType string
+
+const (
+	CardholderLessThanThirtyDays CardholderAccountAgeIndicatorType = "less_than_thirty_days"
+	CardholderMoreThanSixtyDays  CardholderAccountAgeIndicatorType = "more_than_sixty_days"
+	CardholderNoAccount          CardholderAccountAgeIndicatorType = "no_account"
+	CardholderThirtyToSixtyDays  CardholderAccountAgeIndicatorType = "thirty_to_sixty_days"
+	CardholderThisTransaction    CardholderAccountAgeIndicatorType = "this_transaction"
+)
+
+type AccountChangeIndicatorType string
+
+const (
+	AccountChangeLessThanThirtyDays AccountChangeIndicatorType = "less_than_thirty_days"
+	AccountChangeMoreThanSixtyDays  AccountChangeIndicatorType = "more_than_sixty_days"
+	AccountChangeThirtyToSixtyDays  AccountChangeIndicatorType = "thirty_to_sixty_days"
+	AccountChangeThisTransaction    AccountChangeIndicatorType = "this_transaction"
+)
+
+type AccountPasswordChangeIndicatorType string
+
+const (
+	PasswordChangeLessThanThirtyDays AccountPasswordChangeIndicatorType = "less_than_thirty_days"
+	PasswordChangeMoreThanSixtyDays  AccountPasswordChangeIndicatorType = "more_than_sixty_days"
+	PasswordChangeNoChange           AccountPasswordChangeIndicatorType = "no_change"
+	PasswordChangeThirtyToSixtyDays  AccountPasswordChangeIndicatorType = "thirty_to_sixty_days"
+	PasswordChangeThisTransaction    AccountPasswordChangeIndicatorType = "this_transaction"
 )

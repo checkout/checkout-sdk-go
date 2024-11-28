@@ -1,14 +1,12 @@
 package test
 
 import (
-	"net/http"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/payments/contexts"
 	sources "github.com/checkout/checkout-sdk-go/payments/nas/sources/contexts"
@@ -98,11 +96,14 @@ func TestRequestPaymentContextKlarna(t *testing.T) {
 			name:    "test Klarna source for request payment contexts",
 			request: paymentContextsKlarnaRequest,
 			checker: func(response *contexts.PaymentContextsRequestResponse, err error) {
-				assert.NotNil(t, err)
-				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "apm_service_unavailable", ckoErr.Data.ErrorCodes[0])
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, 201, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.PartnerMetadata.ClientToken)
+				assert.NotNil(t, response.PartnerMetadata.SessionId)
+				if response.Links != nil {
+					assert.NotNil(t, response.Links)
+				}
 			},
 		},
 	}

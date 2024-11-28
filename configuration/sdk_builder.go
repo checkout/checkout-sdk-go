@@ -3,6 +3,7 @@ package configuration
 import "net/http"
 
 type SdkBuilder struct {
+	EnableTelemetry      *bool
 	Environment          Environment
 	EnvironmentSubdomain *EnvironmentSubdomain
 	HttpClient           *http.Client

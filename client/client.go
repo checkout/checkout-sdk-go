@@ -2,9 +2,13 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -21,21 +25,26 @@ type HttpClient interface {
 }
 
 type ApiClient struct {
-	HttpClient http.Client
-	BaseUri    string
-	Log        configuration.StdLogger
+	HttpClient          http.Client
+	BaseUri             string
+	EnableTelemetry     bool
+	RequestMetricsQueue common.TelemetryQueue
+	Log                 configuration.StdLogger
 }
 
 const (
-	CkoRequestId = "cko-request-id"
-	CkoVersion   = "cko-version"
+	CkoRequestId       = "cko-request-id"
+	CkoVersion         = "cko-version"
+	CkoTelemetryHeader = "cko-sdk-telemetry"
 )
 
 func NewApiClient(configuration *configuration.Configuration, baseUri string) *ApiClient {
 	return &ApiClient{
-		HttpClient: configuration.HttpClient,
-		BaseUri:    baseUri,
-		Log:        configuration.Logger,
+		HttpClient:          configuration.HttpClient,
+		BaseUri:             baseUri,
+		EnableTelemetry:     configuration.EnableTelemetry,
+		RequestMetricsQueue: *common.NewTelemetryQueue(),
+		Log:                 configuration.Logger,
 	}
 }
 
@@ -82,12 +91,9 @@ func (a *ApiClient) invoke(
 	}
 
 	a.Log.Printf("%s: %s", method, path)
-	resp, err := a.HttpClient.Do(req)
-	if err != nil {
-		return err
-	}
 
-	return a.handleResponse(resp, responseMapping)
+	return a.doRequest(req, responseMapping)
+
 }
 
 func (a *ApiClient) submit(
@@ -109,12 +115,7 @@ func (a *ApiClient) submit(
 	}
 
 	a.Log.Printf("post: %s", path)
-	resp, err := a.HttpClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	return a.handleResponse(resp, responseMapping)
+	return a.doRequest(req, responseMapping)
 }
 
 func (a *ApiClient) buildRequest(
@@ -192,4 +193,38 @@ func (a *ApiClient) readBody(response *http.Response) ([]byte, error) {
 	}(response.Body)
 
 	return body, err
+}
+
+func (a *ApiClient) doRequest(req *http.Request, responseMapping interface{}) error {
+	if a.EnableTelemetry {
+		currentRequestId := uuid.New().String()
+		var lastRequestMetric common.RequestMetrics
+		lastRequestMetric, ok := a.RequestMetricsQueue.Dequeue()
+		if ok {
+			lastRequestMetric.RequestId = currentRequestId
+			lastRequestMetricStr, err := json.Marshal(lastRequestMetric)
+			if err != nil {
+				return err
+			}
+			req.Header.Set(CkoTelemetryHeader, string(lastRequestMetricStr))
+		}
+		start := time.Now()
+		resp, err := a.HttpClient.Do(req)
+		elapsed := time.Since(start)
+		if err != nil {
+			return err
+		}
+
+		lastRequestMetric.PrevRequestDuration = int(elapsed.Milliseconds())
+		lastRequestMetric.PrevRequestId = currentRequestId
+		a.RequestMetricsQueue.Enqueue(lastRequestMetric)
+		return a.handleResponse(resp, responseMapping)
+	} else {
+		resp, err := a.HttpClient.Do(req)
+		if err != nil {
+			return err
+		}
+
+		return a.handleResponse(resp, responseMapping)
+	}
 }

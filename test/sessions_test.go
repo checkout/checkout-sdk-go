@@ -68,9 +68,64 @@ func TestRequestSession(t *testing.T) {
 	}
 }
 
-func TestGetSessionDetails(t *testing.T) {
-	t.Skip("not available")
+func TestGetSessionDetailsBrowser(t *testing.T) {
 	session := createSession(t, getNonHostedSession(getBrowserChannel(),
+		sessions.Payment,
+		common.NoPreference,
+		sessions.GoodsService))
+
+	cases := []struct {
+		name          string
+		sessionId     string
+		sessionSecret string
+		checker       func(*sessions.GetSessionResponse, error)
+	}{
+		{
+			name:      "when session exists return session details - with OAuth",
+			sessionId: session.Created.Id,
+			checker: func(response *sessions.GetSessionResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, session.Created.Id, response.Id)
+				assert.Equal(t, session.Created.SessionSecret, response.SessionSecret)
+			},
+		},
+		{
+			name:          "when session exists return session details - with session secret",
+			sessionId:     session.Created.Id,
+			sessionSecret: session.Created.SessionSecret,
+			checker: func(response *sessions.GetSessionResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, session.Created.Id, response.Id)
+			},
+		},
+		{
+			name:      "when session is inexistent then return error",
+			sessionId: "sid_av6o4xl4h7yejkliycvn67euay",
+			checker: func(response *sessions.GetSessionResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				errChk := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, errChk.StatusCode)
+			},
+		},
+	}
+
+	client := OAuthApi().Sessions
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetSessionDetails(tc.sessionId, tc.sessionSecret))
+		})
+	}
+}
+
+func TestGetSessionDetailsMerchantInitiated(t *testing.T) {
+	t.Skip("unavailable")
+	session := createSession(t, getNonHostedSession(getMerchantInitiated(),
 		sessions.Payment,
 		common.NoPreference,
 		sessions.GoodsService))
@@ -125,7 +180,6 @@ func TestGetSessionDetails(t *testing.T) {
 }
 
 func TestUpdateSession(t *testing.T) {
-	t.Skip("not available")
 	session := createSession(t, getHostedSession()).Accepted
 
 	cases := []struct {
@@ -161,7 +215,7 @@ func TestUpdateSession(t *testing.T) {
 		},
 		{
 			name:      "when updating inexistent session then return error",
-			sessionId: "not_found",
+			sessionId: "sid_av6o4xl4h7yejkliycvn67euay",
 			request:   getBrowserChannel(),
 			checker: func(response *sessions.GetSessionResponse, err error) {
 				assert.Nil(t, response)
@@ -182,7 +236,6 @@ func TestUpdateSession(t *testing.T) {
 }
 
 func TestUpdate3dsMethodCompletion(t *testing.T) {
-	t.Skip("not available")
 	session := createSession(t, getHostedSession()).Accepted
 
 	cases := []struct {
@@ -222,7 +275,7 @@ func TestUpdate3dsMethodCompletion(t *testing.T) {
 		},
 		{
 			name:      "when updating inexistent session then return error",
-			sessionId: "not_found",
+			sessionId: "sid_av6o4xl4h7yejkliycvn67euay",
 			request: sessions.ThreeDsMethodCompletionRequest{
 				ThreeDsMethodCompletion: common.Y,
 			},
@@ -300,6 +353,13 @@ func getBrowserChannel() channels.Channel {
 	c.UserAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36 "
 	c.ThreeDsMethodCompletion = common.Y
 	c.IpAddress = "1.12.123.255"
+
+	return c
+}
+
+func getMerchantInitiated() channels.Channel {
+	c := channels.NewMerchantInitiatedSession()
+	c.RequestType = channels.RecurringTransaction
 
 	return c
 }

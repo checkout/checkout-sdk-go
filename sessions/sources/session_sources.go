@@ -45,8 +45,8 @@ type (
 		ExpiryMonth       int    `json:"expiry_month,omitempty"`
 		ExpiryYear        int    `json:"expiry_year,omitempty"`
 		Name              string `json:"name,omitempty"`
-		Stored            bool   `json:"stored,omitempty" default:"false"`
-		StoreForFutureUse bool   `json:"store_for_future_use,omitempty"`
+		Stored            bool   `json:"stored,omitempty"`
+		StoreForFutureUse bool   `json:"store_for_future_use"`
 	}
 
 	sessionIdSource struct {
@@ -57,7 +57,7 @@ type (
 	sessionTokenSource struct {
 		SessionSourceInfo
 		Token             string `json:"token,omitempty"`
-		StoreForFutureUse bool   `json:"store_for_future_use,omitempty"`
+		StoreForFutureUse bool   `json:"store_for_future_use"`
 	}
 
 	sessionNetworkTokenSource struct {

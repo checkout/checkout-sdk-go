@@ -12,6 +12,7 @@ import (
 )
 
 func TestRequestPaymentListPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	queryRequest := payments.QueryRequest{
@@ -55,6 +56,7 @@ func TestRequestPaymentListPrevious(t *testing.T) {
 }
 
 func TestRequestPaymentPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	tokenSource := sources.NewRequestTokenSource()
 	tokenSource.Token = RequestCardTokenPrevious(t).Token
 
@@ -216,6 +218,7 @@ func TestRequestPaymentPrevious(t *testing.T) {
 }
 
 func TestRequestPaymentIdempotentlyPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cardSource := sources.NewRequestCardSource()
 	cardSource.Name = Name
 	cardSource.Number = CardNumber
@@ -300,6 +303,7 @@ func TestRequestPaymentIdempotentlyPrevious(t *testing.T) {
 }
 
 func makeCardPaymentPrevious(t *testing.T, shouldCapture bool, amount int64) *abc.PaymentResponse {
+	t.Skip("unavailable")
 	cardSource := sources.NewRequestCardSource()
 	cardSource.Name = Name
 	cardSource.Number = CardNumber
@@ -325,6 +329,7 @@ func makeCardPaymentPrevious(t *testing.T, shouldCapture bool, amount int64) *ab
 }
 
 func paymentCommonAssertionsPrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.NotNil(t, response)
 
 	assertAuthorizedPaymentPrevious(t, response)
@@ -341,6 +346,7 @@ func paymentCommonAssertionsPrevious(t *testing.T, response *abc.PaymentResponse
 }
 
 func assertAuthorizedPaymentPrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.NotEmpty(t, response.Id)
 	assert.NotEmpty(t, response.ProcessedOn)
 	assert.NotEmpty(t, response.Reference)
@@ -357,6 +363,7 @@ func assertAuthorizedPaymentPrevious(t *testing.T, response *abc.PaymentResponse
 }
 
 func assertSourcePrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.NotEmpty(t, response.Source)
 	responseCardSource := response.Source.ResponseCardSource
 	assert.NotEmpty(t, payments.CardSource, responseCardSource.Type)
@@ -374,6 +381,7 @@ func assertSourcePrevious(t *testing.T, response *abc.PaymentResponse) {
 }
 
 func assertCustomerPrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.NotEmpty(t, response.Customer)
 	customer := response.Customer
 	assert.NotEmpty(t, customer)
@@ -382,6 +390,7 @@ func assertCustomerPrevious(t *testing.T, response *abc.PaymentResponse) {
 }
 
 func assertProcessingPrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.NotEmpty(t, response.Processing)
 	processing := response.Processing
 	assert.NotEmpty(t, processing)
@@ -390,10 +399,12 @@ func assertProcessingPrevious(t *testing.T, response *abc.PaymentResponse) {
 }
 
 func assertRiskPrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.False(t, response.Risk.Flagged)
 }
 
 func assertLinksPrevious(t *testing.T, response *abc.PaymentResponse) {
+	t.Skip("unavailable")
 	assert.NotEmpty(t, response.Links["self"])
 	assert.NotEmpty(t, response.Links["actions"])
 	assert.NotEmpty(t, response.Links["capture"])

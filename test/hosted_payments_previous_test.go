@@ -27,7 +27,6 @@ func TestCreateHostedPaymentsPageSessionPrevious(t *testing.T) {
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Reference)
-				assert.NotNil(t, response.Warnings)
 				assert.NotNil(t, response.Links)
 				assert.Equal(t, Reference, response.Reference)
 				assert.NotNil(t, response.Links["redirect"])

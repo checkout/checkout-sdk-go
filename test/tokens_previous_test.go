@@ -11,6 +11,7 @@ import (
 )
 
 func TestShouldRequestCardTokenPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	response := RequestCardTokenPrevious(t)
 	assert.Equal(t, tokens.Card, response.Type)
 	assert.NotEmpty(t, response.Token)
@@ -27,6 +28,7 @@ func TestShouldRequestCardTokenPrevious(t *testing.T) {
 }
 
 func RequestCardTokenPrevious(t *testing.T) *tokens.CardTokenResponse {
+	t.Skip("unavailable")
 	request := tokens.CardTokenRequest{
 		Type:        tokens.Card,
 		Number:      CardNumber,

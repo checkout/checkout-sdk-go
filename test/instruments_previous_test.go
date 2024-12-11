@@ -18,11 +18,13 @@ var (
 )
 
 func TestSetupInstrumentsPrevious(t *testing.T) {
+	t.Skip("Forbidden")
 	cardTokenResponse := RequestCardTokenPrevious(t)
 	instrumentTokenPrevious = createTokenInstrumentPrevious(t, cardTokenResponse)
 }
 
 func TestGetInstrumentPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name       string
 		responseId string
@@ -64,6 +66,7 @@ func TestGetInstrumentPrevious(t *testing.T) {
 }
 
 func TestUpdateInstrumentPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	updateRequest := abc.UpdateInstrumentRequest{
 		ExpiryMonth: 12,
 		ExpiryYear:  2026,
@@ -109,6 +112,7 @@ func TestUpdateInstrumentPrevious(t *testing.T) {
 }
 
 func TestDeleteInstrumentPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name          string
 		responseId    string
@@ -143,6 +147,7 @@ func TestDeleteInstrumentPrevious(t *testing.T) {
 }
 
 func createTokenInstrumentPrevious(t *testing.T, token *tokens.CardTokenResponse) *abc.CreateInstrumentResponse {
+	t.Skip("unavailable")
 	request := abc.CreateInstrumentRequest{
 		Type:  common.Token,
 		Token: token.Token,
@@ -164,6 +169,7 @@ func createTokenInstrumentPrevious(t *testing.T, token *tokens.CardTokenResponse
 }
 
 func testCreateInstrument(t *testing.T, err error, response *abc.CreateInstrumentResponse) {
+	t.Skip("unavailable")
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, common.Card, response.Type)

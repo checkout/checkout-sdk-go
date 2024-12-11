@@ -87,6 +87,6 @@ func (s *CardDetailsResponse) UnmarshalJSON(data []byte) error {
 type (
 	CardCredentialsResponse struct {
 		Number string `json:"number,omitempty"`
-		Cvc2   string `json:"cvc_2,omitempty"`
+		Cvc2   string `json:"cvc2,omitempty"`
 	}
 )

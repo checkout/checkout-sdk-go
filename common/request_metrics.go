@@ -5,9 +5,9 @@ import "sync"
 const MaxCountInTelemetryQueue = 10
 
 type RequestMetrics struct {
-	PrevRequestId       string
-	RequestId           string
-	PrevRequestDuration int
+	PrevRequestId       string `json:"prev_request_id"`
+	RequestId           string `json:"request_id"`
+	PrevRequestDuration int    `json:"prev_request_duration"`
 }
 
 type TelemetryQueue struct {

@@ -2,10 +2,12 @@ package test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -19,6 +21,12 @@ import (
 type mockHTTPClient struct {
 	server           *httptest.Server
 	requestsReceived []*http.Request
+}
+
+type telemetry struct {
+	PrevRequestId       string `json:"prev_request_id"`
+	RequestId           string `json:"request_id"`
+	PrevRequestDuration int    `json:"prev_request_duration"`
 }
 
 // newMockHTTPClient initializes a new mockHTTPClient with a TLS test server, optionally introducing a delay.
@@ -59,6 +67,23 @@ func (m *mockHTTPClient) CountRequestsWithHeader(header string) int {
 		}
 	}
 	return count
+}
+
+// ValidateTelemetryHeadersFormat
+func (m *mockHTTPClient) ValidateTelemetryHeadersFormat(header string) error {
+	headerKey := http.CanonicalHeaderKey(header) // Normalize header name.
+	for _, req := range m.requestsReceived {
+		if _, ok := req.Header[headerKey]; ok {
+			var telemetryObj telemetry
+			headerStr := req.Header[headerKey][0]
+			decoder := json.NewDecoder(strings.NewReader(headerStr))
+			decoder.DisallowUnknownFields()
+			if err := decoder.Decode(&telemetryObj); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // createMockEnvironment creates a mock environment using the mock server's URL.
@@ -120,6 +145,8 @@ func TestShouldSendTelemetryByDefault(t *testing.T) {
 	expectedTelemetryHeaderCount := 2 // Telemetry is sent in the 2nd and 3rd requests.
 	telemetryHeaderCount := mock.CountRequestsWithHeader("cko-sdk-telemetry")
 	assert.Equal(t, expectedTelemetryHeaderCount, telemetryHeaderCount, "Expected exactly %d requests to contain the telemetry header", expectedTelemetryHeaderCount)
+
+	assert.Nil(t, mock.ValidateTelemetryHeadersFormat("cko-sdk-telemetry"))
 }
 
 // TestShouldNotSendTelemetryWhenOptedOut verifies that telemetry headers are not sent when telemetry is disabled.

@@ -11,6 +11,7 @@ import (
 )
 
 func TestRequestPayoutPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cardDestination := abc.NewRequestCardDestination()
 	cardDestination.Name = Name
 	cardDestination.FirstName = FirstName

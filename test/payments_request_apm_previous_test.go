@@ -14,6 +14,7 @@ import (
 )
 
 func TestRequestPaymentsAPMPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	var (
 		customer = common.CustomerRequest{
 			Id:    "cus_vtkefqy4pevebjhkdp5bkklncy",

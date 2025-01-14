@@ -26,6 +26,7 @@ type (
 		BillingDescriptor      *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
 		Reference              string                       `json:"reference,omitempty"`
 		Description            string                       `json:"description,omitempty"`
+		DisplayName            string                       `json:"display_name,omitempty"`
 		Customer               *common.CustomerRequest      `json:"customer,omitempty"`
 		Shipping               *payments.ShippingDetails    `json:"shipping,omitempty"`
 		Billing                *payments.BillingInformation `json:"billing,omitempty"`

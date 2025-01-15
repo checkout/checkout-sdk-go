@@ -20,12 +20,15 @@ type (
 	}
 
 	requestIdSource struct {
-		Type              payments.SourceType `json:"type,omitempty"`
-		Id                string              `json:"id,omitempty"`
-		Cvv               string              `json:"cvv,omitempty"`
-		PaymentMethod     string              `json:"payment_method,omitempty"`
-		Stored            *bool               `json:"stored,omitempty"`
-		StoreForFutureUse *bool               `json:"storeForFutureUse,omitempty"`
+		Type              payments.SourceType   `json:"type,omitempty"`
+		Id                string                `json:"id,omitempty"`
+		Cvv               string                `json:"cvv,omitempty"`
+		PaymentMethod     string                `json:"payment_method,omitempty"`
+		Stored            *bool                 `json:"stored,omitempty"`
+		StoreForFutureUse *bool                 `json:"storeForFutureUse,omitempty"`
+		BillingAddress    *common.Address       `json:"billing_address,omitempty"`
+		Phone             *common.Phone         `json:"phone,omitempty"`
+		AccountHolder     *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
 	requestTokenSource struct {

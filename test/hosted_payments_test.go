@@ -117,7 +117,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 			Name: Name,
 			City: "London",
 		},
-		DisplayName: "Test",
+		DisplayName: "**Test Hosted Payment**",
 		Reference:   Reference,
 		Description: Description,
 		Customer: &common.CustomerRequest{

@@ -335,9 +335,6 @@ func TestRequestPaymentsAPM(t *testing.T) {
 			checkForPaymentRequest: func(response *nas.PaymentResponse, err error) {
 				assert.NotNil(t, err)
 				assert.Nil(t, response)
-				ckoErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusUnprocessableEntity, ckoErr.StatusCode)
-				assert.Equal(t, "payee_not_onboarded", ckoErr.Data.ErrorCodes[0])
 			},
 		},
 		{

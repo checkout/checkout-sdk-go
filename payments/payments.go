@@ -533,6 +533,8 @@ type (
 		Aft                              bool                             `json:"aft,omitempty"`
 		MerchantCategoryCode             string                           `json:"merchant_category_code,omitempty"`
 		SchemeMerchantId                 string                           `json:"scheme_merchant_id,omitempty"`
+		PanTypeProcessed                 PanProcessedType                 `json:"pan_type_processed,omitempty"`
+		CkoNetworkTokenAvailable         bool                             `json:"cko_network_token_available,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {

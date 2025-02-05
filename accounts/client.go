@@ -24,26 +24,6 @@ func NewClient(
 	}
 }
 
-func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := common.BuildFileUploadRequest(&file)
-	if err != nil {
-		return nil, err
-	}
-
-	var response common.IdResponse
-	err = c.filesClient.Upload(common.BuildPath(filesPath), auth, req, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}
-
 func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
@@ -53,6 +33,50 @@ func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityRespo
 	var response OnboardEntityResponse
 	err = c.apiClient.Post(
 		common.BuildPath(accountsPath, entitiesPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetSubEntityMembers(entityId string) (*OnboardSubEntityDetailsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response OnboardSubEntityDetailsResponse
+	err = c.apiClient.Get(
+		common.BuildPath(accountsPath, entitiesPath, entityId, membersPath),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) ReinviteSubEntityMember(
+	entityId string,
+	userId string,
+	request OnboardSubEntityRequest,
+) (*OnboardSubEntityResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response OnboardSubEntityResponse
+	err = c.apiClient.Put(
+		common.BuildPath(accountsPath, entitiesPath, entityId, membersPath, userId),
 		auth,
 		request,
 		&response,
@@ -156,40 +180,6 @@ func (c *Client) CreatePaymentInstrument(
 	return &response, nil
 }
 
-func (c *Client) QueryPaymentInstruments(
-	entityId string,
-	query PaymentInstrumentsQuery,
-) (*PaymentInstrumentQueryResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-
-	url, err := common.BuildQueryPath(
-		common.BuildPath(
-			accountsPath,
-			entitiesPath,
-			entityId,
-			paymentInstrumentsPath,
-		), query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var response PaymentInstrumentQueryResponse
-	err = c.apiClient.Get(
-		url,
-		auth,
-		&response,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &response, nil
-}
-
 func (c *Client) RetrievePaymentInstrumentDetails(
 	entityId string,
 	paymentInstrumentId string,
@@ -241,6 +231,40 @@ func (c *Client) UpdatePaymentInstrumentDetails(
 	return &response, nil
 }
 
+func (c *Client) QueryPaymentInstruments(
+	entityId string,
+	query PaymentInstrumentsQuery,
+) (*PaymentInstrumentQueryResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(
+		common.BuildPath(
+			accountsPath,
+			entitiesPath,
+			entityId,
+			paymentInstrumentsPath,
+		), query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var response PaymentInstrumentQueryResponse
+	err = c.apiClient.Get(
+		url,
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) RetrievePayoutSchedule(entityId string) (*PayoutSchedule, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
@@ -281,6 +305,69 @@ func (c *Client) UpdatePayoutSchedule(
 		request,
 		&response,
 		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := common.BuildFileUploadRequest(&file)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.IdResponse
+	err = c.filesClient.Upload(common.BuildPath(filesPath), auth, req, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) UploadFile(
+	entityId string,
+	request File,
+) (*UploadFileResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response UploadFileResponse
+	err = c.apiClient.Post(
+		common.BuildPath(accountsPath, entityId, filesPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response FileDetailsResponse
+	err = c.apiClient.Get(
+		common.BuildPath(accountsPath, entityId, filesPath, fileId),
+		auth,
+		&response,
 	)
 	if err != nil {
 		return nil, err

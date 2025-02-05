@@ -17,9 +17,10 @@ import (
 )
 
 var (
-	oauthAccountsClient     *nas.Api
-	oauthPayoutsScheduleApi *nas.Api
-	oauthFilesApi           *nas.Api
+	oauthAccountsClient        *nas.Api
+	oauthAccountsClientVersion *nas.Api
+	oauthPayoutsScheduleApi    *nas.Api
+	oauthFilesApi              *nas.Api
 
 	entityId            string
 	entityCompanyId     string
@@ -180,6 +181,170 @@ func TestCreateEntity(t *testing.T) {
 	}
 
 	client := buildAccountsClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.CreateEntity(tc.request))
+		})
+	}
+}
+
+func TestCreateEntityV2(t *testing.T) {
+	cases := []struct {
+		name    string
+		request accounts.OnboardEntityRequest
+		checker func(*accounts.OnboardEntityResponse, error)
+	}{
+		{
+			name: "when request is valid then create entity V2",
+			request: accounts.OnboardEntityRequest{
+				Reference: GenerateRandomReference(),
+				Company: &accounts.Company{
+					LegalName:         "Company " + GenerateRandomString(3),
+					TradingName:       "Trading " + GenerateRandomString(3),
+					PrincipalAddress:  Address(),
+					RegisteredAddress: Address(),
+					Representatives: []accounts.Representative{
+						{
+							FirstName: GenerateRandomString(5),
+							LastName:  GenerateRandomString(5),
+							Address:   Address(),
+							Roles:     []accounts.EntityRoles{accounts.DirectorERStringType},
+							DateOfBirth: &accounts.DateOfBirth{
+								Day: 1, Month: 1, Year: 1980,
+							},
+						},
+					},
+					BusinessRegistrationNumber: GenerateRandomBusinessRegistrationNumber(),
+					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 1, Year: 2001},
+				},
+				ContactDetails: &accounts.ContactDetails{
+					Phone: &accounts.Phone{CountryCode: "GB", Number: GenerateRandomDigits(9)},
+					EntityEmailAddresses: &accounts.EntityEmailAddresses{
+						Primary: GenerateRandomEmail(),
+					},
+					Invitee: &accounts.Invitee{
+						Email: GenerateRandomEmail(),
+					},
+				},
+				Profile: &accounts.Profile{
+					Urls:                   []string{"http://example.com"},
+					Mccs:                   []string{"4814"},
+					DefaultHoldingCurrency: common.GBP,
+					HoldingCurrencies:      []common.Currency{common.GBP},
+				},
+				IsDraft: true,
+			},
+			checker: func(response *accounts.OnboardEntityResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+			},
+		},
+	}
+
+	client := buildAccountsClientVersion("2.0").Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.CreateEntity(tc.request))
+		})
+	}
+}
+
+func TestCreateEntityV3(t *testing.T) {
+	t.Skip("Temporarily disabled")
+	cases := []struct {
+		name    string
+		request accounts.OnboardEntityRequest
+		checker func(*accounts.OnboardEntityResponse, error)
+	}{
+		{
+			name: "when request is valid then create entity V3",
+			request: accounts.OnboardEntityRequest{
+				Reference: GenerateRandomReference(),
+				Company: &accounts.Company{
+					LegalName:                  "Company " + GenerateRandomString(3),
+					TradingName:                "Trading " + GenerateRandomString(3),
+					BusinessRegistrationNumber: GenerateRandomBusinessRegistrationNumber(),
+					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 1, Year: 2001},
+					PrincipalAddress:           Address(),
+					RegisteredAddress:          Address(),
+					Representatives: []accounts.Representative{
+						{
+							Company: &accounts.Company{
+								LegalName:         "Company " + GenerateRandomString(3),
+								TradingName:       "Trading " + GenerateRandomString(3),
+								RegisteredAddress: Address(),
+							},
+							OwnershipPercentage: 100,
+						},
+						{
+							Individual: &accounts.Individual{
+								FirstName:    "FirstName " + GenerateRandomString(3),
+								LastName:     "LastName " + GenerateRandomString(3),
+								DateOfBirth:  &accounts.DateOfBirth{Day: 1, Month: 1, Year: 1980},
+								PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
+								Address:      Address(),
+								EmailAddress: GenerateRandomEmail(),
+							},
+							Roles: []accounts.EntityRoles{accounts.AuthorisedSignatoryERStringType, accounts.DirectorERStringType},
+							Documents: &accounts.OnboardSubEntityDocuments{
+								IdentityVerification: &accounts.IdentityVerification{
+									Type:  accounts.PassportIVStringType,
+									Front: "file_bonwzndueqrlwvv3kfcokug5iu",
+								},
+							},
+						},
+					},
+					BusinessType: accounts.PublicLimitedCompany,
+				},
+				Profile: &accounts.Profile{
+					Urls:                   []string{"http://example.com"},
+					Mccs:                   []string{"4814"},
+					DefaultHoldingCurrency: common.GBP,
+					HoldingCurrencies:      []common.Currency{common.GBP},
+				},
+				ContactDetails: &accounts.ContactDetails{
+					Phone: &accounts.Phone{CountryCode: common.GB, Number: GenerateRandomDigits(9)},
+					EntityEmailAddresses: &accounts.EntityEmailAddresses{
+						Primary: GenerateRandomEmail(),
+					},
+					Invitee: &accounts.Invitee{
+						Email: GenerateRandomEmail(),
+					},
+				},
+				Documents: &accounts.OnboardSubEntityDocuments{
+					ArticlesOfAssociation: &accounts.ArticlesOfAssociation{
+						Type:  accounts.ArticlesOfAssociationAOSStringType,
+						Front: "file_aacb27em7gmj6e7dhxabazucqi",
+					},
+					ShareholderStructure: &accounts.ShareholderStructure{
+						Type:  accounts.CertifiedShareholderStructureSHSStringType,
+						Front: "file_bpme2tii3lsgshx4ghj3i4672q",
+					},
+				},
+				ProcessingDetails: &accounts.ProcessingDetails{
+					SettlementCountry:       "GB",
+					TargetCountries:         []string{"GB"},
+					AnnualProcessingVolume:  0,
+					AverageTransactionValue: 0,
+					HighestTransactionValue: 0,
+					Currency:                common.GBP,
+				},
+				IsDraft: false,
+			},
+			checker: func(response *accounts.OnboardEntityResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+			},
+		},
+	}
+
+	client := buildAccountsClientVersion("3.0").Accounts
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -716,9 +881,6 @@ func createEntityCompany(t *testing.T) string {
 					FirstName: "John",
 					LastName:  "Doe",
 					Address:   Address(),
-					Identification: &accounts.Identification{
-						NationalIdNumber: "AB123456C",
-					},
 				},
 			},
 		},
@@ -810,4 +972,20 @@ func buildAccountsClient() *nas.Api {
 	}
 
 	return oauthAccountsClient
+}
+
+func buildAccountsClientVersion(schemaVersion string) *nas.Api {
+	httpClient := CustomHttpClient(schemaVersion)
+	oauthAccountsClientVersion, _ = checkout.Builder().
+		OAuth().
+		WithClientCredentials(
+			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
+			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET"),
+		).
+		WithScopes([]string{configuration.Accounts}).
+		WithEnvironment(configuration.Sandbox()).
+		WithHttpClient(httpClient).
+		Build()
+
+	return oauthAccountsClientVersion
 }

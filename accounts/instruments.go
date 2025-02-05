@@ -4,14 +4,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/common"
 )
 
-type InstrumentStatus string
-
-const (
-	Verified          InstrumentStatus = "verified"
-	Unverified        InstrumentStatus = "unverified"
-	InstrumentPending InstrumentStatus = "pending"
-)
-
 type (
 	PaymentInstrument struct {
 		Type          common.InstrumentType `json:"type,omitempty"`

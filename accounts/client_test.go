@@ -139,6 +139,211 @@ func TestCreateEntity(t *testing.T) {
 	}
 }
 
+func TestGetSubEntityMembers(t *testing.T) {
+	var (
+		entityId = "ent_1234"
+
+		subEntityDetails = OnboardSubEntityDetailsResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Data:         []SubEntityMemberData{{UserId: "member_1234"}},
+			Links:        map[string]common.Link{"self": {HRef: &[]string{"https://example.com"}[0]}},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*OnboardSubEntityDetailsResponse, error)
+	}{
+		{
+			name:     "when members exist then return sub-entity members",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*OnboardSubEntityDetailsResponse)
+						*respMapping = subEntityDetails
+					})
+			},
+			checker: func(response *OnboardSubEntityDetailsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:     "when sub-entity has no members then return empty list",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(2).(*OnboardSubEntityDetailsResponse)
+						*respMapping = OnboardSubEntityDetailsResponse{
+							HttpMetadata: mocks.HttpMetadataStatusOk,
+							Data:         []SubEntityMemberData{},
+							Links:        map[string]common.Link{"self": {HRef: &[]string{"https://example.com"}[0]}},
+						}
+					})
+			},
+			checker: func(response *OnboardSubEntityDetailsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Empty(t, response.Data)
+			},
+		},
+		{
+			name:     "when entity not found then return error",
+			entityId: "not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *OnboardSubEntityDetailsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.GetSubEntityMembers(tc.entityId))
+		})
+	}
+}
+
+func TestReinviteSubEntityMember(t *testing.T) {
+	var (
+		entityId = "ent_1234"
+		userId   = "user_5678"
+
+		reinviteResponse = OnboardSubEntityResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Response: map[string]interface{}{
+				"invitation": "https://example.com/invitation",
+			},
+		}
+
+		reinviteRequest = OnboardSubEntityRequest{
+			Request: map[string]interface{}{
+				"email": "new.email@example.com",
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		userId           string
+		request          OnboardSubEntityRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPut           func(*mock.Mock) mock.Call
+		checker          func(*OnboardSubEntityResponse, error)
+	}{
+		{
+			name:     "when request is correct then reinvite sub-entity member",
+			entityId: entityId,
+			userId:   userId,
+			request:  reinviteRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*OnboardSubEntityResponse)
+						*respMapping = reinviteResponse
+					})
+			},
+			checker: func(response *OnboardSubEntityResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, reinviteResponse.Response["invitation"], response.Response["invitation"])
+			},
+		},
+		{
+			name:     "when sub-entity member not found then return error",
+			entityId: entityId,
+			userId:   "not_found",
+			request:  reinviteRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *OnboardSubEntityResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPut(&apiClient.Mock)
+
+			configuration := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient, filesClient)
+
+			tc.checker(client.ReinviteSubEntityMember(tc.entityId, tc.userId, tc.request))
+		})
+	}
+}
+
 func TestGetEntity(t *testing.T) {
 	var (
 		entityId = "ent_1234"

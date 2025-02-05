@@ -22,12 +22,21 @@ const (
 	DisputesEvidence Purpose = "dispute_evidence"
 
 	// Accounts
-	BankVerification      Purpose = "bank_verification"
-	Identification        Purpose = "identification"
-	IdentityVerification  Purpose = "identity_verification"
-	CompanyVerification   Purpose = "company_verification"
-	FinancialVerification Purpose = "financial_verification"
-	TaxVerification       Purpose = "tax_verification"
+	AdditionalDocument           Purpose = "additional_document"
+	ArticlesOfAssociation        Purpose = "articles_of_association"
+	BankVerification             Purpose = "bank_verification"
+	CertifiedAuthorisedSignatory Purpose = "certified_authorised_signatory"
+	CompanyOwnership             Purpose = "company_ownership"
+	CompanyVerification          Purpose = "company_verification"
+	FinancialVerification        Purpose = "financial_verification"
+	Identification               Purpose = "identification"
+	IdentityVerification         Purpose = "identity_verification"
+	TaxVerification              Purpose = "tax_verification"
+	ProofOfLegality              Purpose = "proof_of_legality"
+	ProofOfPrincipalAddress      Purpose = "proof_of_principal_address"
+	ShareholderStructure         Purpose = "shareholder_structure"
+	ProofOfResidentialAddress    Purpose = "proof_of_residential_address"
+	ProofOfRegistration          Purpose = "proof_of_registration"
 )
 
 type (

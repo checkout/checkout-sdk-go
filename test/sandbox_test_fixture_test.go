@@ -3,7 +3,9 @@ package test
 import (
 	"fmt"
 	"math/rand"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/checkout/checkout-sdk-go"
@@ -35,6 +37,10 @@ const FailureUrl = "https://test.checkout.com/failure"
 const ExpiryYear = 2027
 const ExpiryMonth = 12
 const InvalidCustomerId = "cus_xxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+func newRandom() *rand.Rand {
+	return rand.New(rand.NewSource(time.Now().UnixNano()))
+}
 
 func PreviousApi() *abc.Api {
 	if previousApi == nil {
@@ -97,6 +103,63 @@ func AccountHolder() *common.AccountHolder {
 		Phone:          Phone(),
 		BillingAddress: Address(),
 	}
+}
+
+type customTransport struct {
+	schemaVersion string
+	base          http.RoundTripper
+}
+
+func CustomHttpClient(schemaVersion string) *http.Client {
+	return &http.Client{
+		Transport: &customTransport{
+			schemaVersion: schemaVersion,
+			base:          http.DefaultTransport,
+		},
+	}
+}
+
+func (c *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Accept", "application/json;schema_version="+c.schemaVersion)
+	return c.base.RoundTrip(req)
+}
+
+func GenerateRandomString(length int, chars ...string) string {
+	defaultChars := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	charSet := defaultChars
+	if len(chars) > 0 {
+		charSet = chars[0]
+	}
+
+	r := newRandom()
+	var sb strings.Builder
+	for i := 0; i < length; i++ {
+		sb.WriteByte(charSet[r.Intn(len(charSet))])
+	}
+	return sb.String()
+}
+
+func GenerateRandomBusinessRegistrationNumber() string {
+	r := newRandom()
+	gbPrefixes := []string{"OC", "LP", "SC", "AC", "CE", "GS"}
+
+	if r.Intn(2) == 0 {
+		return GenerateRandomDigits(8)
+	}
+	return gbPrefixes[r.Intn(len(gbPrefixes))] + GenerateRandomDigits(6)
+}
+
+func GenerateRandomIdentifier(length int, prefix string) string {
+	validChars := "abcdefghijklmnopqrstuvwxyz234567"
+	return prefix + GenerateRandomString(length, validChars)
+}
+
+func GenerateRandomDigits(length int) string {
+	return GenerateRandomString(length, "0123456789")
+}
+
+func GenerateRandomAlphanumeric(length int) string {
+	return GenerateRandomString(length, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 }
 
 func GenerateRandomEmail() string {

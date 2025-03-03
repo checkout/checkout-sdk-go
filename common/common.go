@@ -193,7 +193,7 @@ type (
 		CompanyName       string                       `json:"company_name,omitempty"`
 		TaxId             string                       `json:"tax_id,omitempty"`
 		DateOfBirth       string                       `json:"date_of_birth,omitempty"`
-		CountryOfBirth    string                       `json:"country_of_birth,omitempty"`
+		CountryOfBirth    Country                      `json:"country_of_birth,omitempty"`
 		ResidentialStatus string                       `json:"residential_status,omitempty"`
 		BillingAddress    *Address                     `json:"billing_address,omitempty"`
 		Phone             *Phone                       `json:"phone,omitempty"`
@@ -267,7 +267,7 @@ type (
 
 	Commission struct {
 		Amount     int64   `json:"amount,omitempty"`
-		Percentage float32 `json:"percentage,omitempty"`
+		Percentage float64 `json:"percentage,omitempty"`
 	}
 )
 

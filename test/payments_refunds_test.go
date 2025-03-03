@@ -15,7 +15,7 @@ import (
 func TestRefundCardPayment(t *testing.T) {
 	paymentResponse := makeCardPayment(t, true, 10)
 
-	order := payments.Order{
+	order := payments.RefundOrder{
 		Name:        "OrderTest",
 		Quantity:    88,
 		TotalAmount: 99,
@@ -43,7 +43,7 @@ func TestRefundCardPayment(t *testing.T) {
 	refundRequest := payments.RefundRequest{
 		Amount:    paymentResponse.Amount,
 		Reference: uuid.New().String(),
-		Items: []payments.Order{
+		Items: []payments.RefundOrder{
 			order,
 		},
 		Destination: &destination,

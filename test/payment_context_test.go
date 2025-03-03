@@ -17,6 +17,12 @@ var (
 
 	paymentContextKlarnaSource = getKlarnaPaymentContextsSource()
 
+	customer = contexts.PaymentContextCustomerRequest{
+		Email:         Email,
+		EmailVerified: true,
+		Name:          Name,
+	}
+
 	item = contexts.PaymentContextsItems{
 		Name:        "mask",
 		Quantity:    1,
@@ -29,6 +35,7 @@ var (
 		Amount:              1000,
 		Currency:            common.EUR,
 		PaymentType:         payments.Regular,
+		Customer:            &customer,
 		Capture:             true,
 		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
 		SuccessUrl:          "https://example.com/payments/success",

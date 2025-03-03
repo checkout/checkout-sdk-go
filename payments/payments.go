@@ -171,6 +171,65 @@ const (
 	DPAN PanProcessedType = "dpan"
 )
 
+type StorePaymentDetailsType string
+
+const (
+	Disabled StorePaymentDetailsType = "disabled"
+	Enabled  StorePaymentDetailsType = "enabled"
+)
+
+type PaymentPurposeType string
+
+const (
+	DonationsPPT         PaymentPurposeType = "donations"
+	EducationPPT         PaymentPurposeType = "education"
+	EmergencyNeedsPPT    PaymentPurposeType = "emergency_needs"
+	ExpatriationPPT      PaymentPurposeType = "expatriation"
+	FamilySupportPPT     PaymentPurposeType = "family_support"
+	FinancialServicesPPT PaymentPurposeType = "financial_services"
+	GiftsPPT             PaymentPurposeType = "gifts"
+	IncomePPT            PaymentPurposeType = "income"
+	InsurancePPT         PaymentPurposeType = "insurance"
+	InvestmentPPT        PaymentPurposeType = "investment"
+	ItServicesPPT        PaymentPurposeType = "it_services"
+	LeisurePPT           PaymentPurposeType = "leisure"
+	LoanPaymentPPT       PaymentPurposeType = "loan_payment"
+	MedicalTreatmentPPT  PaymentPurposeType = "medical_treatment"
+	OtherPPT             PaymentPurposeType = "other"
+	PensionPPT           PaymentPurposeType = "pension"
+	RoyaltiesPPT         PaymentPurposeType = "royalties"
+	SavingsPPT           PaymentPurposeType = "savings"
+	TravelAndTourismPPT  PaymentPurposeType = "travel_and_tourism"
+)
+
+type LocalType string
+
+const (
+	ArLT    LocalType = "ar"
+	DaDkLT  LocalType = "da_dk"
+	DeDELT  LocalType = "de_de"
+	ElELLT  LocalType = "el"
+	EnGBLT  LocalType = "en_GB"
+	EsESLT  LocalType = "es_ES"
+	FiFILT  LocalType = "fi_FI"
+	FilPhLT LocalType = "fil_PH"
+	FrFRLT  LocalType = "fr_FR"
+	HiInLT  LocalType = "hi_IN"
+	IdIDLT  LocalType = "id_ID"
+	ItITLT  LocalType = "it_IT"
+	JaJpLT  LocalType = "ja_JP"
+	MsMYLT  LocalType = "ms_MY"
+	NbNOLT  LocalType = "nb_NO"
+	NlNLLT  LocalType = "nl_NL"
+	PtPTLT  LocalType = "pt_PT"
+	SvSELT  LocalType = "sv_SE"
+	ThTHLT  LocalType = "th_TH"
+	ViVNLT  LocalType = "vi_VN"
+	ZhCNLT  LocalType = "zh_CN"
+	ZhHkLT  LocalType = "zh_HK"
+	ZhTWLT  LocalType = "zh_TW"
+)
+
 type (
 	AirlineData struct {
 		Ticket           *Ticket            `json:"ticket,omitempty"`
@@ -243,32 +302,30 @@ type (
 	}
 
 	BillingDescriptor struct {
-		Name string `json:"name,omitempty"`
-		City string `json:"city,omitempty"`
-		// Not available on Previous
+		Name      string `json:"name,omitempty"`
+		City      string `json:"city,omitempty"`
 		Reference string `json:"reference,omitempty"`
 	}
 
 	ThreeDsRequest struct {
-		Enabled            bool                      `json:"enabled"`
-		AttemptN3D         bool                      `json:"attempt_n3d"`
-		Eci                string                    `json:"eci,omitempty"`
-		Cryptogram         string                    `json:"cryptogram,omitempty"`
-		Xid                string                    `json:"xid,omitempty"`
-		Version            string                    `json:"version,omitempty"`
-		Exemption          Exemption                 `json:"exemption,omitempty"`
-		ChallengeIndicator common.ChallengeIndicator `json:"challenge_indicator,omitempty"`
-		AllowUpgrade       bool                      `json:"allow_upgrade,omitempty"`
-		// Not available on Previous
-		Status                string                 `json:"status,omitempty"`
-		AuthenticationDate    *time.Time             `json:"authentication_date,omitempty"`
-		AuthenticationAmount  float64                `json:"authentication_amount,omitempty"`
-		FlowType              common.ThreeDsFlowType `json:"flow_type,omitempty"`
-		StatusReasonCode      string                 `json:"status_reason_code,omitempty"`
-		ChallengeCancelReason string                 `json:"challenge_cancel_reason,omitempty"`
-		Score                 string                 `json:"score,omitempty"`
-		CryptogramAlgorithm   string                 `json:"cryptogram_algorithm,omitempty"`
-		AuthenticationId      string                 `json:"authentication_id,omitempty"`
+		Enabled               bool                      `json:"enabled"`
+		AttemptN3D            bool                      `json:"attempt_n3d"`
+		Eci                   string                    `json:"eci,omitempty"`
+		Cryptogram            string                    `json:"cryptogram,omitempty"`
+		Xid                   string                    `json:"xid,omitempty"`
+		Version               string                    `json:"version,omitempty"`
+		Exemption             Exemption                 `json:"exemption,omitempty"`
+		ChallengeIndicator    common.ChallengeIndicator `json:"challenge_indicator,omitempty"`
+		AllowUpgrade          bool                      `json:"allow_upgrade,omitempty"`
+		Status                string                    `json:"status,omitempty"`
+		AuthenticationDate    *time.Time                `json:"authentication_date,omitempty"`
+		AuthenticationAmount  float64                   `json:"authentication_amount,omitempty"`
+		FlowType              common.ThreeDsFlowType    `json:"flow_type,omitempty"`
+		StatusReasonCode      string                    `json:"status_reason_code,omitempty"`
+		ChallengeCancelReason string                    `json:"challenge_cancel_reason,omitempty"`
+		Score                 string                    `json:"score,omitempty"`
+		CryptogramAlgorithm   string                    `json:"cryptogram_algorithm,omitempty"`
+		AuthenticationId      string                    `json:"authentication_id,omitempty"`
 	}
 
 	RiskRequest struct {
@@ -439,7 +496,7 @@ type (
 		Phone   *common.Phone   `json:"phone,omitempty"`
 	}
 
-	Order struct {
+	RefundOrder struct {
 		Name           string     `json:"name,omitempty"`
 		Quantity       int64      `json:"quantity,omitempty"`
 		UnitPrice      int64      `json:"unit_price,omitempty"`
@@ -461,6 +518,31 @@ type (
 		Type        string `json:"type,omitempty"`
 		Network     string `json:"network,omitempty"`
 	}
+
+	Applepay struct {
+		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
+		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+	}
+
+	Card struct {
+		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
+		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+	}
+
+	Googlepay struct {
+		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
+		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+	}
+
+	PaymentMethodConfiguration struct {
+		Applepay  *Applepay  `json:"applepay,omitempty"`
+		Card      *Card      `json:"card,omitempty"`
+		Googlepay *Googlepay `json:"googlepay,omitempty"`
+	}
+
+	PaymentInstruction struct {
+		Purpose PaymentPurposeType `json:"type,omitempty"`
+	}
 )
 
 // Request
@@ -473,7 +555,7 @@ type (
 		AmountAllocations []common.AmountAllocations `json:"amount_allocations,omitempty"`
 		CaptureActionId   string                     `json:"capture_action_id,omitempty"`
 		Destination       *common.Destination        `json:"destination,omitempty"`
-		Items             []Order                    `json:"items,omitempty"`
+		Items             []RefundOrder              `json:"items,omitempty"`
 	}
 
 	VoidRequest struct {

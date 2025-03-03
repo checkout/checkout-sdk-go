@@ -17,10 +17,12 @@ var (
 )
 
 func TestSetupCustomersPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	customerIdPrevious = createCustomerPrevious(t)
 }
 
 func TestCreateCustomerPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		request customers.CustomerRequest
@@ -67,6 +69,7 @@ func TestCreateCustomerPrevious(t *testing.T) {
 }
 
 func TestGetCustomerPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name       string
 		customerId string
@@ -102,6 +105,7 @@ func TestGetCustomerPrevious(t *testing.T) {
 }
 
 func TestUpdateCustomerPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name       string
 		customerId string
@@ -145,6 +149,7 @@ func TestUpdateCustomerPrevious(t *testing.T) {
 }
 
 func TestDeleteCustomerPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name       string
 		customerId string

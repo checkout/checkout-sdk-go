@@ -20,22 +20,38 @@ const (
 const PaymentContextsPath = "payment-contexts"
 
 type (
+	PaymentContextsCustomerSummary struct {
+		RegistrationDate     *time.Time `json:"registration_date,omitempty"`
+		FirstTransactionDate *time.Time `json:"first_transaction_date,omitempty"`
+		LastPaymentDate      *time.Time `json:"last_payment_date,omitempty"`
+		TotalOrderCount      int64      `json:"total_order_count,omitempty"`
+		LastPaymentAmount    float64    `json:"last_payment_amount,omitempty"`
+	}
+
+	PaymentContextCustomerRequest struct {
+		EmailVerified bool                            `json:"email_verified,omitempty"`
+		Email         string                          `json:"email,omitempty"`
+		Name          string                          `json:"name,omitempty"`
+		Phone         *common.Phone                   `json:"phone,omitempty"`
+		Summary       *PaymentContextsCustomerSummary `json:"summary,omitempty"`
+	}
+
 	PaymentContextsRequest struct {
-		Source              payments.PaymentSource     `json:"source,omitempty"`
-		Amount              int64                      `json:"amount,omitempty"`
-		Currency            common.Currency            `json:"currency,omitempty"`
-		PaymentType         payments.PaymentType       `json:"payment_type,omitempty"`
-		AuthorizationType   string                     `json:"authorization_type,omitempty"`
-		Capture             bool                       `json:"capture,omitempty"`
-		Customer            *common.CustomerRequest    `json:"customer,omitempty"`
-		Shipping            *payments.ShippingDetails  `json:"shipping,omitempty"`
-		Processing          *PaymentContextsProcessing `json:"processing,omitempty"`
-		ProcessingChannelId string                     `json:"processing_channel_id,omitempty"`
-		Reference           string                     `json:"reference,omitempty"`
-		Description         string                     `json:"description,omitempty"`
-		SuccessUrl          string                     `json:"success_url,omitempty"`
-		FailureUrl          string                     `json:"failure_url,omitempty"`
-		Items               []PaymentContextsItems     `json:"items,omitempty"`
+		Source              payments.PaymentSource         `json:"source,omitempty"`
+		Amount              int64                          `json:"amount,omitempty"`
+		Currency            common.Currency                `json:"currency,omitempty"`
+		PaymentType         payments.PaymentType           `json:"payment_type,omitempty"`
+		AuthorizationType   string                         `json:"authorization_type,omitempty"`
+		Capture             bool                           `json:"capture,omitempty"`
+		Customer            *PaymentContextCustomerRequest `json:"customer,omitempty"`
+		Shipping            *payments.ShippingDetails      `json:"shipping,omitempty"`
+		Processing          *PaymentContextsProcessing     `json:"processing,omitempty"`
+		ProcessingChannelId string                         `json:"processing_channel_id,omitempty"`
+		Reference           string                         `json:"reference,omitempty"`
+		Description         string                         `json:"description,omitempty"`
+		SuccessUrl          string                         `json:"success_url,omitempty"`
+		FailureUrl          string                         `json:"failure_url,omitempty"`
+		Items               []PaymentContextsItems         `json:"items,omitempty"`
 	}
 )
 

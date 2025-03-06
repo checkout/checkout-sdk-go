@@ -49,6 +49,7 @@ const (
 	SofortSource          SourceType = "sofort"
 	Stcpay                SourceType = "stcpay"
 	TamaraSource          SourceType = "tamara"
+	TabbySource           SourceType = "tabby"
 	Tng                   SourceType = "tng"
 	TokenSource           SourceType = "token"
 	Truemoney             SourceType = "truemoney"

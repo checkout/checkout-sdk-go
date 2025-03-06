@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -30,7 +31,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.Reference)
 				assert.NotNil(t, response.Links)
-				assert.Equal(t, Reference, response.Reference)
+				assert.Equal(t, "Hosted Payment Reference", response.Reference)
 				assert.NotNil(t, response.Links["redirect"])
 			},
 		},
@@ -110,57 +111,121 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 	now = time.Now()
 
 	return &hosted.HostedPaymentRequest{
-		Amount:      1000,
-		Currency:    common.GBP,
-		PaymentType: payments.Regular,
+		Amount:    1000,
+		Currency:  common.GBP,
+		PaymentIp: "0.0.0.0",
 		BillingDescriptor: &payments.BillingDescriptor{
-			Name: Name,
-			City: "London",
+			Name:      "Company Name",
+			City:      "City",
+			Reference: "Billing Descriptor Reference",
 		},
-		DisplayName: "**Test Hosted Payment**",
-		Reference:   Reference,
-		Description: Description,
+		Reference:           "Hosted Payment Reference",
+		Description:         "Hosted Payment Description",
+		DisplayName:         "Company Name",
+		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
+		AmountAllocations: []common.AmountAllocations{
+			{
+				Id:        "ent_w4jelhppmfiufdnatam37wrfc4",
+				Amount:    1000,
+				Reference: "Entity Reference",
+				Commission: &common.Commission{
+					Amount:     1000,
+					Percentage: 1.125,
+				},
+			},
+		},
 		Customer: &common.CustomerRequest{
 			Email: GenerateRandomEmail(),
-			Name:  Name,
-			Phone: Phone(),
+			Name:  "Customer Name",
 		},
 		Shipping: &payments.ShippingDetails{
-			Address: Address(),
-			Phone:   Phone(),
+			Address: &common.Address{
+				AddressLine1: "Address",
+				AddressLine2: "Road",
+				City:         "City",
+				State:        "State",
+				Zip:          "Zip Code",
+				Country:      common.GB,
+			},
+			Phone: &common.Phone{
+				CountryCode: "1",
+				Number:      "1234567890",
+			},
 		},
 		Billing: &payments.BillingInformation{
 			Address: Address(),
 			Phone:   Phone(),
 		},
 		Recipient: &payments.PaymentRecipient{
-			DateOfBirth:   "1985-05-15",
-			AccountNumber: "1234567",
-			CountryCode:   common.GB,
+			DateOfBirth:   "1980-01-01",
+			AccountNumber: "1234567890",
+			Address:       Address(),
 			Zip:           "12345",
-			FirstName:     FirstName,
-			LastName:      LastName,
+			FirstName:     "Recipient First Name",
+			LastName:      "Recipient Last Name",
 		},
-		Processing:          &payments.ProcessingSettings{Aft: true},
-		AllowPaymentMethods: []payments.SourceType{payments.CardSource, payments.IdealSource},
+		Processing: &payments.ProcessingSettings{
+			Aft: true,
+		},
+		AllowPaymentMethods: []payments.SourceType{
+			payments.CardSource,
+			payments.GooglepaySource,
+			payments.ApplepaySource,
+		},
+		DisabledPaymentMethods: []payments.SourceType{
+			payments.EpsSource,
+			payments.IdealSource,
+			payments.KnetSource,
+		},
 		Products: []payments.Product{
 			{
-				Name:     "Gold Necklace",
-				Quantity: 1,
-				Price:    1000,
+				Reference: "Product Reference",
+				Name:      "Product Name",
+				Quantity:  1,
+				Price:     1000,
 			},
 		},
-		Risk:       &payments.RiskRequest{Enabled: false},
+		Risk: &payments.RiskRequest{
+			Enabled: false,
+		},
 		SuccessUrl: "https://example.com/payments/success",
 		CancelUrl:  "https://example.com/payments/cancel",
 		FailureUrl: "https://example.com/payments/failure",
-		Locale:     "en-GB",
+		Locale:     payments.EnGBLT,
 		ThreeDs: &payments.ThreeDsRequest{
 			Enabled:            false,
 			AttemptN3D:         false,
-			ChallengeIndicator: common.NoChallengeRequested,
+			ChallengeIndicator: common.NoPreference,
+			AllowUpgrade:       true,
+			Exemption:          payments.LowValue,
 		},
 		Capture:   true,
 		CaptureOn: &now,
+		Instruction: &payments.PaymentInstruction{
+			Purpose: payments.DonationsPPT,
+		},
+		PaymentMethodConfiguration: &payments.PaymentMethodConfiguration{
+			Applepay: &payments.Applepay{
+				AccountHolder: &common.AccountHolder{
+					FirstName: "Account Holder First Name",
+					LastName:  "Account Holder Last Name",
+					Type:      common.Individual,
+				},
+			},
+			Card: &payments.Card{
+				AccountHolder: &common.AccountHolder{
+					FirstName: "Account Holder First Name",
+					LastName:  "Account Holder Last Name",
+					Type:      common.Individual,
+				},
+			},
+			Googlepay: &payments.Googlepay{
+				AccountHolder: &common.AccountHolder{
+					FirstName: "Account Holder First Name",
+					LastName:  "Account Holder Last Name",
+					Type:      common.Individual,
+				},
+			},
+		},
 	}
 }

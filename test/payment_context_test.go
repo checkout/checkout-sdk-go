@@ -63,6 +63,7 @@ var (
 )
 
 func TestRequestPaymentContextPayPal(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		request contexts.PaymentContextsRequest

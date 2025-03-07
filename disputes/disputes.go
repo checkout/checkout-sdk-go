@@ -128,9 +128,10 @@ type (
 		LastUpdate         *time.Time      `json:"last_update,omitempty"`
 
 		// Not available on Previous
-		EntityId    string `json:"entity_id,omitempty"`
-		SubEntityId string `json:"sub_entity_id,omitempty"`
-		PaymentMcc  string `json:"payment_mcc,omitempty"`
+		EntityId       string                `json:"entity_id,omitempty"`
+		SubEntityId    string                `json:"sub_entity_id,omitempty"`
+		PaymentMcc     string                `json:"payment_mcc,omitempty"`
+		ResolvedReason DisputeResolvedReason `json:"resolved_reason,omitempty"`
 	}
 )
 

@@ -42,7 +42,7 @@ type (
 	}
 
 	PaymentSessionsRequest struct {
-		Amount                     int64                                `json:"amount,omitempty"`
+		Amount                     int64                                `json:"amount"`
 		Currency                   common.Currency                      `json:"currency,omitempty"`
 		PaymentType                payments.PaymentType                 `json:"payment_type,omitempty"`
 		Billing                    *payments.BillingInformation         `json:"billing,omitempty"`

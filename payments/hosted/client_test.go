@@ -48,7 +48,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(nil).
 					Run(func(args mock.Arguments) {
 						respMapping := args.Get(4).(*HostedPaymentResponse)
-						*respMapping = hostedPayementResponse
+						*respMapping = hostedPaymentResponse
 					})
 			},
 			checker: func(response *HostedPaymentResponse, err error) {

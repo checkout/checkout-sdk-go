@@ -1,6 +1,8 @@
 package financial
 
 import (
+	"context"
+
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,6 +21,10 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) GetFinancialActions(query QueryFilter) (*QueryResponse, error) {
+	return c.GetFinancialActionsWithContext(context.Background(), query)
+}
+
+func (c *Client) GetFinancialActionsWithContext(ctx context.Context, query QueryFilter) (*QueryResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -30,7 +36,8 @@ func (c *Client) GetFinancialActions(query QueryFilter) (*QueryResponse, error) 
 	}
 
 	var response QueryResponse
-	err = c.apiClient.Get(
+	err = c.apiClient.GetWithContext(
+		ctx,
 		url,
 		auth,
 		&response,

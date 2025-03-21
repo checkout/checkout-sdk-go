@@ -165,10 +165,10 @@ func TestGetSubEntityMembers(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*OnboardSubEntityDetailsResponse)
+						respMapping := args.Get(3).(*OnboardSubEntityDetailsResponse)
 						*respMapping = subEntityDetails
 					})
 			},
@@ -186,10 +186,10 @@ func TestGetSubEntityMembers(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*OnboardSubEntityDetailsResponse)
+						respMapping := args.Get(3).(*OnboardSubEntityDetailsResponse)
 						*respMapping = OnboardSubEntityDetailsResponse{
 							HttpMetadata: mocks.HttpMetadataStatusOk,
 							Data:         []SubEntityMemberData{},
@@ -212,7 +212,7 @@ func TestGetSubEntityMembers(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -285,10 +285,10 @@ func TestReinviteSubEntityMember(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*OnboardSubEntityResponse)
+						respMapping := args.Get(4).(*OnboardSubEntityResponse)
 						*respMapping = reinviteResponse
 					})
 			},
@@ -309,7 +309,7 @@ func TestReinviteSubEntityMember(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,

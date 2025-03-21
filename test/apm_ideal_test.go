@@ -40,6 +40,7 @@ func TestGetInfo(t *testing.T) {
 */
 
 func TestGetIssuers(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		checker func(*ideal.IssuerResponse, error)

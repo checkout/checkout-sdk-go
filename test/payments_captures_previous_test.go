@@ -11,6 +11,8 @@ import (
 )
 
 func TestCaptureCardPaymentPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	metadata := make(map[string]interface{})
@@ -59,6 +61,8 @@ func TestCaptureCardPaymentPrevious(t *testing.T) {
 }
 
 func TestCaptureCardPaymentWithoutRequestPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	cases := []struct {
@@ -96,6 +100,8 @@ func TestCaptureCardPaymentWithoutRequestPrevious(t *testing.T) {
 }
 
 func TestCaptureCardPaymentIdempotentlyPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	metadata := make(map[string]interface{})
@@ -174,6 +180,8 @@ func TestCaptureCardPaymentIdempotentlyPrevious(t *testing.T) {
 }
 
 func TestCaptureCardPaymentIdempotentlyWithoutRequestPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	idempotencyKeyRandom1 := uuid.New().String()

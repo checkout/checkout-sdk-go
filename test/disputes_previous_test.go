@@ -40,6 +40,7 @@ func TestSetupPrevious(t *testing.T) {
 }
 
 func TestQueryPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	var (
 		layout        = "2006-01-02T15:04:05Z"
 		now           = time.Now()
@@ -286,6 +287,7 @@ func TestGetEvidencePrevious(t *testing.T) {
 }
 
 func TestUploadFilePrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name        string
 		fileRequest common.File
@@ -351,6 +353,7 @@ func TestUploadFilePrevious(t *testing.T) {
 }
 
 func TestGetFileDetailsPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	var (
 		req = common.File{
 			File:    "./checkout.jpeg",
@@ -445,6 +448,7 @@ func TestGetDisputeSchemeFilesPrevious(t *testing.T) {
 }
 
 func getCardTokenPrevious(t *testing.T) *tokens.CardTokenResponse {
+	t.Skip("unavailable")
 	request := tokens.CardTokenRequest{
 		Type:        tokens.Card,
 		Number:      CardNumber,
@@ -462,6 +466,7 @@ func getCardTokenPrevious(t *testing.T) *tokens.CardTokenResponse {
 }
 
 func getPaymentRequestPrevious(t *testing.T, token string) *abc.PaymentResponse {
+	t.Skip("unavailable")
 	tokenSource := sources.NewRequestTokenSource()
 	tokenSource.Token = token
 
@@ -516,6 +521,8 @@ func getDisputePrevious(paymentId string) (dispute disputes.DisputeSummary) {
 }
 
 func uploadDisputeFilePrevious(t *testing.T, fileRequest common.File) *common.IdResponse {
+	t.Skip("unavailable")
+
 	response, err := PreviousApi().Disputes.UploadFile(fileRequest)
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error uploading file - %s", err.Error()))

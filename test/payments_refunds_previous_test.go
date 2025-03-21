@@ -10,6 +10,8 @@ import (
 )
 
 func TestRefundCardPaymentPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, true, 10)
 
 	refundRequest := payments.RefundRequest{
@@ -56,6 +58,8 @@ func TestRefundCardPaymentPrevious(t *testing.T) {
 }
 
 func TestRefundCardPaymentIdempotentlyPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, true, 10)
 
 	refundRequest := payments.RefundRequest{

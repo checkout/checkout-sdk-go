@@ -3,6 +3,7 @@ package payments
 type SourceType string
 
 const (
+	AchSource             SourceType = "ach"
 	Afterpay              SourceType = "afterpay"
 	AlipayCn              SourceType = "alipay_cn"
 	AlipayHk              SourceType = "alipay_hk"
@@ -14,6 +15,7 @@ const (
 	BankAccountSource     SourceType = "bank_account"
 	Benefit               SourceType = "benefit"
 	BenefitPaySource      SourceType = "benefitpay"
+	BizumSource           SourceType = "bizum"
 	BoletoSource          SourceType = "boleto"
 	CardSource            SourceType = "card"
 	CurrencyAccountSource SourceType = "currency_account"
@@ -37,15 +39,19 @@ const (
 	MultiBancoSource      SourceType = "multibanco"
 	NetworkTokenSource    SourceType = "network_token"
 	OxxoSource            SourceType = "oxxo"
+	OctopusSource         SourceType = "octopus"
 	P24Source             SourceType = "p24"
 	PagoFacilSource       SourceType = "pagofacil"
+	PaynowSource          SourceType = "paynow"
 	PayPalSource          SourceType = "paypal"
+	PlaidSource           SourceType = "plaid"
 	PoliSource            SourceType = "poli"
 	Postfinance           SourceType = "postfinance"
 	ProviderTokenSource   SourceType = "provider_token"
 	QPaySource            SourceType = "qpay"
 	RapiPagoSource        SourceType = "rapipago"
 	SepaSource            SourceType = "sepa"
+	SequraSource          SourceType = "sequra"
 	SofortSource          SourceType = "sofort"
 	Stcpay                SourceType = "stcpay"
 	TamaraSource          SourceType = "tamara"
@@ -54,6 +60,7 @@ const (
 	TokenSource           SourceType = "token"
 	Truemoney             SourceType = "truemoney"
 	TrustlySource         SourceType = "trustly"
+	TwintSource           SourceType = "twint"
 	Wechatpay             SourceType = "wechatpay"
 )
 

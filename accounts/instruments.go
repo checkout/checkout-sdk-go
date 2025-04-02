@@ -18,7 +18,7 @@ type (
 		Currency      common.Currency       `json:"currency,omitempty"`
 		Country       common.Country        `json:"country,omitempty"`
 		Document      *InstrumentDocument   `json:"document,omitempty"`
-		AccountHolder *AccountHolder        `json:"account_holder,omitempty"`
+		AccountHolder *common.AccountHolder `json:"account_holder,omitempty"`
 		Bank          *common.BankDetails   `json:"bank,omitempty"`
 	}
 )

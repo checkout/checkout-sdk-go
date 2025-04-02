@@ -611,7 +611,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 			Country:      common.GB,
 		}
 
-		accountHolder = AccountHolder{
+		accountHolder = common.AccountHolder{
 			FirstName:      "Peter",
 			LastName:       "Parker",
 			BillingAddress: &address,

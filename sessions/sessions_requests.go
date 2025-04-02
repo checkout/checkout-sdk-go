@@ -4,20 +4,10 @@ import (
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/payments"
 	"github.com/checkout/checkout-sdk-go/sessions/channels"
 	"github.com/checkout/checkout-sdk-go/sessions/completion"
 	"github.com/checkout/checkout-sdk-go/sessions/sources"
-)
-
-type AuthenticationMethod string
-
-const (
-	FederatedId              AuthenticationMethod = "federated_id"
-	Fido                     AuthenticationMethod = "fido"
-	IssuerCredentials        AuthenticationMethod = "issuer_credentials"
-	NoAuthentication         AuthenticationMethod = "no_authentication"
-	OwnCredentials           AuthenticationMethod = "own_credentials"
-	ThirdPartyAuthentication AuthenticationMethod = "third_party_authentication"
 )
 
 type ShippingIndicator string
@@ -26,55 +16,16 @@ const (
 	Visa ShippingIndicator = "visa"
 )
 
-type AccountTypeCardProductType string
-
-const (
-	Credit        AccountTypeCardProductType = "credit"
-	Debit         AccountTypeCardProductType = "debit"
-	NotApplicable AccountTypeCardProductType = "not_applicable"
-)
-
-type ThreeDsReqAuthMethodType string
-
-const (
-	ThreeDsFederatedId                              ThreeDsReqAuthMethodType = "federated_id"
-	ThreeDsFidoAuthenticator                        ThreeDsReqAuthMethodType = "fido_authenticator"
-	ThreeDsFidoAuthenticatorFidoAssuranceDataSigned ThreeDsReqAuthMethodType = "fido_authenticator_fido_assurance_data_signed"
-	ThreeDsIssuerCredentials                        ThreeDsReqAuthMethodType = "issuer_credentials"
-	ThreeDsNoAuthenticationOccurred                 ThreeDsReqAuthMethodType = "no_threeds_requestor_authentication_occurred"
-	ThreeDsSrcAssuranceData                         ThreeDsReqAuthMethodType = "src_assurance_data"
-	ThreeDsOwnCredentials                           ThreeDsReqAuthMethodType = "three3ds_requestor_own_credentials"
-	ThreeDsThirdPartyAuthentication                 ThreeDsReqAuthMethodType = "third_party_authentication"
-)
-
 type (
 	ThreeDsRequestorAuthenticationInfo struct {
-		ThreeDsReqAuthMethod    *ThreeDsReqAuthMethodType `json:"three_ds_req_auth_method,omitempty"`
-		ThreeDsReqAuthTimestamp *time.Time                `json:"three_ds_req_auth_timestamp,omitempty"`
-		ThreeDsReqAuthData      string                    `json:"three_ds_req_auth_data,omitempty"`
+		ThreeDsReqAuthMethod    payments.ThreeDsReqAuthMethodType `json:"three_ds_req_auth_method,omitempty"`
+		ThreeDsReqAuthTimestamp *time.Time                        `json:"three_ds_req_auth_timestamp,omitempty"`
+		ThreeDsReqAuthData      string                            `json:"three_ds_req_auth_data,omitempty"`
 	}
 
 	CardholderAccountInfo struct {
-		PurchaseCount                      int64                                     `json:"purchase_count,omitempty"`
-		AccountAge                         string                                    `json:"account_age,omitempty"`
-		AddCardAttempts                    int64                                     `json:"add_card_attempts,omitempty"`
-		ShippingAddressAge                 string                                    `json:"shipping_address_age,omitempty"`
-		AccountNameMatchesShippingName     bool                                      `json:"account_name_matches_shipping_name,omitempty"`
-		SuspiciousAccountActivity          bool                                      `json:"suspicious_account_activity,omitempty"`
-		TransactionsToday                  int64                                     `json:"transactions_today,omitempty"`
-		AuthenticationMethod               *AuthenticationMethod                     `json:"authentication_method,omitempty"` // Deprecated field
-		CardholderAccountAgeIndicator      common.CardholderAccountAgeIndicatorType  `json:"cardholder_account_age_indicator,omitempty"`
-		AccountChange                      *time.Time                                `json:"account_change,omitempty"`
-		AccountChangeIndicator             common.AccountChangeIndicatorType         `json:"account_change_indicator,omitempty"`
-		AccountDate                        *time.Time                                `json:"account_date,omitempty"`
-		AccountPasswordChange              string                                    `json:"account_password_change,omitempty"`
-		AccountPasswordChangeIndicator     common.AccountPasswordChangeIndicatorType `json:"account_password_change_indicator,omitempty"`
-		TransactionsPerYear                int                                       `json:"transactions_per_year,omitempty"`
-		PaymentAccountAge                  *time.Time                                `json:"payment_account_age,omitempty"`
-		ShippingAddressUsage               *time.Time                                `json:"shipping_address_usage,omitempty"`
-		AccountType                        AccountTypeCardProductType                `json:"account_type,omitempty"`
-		AccountId                          string                                    `json:"account_id,omitempty"`
-		ThreeDsRequestorAuthenticationInfo *ThreeDsRequestorAuthenticationInfo       `json:"three_ds_requestor_authentication_info,omitempty"`
+		AccountInfo                        *payments.AccountInfo
+		ThreeDsRequestorAuthenticationInfo *ThreeDsRequestorAuthenticationInfo `json:"three_ds_requestor_authentication_info,omitempty"`
 	}
 
 	SessionMarketplaceData struct {

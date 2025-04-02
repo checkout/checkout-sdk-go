@@ -36,9 +36,9 @@ type (
 		FirstName      string          `json:"first_name,omitempty"`
 		MiddleName     string          `json:"middle_name,omitempty"`
 		LastName       string          `json:"last_name,omitempty"`
+		Address        *common.Address `json:"address,omitempty"`
 		Dob            string          `json:"dob,omitempty"`
 		DateOfBirth    string          `json:"date_of_birth,omitempty"`
-		Address        *common.Address `json:"address,omitempty"`
 		Identification *Identification `json:"identification,omitempty"`
 		Reference      string          `json:"reference,omitempty"`
 		ReferenceType  string          `json:"reference_type,omitempty"`

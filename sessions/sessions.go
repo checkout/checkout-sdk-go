@@ -1,6 +1,10 @@
 package sessions
 
-import "time"
+import (
+	"time"
+
+	"github.com/checkout/checkout-sdk-go/payments"
+)
 
 const (
 	SessionsPath          = "sessions"
@@ -76,15 +80,6 @@ const (
 	RedirectCardholder  NextAction = "redirect_cardholder"
 )
 
-type DeliveryTimeframe string
-
-const (
-	ElectronicDelivery DeliveryTimeframe = "electronic_delivery"
-	SameDay            DeliveryTimeframe = "same_day"
-	Overnight          DeliveryTimeframe = "overnight"
-	TwoDayOrMore       DeliveryTimeframe = "two_day_or_more"
-)
-
 type PreOrderPurchaseIndicatorType string
 
 const (
@@ -112,7 +107,7 @@ type Installment struct {
 
 type MerchantRiskInfo struct {
 	DeliveryEmail             string                        `json:"delivery_email,omitempty"`
-	DeliveryTimeframe         DeliveryTimeframe             `json:"delivery_timeframe,omitempty"`
+	DeliveryTimeframe         payments.DeliveryTimeframe    `json:"delivery_timeframe,omitempty"`
 	IsPreorder                bool                          `json:"is_preorder,omitempty"`
 	IsReorder                 bool                          `json:"is_reorder,omitempty"`
 	ShippingIndicator         ShippingIndicator             `json:"shipping_indicator,omitempty"`

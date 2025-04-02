@@ -13,6 +13,7 @@ import (
 )
 
 func TestCreateCreditSession(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		request klarna.CreditSessionRequest
@@ -60,6 +61,7 @@ func TestCreateCreditSession(t *testing.T) {
 }
 
 func TestGetCreditSession(t *testing.T) {
+	t.Skip("unavailable")
 	var (
 		sessionId = createCreditSession(t).SessionId
 	)

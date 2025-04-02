@@ -40,13 +40,44 @@ const (
 	NationalId     IdentificationType = "national_id"
 )
 
+type PreferredExperiencesType string
+
+const (
+	GoogleSpaPET PreferredExperiencesType = "google_spa"
+	ThreeDsPET   PreferredExperiencesType = "3ds"
+)
+
+type PaymentPurposeType string
+
+const (
+	DonationsPPT         PaymentPurposeType = "donations"
+	EducationPPT         PaymentPurposeType = "education"
+	EmergencyNeedPPT     PaymentPurposeType = "emergency_need"
+	ExpatriationPPT      PaymentPurposeType = "expatriation"
+	FamilySupportPPT     PaymentPurposeType = "family_support"
+	FinancialServicesPPT PaymentPurposeType = "financial_services"
+	GiftsPPT             PaymentPurposeType = "gifts"
+	IncomePPT            PaymentPurposeType = "income"
+	InsurancePPT         PaymentPurposeType = "insurance"
+	InvestmentPPT        PaymentPurposeType = "investment"
+	ItServicesPPT        PaymentPurposeType = "it_services"
+	LeisurePPT           PaymentPurposeType = "leisure"
+	LoanPaymentPPT       PaymentPurposeType = "loan_payment"
+	MedicalTreatmentPPT  PaymentPurposeType = "medical_treatment"
+	OtherPPT             PaymentPurposeType = "other"
+	PensionPPT           PaymentPurposeType = "pension"
+	RoyaltiesPPT         PaymentPurposeType = "royalties"
+	SavingsPPT           PaymentPurposeType = "savings"
+	TravelAndTourismPPT  PaymentPurposeType = "travel_and_tourism"
+)
+
 type (
 	PayoutBillingDescriptor struct {
 		Reference string `json:"reference,omitempty"`
 	}
 
 	PaymentInstruction struct {
-		Purpose           string                    `json:"purpose,omitempty"`
+		Purpose           PaymentPurposeType        `json:"purpose,omitempty"`
 		ChargeBearer      string                    `json:"charge_bearer,omitempty"`
 		Repair            bool                      `json:"repair"`
 		Scheme            *InstructionScheme        `json:"scheme,omitempty"`
@@ -81,30 +112,35 @@ type (
 	PartialAuthorization struct {
 		Enabled bool `json:"enabled,omitempty"`
 	}
+
+	Authentication struct {
+		PreferredExperiences []PreferredExperiencesType `json:"preferred_experiences,omitempty"`
+	}
 )
 
 // Request
 type (
 	PaymentRequest struct {
 		PaymentContextId     string                        `json:"payment_context_id,omitempty"`
-		Source               payments.PaymentSource        `json:"source,omitempty"`
-		Amount               int64                         `json:"amount,omitempty"`
 		Currency             common.Currency               `json:"currency,omitempty"`
-		PaymentType          payments.PaymentType          `json:"payment_type,omitempty"`
+		Source               payments.PaymentSource        `json:"source,omitempty"`
+		Amount               int64                         `json:"amount"`
+		PaymentType          payments.PaymentType          `json:"payment_type,omitempty" default:"Regular"`
+		PaymentPlan          payments.PaymentPlan          `json:"payment_plan,omitempty"`
 		MerchantInitiated    bool                          `json:"merchant_initiated"`
 		Reference            string                        `json:"reference,omitempty"`
 		Description          string                        `json:"description,omitempty"`
-		AuthorizationType    AuthorizationType             `json:"authorization_type,omitempty"`
+		AuthorizationType    AuthorizationType             `json:"authorization_type,omitempty" default:"Final"`
 		PartialAuthorization *PartialAuthorization         `json:"partial_authorization,omitempty"`
-		Capture              bool                          `json:"capture"`
+		Capture              bool                          `json:"capture" default:"true"`
 		CaptureOn            *time.Time                    `json:"capture_on,omitempty"`
 		Customer             *common.CustomerRequest       `json:"customer,omitempty"`
 		BillingDescriptor    *payments.BillingDescriptor   `json:"billing_descriptor,omitempty"`
 		ShippingDetails      *payments.ShippingDetails     `json:"shipping,omitempty"`
-		Segment              *payments.PaymentSegment      `json:"segment,omitempty"`
 		ThreeDsRequest       *payments.ThreeDsRequest      `json:"3ds,omitempty"`
-		PreviousPaymentId    string                        `json:"previous_payment_id,omitempty"`
+		Authentication       *Authentication               `json:"authentication,omitempty"`
 		ProcessingChannelId  string                        `json:"processing_channel_id,omitempty"`
+		PreviousPaymentId    string                        `json:"previous_payment_id,omitempty"`
 		Risk                 *payments.RiskRequest         `json:"risk,omitempty"`
 		SuccessUrl           string                        `json:"success_url,omitempty"`
 		FailureUrl           string                        `json:"failure_url,omitempty"`
@@ -117,6 +153,7 @@ type (
 		Items                []payments.Product            `json:"items,omitempty"`
 		Retry                *payments.PaymentRetryRequest `json:"retry,omitempty"`
 		Metadata             map[string]interface{}        `json:"metadata,omitempty"`
+		Segment              *payments.PaymentSegment      `json:"segment,omitempty"`
 		Instruction          *PaymentInstruction           `json:"instruction,omitempty"`
 	}
 
@@ -159,28 +196,31 @@ type (
 type (
 	PaymentResponse struct {
 		HttpMetadata    common.HttpMetadata
+		Id              string                         `json:"id,omitempty"`
 		ActionId        string                         `json:"action_id,omitempty"`
 		Amount          int64                          `json:"amount,omitempty"`
-		Approved        bool                           `json:"approved,omitempty"`
-		AuthCode        string                         `json:"auth_code,omitempty"`
-		Id              string                         `json:"id,omitempty"`
 		Currency        common.Currency                `json:"currency,omitempty"`
-		Customer        *common.CustomerResponse       `json:"customer,omitempty"`
-		Source          *SourceResponse                `json:"source,omitempty"`
+		Approved        bool                           `json:"approved,omitempty"`
 		Status          payments.PaymentStatus         `json:"status,omitempty"`
-		ThreeDs         *payments.ThreeDsEnrollment    `json:"3ds,omitempty"`
-		Reference       string                         `json:"reference,omitempty"`
 		ResponseCode    string                         `json:"response_code,omitempty"`
-		ResponseSummary string                         `json:"response_summary,omitempty"`
-		Risk            *payments.RiskAssessment       `json:"risk,omitempty"`
 		ProcessedOn     *time.Time                     `json:"processed_on,omitempty"`
+		Links           map[string]common.Link         `json:"_links"`
+		PaymentType     payments.PaymentType           `json:"payment_type,omitempty" default:"Regular"`
+		PaymentPlan     payments.PaymentPlan           `json:"payment_plan,omitempty"`
+		AmountRequested int                            `json:"amount_requested,omitempty"`
+		AuthCode        string                         `json:"auth_code,omitempty"`
+		ResponseSummary string                         `json:"response_summary,omitempty"`
 		ExpiresOn       *time.Time                     `json:"expires_on,omitempty"`
+		ThreeDs         *payments.ThreeDsEnrollment    `json:"3ds,omitempty"`
+		Risk            *payments.RiskAssessment       `json:"risk,omitempty"`
+		Source          *SourceResponse                `json:"source,omitempty"`
+		Customer        *common.CustomerResponse       `json:"customer,omitempty"`
 		Balances        *PaymentResponseBalances       `json:"balances,omitempty"`
+		Reference       string                         `json:"reference,omitempty"`
 		Processing      *payments.PaymentProcessing    `json:"processing,omitempty"`
 		Eci             string                         `json:"eci,omitempty"`
 		SchemeId        string                         `json:"scheme_id,omitempty"`
 		Retry           *payments.PaymentRetryResponse `json:"retry,omitempty"`
-		Links           map[string]common.Link         `json:"_links"`
 	}
 
 	PayoutResponse struct {
@@ -188,6 +228,7 @@ type (
 		Id           string                      `json:"id,omitempty"`
 		Status       payments.PaymentStatus      `json:"status,omitempty"`
 		Reference    string                      `json:"reference,omitempty"`
+		Destination  *DestinationResponse        `json:"destination,omitempty"`
 		Instruction  *PaymentInstructionResponse `json:"instruction,omitempty"`
 	}
 

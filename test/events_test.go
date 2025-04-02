@@ -9,6 +9,7 @@ import (
 )
 
 func TestShouldGetEventTypes(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		query   events.QueryRetrieveAllEventType

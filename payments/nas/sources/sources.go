@@ -7,16 +7,17 @@ import (
 
 type (
 	requestCardSource struct {
-		Type              payments.SourceType `json:"type,omitempty"`
-		Number            string              `json:"number,omitempty"`
-		ExpiryMonth       int                 `json:"expiry_month,omitempty"`
-		ExpiryYear        int                 `json:"expiry_year,omitempty"`
-		Name              string              `json:"name,omitempty"`
-		Cvv               string              `json:"cvv,omitempty"`
-		Stored            bool                `json:"stored"`
-		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
-		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
-		Phone             *common.Phone       `json:"phone,omitempty"`
+		Type              payments.SourceType   `json:"type,omitempty"`
+		Number            string                `json:"number,omitempty"`
+		ExpiryMonth       int                   `json:"expiry_month,omitempty"`
+		ExpiryYear        int                   `json:"expiry_year,omitempty"`
+		Name              string                `json:"name,omitempty"`
+		Cvv               string                `json:"cvv,omitempty"`
+		Stored            bool                  `json:"stored"`
+		StoreForFutureUse *bool                 `json:"store_for_future_use,omitempty" default:"true"`
+		BillingAddress    *common.Address       `json:"billing_address,omitempty"`
+		Phone             *common.Phone         `json:"phone,omitempty"`
+		AccountHolder     *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
 	requestIdSource struct {
@@ -32,12 +33,13 @@ type (
 	}
 
 	requestTokenSource struct {
-		Type              payments.SourceType `json:"type,omitempty"`
-		Token             string              `json:"token,omitempty"`
-		BillingAddress    *common.Address     `json:"billing_address,omitempty"`
-		Phone             *common.Phone       `json:"phone,omitempty"`
-		Stored            *bool               `json:"stored,omitempty"`
-		StoreForFutureUse bool                `json:"store_for_future_use,omitempty"`
+		Type              payments.SourceType   `json:"type,omitempty"`
+		Token             string                `json:"token,omitempty"`
+		BillingAddress    *common.Address       `json:"billing_address,omitempty"`
+		Phone             *common.Phone         `json:"phone,omitempty"`
+		Stored            *bool                 `json:"stored,omitempty"`
+		StoreForFutureUse bool                  `json:"store_for_future_use,omitempty"`
+		AccountHolder     *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
 	requestProviderTokenSource struct {
@@ -74,8 +76,11 @@ type (
 	}
 
 	requestCustomerSource struct {
-		Type payments.SourceType `json:"type,omitempty"`
-		Id   string              `json:"number,omitempty"`
+		Type           payments.SourceType   `json:"type,omitempty"`
+		Id             string                `json:"number,omitempty"`
+		BillingAddress *common.Address       `json:"billing_address,omitempty"`
+		Phone          *common.Phone         `json:"phone,omitempty"`
+		AccountHolder  *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 )
 

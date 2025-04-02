@@ -40,6 +40,7 @@ func TestSetupPrevious(t *testing.T) {
 }
 
 func TestQueryPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	var (
 		layout        = "2006-01-02T15:04:05Z"
 		now           = time.Now()
@@ -286,6 +287,7 @@ func TestGetEvidencePrevious(t *testing.T) {
 }
 
 func TestUploadFilePrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name        string
 		fileRequest common.File
@@ -351,6 +353,7 @@ func TestUploadFilePrevious(t *testing.T) {
 }
 
 func TestGetFileDetailsPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	var (
 		req = common.File{
 			File:    "./checkout.jpeg",

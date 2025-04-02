@@ -13,6 +13,7 @@ import (
 )
 
 func TestCreatePaymentLinkPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	cases := []struct {
 		name    string
 		request links.PaymentLinkRequest
@@ -55,6 +56,7 @@ func TestCreatePaymentLinkPrevious(t *testing.T) {
 }
 
 func TestGetPaymentLinkPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	paymentLink, err := PreviousApi().Links.CreatePaymentLink(*getPaymentLinkRequest())
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("Error creating payment link: %s", err.Error()))

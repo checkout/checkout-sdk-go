@@ -17,15 +17,15 @@ const (
 
 type (
 	requestBankAccountDestination struct {
-		Type          payments.DestinationType `json:"type,omitempty"`
+		Country       common.Country           `json:"country,omitempty"`
 		AccountType   AccountType              `json:"account_type,omitempty"`
+		Type          payments.DestinationType `json:"type,omitempty"`
+		Iban          string                   `json:"iban,omitempty"`
 		AccountNumber string                   `json:"account_number,omitempty"`
 		BankCode      string                   `json:"bank_code,omitempty"`
 		BranchCode    string                   `json:"branch_code,omitempty"`
-		Iban          string                   `json:"iban,omitempty"`
 		Bban          string                   `json:"bban,omitempty"`
 		SwiftBic      string                   `json:"swift_bic,omitempty"`
-		Country       common.Country           `json:"country,omitempty"`
 		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
 		Bank          *common.BankDetails      `json:"bank,omitempty"`
 	}
@@ -49,6 +49,17 @@ type (
 		Token         string                   `json:"token,omitempty"`
 		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
 	}
+
+	requestNetworkTokenDestination struct {
+		Type          payments.DestinationType  `json:"type,omitempty"`
+		Token         string                    `json:"token,omitempty"`
+		ExpiryMonth   int                       `json:"expiry_month,omitempty"`
+		ExpiryYear    int                       `json:"expiry_year,omitempty"`
+		TokenType     payments.NetworkTokenType `json:"token_type,omitempty"`
+		Cryptogram    string                    `json:"cryptogram,omitempty"`
+		Eci           string                    `json:"eci,omitempty"`
+		AccountHolder *common.AccountHolder     `json:"account_holder,omitempty"`
+	}
 )
 
 func NewRequestBankAccountDestination() *requestBankAccountDestination {
@@ -67,6 +78,10 @@ func NewRequestTokenDestination() *requestTokenDestination {
 	return &requestTokenDestination{Type: payments.TokenDestination}
 }
 
+func NewRequestNetworkTokenDestination() *requestNetworkTokenDestination {
+	return &requestNetworkTokenDestination{Type: payments.NetworkTokenDestination}
+}
+
 func (d *requestBankAccountDestination) GetType() payments.DestinationType {
 	return d.Type
 }
@@ -80,6 +95,10 @@ func (d *requestTokenDestination) GetType() payments.DestinationType {
 }
 
 func (d *requestCardDestination) GetType() payments.DestinationType {
+	return d.Type
+}
+
+func (d *requestNetworkTokenDestination) GetType() payments.DestinationType {
 	return d.Type
 }
 
@@ -104,6 +123,7 @@ type (
 		IssuerCountry common.Country           `json:"issuer_country,omitempty"`
 		ProductId     string                   `json:"product_id,omitempty"`
 		ProductType   string                   `json:"product_type,omitempty"`
+		AccountHolder *common.AccountHolder    `json:"account_holder,omitempty"`
 	}
 )
 

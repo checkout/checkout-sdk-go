@@ -57,6 +57,7 @@ func TestVoidCardPaymentPrevious(t *testing.T) {
 }
 
 func TestVoidCardPaymentIdempotentlyPrevious(t *testing.T) {
+	t.Skip("unavailable")
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	idempotencyKey := uuid.New().String()

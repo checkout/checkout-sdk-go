@@ -36,7 +36,7 @@ type (
 		ProcessingChannelId        string                               `json:"processing_channel_id,omitempty"`
 		AmountAllocations          []common.AmountAllocations           `json:"amount_allocations,omitempty"`
 		Customer                   *common.CustomerRequest              `json:"customer,omitempty"`
-		Shipping                   *payments.ShippingDetails            `json:"shipping,omitempty"`
+		Shipping                   *payments.ShippingDetailsHostedLinks `json:"shipping,omitempty"`
 		Recipient                  *payments.PaymentRecipient           `json:"recipient,omitempty"`
 		Processing                 *payments.ProcessingSettings         `json:"processing,omitempty"`
 		AllowPaymentMethods        []payments.SourceType                `json:"allow_payment_methods,omitempty"`
@@ -47,7 +47,7 @@ type (
 		Sender                     *nas.Sender                          `json:"sender,omitempty"`
 		Metadata                   map[string]interface{}               `json:"metadata,omitempty"`
 		Locale                     payments.LocalType                   `json:"locale,omitempty"`
-		ThreeDs                    *payments.ThreeDsRequest             `json:"3ds,omitempty"`
+		ThreeDs                    *payments.ThreeDsRequestHostedLinks  `json:"3ds,omitempty"`
 		Capture                    bool                                 `json:"capture,omitempty"`
 		CaptureOn                  *time.Time                           `json:"capture_on,omitempty"`
 		Instruction                *payments.PaymentInstruction         `json:"instruction,omitempty"`

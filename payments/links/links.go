@@ -20,32 +20,32 @@ const (
 
 type (
 	PaymentLinkRequest struct {
-		Amount                 int                           `json:"amount,omitempty"`
-		Currency               common.Currency               `json:"currency,omitempty"`
-		PaymentType            payments.PaymentType          `json:"payment_type,omitempty,omitempty"`
-		PaymentIp              string                        `json:"payment_ip,omitempty"`
-		BillingDescriptor      *payments.BillingDescriptor   `json:"billing_descriptor,omitempty"`
-		Reference              string                        `json:"reference,omitempty"`
-		Description            string                        `json:"description,omitempty"`
-		DisplayName            string                        `json:"display_name,omitempty"`
-		ExpiresIn              int                           `json:"expires_in,omitempty"`
-		Customer               *common.CustomerRequest       `json:"customer,omitempty"`
-		Shipping               *payments.ShippingDetails     `json:"shipping,omitempty"`
-		Billing                *payments.BillingInformation  `json:"billing,omitempty"`
-		Recipient              *payments.PaymentRecipient    `json:"recipient,omitempty"`
-		Processing             *payments.ProcessingSettings  `json:"processing,omitempty"`
-		AllowPaymentMethods    []payments.SourceType         `json:"allow_payment_methods,omitempty"`
-		DisabledPaymentMethods []payments.SourceType         `json:"disabled_payment_methods,omitempty"`
-		Products               []payments.Product            `json:"products,omitempty"`
-		Metadata               map[string]interface{}        `json:"metadata,omitempty"`
-		ThreeDs                *payments.ThreeDsRequest      `json:"3ds,omitempty"`
-		Risk                   *payments.RiskRequest         `json:"risk,omitempty"`
-		CustomerRetry          *payments.PaymentRetryRequest `json:"customer_retry,omitempty"`
-		Sender                 *nas.Sender                   `json:"sender,omitempty"`
-		ReturnUrl              string                        `json:"return_url,omitempty"`
-		Locale                 string                        `json:"locale,omitempty"`
-		Capture                bool                          `json:"capture,omitempty"`
-		CaptureOn              *time.Time                    `json:"capture_on,omitempty"`
+		Amount                 int                                  `json:"amount,omitempty"`
+		Currency               common.Currency                      `json:"currency,omitempty"`
+		PaymentType            payments.PaymentType                 `json:"payment_type,omitempty,omitempty"`
+		PaymentIp              string                               `json:"payment_ip,omitempty"`
+		BillingDescriptor      *payments.BillingDescriptor          `json:"billing_descriptor,omitempty"`
+		Reference              string                               `json:"reference,omitempty"`
+		Description            string                               `json:"description,omitempty"`
+		DisplayName            string                               `json:"display_name,omitempty"`
+		ExpiresIn              int                                  `json:"expires_in,omitempty"`
+		Customer               *common.CustomerRequest              `json:"customer,omitempty"`
+		Shipping               *payments.ShippingDetailsHostedLinks `json:"shipping,omitempty"`
+		Billing                *payments.BillingInformation         `json:"billing,omitempty"`
+		Recipient              *payments.PaymentRecipient           `json:"recipient,omitempty"`
+		Processing             *payments.ProcessingSettings         `json:"processing,omitempty"`
+		AllowPaymentMethods    []payments.SourceType                `json:"allow_payment_methods,omitempty"`
+		DisabledPaymentMethods []payments.SourceType                `json:"disabled_payment_methods,omitempty"`
+		Products               []payments.Product                   `json:"products,omitempty"`
+		Metadata               map[string]interface{}               `json:"metadata,omitempty"`
+		ThreeDs                *payments.ThreeDsRequestHostedLinks  `json:"3ds,omitempty"`
+		Risk                   *payments.RiskRequest                `json:"risk,omitempty"`
+		CustomerRetry          *payments.PaymentRetryRequest        `json:"customer_retry,omitempty"`
+		Sender                 *nas.Sender                          `json:"sender,omitempty"`
+		ReturnUrl              string                               `json:"return_url,omitempty"`
+		Locale                 string                               `json:"locale,omitempty"`
+		Capture                bool                                 `json:"capture,omitempty"`
+		CaptureOn              *time.Time                           `json:"capture_on,omitempty"`
 		//Not available on previous
 		ProcessingChannelId string                     `json:"processing_channel_id,omitempty"`
 		AmountAllocations   []common.AmountAllocations `json:"amount_allocations,omitempty"`

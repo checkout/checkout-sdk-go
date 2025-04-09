@@ -138,7 +138,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 			Email: GenerateRandomEmail(),
 			Name:  "Customer Name",
 		},
-		Shipping: &payments.ShippingDetails{
+		Shipping: &payments.ShippingDetailsHostedLinks{
 			Address: &common.Address{
 				AddressLine1: "Address",
 				AddressLine2: "Road",
@@ -165,6 +165,28 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 			LastName:      "Recipient Last Name",
 		},
 		Processing: &payments.ProcessingSettings{
+			AirlineData: []payments.AirlineData{
+				{
+					Ticket: &payments.Ticket{
+						Number: "123456",
+					},
+					Passenger: &payments.Passenger{
+						FirstName:   "John",
+						LastName:    "Doe",
+						DateOfBirth: "0001-01-01",
+						Address: &common.Address{
+							Country: common.FR,
+						},
+					},
+					FlightLegDetails: []payments.FlightLegDetails{
+						{
+							FlightNumber:     "123456",
+							DepartureAirport: "CDG",
+							ArrivalAirport:   "ORY",
+						},
+					},
+				},
+			},
 			Aft: true,
 		},
 		AllowPaymentMethods: []payments.SourceType{
@@ -192,7 +214,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 		CancelUrl:  "https://example.com/payments/cancel",
 		FailureUrl: "https://example.com/payments/failure",
 		Locale:     payments.EnGBLT,
-		ThreeDs: &payments.ThreeDsRequest{
+		ThreeDs: &payments.ThreeDsRequestHostedLinks{
 			Enabled:            false,
 			AttemptN3D:         false,
 			ChallengeIndicator: common.NoPreference,

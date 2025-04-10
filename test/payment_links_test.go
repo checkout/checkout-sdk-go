@@ -125,7 +125,7 @@ func getPaymentLinkRequest() *links.PaymentLinkRequest {
 			Name:  Name,
 			Phone: Phone(),
 		},
-		Shipping: &payments.ShippingDetailsHostedLinks{
+		Shipping: &payments.ShippingDetailsFlowHostedLinks{
 			Address: Address(),
 			Phone:   Phone(),
 		},
@@ -151,10 +151,12 @@ func getPaymentLinkRequest() *links.PaymentLinkRequest {
 				Price:    200,
 			},
 		},
-		ThreeDs: &payments.ThreeDsRequestHostedLinks{
+		ThreeDs: &payments.ThreeDsRequestFlowHostedLinks{
 			Enabled:            false,
 			AttemptN3D:         false,
 			ChallengeIndicator: common.NoChallengeRequested,
+			Exemption:          payments.LowValue,
+			AllowUpgrade:       true,
 		},
 		Risk:                &payments.RiskRequest{Enabled: false},
 		ReturnUrl:           "https://example.com/payments/success",

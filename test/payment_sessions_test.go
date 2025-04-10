@@ -12,9 +12,20 @@ import (
 
 var (
 	paymentSessionsRequest = payment_sessions.PaymentSessionsRequest{
-		Amount:     int64(2000),
-		Currency:   common.GBP,
-		Reference:  "ORD-123A",
+		Amount:    int64(2000),
+		Currency:  common.GBP,
+		Reference: "ORD-123A",
+		Shipping: &payments.ShippingDetailsFlowHostedLinks{
+			Address: Address(),
+			Phone:   Phone(),
+		},
+		ThreeDsRequest: &payments.ThreeDsRequestFlowHostedLinks{
+			Enabled:            false,
+			AttemptN3D:         false,
+			ChallengeIndicator: common.NoPreference,
+			Exemption:          payments.LowValue,
+			AllowUpgrade:       true,
+		},
 		Billing:    &payments.BillingInformation{Address: Address()},
 		SuccessUrl: "https://example.com/payments/success",
 		FailureUrl: "https://example.com/payments/fail",

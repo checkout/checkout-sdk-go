@@ -138,7 +138,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 			Email: GenerateRandomEmail(),
 			Name:  "Customer Name",
 		},
-		Shipping: &payments.ShippingDetailsHostedLinks{
+		Shipping: &payments.ShippingDetailsFlowHostedLinks{
 			Address: &common.Address{
 				AddressLine1: "Address",
 				AddressLine2: "Road",
@@ -214,7 +214,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 		CancelUrl:  "https://example.com/payments/cancel",
 		FailureUrl: "https://example.com/payments/failure",
 		Locale:     payments.EnGBLT,
-		ThreeDs: &payments.ThreeDsRequestHostedLinks{
+		ThreeDs: &payments.ThreeDsRequestFlowHostedLinks{
 			Enabled:            false,
 			AttemptN3D:         false,
 			ChallengeIndicator: common.NoPreference,

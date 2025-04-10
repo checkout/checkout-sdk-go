@@ -353,7 +353,7 @@ type (
 		ReturnTrackingUri     string `json:"return_tracking_uri,omitempty"`
 	}
 
-	ShippingDetailsHostedLinks struct {
+	ShippingDetailsFlowHostedLinks struct {
 		Address *common.Address `json:"address,omitempty"`
 		Phone   *common.Phone   `json:"phone,omitempty"`
 	}
@@ -435,7 +435,7 @@ type (
 		AccountId                      string                                    `json:"account_id,omitempty"`
 	}
 
-	ThreeDsRequestHostedLinks struct {
+	ThreeDsRequestFlowHostedLinks struct {
 		Enabled            bool                      `json:"enabled"`
 		AttemptN3D         bool                      `json:"attempt_n3d"`
 		ChallengeIndicator common.ChallengeIndicator `json:"challenge_indicator,omitempty" default:"NoPreference"`

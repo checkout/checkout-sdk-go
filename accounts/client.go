@@ -1,6 +1,8 @@
 package accounts
 
 import (
+	"context"
+
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -25,13 +27,21 @@ func NewClient(
 }
 
 func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityResponse, error) {
+	return c.CreateEntityWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateEntityWithContext(
+	ctx context.Context,
+	request OnboardEntityRequest,
+) (*OnboardEntityResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response OnboardEntityResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entitiesPath),
 		auth,
 		request,
@@ -46,17 +56,20 @@ func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityRespo
 }
 
 func (c *Client) GetSubEntityMembers(entityId string) (*OnboardSubEntityDetailsResponse, error) {
+	return c.GetSubEntityMembersWithContext(context.Background(), entityId)
+}
+
+func (c *Client) GetSubEntityMembersWithContext(
+	ctx context.Context,
+	entityId string,
+) (*OnboardSubEntityDetailsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response OnboardSubEntityDetailsResponse
-	err = c.apiClient.Get(
-		common.BuildPath(accountsPath, entitiesPath, entityId, membersPath),
-		auth,
-		&response,
-	)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, membersPath), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -69,19 +82,28 @@ func (c *Client) ReinviteSubEntityMember(
 	userId string,
 	request OnboardSubEntityRequest,
 ) (*OnboardSubEntityResponse, error) {
+	return c.ReinviteSubEntityMemberWithContext(context.Background(), entityId, userId, request)
+}
+
+func (c *Client) ReinviteSubEntityMemberWithContext(
+	ctx context.Context,
+	entityId string,
+	userId string,
+	request OnboardSubEntityRequest,
+) (*OnboardSubEntityResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response OnboardSubEntityResponse
-	err = c.apiClient.Put(
-		common.BuildPath(accountsPath, entitiesPath, entityId, membersPath, userId),
-		auth,
-		request,
-		&response,
-		nil,
-	)
+	err = c.apiClient.PutWithContext(ctx, common.BuildPath(
+		accountsPath,
+		entitiesPath,
+		entityId,
+		membersPath,
+		userId,
+	), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -90,17 +112,17 @@ func (c *Client) ReinviteSubEntityMember(
 }
 
 func (c *Client) GetEntity(entityId string) (*OnboardEntityDetails, error) {
+	return c.GetEntityWithContext(context.Background(), entityId)
+}
+
+func (c *Client) GetEntityWithContext(ctx context.Context, entityId string) (*OnboardEntityDetails, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response OnboardEntityDetails
-	err = c.apiClient.Get(
-		common.BuildPath(accountsPath, entitiesPath, entityId),
-		auth,
-		&response,
-	)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +130,12 @@ func (c *Client) GetEntity(entityId string) (*OnboardEntityDetails, error) {
 	return &response, nil
 }
 
-func (c *Client) UpdateEntity(
+func (c *Client) UpdateEntity(entityId string, request OnboardEntityRequest) (*OnboardEntityResponse, error) {
+	return c.UpdateEntityWithContext(context.Background(), entityId, request)
+}
+
+func (c *Client) UpdateEntityWithContext(
+	ctx context.Context,
 	entityId string,
 	request OnboardEntityRequest,
 ) (*OnboardEntityResponse, error) {
@@ -118,12 +145,7 @@ func (c *Client) UpdateEntity(
 	}
 
 	var response OnboardEntityResponse
-	err = c.apiClient.Put(common.BuildPath(accountsPath, entitiesPath, entityId),
-		auth,
-		request,
-		&response,
-		nil,
-	)
+	err = c.apiClient.PutWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +153,17 @@ func (c *Client) UpdateEntity(
 	return &response, nil
 }
 
-// Deprecated: Use CreatePaymentInstrumentIdResponse for CreatePaymentInstrument instead.
+// Deprecated: Use CreatePaymentInstrument IdResponse for CreatePaymentInstrument instead.
 func (c *Client) CreatePaymentInstruments(
+	entityId string,
+	request PaymentInstrument,
+) (*common.MetadataResponse, error) {
+	return c.CreatePaymentInstrumentsWithContext(context.Background(), entityId, request)
+}
+
+// Deprecated: Use CreatePaymentInstrumentWithContext IdResponse for CreatePaymentInstrumentsWithContext instead.
+func (c *Client) CreatePaymentInstrumentsWithContext(
+	ctx context.Context,
 	entityId string,
 	request PaymentInstrument,
 ) (*common.MetadataResponse, error) {
@@ -142,7 +173,8 @@ func (c *Client) CreatePaymentInstruments(
 	}
 
 	var response common.MetadataResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, instrumentsPath),
 		auth,
 		request,
@@ -160,13 +192,22 @@ func (c *Client) CreatePaymentInstrument(
 	entityId string,
 	request PaymentInstrumentRequest,
 ) (*common.IdResponse, error) {
+	return c.CreatePaymentInstrumentWithContext(context.Background(), entityId, request)
+}
+
+func (c *Client) CreatePaymentInstrumentWithContext(
+	ctx context.Context,
+	entityId string,
+	request PaymentInstrumentRequest,
+) (*common.IdResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response common.IdResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, paymentInstrumentsPath),
 		auth,
 		request,
@@ -184,20 +225,23 @@ func (c *Client) RetrievePaymentInstrumentDetails(
 	entityId string,
 	paymentInstrumentId string,
 ) (*PaymentInstrumentDetailsResponse, error) {
+	return c.RetrievePaymentInstrumentDetailsWithContext(context.Background(), entityId, paymentInstrumentId)
+}
+
+func (c *Client) RetrievePaymentInstrumentDetailsWithContext(
+	ctx context.Context,
+	entityId string,
+	paymentInstrumentId string,
+) (*PaymentInstrumentDetailsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentInstrumentDetailsResponse
-	err = c.apiClient.Get(
-		common.BuildPath(
-			accountsPath,
-			entitiesPath,
-			entityId,
-			paymentInstrumentsPath,
-			paymentInstrumentId,
-		),
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(accountsPath, entitiesPath, entityId, paymentInstrumentsPath, paymentInstrumentId),
 		auth,
 		&response,
 	)
@@ -212,13 +256,22 @@ func (c *Client) UpdatePaymentInstrumentDetails(
 	entityId, instrumentId string,
 	request UpdatePaymentInstrumentRequest,
 ) (*common.IdResponse, error) {
+	return c.UpdatePaymentInstrumentDetailsWithContext(context.Background(), entityId, instrumentId, request)
+}
+
+func (c *Client) UpdatePaymentInstrumentDetailsWithContext(
+	ctx context.Context,
+	entityId, instrumentId string,
+	request UpdatePaymentInstrumentRequest,
+) (*common.IdResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response common.IdResponse
-	err = c.apiClient.Patch(
+	err = c.apiClient.PatchWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, paymentInstrumentsPath, instrumentId),
 		auth,
 		request,
@@ -235,29 +288,29 @@ func (c *Client) QueryPaymentInstruments(
 	entityId string,
 	query PaymentInstrumentsQuery,
 ) (*PaymentInstrumentQueryResponse, error) {
+	return c.QueryPaymentInstrumentsWithContext(context.Background(), entityId, query)
+}
+
+func (c *Client) QueryPaymentInstrumentsWithContext(
+	ctx context.Context,
+	entityId string,
+	query PaymentInstrumentsQuery,
+) (*PaymentInstrumentQueryResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	url, err := common.BuildQueryPath(
-		common.BuildPath(
-			accountsPath,
-			entitiesPath,
-			entityId,
-			paymentInstrumentsPath,
-		), query)
-
+		common.BuildPath(accountsPath, entitiesPath, entityId, paymentInstrumentsPath),
+		query,
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentInstrumentQueryResponse
-	err = c.apiClient.Get(
-		url,
-		auth,
-		&response,
-	)
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -266,13 +319,21 @@ func (c *Client) QueryPaymentInstruments(
 }
 
 func (c *Client) RetrievePayoutSchedule(entityId string) (*PayoutSchedule, error) {
+	return c.RetrievePayoutScheduleWithContext(context.Background(), entityId)
+}
+
+func (c *Client) RetrievePayoutScheduleWithContext(
+	ctx context.Context,
+	entityId string,
+) (*PayoutSchedule, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PayoutSchedule
-	err = c.apiClient.Get(
+	err = c.apiClient.GetWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, payoutSchedulesPath),
 		auth,
 		&response,
@@ -289,6 +350,15 @@ func (c *Client) UpdatePayoutSchedule(
 	currency common.Currency,
 	updateSchedule CurrencySchedule,
 ) (*common.IdResponse, error) {
+	return c.UpdatePayoutScheduleWithContext(context.Background(), entityId, currency, updateSchedule)
+}
+
+func (c *Client) UpdatePayoutScheduleWithContext(
+	ctx context.Context,
+	entityId string,
+	currency common.Currency,
+	updateSchedule CurrencySchedule,
+) (*common.IdResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -299,7 +369,8 @@ func (c *Client) UpdatePayoutSchedule(
 	}
 
 	var response common.IdResponse
-	err = c.apiClient.Put(
+	err = c.apiClient.PutWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, payoutSchedulesPath),
 		auth,
 		request,
@@ -314,6 +385,13 @@ func (c *Client) UpdatePayoutSchedule(
 }
 
 func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
+	return c.SubmitFileWithContext(context.Background(), file)
+}
+
+func (c *Client) SubmitFileWithContext(
+	ctx context.Context,
+	file File,
+) (*common.IdResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -325,7 +403,7 @@ func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	}
 
 	var response common.IdResponse
-	err = c.filesClient.Upload(common.BuildPath(filesPath), auth, req, &response)
+	err = c.filesClient.UploadWithContext(ctx, common.BuildPath(filesPath), auth, req, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -333,7 +411,12 @@ func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	return &response, nil
 }
 
-func (c *Client) UploadFile(
+func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
+	return c.UploadFileWithContext(context.Background(), entityId, request)
+}
+
+func (c *Client) UploadFileWithContext(
+	ctx context.Context,
 	entityId string,
 	request File,
 ) (*UploadFileResponse, error) {
@@ -343,7 +426,8 @@ func (c *Client) UploadFile(
 	}
 
 	var response UploadFileResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(accountsPath, entityId, filesPath),
 		auth,
 		request,
@@ -358,17 +442,17 @@ func (c *Client) UploadFile(
 }
 
 func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, error) {
+	return c.RetrieveFileWithContext(context.Background(), entityId, fileId)
+}
+
+func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId string) (*FileDetailsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response FileDetailsResponse
-	err = c.apiClient.Get(
-		common.BuildPath(accountsPath, entityId, filesPath, fileId),
-		auth,
-		&response,
-	)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entityId, filesPath, fileId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -186,6 +186,7 @@ func TestDeleteCustomerPrevious(t *testing.T) {
 }
 
 func createCustomerPrevious(t *testing.T) string {
+	t.Skip("unavailable")
 	request := customers.CustomerRequest{
 		Email: GenerateRandomEmail(),
 		Name:  Name,

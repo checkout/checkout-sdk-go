@@ -537,6 +537,10 @@ type (
 		Guests           []Guest         `json:"guests,omitempty"`
 		Room             []Room          `json:"room,omitempty"`
 	}
+	PartnerCustomerRiskData struct {
+		Key   string `json:"key,omitempty"`
+		Value string `json:"value,omitempty"`
+	}
 
 	ProcessingSettings struct {
 		OrderId                 string                    `json:"order_id,omitempty"`
@@ -577,6 +581,7 @@ type (
 		SenderInformation       *SenderInformation        `json:"senderInformation,omitempty"`
 		Purpose                 string                    `json:"purpose,omitempty"`
 		Dlocal                  *DLocalProcessingSettings `json:"dlocal,omitempty"`
+		PartnerCustomerRiskData *PartnerCustomerRiskData  `json:"partner_customer_risk_data,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {

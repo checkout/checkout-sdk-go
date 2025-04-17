@@ -44,10 +44,10 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*HostedPaymentResponse)
+						respMapping := args.Get(4).(*HostedPaymentResponse)
 						*respMapping = hostedPaymentResponse
 					})
 			},
@@ -82,7 +82,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -146,10 +146,10 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*HostedPaymentDetails)
+						respMapping := args.Get(3).(*HostedPaymentDetails)
 						*respMapping = hostedPaymentDetails
 					})
 			},
@@ -190,7 +190,7 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,

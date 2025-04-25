@@ -545,7 +545,7 @@ type (
 	ProcessingSettings struct {
 		OrderId                 string                    `json:"order_id,omitempty"`
 		TaxAmount               int64                     `json:"tax_amount"`
-		SurchargeAmount         int64                     `json:"surcharge_amount"`
+		SurchargeAmount         int64                     `json:"surcharge_amount,omitempty"`
 		DiscountAmount          int64                     `json:"discount_amount"`
 		DutyAmount              int64                     `json:"duty_amount"`
 		ShippingAmount          int64                     `json:"shipping_amount"`

@@ -213,7 +213,7 @@ func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
 		SuccessUrl: "https://example.com/payments/success",
 		CancelUrl:  "https://example.com/payments/cancel",
 		FailureUrl: "https://example.com/payments/failure",
-		Locale:     payments.EnGBLT,
+		Locale:     payments.FrFRLT,
 		ThreeDs: &payments.ThreeDsRequestFlowHostedLinks{
 			Enabled:            false,
 			AttemptN3D:         false,

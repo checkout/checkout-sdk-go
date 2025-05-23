@@ -21,8 +21,9 @@ const (
 // Request
 type (
 	TransferSourceRequest struct {
-		Id     string `json:"id,omitempty"`
-		Amount int64  `json:"amount,omitempty"`
+		Id       string          `json:"id,omitempty"`
+		Amount   int64           `json:"amount,omitempty"`
+		Currency common.Currency `json:"currency,omitempty"`
 	}
 
 	TransferDestinationRequest struct {

@@ -29,6 +29,7 @@ type (
 
 	OAuthServiceResponse struct {
 		AccessToken string        `json:"access_token,omitempty"`
+		TokenType   string        `json:"token_type,omitempty"`
 		ExpiresIn   time.Duration `json:"expires_in,omitempty"`
 	}
 )
@@ -82,9 +83,9 @@ func (f *OAuthSdkCredentials) GetAccessToken() error {
 	}
 
 	data := url.Values{}
+	data.Set("grant_type", "client_credentials")
 	data.Set("client_id", f.ClientId)
 	data.Set("client_secret", f.ClientSecret)
-	data.Set("grant_type", "client_credentials")
 	data.Set("scope", strings.Join(f.Scopes, " "))
 
 	req, err := http.NewRequest(http.MethodPost, f.AuthorizationUri, strings.NewReader(data.Encode()))

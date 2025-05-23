@@ -113,8 +113,8 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			conf := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(conf, apiClient)
 
 			tc.checker(client.InitiateTransferOfFounds(tc.request, nil))
 		})
@@ -137,7 +137,7 @@ func TestRetrieveTransfer(t *testing.T) {
 			},
 			Source: &TransferSourceResponse{
 				EntityId: "ent_azsiyswl7bwe2ynjzujy7lcjca",
-				Amount:   100,
+				Amount:   int64(100),
 				Currency: common.GBP,
 			},
 			Destination: &TransferDestinationResponse{EntityId: "ent_bqik7gxoavwhmy3ot6kvmbx6py"},
@@ -175,6 +175,8 @@ func TestRetrieveTransfer(t *testing.T) {
 				assert.Equal(t, transferDetails.Status, response.Status)
 				assert.Equal(t, transferDetails.TransferType, response.TransferType)
 				assert.Equal(t, transferDetails.Source, response.Source)
+				assert.Equal(t, int64(100), response.Source.Amount)
+				assert.Equal(t, common.GBP, response.Source.Currency)
 				assert.Equal(t, transferDetails.Destination, response.Destination)
 			},
 		},
@@ -230,8 +232,8 @@ func TestRetrieveTransfer(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			conf := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(conf, apiClient)
 
 			tc.checker(client.RetrieveTransfer(tc.transferId))
 		})

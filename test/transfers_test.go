@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"github.com/checkout/checkout-sdk-go/common"
 	"net/http"
 	"testing"
 
@@ -27,8 +28,9 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 				Reference:    "reference",
 				TransferType: transfers.Commission,
 				Source: &transfers.TransferSourceRequest{
-					Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-					Amount: 100,
+					Id:       "ent_kidtcgc3ge5unf4a5i6enhnr5m",
+					Amount:   100,
+					Currency: common.GBP,
 				},
 				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 			},
@@ -59,8 +61,9 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 				Reference:    "reference",
 				TransferType: transfers.Commission,
 				Source: &transfers.TransferSourceRequest{
-					Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-					Amount: 100,
+					Id:       "ent_kidtcgc3ge5unf4a5i6enhnr5m",
+					Amount:   100,
+					Currency: common.GBP,
 				},
 				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 			},
@@ -104,6 +107,8 @@ func TestRetrieveTransfer(t *testing.T) {
 				assert.NotNil(t, response.Status)
 				assert.NotNil(t, response.TransferType)
 				assert.NotNil(t, response.Source)
+				assert.Equal(t, int64(100), response.Source.Amount)
+				assert.Equal(t, common.GBP, response.Source.Currency)
 				assert.NotNil(t, response.Destination)
 			},
 		},
@@ -123,8 +128,9 @@ func createTransferOfFounds(t *testing.T) *transfers.TransferResponse {
 		Reference:    "reference",
 		TransferType: transfers.Commission,
 		Source: &transfers.TransferSourceRequest{
-			Id:     "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-			Amount: 100,
+			Id:       "ent_kidtcgc3ge5unf4a5i6enhnr5m",
+			Amount:   100,
+			Currency: common.GBP,
 		},
 		Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
 	}

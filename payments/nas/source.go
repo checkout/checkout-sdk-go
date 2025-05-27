@@ -42,7 +42,7 @@ type (
 		PaymentAccountReference string                           `json:"payment_account_reference,omitempty"`
 		EncryptedCardNumber     string                           `json:"encrypted_card_number,omitempty"`
 		AccountUpdateStatus     payments.AccountUpdateStatusType `json:"account_update_status,omitempty"`
-		AccountHolder           *common.AccountHolder            `json:"account_holder,omitempty"`
+		AccountHolder           *common.AccountHolderResponse    `json:"account_holder,omitempty"`
 	}
 
 	ResponseCurrencyAccountSource struct {

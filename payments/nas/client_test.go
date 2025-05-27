@@ -146,8 +146,8 @@ func TestRequestPayment(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.RequestPayment(tc.request, tc.idempotencyKey))
 		})
@@ -170,6 +170,9 @@ func TestRequestPaymentList(t *testing.T) {
 			Source: &SourceResponse{
 				ResponseCardSource: &ResponseCardSource{
 					Type: payments.CardSource,
+					AccountHolder: &common.AccountHolderResponse{
+						AccountNameInquiry: common.NoMatchANIT,
+					},
 				},
 			},
 			Reference: reference,
@@ -216,7 +219,10 @@ func TestRequestPaymentList(t *testing.T) {
 				assert.Equal(t, paymentListResponse.Data[0].Id, response.Data[0].Id)
 				assert.Equal(t, paymentListResponse.Data[0].Amount, response.Data[0].Amount)
 				assert.Equal(t, paymentListResponse.Data[0].Currency, response.Data[0].Currency)
-				assert.Equal(t, paymentListResponse.Data[0].Source.ResponseCardSource.Type, response.Data[0].Source.ResponseCardSource.Type)
+				assert.Equal(t, paymentListResponse.Data[0].Source.ResponseCardSource.Type,
+					response.Data[0].Source.ResponseCardSource.Type)
+				assert.Equal(t, paymentListResponse.Data[0].Source.ResponseCardSource.AccountHolder.AccountNameInquiry,
+					response.Data[0].Source.ResponseCardSource.AccountHolder.AccountNameInquiry)
 				assert.Equal(t, paymentListResponse.Data[0].Reference, response.Data[0].Reference)
 			},
 		},
@@ -273,8 +279,8 @@ func TestRequestPaymentList(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.RequestPaymentList(tc.queryRequest))
 		})
@@ -384,8 +390,8 @@ func TestRequestPayout(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.RequestPayout(tc.request, tc.idempotencyKey))
 		})
@@ -489,8 +495,8 @@ func TestGetPaymentDetails(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetPaymentDetails(tc.paymentId))
 		})
@@ -600,8 +606,8 @@ func TestGetPaymentActions(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetPaymentActions(tc.paymentId))
 		})
@@ -800,8 +806,8 @@ func TestIncrementAuthorization(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.IncrementAuthorization(tc.paymentId, tc.request, tc.idempotencyKey))
 		})
@@ -957,8 +963,8 @@ func TestCapturePayment(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.CapturePayment(tc.paymentId, tc.request, tc.idempotencyKey))
 		})
@@ -1111,8 +1117,8 @@ func TestRefundPayment(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.RefundPayment(tc.paymentId, &tc.request, tc.idempotencyKey))
 		})
@@ -1264,8 +1270,8 @@ func TestVoidPayment(t *testing.T) {
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.VoidPayment(tc.paymentId, &tc.request, tc.idempotencyKey))
 		})

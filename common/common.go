@@ -111,6 +111,24 @@ const (
 	U ThreeDsMethodCompletion = "u"
 )
 
+type AccountNameInquiryType string
+
+const (
+	FullMatchANIT    AccountNameInquiryType = "full_match"
+	PartialMatchANIT AccountNameInquiryType = "partial_match"
+	NoMatchANIT      AccountNameInquiryType = "no_match"
+	NotPerformedANIT AccountNameInquiryType = "not_performed"
+	NotSupportedANIT AccountNameInquiryType = "not_supported"
+)
+
+type NameCheckType string
+
+const (
+	FullMatchNCT    NameCheckType = "full_match"
+	PartialMatchNCT NameCheckType = "partial_match"
+	NoMatchNCT      NameCheckType = "no_match"
+)
+
 type (
 	Address struct {
 		AddressLine1 string  `json:"address_line1,omitempty"`
@@ -200,6 +218,34 @@ type (
 		Phone              *Phone                       `json:"phone,omitempty"`
 		Identification     *AccountHolderIdentification `json:"identification,omitempty"`
 		AccountNameInquiry bool                         `json:"account_name_inquiry,omitempty"`
+	}
+
+	AccountNameInquiryDetails struct {
+		FirstName  NameCheckType `json:"first_name,omitempty"`
+		MiddleName NameCheckType `json:"middle_name,omitempty"`
+		LastName   NameCheckType `json:"last_name,omitempty"`
+	}
+
+	AccountHolderResponse struct {
+		Id                        string                       `json:"id,omitempty"`
+		Type                      AccountHolderType            `json:"type,omitempty"`
+		Title                     string                       `json:"title,omitempty"`
+		FullName                  string                       `json:"full_name,omitempty"`
+		FirstName                 string                       `json:"first_name,omitempty"`
+		MiddleName                string                       `json:"middle_name,omitempty"`
+		LastName                  string                       `json:"last_name,omitempty"`
+		Email                     string                       `json:"email,omitempty"`
+		Gender                    string                       `json:"gender,omitempty"`
+		CompanyName               string                       `json:"company_name,omitempty"`
+		TaxId                     string                       `json:"tax_id,omitempty"`
+		DateOfBirth               string                       `json:"date_of_birth,omitempty"`
+		CountryOfBirth            Country                      `json:"country_of_birth,omitempty"`
+		ResidentialStatus         string                       `json:"residential_status,omitempty"`
+		BillingAddress            *Address                     `json:"billing_address,omitempty"`
+		Phone                     *Phone                       `json:"phone,omitempty"`
+		Identification            *AccountHolderIdentification `json:"identification,omitempty"`
+		AccountNameInquiry        AccountNameInquiryType       `json:"account_name_inquiry,omitempty"`
+		AccountNameInquiryDetails AccountNameInquiryDetails    `json:"account_name_inquiry_details,omitempty"`
 	}
 )
 

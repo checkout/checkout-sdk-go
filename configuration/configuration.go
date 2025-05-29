@@ -17,7 +17,7 @@ type Configuration struct {
 
 func NewConfiguration(
 	credentials SdkCredentials,
-	enableTelemertry *bool,
+	enableTelemetry *bool,
 	environment Environment,
 	client *http.Client,
 	logger StdLogger,
@@ -35,8 +35,8 @@ func NewConfiguration(
 	}
 
 	telemetry := true
-	if enableTelemertry != nil {
-		telemetry = *enableTelemertry
+	if enableTelemetry != nil {
+		telemetry = *enableTelemetry
 	}
 
 	return &Configuration{
@@ -47,7 +47,6 @@ func NewConfiguration(
 		Logger:          logger,
 	}
 }
-
 
 func NewConfigurationWithSubdomain(
 	credentials SdkCredentials,

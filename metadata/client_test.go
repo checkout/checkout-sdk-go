@@ -108,13 +108,13 @@ func TestRequestQuote(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.RequestCardMetadata(tc.request))
 		})

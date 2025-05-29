@@ -96,13 +96,13 @@ func TestCreateSession(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.CreateCreditSession(tc.request))
 		})
@@ -198,13 +198,13 @@ func TestGetCreditSession(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetCreditSession(tc.sessionId))
 		})
@@ -293,13 +293,13 @@ func TestCapturePayment(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.CapturePayment(tc.paymentId, tc.request))
 		})
@@ -385,13 +385,13 @@ func TestVoidPayment(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.VoidPayment(tc.paymentId, tc.request))
 		})

@@ -144,13 +144,13 @@ func TestQuery(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.Query(tc.query))
 		})
@@ -253,13 +253,13 @@ func TestGetDisputeDetails(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetDisputeDetails(tc.disputeId))
 		})
@@ -345,13 +345,13 @@ func TestAccept(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.Accept(tc.disputeId))
 		})
@@ -442,13 +442,13 @@ func TestPutEvidence(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPut(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.PutEvidence(tc.disputeId, tc.request))
 		})
@@ -539,13 +539,13 @@ func TestGetEvidence(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetEvidence(tc.disputeId))
 		})
@@ -631,13 +631,13 @@ func TestSubmitEvidence(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.SubmitEvidence(tc.disputeId))
 		})
@@ -735,13 +735,13 @@ func TestGetCompiledSubmittedEvidence(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetCompiledSubmittedEvidence(tc.disputeId))
 		})
@@ -839,13 +839,13 @@ func TestGetDisputeSchemeFiles(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			client := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
 
 			tc.checker(client.GetDisputeSchemeFiles(tc.disputeId))
 		})

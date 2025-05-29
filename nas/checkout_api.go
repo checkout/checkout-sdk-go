@@ -12,6 +12,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/disputes"
 	"github.com/checkout/checkout-sdk-go/financial"
 	"github.com/checkout/checkout-sdk-go/forex"
+	"github.com/checkout/checkout-sdk-go/forward"
 	instruments "github.com/checkout/checkout-sdk-go/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/issuing"
 	"github.com/checkout/checkout-sdk-go/metadata"
@@ -47,6 +48,7 @@ type Api struct {
 	Issuing         *issuing.Client
 	Contexts        *contexts.Client
 	PaymentSessions *payment_sessions.Client
+	Forward         *forward.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -76,6 +78,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Issuing = issuing.NewClient(configuration, apiClient)
 	api.Contexts = contexts.NewClient(configuration, apiClient)
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
+	api.Forward = forward.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

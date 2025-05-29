@@ -103,15 +103,15 @@ type (
 	}
 
 	PaymentContextsProcessing struct {
-		Plan                    *apm.BillingPlan                        `json:"plan,omitempty"`
-		ShippingAmount          int                                     `json:"shipping_amount,omitempty"`
-		InvoiceId               string                                  `json:"invoice_id,omitempty"`
-		BrandName               string                                  `json:"brand_name,omitempty"`
-		Locale                  string                                  `json:"locale,omitempty"`
-		ShippingPreference      payments.ShippingPreference             `json:"shipping_preference,omitempty"`
-		UserAction              payments.UserAction                     `json:"user_action,omitempty"`
-		PartnerCustomerRiskData *PaymentContextsPartnerCustomerRiskData `json:"partner_customer_risk_data,omitempty"`
-		AirlineData             []PaymentContextsAirlineData            `json:"airline_data,omitempty"`
+		Plan                    *apm.BillingPlan                         `json:"plan,omitempty"`
+		ShippingAmount          int                                      `json:"shipping_amount,omitempty"`
+		InvoiceId               string                                   `json:"invoice_id,omitempty"`
+		BrandName               string                                   `json:"brand_name,omitempty"`
+		Locale                  string                                   `json:"locale,omitempty"`
+		ShippingPreference      payments.ShippingPreference              `json:"shipping_preference,omitempty"`
+		UserAction              payments.UserAction                      `json:"user_action,omitempty"`
+		PartnerCustomerRiskData []PaymentContextsPartnerCustomerRiskData `json:"partner_customer_risk_data,omitempty"`
+		AirlineData             []PaymentContextsAirlineData             `json:"airline_data,omitempty"`
 	}
 
 	PaymentContextsItems struct {

@@ -121,13 +121,13 @@ func TestRetrieveAllEventTypes(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			eventsClient := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			eventsClient := NewClient(config, apiClient)
 
 			tc.checker(eventsClient.RetrieveAllEventTypesQuery(tc.query))
 		})
@@ -264,13 +264,13 @@ func TestRetrieveEvents(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			eventsClient := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			eventsClient := NewClient(config, apiClient)
 
 			tc.checker(eventsClient.RetrieveEventsQuery(tc.query))
 		})
@@ -369,13 +369,13 @@ func TestRetrieveEvent(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			eventsClient := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			eventsClient := NewClient(config, apiClient)
 
 			tc.checker(eventsClient.RetrieveEvent(tc.eventId))
 		})
@@ -475,13 +475,13 @@ func TestRetrieveEventNotification(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			eventsClient := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			eventsClient := NewClient(config, apiClient)
 
 			tc.checker(eventsClient.RetrieveEventNotification(tc.eventId, tc.notificationId))
 		})
@@ -597,13 +597,13 @@ func TestRetryWebhook(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			eventsClient := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			eventsClient := NewClient(config, apiClient)
 
 			tc.checker(eventsClient.RetryWebhook(tc.eventId, tc.webhookId))
 		})
@@ -694,13 +694,13 @@ func TestRetryAllWebhooks(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemertry := true
+			enableTelemetry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
-			eventsClient := NewClient(configuration, apiClient)
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			eventsClient := NewClient(config, apiClient)
 
 			tc.checker(eventsClient.RetryAllWebhooks(tc.eventId))
 		})

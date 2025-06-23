@@ -22,6 +22,18 @@ type (
 	}
 )
 
+type SignatureType string
+
+const (
+	DlocalST SignatureType = "dlocal"
+)
+
+type (
+	AbstractSignature interface {
+		GetType() SignatureType
+	}
+)
+
 type MethodType string
 
 const (
@@ -55,6 +67,21 @@ type (
 		Token string `json:"token"`
 	}
 
+	DlocalParameters struct {
+		// The secret key used to generate the request signature. This is part of the dLocal API credentials.
+		SecretKey string `json:"secret_key"`
+	}
+
+	dlocalSignature struct {
+		// The identifier of the supported signature generation method or a specific third-party service. (Required)
+		Type SignatureType `json:"type"`
+		// The parameters required to generate an HMAC signature for the dLocal API. See their documentation for details.
+		// This method requires you to provide the X-Login header value in the destination request headers.
+		// When used, the Forward API appends the X-Date and Authorization headers to the outgoing HTTP request before
+		// forwarding.
+		DlocalParameters DlocalParameters `json:"dlocal_parameters"`
+	}
+
 	NetworkToken struct {
 		// Specifies whether to use a network token (Optional)
 		Enabled bool `json:"enabled,omitempty"`
@@ -72,14 +99,19 @@ type (
 	}
 
 	DestinationRequest struct {
-		// Url is the URL of the forward request. (Required: true)
+		// The URL to forward the request to (Required, max 1024 characters)
 		Url string `json:"url"`
-		// Method is the HTTP method of the forward request. (Required: true)
+		// The HTTP method to use for the forward request (Required)
 		Method MethodType `json:"method"`
-		// Headers are the HTTP headers of the forward request. (Required: true)
+		// The HTTP headers to include in the forward request (Required)
 		Headers *Headers `json:"headers"`
-		// Body is the HTTP message body of the forward request. (Required: true)
+		// The HTTP message body to include in the forward request. If you provide source.id or source.token, you can
+		// specify placeholder values in the body. The request will be enriched with the respective payment details
+		// from the token or payment instrument you specified. For example, {{card_number}}
+		// (Required, max 16384 characters)
 		Body string `json:"body"`
+		// Optional configuration to add a signature to the forwarded HTTP request. (Optional)
+		Signature AbstractSignature `json:"signature,omitempty"`
 	}
 
 	ForwardRequest struct {
@@ -159,10 +191,18 @@ func NewTokenSource() *tokenSource {
 	return &tokenSource{Type: TokenST}
 }
 
+func NewDlocalSignature() *dlocalSignature {
+	return &dlocalSignature{Type: DlocalST}
+}
+
 func (s *idSource) GetType() SourceType {
 	return s.Type
 }
 
 func (s *tokenSource) GetType() SourceType {
+	return s.Type
+}
+
+func (s *dlocalSignature) GetType() SignatureType {
 	return s.Type
 }

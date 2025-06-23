@@ -11,6 +11,11 @@ func getForwardRequestIdSource() forward.ForwardRequest {
 	IdSource := forward.NewIdSource()
 	IdSource.Id = "src_v5rgkf3gdtpuzjqesyxmyodnya"
 
+	DlocalSignature := forward.NewDlocalSignature()
+	DlocalSignature.DlocalParameters = forward.DlocalParameters{
+		SecretKey: "9f439fe1a9f96e67b047d3c1a28c33a2e",
+	}
+
 	request := forward.ForwardRequest{
 		Source: IdSource,
 		DestinationRequest: &forward.DestinationRequest{
@@ -23,7 +28,8 @@ func getForwardRequestIdSource() forward.ForwardRequest {
 					"Content-Type":    "application/json",
 				},
 			},
-			Body: `{\"amount\": 1000, \"currency\": \"USD\", \"reference\": \"some_reference\", \"source\": {\"type\": \"card\", \"number\": \"{{card_number}}\", \"expiry_month\": \"{{card_expiry_month}}\", \"expiry_year\": \"{{card_expiry_year_yyyy}}\", \"name\": \"Ali Farid\"}, \"payment_type\": \"Regular\", \"authorization_type\": \"Final\", \"capture\": true, \"processing_channel_id\": \"pc_xxxxxxxxxxx\", \"risk\": {\"enabled\": false}, \"merchant_initiated\": true}`,
+			Body:      `{\"amount\": 1000, \"currency\": \"USD\", \"reference\": \"some_reference\", \"source\": {\"type\": \"card\", \"number\": \"{{card_number}}\", \"expiry_month\": \"{{card_expiry_month}}\", \"expiry_year\": \"{{card_expiry_year_yyyy}}\", \"name\": \"Ali Farid\"}, \"payment_type\": \"Regular\", \"authorization_type\": \"Final\", \"capture\": true, \"processing_channel_id\": \"pc_xxxxxxxxxxx\", \"risk\": {\"enabled\": false}, \"merchant_initiated\": true}`,
+			Signature: DlocalSignature,
 		},
 		Reference:           "ORD-5023-4E89",
 		ProcessingChannelId: "pc_azsiyswl7bwe2ynjzujy7lcjca",

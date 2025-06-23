@@ -49,4 +49,5 @@ const (
 	IssuingControlsRead         = "issuing:controls-read"
 	IssuingControlsWrite        = "issuing:controls-write"
 	PaymentContexts             = "Payment Contexts"
+	Forward                     = "forward"
 )

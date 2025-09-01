@@ -18,13 +18,13 @@ import (
 func TestCreateHostedPaymentsPageSession(t *testing.T) {
 	cases := []struct {
 		name    string
-		request hosted.HostedPaymentRequest
-		checker func(*hosted.HostedPaymentResponse, error)
+		request hosted.PaymentHostedRequest
+		checker func(*hosted.PaymentHostedResponse, error)
 	}{
 		{
 			name:    "when request is valid then create hosted payment session",
 			request: *getHostedPaymentRequest(),
-			checker: func(response *hosted.HostedPaymentResponse, err error) {
+			checker: func(response *hosted.PaymentHostedResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
@@ -38,8 +38,8 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 		{
 
 			name:    "when request is invalid then return error",
-			request: hosted.HostedPaymentRequest{},
-			checker: func(response *hosted.HostedPaymentResponse, err error) {
+			request: hosted.PaymentHostedRequest{},
+			checker: func(response *hosted.PaymentHostedResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				errChk := err.(errors.CheckoutAPIError)
@@ -66,12 +66,12 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 	cases := []struct {
 		name            string
 		hostedPaymentId string
-		checker         func(*hosted.HostedPaymentDetails, error)
+		checker         func(*hosted.PaymentHostedDetails, error)
 	}{
 		{
 			name:            "when fetching existing hosted payment session then return session details",
 			hostedPaymentId: hostedPaymentSession.Id,
-			checker: func(response *hosted.HostedPaymentDetails, err error) {
+			checker: func(response *hosted.PaymentHostedDetails, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
@@ -89,7 +89,7 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 		{
 			name:            "when hostedPaymentId is inexistent then return error",
 			hostedPaymentId: "not_found",
-			checker: func(response *hosted.HostedPaymentDetails, err error) {
+			checker: func(response *hosted.PaymentHostedDetails, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				errChk := err.(errors.CheckoutAPIError)
@@ -107,10 +107,10 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 	}
 }
 
-func getHostedPaymentRequest() *hosted.HostedPaymentRequest {
+func getHostedPaymentRequest() *hosted.PaymentHostedRequest {
 	now = time.Now()
 
-	return &hosted.HostedPaymentRequest{
+	return &hosted.PaymentHostedRequest{
 		Amount:    1000,
 		Currency:  common.GBP,
 		PaymentIp: "0.0.0.0",

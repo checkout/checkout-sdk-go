@@ -20,7 +20,7 @@ const (
 )
 
 type (
-	HostedPaymentRequest struct {
+	PaymentHostedRequest struct {
 		Currency                   common.Currency                          `json:"currency,omitempty"`
 		Billing                    *payments.BillingInformation             `json:"billing,omitempty"`
 		SuccessUrl                 string                                   `json:"success_url,omitempty"`
@@ -56,15 +56,15 @@ type (
 )
 
 type (
-	HostedPaymentResponse struct {
+	PaymentHostedResponse struct {
 		HttpMetadata common.HttpMetadata
 		Id           string                 `json:"id,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
 		Reference    string                 `json:"reference,omitempty"`
 		Warnings     []interface{}          `json:"warnings,omitempty"`
-		Links        map[string]common.Link `json:"_links"`
 	}
 
-	HostedPaymentDetails struct {
+	PaymentHostedDetails struct {
 		HttpMetadata      common.HttpMetadata
 		Id                string                       `json:"id,omitempty"`
 		Status            PaymentStatus                `json:"status,omitempty"`
@@ -74,6 +74,7 @@ type (
 		SuccessUrl        string                       `json:"success_url,omitempty"`
 		CancelUrl         string                       `json:"cancel_url,omitempty"`
 		FailureUrl        string                       `json:"failure_url,omitempty"`
+		Links             map[string]common.Link       `json:"_links"`
 		PaymentId         string                       `json:"payment_id,omitempty"`
 		Reference         string                       `json:"reference,omitempty"`
 		Description       string                       `json:"description,omitempty"`
@@ -81,6 +82,5 @@ type (
 		Products          []payments.Product           `json:"products,omitempty"`
 		Metadata          map[string]interface{}       `json:"metadata,omitempty"`
 		AmountAllocations []common.AmountAllocations   `json:"amount_allocations,omitempty"`
-		Links             map[string]common.Link       `json:"_links"`
 	}
 )

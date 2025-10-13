@@ -313,18 +313,19 @@ const (
 type ItemType string
 
 const (
-	PhysicalIT ItemType = "physical"
 	DigitalIT  ItemType = "digital"
 	DiscountIT ItemType = "discount"
+	PhysicalIT ItemType = "physical"
 )
 
 type ItemSubType string
 
 const (
-	BlockchainIST ItemSubType = "blockchain"
-	CbdcIST       ItemSubType = "cbdc"
-	DiscountIST   ItemSubType = "discount"
-	PhysicalIST   ItemSubType = "physical"
+	BlockchainIST     ItemSubType = "blockchain"
+	CbdcIST           ItemSubType = "cbdc"
+	CryptocurrencyIST ItemSubType = "cryptocurrency"
+	NftIST            ItemSubType = "nft"
+	StablecoinIST     ItemSubType = "stablecoin"
 )
 
 type (

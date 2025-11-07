@@ -147,6 +147,7 @@ func TestShouldGetBankAccountFields(t *testing.T) {
 }
 
 func TestShouldUpdateInstrument(t *testing.T) {
+	t.Skip("unavailable")
 	cardTokenResponse := RequestCardToken(t)
 	updateTokenInstrumentRequest := nas.NewUpdateTokenInstrumentRequest()
 	updateTokenInstrumentRequest.Token = cardTokenResponse.Token

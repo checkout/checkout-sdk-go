@@ -278,13 +278,25 @@ type (
 )
 
 type (
+	CustomerSummary struct {
+		RegistrationDate     string  `json:"registration_date,omitempty"`
+		FirstTransactionDate string  `json:"first_transaction_date,omitempty"`
+		LastPaymentDate      string  `json:"last_payment_date,omitempty"`
+		TotalOrderCount      int     `json:"total_order_count,omitempty"`
+		LastPaymentAmount    float64 `json:"last_payment_amount,omitempty"`
+		IsPremiumCustomer    bool    `json:"is_premium_customer,omitempty"`
+		IsReturningCustomer  bool    `json:"is_returning_customer,omitempty"`
+		LifetimeValue        float64 `json:"lifetime_value,omitempty"`
+	}
+
 	CustomerRequest struct {
-		Id        string `json:"id,omitempty"`
-		Email     string `json:"email,omitempty"`
-		Name      string `json:"name,omitempty"`
-		TaxNumber string `json:"tax_number,omitempty"`
-		Phone     *Phone `json:"phone,omitempty"`
-		Default   bool   `json:"default,omitempty"`
+		Id        string           `json:"id,omitempty"`
+		Email     string           `json:"email,omitempty"`
+		Name      string           `json:"name,omitempty"`
+		TaxNumber string           `json:"tax_number,omitempty"`
+		Phone     *Phone           `json:"phone,omitempty"`
+		Summary   *CustomerSummary `json:"summary,omitempty"`
+		Default   bool             `json:"default,omitempty"`
 	}
 
 	CustomerResponse struct {

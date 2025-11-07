@@ -190,7 +190,7 @@ type PaymentPurposeType string
 const (
 	DonationsPPT         PaymentPurposeType = "donations"
 	EducationPPT         PaymentPurposeType = "education"
-	EmergencyNeedsPPT    PaymentPurposeType = "emergency_needs"
+	EmergencyNeedPPT     PaymentPurposeType = "emergency_need"
 	ExpatriationPPT      PaymentPurposeType = "expatriation"
 	FamilySupportPPT     PaymentPurposeType = "family_support"
 	FinancialServicesPPT PaymentPurposeType = "financial_services"
@@ -213,8 +213,8 @@ type LocalType string
 
 const (
 	ArLT    LocalType = "ar"
-	DaDkLT  LocalType = "da-dk"
-	DeDELT  LocalType = "de-de"
+	DaDKLT  LocalType = "da-DK"
+	DeDELT  LocalType = "de-DE"
 	ElELLT  LocalType = "el"
 	EnGBLT  LocalType = "en-GB"
 	EsESLT  LocalType = "es-ES"
@@ -225,6 +225,7 @@ const (
 	IdIDLT  LocalType = "id-ID"
 	ItITLT  LocalType = "it-IT"
 	JaJpLT  LocalType = "ja-JP"
+	KoKRLT  LocalType = "ko-KR"
 	MsMYLT  LocalType = "ms-MY"
 	NbNOLT  LocalType = "nb-NO"
 	NlNLLT  LocalType = "nl-NL"
@@ -439,8 +440,8 @@ type (
 		Enabled            bool                      `json:"enabled"`
 		AttemptN3D         bool                      `json:"attempt_n3d"`
 		ChallengeIndicator common.ChallengeIndicator `json:"challenge_indicator,omitempty" default:"NoPreference"`
-		AllowUpgrade       bool                      `json:"allow_upgrade,omitempty"`
 		Exemption          Exemption                 `json:"exemption,omitempty"`
+		AllowUpgrade       bool                      `json:"allow_upgrade,omitempty"`
 	}
 
 	ThreeDsRequest struct {
@@ -741,14 +742,20 @@ type (
 		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
 	}
 
+	StoredCard struct {
+		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
+		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+	}
+
 	PaymentMethodConfiguration struct {
-		Applepay  *Applepay  `json:"applepay,omitempty"`
-		Card      *Card      `json:"card,omitempty"`
-		Googlepay *Googlepay `json:"googlepay,omitempty"`
+		Applepay   *Applepay   `json:"applepay,omitempty"`
+		Card       *Card       `json:"card,omitempty"`
+		Googlepay  *Googlepay  `json:"googlepay,omitempty"`
+		StoredCard *StoredCard `json:"stored_card,omitempty"`
 	}
 
 	PaymentInstruction struct {
-		Purpose PaymentPurposeType `json:"type,omitempty"`
+		Purpose PaymentPurposeType `json:"purpose,omitempty"`
 	}
 
 	PaymentPlan struct {

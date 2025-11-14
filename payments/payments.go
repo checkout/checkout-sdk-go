@@ -15,6 +15,7 @@ const (
 	Recurring   PaymentType = "Recurring"
 	MOTO        PaymentType = "MOTO"
 	Installment PaymentType = "Installment"
+	PayLaterPT  PaymentType = "PayLater"
 	Unscheduled PaymentType = "Unscheduled"
 )
 
@@ -743,8 +744,9 @@ type (
 	}
 
 	StoredCard struct {
-		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
-		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+		CustomerId          string   `json:"customer_id,omitempty"`
+		InstrumentIds       []string `json:"instrument_ids,omitempty"`
+		DefaultInstrumentId string   `json:"default_instrument_id,omitempty"`
 	}
 
 	PaymentMethodConfiguration struct {

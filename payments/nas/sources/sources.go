@@ -38,7 +38,7 @@ type (
 		BillingAddress    *common.Address       `json:"billing_address,omitempty"`
 		Phone             *common.Phone         `json:"phone,omitempty"`
 		Stored            *bool                 `json:"stored,omitempty"`
-		StoreForFutureUse bool                  `json:"store_for_future_use,omitempty"`
+		StoreForFutureUse *bool                  `json:"store_for_future_use,omitempty"`
 		AccountHolder     *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 
@@ -58,7 +58,7 @@ type (
 		Cryptogram        string                    `json:"cryptogram,omitempty"`
 		Eci               string                    `json:"eci,omitempty"`
 		Stored            bool                      `json:"stored"`
-		StoreForFutureUse bool                      `json:"store_for_future_use,omitempty"`
+		StoreForFutureUse *bool                     `json:"store_for_future_use,omitempty"`
 		Name              string                    `json:"name,omitempty"`
 		Cvv               string                    `json:"cvv,omitempty"`
 		BillingAddress    *common.Address           `json:"billing_address,omitempty"`

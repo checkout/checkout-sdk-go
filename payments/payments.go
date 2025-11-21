@@ -310,6 +310,24 @@ const (
 	TwoDayOrMore       DeliveryTimeframe = "two_day_or_more"
 )
 
+type ItemType string
+
+const (
+	DigitalIT  ItemType = "digital"
+	DiscountIT ItemType = "discount"
+	PhysicalIT ItemType = "physical"
+)
+
+type ItemSubType string
+
+const (
+	BlockchainIST     ItemSubType = "blockchain"
+	CbdcIST           ItemSubType = "cbdc"
+	CryptocurrencyIST ItemSubType = "cryptocurrency"
+	NftIST            ItemSubType = "nft"
+	StablecoinIST     ItemSubType = "stablecoin"
+)
+
 type (
 	AirlineData struct {
 		Ticket           *Ticket            `json:"ticket,omitempty"`
@@ -620,6 +638,9 @@ type (
 		ContinuationPayload              string           `json:"continuation_payload,omitempty"`
 		Pun                              string           `json:"pun,omitempty"`
 		MerchantCategoryCode             string           `json:"merchant_category_code,omitempty"`
+		CardType                         common.CardType  `json:"card_type,omitempty"`
+		AffiliateId                      string           `json:"affiliate_id,omitempty"`
+		AffiliateUrl                     string           `json:"affiliate_url,omitempty"`
 	}
 
 	PaymentRetryResponse struct {
@@ -681,23 +702,24 @@ type (
 	}
 
 	Product struct {
-		Type           string     `json:"type,omitempty"`
-		Name           string     `json:"name,omitempty"`
-		Quantity       int        `json:"quantity,omitempty"`
-		UnitPrice      int        `json:"unit_price"`
-		Price          int        `json:"price"`
-		Reference      string     `json:"reference,omitempty"`
-		CommodityCode  string     `json:"commodity_code,omitempty"`
-		UnitOfMeasure  string     `json:"unit_of_measure,omitempty"`
-		TotalAmount    int64      `json:"total_amount,omitempty"`
-		TaxRate        int64      `json:"tax_rate,omitempty"`
-		TaxAmount      int64      `json:"tax_amount,omitempty"`
-		DiscountAmount int64      `json:"discount_amount,omitempty"`
-		WxpayGoodsId   string     `json:"wxpay_goods_id,omitempty"`
-		Url            string     `json:"url,omitempty"`
-		ImageUrl       string     `json:"image_url,omitempty"`
-		ServiceEndsOn  *time.Time `json:"service_ends_on,omitempty"`
-		Sku            string     `json:"sku,omitempty"`
+		Type           ItemType    `json:"type,omitempty"`
+		SubType        ItemSubType `json:"sub_type,omitempty"`
+		Name           string      `json:"name,omitempty"`
+		Quantity       int         `json:"quantity,omitempty"`
+		UnitPrice      int         `json:"unit_price"`
+		Price          int         `json:"price"`
+		Reference      string      `json:"reference,omitempty"`
+		CommodityCode  string      `json:"commodity_code,omitempty"`
+		UnitOfMeasure  string      `json:"unit_of_measure,omitempty"`
+		TotalAmount    int64       `json:"total_amount,omitempty"`
+		TaxRate        int64       `json:"tax_rate,omitempty"`
+		TaxAmount      int64       `json:"tax_amount,omitempty"`
+		DiscountAmount int64       `json:"discount_amount,omitempty"`
+		WxpayGoodsId   string      `json:"wxpay_goods_id,omitempty"`
+		Url            string      `json:"url,omitempty"`
+		ImageUrl       string      `json:"image_url,omitempty"`
+		ServiceEndsOn  *time.Time  `json:"service_ends_on,omitempty"`
+		Sku            string      `json:"sku,omitempty"`
 	}
 
 	BillingInformation struct {

@@ -29,6 +29,7 @@ type PaymentSetupRequest struct {
 
 // Payment Setup Response
 type PaymentSetupResponse struct {
+	HttpMetadata        common.HttpMetadata
 	Id                  string                `json:"id,omitempty"`
 	ProcessingChannelId string                `json:"processing_channel_id,omitempty"`
 	Amount              int64                 `json:"amount,omitempty"`
@@ -45,6 +46,7 @@ type PaymentSetupResponse struct {
 
 // Payment Setup Confirm Response - Using common payment structs for consistency
 type PaymentSetupConfirmResponse struct {
+	HttpMetadata    common.HttpMetadata
 	Id              string                      `json:"id,omitempty"`
 	ActionId        string                      `json:"action_id,omitempty"`
 	Amount          int64                       `json:"amount,omitempty"`

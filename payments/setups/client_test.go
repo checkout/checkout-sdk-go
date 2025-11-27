@@ -11,6 +11,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/configuration"
 	"github.com/checkout/checkout-sdk-go/errors"
 	"github.com/checkout/checkout-sdk-go/mocks"
+	"github.com/checkout/checkout-sdk-go/payments"
 )
 
 func TestCreatePaymentSetup(t *testing.T) {
@@ -264,7 +265,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 		paymentMethodOptionId = "pmo_123456789"
 		confirmResponse       = PaymentSetupConfirmResponse{
 			Id:     setupId,
-			Status: PaymentSetupStatusConfirmed,
+			Status: payments.Authorized,
 		}
 	)
 

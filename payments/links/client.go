@@ -1,6 +1,7 @@
 package links
 
 import (
+	"context"
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,13 +20,17 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) CreatePaymentLink(request PaymentLinkRequest) (*PaymentLinkResponse, error) {
+	return c.CreatePaymentLinkWithContext(context.Background(), request)
+}
+
+func (c *Client) CreatePaymentLinkWithContext(ctx context.Context, request PaymentLinkRequest) (*PaymentLinkResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentLinkResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentLinksPath), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentLinksPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +39,17 @@ func (c *Client) CreatePaymentLink(request PaymentLinkRequest) (*PaymentLinkResp
 }
 
 func (c *Client) GetPaymentLink(paymentLinkId string) (*PaymentLinkDetails, error) {
+	return c.GetPaymentLinkWithContext(context.Background(), paymentLinkId)
+}
+
+func (c *Client) GetPaymentLinkWithContext(ctx context.Context, paymentLinkId string) (*PaymentLinkDetails, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentLinkDetails
-	err = c.apiClient.Get(common.BuildPath(PaymentLinksPath, paymentLinkId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(PaymentLinksPath, paymentLinkId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

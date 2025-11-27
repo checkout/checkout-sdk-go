@@ -13,6 +13,7 @@ import (
 	payments "github.com/checkout/checkout-sdk-go/payments/abc"
 	"github.com/checkout/checkout-sdk-go/payments/hosted"
 	"github.com/checkout/checkout-sdk-go/payments/links"
+	"github.com/checkout/checkout-sdk-go/payments/setups"
 	"github.com/checkout/checkout-sdk-go/reconciliation"
 	"github.com/checkout/checkout-sdk-go/sources"
 	"github.com/checkout/checkout-sdk-go/tokens"
@@ -27,6 +28,7 @@ type Api struct {
 	Instruments    *abc.Client
 	Links          *links.Client
 	Payments       *payments.Client
+	PaymentSetups  *setups.Client
 	Reconciliation *reconciliation.Client
 	Sources        *sources.Client
 	Tokens         *tokens.Client
@@ -48,6 +50,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Instruments = abc.NewClient(configuration, apiClient)
 	api.Links = links.NewClient(configuration, apiClient)
 	api.Payments = payments.NewClient(configuration, apiClient)
+	api.PaymentSetups = setups.NewClient(configuration, apiClient)
 	api.Reconciliation = reconciliation.NewClient(configuration, apiClient)
 	api.Sources = sources.NewClient(configuration, apiClient)
 	api.Tokens = tokens.NewClient(configuration, apiClient)

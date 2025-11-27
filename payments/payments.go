@@ -182,8 +182,9 @@ const (
 type StorePaymentDetailsType string
 
 const (
-	Disabled StorePaymentDetailsType = "disabled"
-	Enabled  StorePaymentDetailsType = "enabled"
+	Disabled       StorePaymentDetailsType = "disabled"
+	Enabled        StorePaymentDetailsType = "enabled"
+	CollectConsent StorePaymentDetailsType = "collect_consent"
 )
 
 type PaymentPurposeType string
@@ -310,22 +311,14 @@ const (
 	TwoDayOrMore       DeliveryTimeframe = "two_day_or_more"
 )
 
-type ItemType string
-
-const (
-	DigitalIT  ItemType = "digital"
-	DiscountIT ItemType = "discount"
-	PhysicalIT ItemType = "physical"
-)
-
 type ItemSubType string
 
 const (
-	BlockchainIST     ItemSubType = "blockchain"
-	CbdcIST           ItemSubType = "cbdc"
-	CryptocurrencyIST ItemSubType = "cryptocurrency"
-	NftIST            ItemSubType = "nft"
-	StablecoinIST     ItemSubType = "stablecoin"
+	Blockchain     ItemSubType = "blockchain"
+	CBDC           ItemSubType = "cbdc"
+	Cryptocurrency ItemSubType = "cryptocurrency"
+	NFT            ItemSubType = "nft"
+	Stablecoin     ItemSubType = "stablecoin"
 )
 
 type (
@@ -602,6 +595,8 @@ type (
 		Purpose                 string                    `json:"purpose,omitempty"`
 		Dlocal                  *DLocalProcessingSettings `json:"dlocal,omitempty"`
 		PartnerCustomerRiskData *PartnerCustomerRiskData  `json:"partner_customer_risk_data,omitempty"`
+		AffiliateId             string                    `json:"affiliate_id,omitempty"`
+		AffiliateUrl            string                    `json:"affiliate_url,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {
@@ -638,9 +633,6 @@ type (
 		ContinuationPayload              string           `json:"continuation_payload,omitempty"`
 		Pun                              string           `json:"pun,omitempty"`
 		MerchantCategoryCode             string           `json:"merchant_category_code,omitempty"`
-		CardType                         common.CardType  `json:"card_type,omitempty"`
-		AffiliateId                      string           `json:"affiliate_id,omitempty"`
-		AffiliateUrl                     string           `json:"affiliate_url,omitempty"`
 	}
 
 	PaymentRetryResponse struct {
@@ -702,7 +694,7 @@ type (
 	}
 
 	Product struct {
-		Type           ItemType    `json:"type,omitempty"`
+		Type           string      `json:"type,omitempty"`
 		SubType        ItemSubType `json:"sub_type,omitempty"`
 		Name           string      `json:"name,omitempty"`
 		Quantity       int         `json:"quantity,omitempty"`

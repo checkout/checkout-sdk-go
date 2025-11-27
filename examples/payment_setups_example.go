@@ -46,11 +46,22 @@ func main() {
 		},
 		PaymentMethods: &setups.PaymentMethods{
 			Klarna: &setups.KlarnaPaymentMethod{
-				Initialization: "disabled",
-				PaymentMethodOptions: &setups.KlarnaPaymentMethodOptions{
-					Sdk: &setups.KlarnaSDKOption{
-						Id: "opt_123456789",
-						Action: &setups.KlarnaSDKAction{
+				PaymentMethodBase: setups.PaymentMethodBase{
+					Status:         "available",
+					Flags:          []string{"supported"},
+					Initialization: setups.PaymentMethodInitializationDisabled,
+				},
+				AccountHolder: &setups.KlarnaAccountHolder{
+					BillingAddress: &common.Address{
+						Country: common.GB,
+					},
+				},
+				PaymentMethodOptions: &setups.PaymentMethodOptions{
+					Sdk: &setups.PaymentMethodOption{
+						Id:     "opt_123456789",
+						Status: "pending",
+						Flags:  []string{"supported"},
+						Action: &setups.PaymentMethodAction{
 							Type:        "sdk",
 							ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewog",
 							SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
@@ -71,8 +82,8 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Payment Setup created: ID=%s, Status=%s\n",
-		createResponse.Id, createResponse.Status)
+	fmt.Printf("Payment Setup created: ID=%s, Amount=%d, Currency=%s\n",
+		createResponse.Id, createResponse.Amount, createResponse.Currency)
 
 	// Example 2: Get Payment Setup Details
 	fmt.Println("\n=== Getting Payment Setup Details ===")

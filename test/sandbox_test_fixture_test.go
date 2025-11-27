@@ -184,6 +184,8 @@ func getOAuthScopes() []string {
 		configuration.VaultCardMetadata, configuration.FinancialActions}
 }
 
+func Bool(v bool) *bool { return &v }
+
 func retriable(
 	callback func() (interface{}, error),
 	predicate func(interface{}) bool,

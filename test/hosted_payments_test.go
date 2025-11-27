@@ -173,7 +173,7 @@ func getHostedPaymentRequest() *hosted.PaymentHostedRequest {
 					Passenger: &payments.Passenger{
 						FirstName:   "John",
 						LastName:    "Doe",
-						DateOfBirth: "0001-01-01",
+						DateOfBirth: func() *time.Time { t, _ := time.Parse("2006-01-02", "1990-01-01"); return &t }(),
 						Address: &common.Address{
 							Country: common.FR,
 						},

@@ -46,22 +46,30 @@ createRequest := setups.PaymentSetupRequest{
     Reference:   "ORDER-123",
     Description: "Test payment setup",
     Customer: &setups.PaymentSetupCustomer{
-        Email: "customer@example.com",
-        Name:  "John Doe",
+        Email: &setups.PaymentSetupCustomerEmail{
+            Address:  "customer@example.com",
+            Verified: true,
+        },
+        Name: "John Doe",
     },
-    ReturnUrl: "https://example.com/return",
     PaymentMethods: &setups.PaymentMethods{
         Klarna: &setups.KlarnaPaymentMethod{
-            Options: &setups.PaymentMethodOptions{
-                Initialization: &setups.PaymentMethodInitialization{
-                    PaymentMethodActions: []setups.PaymentMethodAction{
-                        {
-                            Type: "initialize",
-                        },
+            Initialization: "disabled",
+            PaymentMethodOptions: &setups.KlarnaPaymentMethodOptions{
+                Sdk: &setups.KlarnaSDKOption{
+                    Id: "opt_123456789",
+                    Action: &setups.KlarnaSDKAction{
+                        Type:        "sdk",
+                        ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewog",
+                        SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
                     },
                 },
             },
         },
+    },
+    Settings: &setups.PaymentSetupSettings{
+        SuccessUrl: "https://example.com/success",
+        FailureUrl: "https://example.com/failure",
     },
 }
 
@@ -145,17 +153,58 @@ The module supports industry-specific data such as airline data for travel indus
 ```go
 request := setups.PaymentSetupRequest{
     Industry: &setups.PaymentSetupIndustry{
-        Type: "airline",
         AirlineData: &setups.AirlineData{
             Ticket: &setups.AirlineTicket{
-                Number:            "1234567890123",
-                IssueDate:         "2024-01-15",
-                IssuingCarrierCode: "CK",
+                Number:                 "1234567890123",
+                IssueDate:              "2024-01-15",
+                IssuingCarrierCode:     "CK",
+                TravelPackageIndicator: "A",
+                TravelAgencyName:       "Checkout Travel Agents",
+                TravelAgencyCode:       "91114362",
             },
-            Passenger: &setups.AirlinePassenger{
-                Name: &setups.AirlinePassengerName{
-                    First: "John",
-                    Last:  "Doe",
+            Passengers: []setups.AirlinePassenger{
+                {
+                    FirstName:   "John",
+                    LastName:    "Doe",
+                    DateOfBirth: "1990-10-31",
+                    Address: &common.Address{
+                        Country: common.GB,
+                    },
+                },
+            },
+            FlightLegDetails: []setups.FlightLegDetail{
+                {
+                    FlightNumber:      "BA1483",
+                    CarrierCode:       "BA",
+                    ClassOfTravelling: "W",
+                    DepartureAirport:  "LHW",
+                    DepartureDate:     "2025-10-13",
+                    DepartureTime:     "18:30",
+                    ArrivalAirport:    "JFK",
+                    StopOverCode:      "X",
+                    FareBasisCode:     "WUP14B",
+                },
+            },
+        },
+        AccommodationData: []setups.AccommodationData{
+            {
+                Name:             "Checkout Lodge",
+                BookingReference: "REF9083748",
+                CheckInDate:      "2025-04-11",
+                CheckOutDate:     "2025-04-18",
+                NumberOfRooms:    2,
+                Guests: []setups.AccommodationGuest{
+                    {
+                        FirstName:   "Jia",
+                        LastName:    "Tsang",
+                        DateOfBirth: "1970-03-19",
+                    },
+                },
+                Room: []setups.AccommodationRoom{
+                    {
+                        Rate:           42.3,
+                        NumberOfNights: 5,
+                    },
                 },
             },
         },

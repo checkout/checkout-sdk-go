@@ -38,28 +38,30 @@ func main() {
 		Reference:   "ORDER-123",
 		Description: "Test payment setup",
 		Customer: &setups.PaymentSetupCustomer{
-			Email: "customer@example.com",
-			Name:  "John Doe",
+			Email: &setups.PaymentSetupCustomerEmail{
+				Address:  "customer@example.com",
+				Verified: true,
+			},
+			Name: "John Doe",
 		},
-		ReturnUrl: "https://example.com/return",
 		PaymentMethods: &setups.PaymentMethods{
 			Klarna: &setups.KlarnaPaymentMethod{
-				Options: &setups.PaymentMethodOptions{
-					Initialization: &setups.PaymentMethodInitialization{
-						PaymentMethodActions: []setups.PaymentMethodAction{
-							{
-								Type: "initialize",
-								Options: &setups.PaymentMethodOption{
-									RequiredDocuments: []string{"passport", "driving_license"},
-								},
-							},
+				Initialization: "disabled",
+				PaymentMethodOptions: &setups.KlarnaPaymentMethodOptions{
+					Sdk: &setups.KlarnaSDKOption{
+						Id: "opt_123456789",
+						Action: &setups.KlarnaSDKAction{
+							Type:        "sdk",
+							ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewog",
+							SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
 						},
 					},
 				},
 			},
 		},
 		Settings: &setups.PaymentSetupSettings{
-			PaymentCollectionMethod: "automatic",
+			SuccessUrl: "https://example.com/success",
+			FailureUrl: "https://example.com/failure",
 		},
 	}
 

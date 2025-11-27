@@ -98,7 +98,8 @@ confirmRequest := setups.PaymentSetupConfirmRequest{
     },
 }
 
-response, err := api.PaymentSetups.ConfirmPaymentSetup("ps_123456789", confirmRequest)
+paymentMethodOptionId := "pmo_123456789" // Payment method option ID from setup creation
+response, err := api.PaymentSetups.ConfirmPaymentSetup("ps_123456789", paymentMethodOptionId, confirmRequest)
 ```
 
 ## Supported Payment Methods

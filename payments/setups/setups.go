@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	PaymentSetupsPath = "payment-setups"
+	PaymentSetupsPath = "payments/setups"
 	ConfirmPath       = "confirm"
 )
 

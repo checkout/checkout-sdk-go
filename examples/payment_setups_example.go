@@ -115,7 +115,8 @@ func main() {
 		},
 	}
 
-	confirmResponse, err := api.PaymentSetups.ConfirmPaymentSetup(createResponse.Id, confirmRequest)
+	paymentMethodOptionId := "pmo_123456789" // Payment method option ID from setup creation
+	confirmResponse, err := api.PaymentSetups.ConfirmPaymentSetup(createResponse.Id, paymentMethodOptionId, confirmRequest)
 	if err != nil {
 		fmt.Printf("Error confirming payment setup: %v\n", err)
 		return

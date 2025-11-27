@@ -63,14 +63,14 @@ func (c *Client) GetPaymentSetup(setupId string) (*PaymentSetupResponse, error) 
 	return &response, nil
 }
 
-func (c *Client) ConfirmPaymentSetup(setupId string, request PaymentSetupConfirmRequest) (*PaymentSetupConfirmResponse, error) {
+func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodOptionId string, request PaymentSetupConfirmRequest) (*PaymentSetupConfirmResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSetupConfirmResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentSetupsPath, setupId, ConfirmPath), auth, request, &response, nil)
+	err = c.apiClient.Post(common.BuildPath(PaymentSetupsPath, setupId, ConfirmPath, paymentMethodOptionId), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -260,7 +260,8 @@ func TestGetPaymentSetup(t *testing.T) {
 
 func TestConfirmPaymentSetup(t *testing.T) {
 	var (
-		setupId = "ps_123456789"
+		setupId               = "ps_123456789"
+		paymentMethodOptionId = "pmo_123456789"
 		confirmResponse = PaymentSetupConfirmResponse{
 			Id:     setupId,
 			Status: PaymentSetupStatusConfirmed,
@@ -268,16 +269,18 @@ func TestConfirmPaymentSetup(t *testing.T) {
 	)
 
 	cases := []struct {
-		name             string
-		setupId          string
-		request          PaymentSetupConfirmRequest
-		getAuthorization func(*mock.Mock) mock.Call
-		apiPost          func(*mock.Mock) mock.Call
-		checker          func(*PaymentSetupConfirmResponse, error)
+		name                  string
+		setupId               string
+		paymentMethodOptionId string
+		request               PaymentSetupConfirmRequest
+		getAuthorization      func(*mock.Mock) mock.Call
+		apiPost               func(*mock.Mock) mock.Call
+		checker               func(*PaymentSetupConfirmResponse, error)
 	}{
 		{
-			name:    "when request is correct then confirm payment setup",
-			setupId: setupId,
+			name:                  "when request is correct then confirm payment setup",
+			setupId:               setupId,
+			paymentMethodOptionId: paymentMethodOptionId,
 			request: PaymentSetupConfirmRequest{
 				Source: &PaymentSetupSource{
 					Type: "card",
@@ -303,8 +306,9 @@ func TestConfirmPaymentSetup(t *testing.T) {
 			},
 		},
 		{
-			name:    "when credentials invalid then return error",
-			setupId: setupId,
+			name:                  "when credentials invalid then return error",
+			setupId:               setupId,
+			paymentMethodOptionId: paymentMethodOptionId,
 			request: PaymentSetupConfirmRequest{
 				Source: &PaymentSetupSource{
 					Type: "card",
@@ -339,7 +343,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 			enableTelemetry := true
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient)
-			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.request))
+			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodOptionId, tc.request))
 		})
 	}
 }

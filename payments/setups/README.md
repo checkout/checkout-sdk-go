@@ -97,17 +97,8 @@ response, err := api.PaymentSetups.UpdatePaymentSetup("ps_123456789", updateRequ
 ### Confirm Payment Setup
 
 ```go
-confirmRequest := setups.PaymentSetupConfirmRequest{
-    Source: &setups.PaymentSetupSource{
-        Type: "card",
-    },
-    ThreeDs: &setups.PaymentSetupThreeDs{
-        Enabled: true,
-    },
-}
-
 paymentMethodOptionId := "pmo_123456789" // Payment method option ID from setup creation
-response, err := api.PaymentSetups.ConfirmPaymentSetup("ps_123456789", paymentMethodOptionId, confirmRequest)
+response, err := api.PaymentSetups.ConfirmPaymentSetup("ps_123456789", paymentMethodOptionId)
 ```
 
 ## Supported Payment Methods

@@ -17,7 +17,6 @@ func TestCreatePaymentSetup(t *testing.T) {
 	var (
 		setupResponse = PaymentSetupResponse{
 			Id:       "ps_123456789",
-			Status:   PaymentSetupStatusPending,
 			Amount:   1000,
 			Currency: common.GBP,
 		}
@@ -52,7 +51,8 @@ func TestCreatePaymentSetup(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, setupResponse.Id, response.Id)
-				assert.Equal(t, setupResponse.Status, response.Status)
+				assert.Equal(t, setupResponse.Amount, response.Amount)
+				assert.Equal(t, setupResponse.Currency, response.Currency)
 			},
 		},
 		{
@@ -97,10 +97,9 @@ func TestCreatePaymentSetup(t *testing.T) {
 
 func TestUpdatePaymentSetup(t *testing.T) {
 	var (
-		setupId = "ps_123456789"
+		setupId       = "ps_123456789"
 		setupResponse = PaymentSetupResponse{
 			Id:       setupId,
-			Status:   PaymentSetupStatusPending,
 			Amount:   1000,
 			Currency: common.GBP,
 		}
@@ -137,7 +136,8 @@ func TestUpdatePaymentSetup(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, setupResponse.Id, response.Id)
-				assert.Equal(t, setupResponse.Status, response.Status)
+				assert.Equal(t, setupResponse.Amount, response.Amount)
+				assert.Equal(t, setupResponse.Currency, response.Currency)
 			},
 		},
 		{
@@ -183,10 +183,9 @@ func TestUpdatePaymentSetup(t *testing.T) {
 
 func TestGetPaymentSetup(t *testing.T) {
 	var (
-		setupId = "ps_123456789"
+		setupId       = "ps_123456789"
 		setupResponse = PaymentSetupResponse{
 			Id:       setupId,
-			Status:   PaymentSetupStatusConfirmed,
 			Amount:   1000,
 			Currency: common.GBP,
 		}
@@ -200,7 +199,7 @@ func TestGetPaymentSetup(t *testing.T) {
 		checker          func(*PaymentSetupResponse, error)
 	}{
 		{
-			name:    "when request is correct then get payment setup",
+			name:    "when setupId is correct then get payment setup",
 			setupId: setupId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -218,7 +217,8 @@ func TestGetPaymentSetup(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, setupResponse.Id, response.Id)
-				assert.Equal(t, setupResponse.Status, response.Status)
+				assert.Equal(t, setupResponse.Amount, response.Amount)
+				assert.Equal(t, setupResponse.Currency, response.Currency)
 			},
 		},
 		{
@@ -262,7 +262,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 	var (
 		setupId               = "ps_123456789"
 		paymentMethodOptionId = "pmo_123456789"
-		confirmResponse = PaymentSetupConfirmResponse{
+		confirmResponse       = PaymentSetupConfirmResponse{
 			Id:     setupId,
 			Status: PaymentSetupStatusConfirmed,
 		}
@@ -272,20 +272,14 @@ func TestConfirmPaymentSetup(t *testing.T) {
 		name                  string
 		setupId               string
 		paymentMethodOptionId string
-		request               PaymentSetupConfirmRequest
 		getAuthorization      func(*mock.Mock) mock.Call
 		apiPost               func(*mock.Mock) mock.Call
 		checker               func(*PaymentSetupConfirmResponse, error)
 	}{
 		{
-			name:                  "when request is correct then confirm payment setup",
+			name:                  "when path parameters are correct then confirm payment setup",
 			setupId:               setupId,
 			paymentMethodOptionId: paymentMethodOptionId,
-			request: PaymentSetupConfirmRequest{
-				Source: &PaymentSetupSource{
-					Type: "card",
-				},
-			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -309,11 +303,6 @@ func TestConfirmPaymentSetup(t *testing.T) {
 			name:                  "when credentials invalid then return error",
 			setupId:               setupId,
 			paymentMethodOptionId: paymentMethodOptionId,
-			request: PaymentSetupConfirmRequest{
-				Source: &PaymentSetupSource{
-					Type: "card",
-				},
-			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization"))
@@ -343,7 +332,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 			enableTelemetry := true
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient)
-			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodOptionId, tc.request))
+			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodOptionId))
 		})
 	}
 }

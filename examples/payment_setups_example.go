@@ -16,13 +16,13 @@ func main() {
 		"sk_sbox_...", // Replace with your secret key
 		"pk_sbox_...", // Replace with your public key
 	)
-	
+
 	enableTelemetry := true
 	config := configuration.NewConfiguration(
-		credentials, 
-		&enableTelemetry, 
+		credentials,
+		&enableTelemetry,
 		configuration.Sandbox(), // Use Sandbox for testing
-		&http.Client{}, 
+		&http.Client{},
 		nil,
 	)
 
@@ -31,7 +31,7 @@ func main() {
 
 	// Example 1: Create a Payment Setup
 	fmt.Println("=== Creating Payment Setup ===")
-	
+
 	createRequest := setups.PaymentSetupRequest{
 		Amount:      1000, // £10.00
 		Currency:    common.GBP,
@@ -71,24 +71,24 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Payment Setup created: ID=%s, Status=%s\n", 
+	fmt.Printf("Payment Setup created: ID=%s, Status=%s\n",
 		createResponse.Id, createResponse.Status)
 
 	// Example 2: Get Payment Setup Details
 	fmt.Println("\n=== Getting Payment Setup Details ===")
-	
+
 	getResponse, err := api.PaymentSetups.GetPaymentSetup(createResponse.Id)
 	if err != nil {
 		fmt.Printf("Error getting payment setup: %v\n", err)
 		return
 	}
 
-	fmt.Printf("Payment Setup details: ID=%s, Amount=%d, Currency=%s\n", 
+	fmt.Printf("Payment Setup details: ID=%s, Amount=%d, Currency=%s\n",
 		getResponse.Id, getResponse.Amount, getResponse.Currency)
 
 	// Example 3: Update Payment Setup
 	fmt.Println("\n=== Updating Payment Setup ===")
-	
+
 	updateRequest := setups.PaymentSetupRequest{
 		Amount:      1500, // Update to £15.00
 		Currency:    common.GBP,
@@ -102,29 +102,20 @@ func main() {
 		return
 	}
 
-	fmt.Printf("Payment Setup updated: ID=%s, Amount=%d\n", 
+	fmt.Printf("Payment Setup updated: ID=%s, Amount=%d\n",
 		updateResponse.Id, updateResponse.Amount)
 
 	// Example 4: Confirm Payment Setup
 	fmt.Println("\n=== Confirming Payment Setup ===")
-	
-	confirmRequest := setups.PaymentSetupConfirmRequest{
-		Source: &setups.PaymentSetupSource{
-			Type: "card",
-		},
-		ThreeDs: &setups.PaymentSetupThreeDs{
-			Enabled: true,
-		},
-	}
 
 	paymentMethodOptionId := "pmo_123456789" // Payment method option ID from setup creation
-	confirmResponse, err := api.PaymentSetups.ConfirmPaymentSetup(createResponse.Id, paymentMethodOptionId, confirmRequest)
+	confirmResponse, err := api.PaymentSetups.ConfirmPaymentSetup(createResponse.Id, paymentMethodOptionId)
 	if err != nil {
 		fmt.Printf("Error confirming payment setup: %v\n", err)
 		return
 	}
 
-	fmt.Printf("Payment Setup confirmed: ID=%s, Status=%s\n", 
+	fmt.Printf("Payment Setup confirmed: ID=%s, Status=%s\n",
 		confirmResponse.Id, confirmResponse.Status)
 
 	fmt.Println("\n=== Payment Setups Example Complete ===")

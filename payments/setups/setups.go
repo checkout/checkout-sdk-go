@@ -101,14 +101,14 @@ type PaymentSetupCustomerDevice struct {
 
 // Customer Merchant Account
 type CustomerMerchantAccount struct {
-	Id                   string `json:"id,omitempty"`
-	RegistrationDate     string `json:"registration_date,omitempty"`
-	LastModified         string `json:"last_modified,omitempty"`
-	ReturningCustomer    bool   `json:"returning_customer,omitempty"`
-	FirstTransactionDate string `json:"first_transaction_date,omitempty"`
-	LastTransactionDate  string `json:"last_transaction_date,omitempty"`
-	TotalOrderCount      int    `json:"total_order_count,omitempty"`
-	LastPaymentAmount    int64  `json:"last_payment_amount,omitempty"`
+	Id                   string     `json:"id,omitempty"`
+	RegistrationDate     *time.Time `json:"registration_date,omitempty"`
+	LastModified         *time.Time `json:"last_modified,omitempty"`
+	ReturningCustomer    bool       `json:"returning_customer,omitempty"`
+	FirstTransactionDate *time.Time `json:"first_transaction_date,omitempty"`
+	LastTransactionDate  *time.Time `json:"last_transaction_date,omitempty"`
+	TotalOrderCount      int        `json:"total_order_count,omitempty"`
+	LastPaymentAmount    int64      `json:"last_payment_amount,omitempty"`
 }
 
 // Payment Setup Shipping
@@ -204,10 +204,10 @@ type PaymentSetupOrder struct {
 
 // Order Sub Merchant
 type OrderSubMerchant struct {
-	Id               string `json:"id,omitempty"`
-	ProductCategory  string `json:"product_category,omitempty"`
-	NumberOfTrades   int    `json:"number_of_trades,omitempty"`
-	RegistrationDate string `json:"registration_date,omitempty"`
+	Id               string     `json:"id,omitempty"`
+	ProductCategory  string     `json:"product_category,omitempty"`
+	NumberOfTrades   int        `json:"number_of_trades,omitempty"`
+	RegistrationDate *time.Time `json:"registration_date,omitempty"`
 }
 
 // Payment Setup Industry - Using common payment structs when possible for DRY principles

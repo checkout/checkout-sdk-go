@@ -65,19 +65,7 @@ type PaymentSetupConfirmResponse struct {
 	Processing      *payments.PaymentProcessing `json:"processing,omitempty"`
 	Eci             string                      `json:"eci,omitempty"`
 	SchemeId        string                      `json:"scheme_id,omitempty"`
-	Links           map[string]common.Link      `json:"_links,omitempty"`
 }
-
-// Payment Setup Status
-type PaymentSetupStatus string
-
-const (
-	PaymentSetupStatusPending   PaymentSetupStatus = "Pending"
-	PaymentSetupStatusConfirmed PaymentSetupStatus = "Confirmed"
-	PaymentSetupStatusCompleted PaymentSetupStatus = "Completed"
-	PaymentSetupStatusExpired   PaymentSetupStatus = "Expired"
-	PaymentSetupStatusCancelled PaymentSetupStatus = "Cancelled"
-)
 
 // Payment Setup Customer
 type PaymentSetupCustomer struct {
@@ -123,8 +111,8 @@ type PaymentMethods struct {
 type PaymentMethodInitialization string
 
 const (
-	PaymentMethodInitializationEnabled  PaymentMethodInitialization = "enabled"
 	PaymentMethodInitializationDisabled PaymentMethodInitialization = "disabled"
+	PaymentMethodInitializationEnabled  PaymentMethodInitialization = "enabled"
 )
 
 // Payment Method Base - Common fields for all payment methods

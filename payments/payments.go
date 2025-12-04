@@ -311,6 +311,14 @@ const (
 	TwoDayOrMore       DeliveryTimeframe = "two_day_or_more"
 )
 
+type ItemType string
+
+const (
+	DigitalIT  ItemType = "digital"
+	DiscountIT ItemType = "discount"
+	PhysicalIT ItemType = "physical"
+)
+
 type ItemSubType string
 
 const (
@@ -694,7 +702,7 @@ type (
 	}
 
 	Product struct {
-		Type           string      `json:"type,omitempty"`
+		Type           ItemType    `json:"type,omitempty"`
 		SubType        ItemSubType `json:"sub_type,omitempty"`
 		Name           string      `json:"name,omitempty"`
 		Quantity       int         `json:"quantity,omitempty"`

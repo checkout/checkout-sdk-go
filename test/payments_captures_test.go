@@ -47,7 +47,7 @@ func TestCaptureCardPayment(t *testing.T) {
 				assert.Equal(t, int64(10), response.Balances.TotalAuthorized)
 				assert.Equal(t, int64(5), response.Balances.TotalCaptured)
 				assert.Equal(t, int64(0), response.Balances.TotalRefunded)
-				assert.Equal(t, int64(0), response.Balances.TotalVoided)
+				assert.Equal(t, int64(5), response.Balances.TotalVoided)
 				assert.Equal(t, int64(0), response.Balances.AvailableToCapture)
 				assert.Equal(t, int64(5), response.Balances.AvailableToRefund)
 				assert.Equal(t, int64(0), response.Balances.AvailableToVoid)

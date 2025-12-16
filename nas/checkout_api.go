@@ -21,6 +21,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/payments/links"
 	payments "github.com/checkout/checkout-sdk-go/payments/nas"
 	"github.com/checkout/checkout-sdk-go/payments/sessions"
+	"github.com/checkout/checkout-sdk-go/payments/setups"
 	"github.com/checkout/checkout-sdk-go/reports"
 	"github.com/checkout/checkout-sdk-go/sessions"
 	"github.com/checkout/checkout-sdk-go/tokens"
@@ -48,6 +49,7 @@ type Api struct {
 	Issuing         *issuing.Client
 	Contexts        *contexts.Client
 	PaymentSessions *payment_sessions.Client
+	PaymentSetups   *setups.Client
 	Forward         *forward.Client
 
 	Ideal  *ideal.Client
@@ -78,6 +80,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Issuing = issuing.NewClient(configuration, apiClient)
 	api.Contexts = contexts.NewClient(configuration, apiClient)
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
+	api.PaymentSetups = setups.NewClient(configuration, apiClient)
 	api.Forward = forward.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)

@@ -337,31 +337,31 @@ type (
 	}
 
 	Ticket struct {
-		Number                 string `json:"number,omitempty"`
-		IssueDate              string `json:"issue_date,omitempty"`
-		IssuingCarrierCode     string `json:"issuing_carrier_code,omitempty"`
-		TravelPackageIndicator string `json:"travel_package_indicator,omitempty"`
-		TravelAgencyName       string `json:"travel_agency_name,omitempty"`
-		TravelAgencyCode       string `json:"travel_agency_code,omitempty"`
+		Number                 string     `json:"number,omitempty"`
+		IssueDate              *time.Time `json:"issue_date,omitempty"`
+		IssuingCarrierCode     string     `json:"issuing_carrier_code,omitempty"`
+		TravelPackageIndicator string     `json:"travel_package_indicator,omitempty"`
+		TravelAgencyName       string     `json:"travel_agency_name,omitempty"`
+		TravelAgencyCode       string     `json:"travel_agency_code,omitempty"`
 	}
 
 	Passenger struct {
 		FirstName   string          `json:"first_name,omitempty"`
 		LastName    string          `json:"last_name,omitempty"`
-		DateOfBirth string          `json:"date_of_birth,omitempty"`
+		DateOfBirth *time.Time      `json:"date_of_birth,omitempty"`
 		Address     *common.Address `json:"address,omitempty"`
 	}
 
 	FlightLegDetails struct {
-		FlightNumber     string `json:"flight_number,omitempty"`
-		CarrierCode      string `json:"carrier_code,omitempty"`
-		ClassOfTraveling string `json:"class_of_traveling,omitempty"`
-		DepartureAirport string `json:"departure_airport,omitempty"`
-		DepartureDate    string `json:"departure_date,omitempty"`
-		DepartureTime    string `json:"departure_time,omitempty"`
-		ArrivalAirport   string `json:"arrival_airport,omitempty"`
-		StopoverCode     string `json:"stopover_code,omitempty"`
-		FareBasisCode    string `json:"fare_basis_code,omitempty"`
+		FlightNumber     string     `json:"flight_number,omitempty"`
+		CarrierCode      string     `json:"carrier_code,omitempty"`
+		ClassOfTraveling string     `json:"class_of_traveling,omitempty"`
+		DepartureAirport string     `json:"departure_airport,omitempty"`
+		DepartureDate    *time.Time `json:"departure_date,omitempty"`
+		DepartureTime    string     `json:"departure_time,omitempty"`
+		ArrivalAirport   string     `json:"arrival_airport,omitempty"`
+		StopoverCode     string     `json:"stopover_code,omitempty"`
+		FareBasisCode    string     `json:"fare_basis_code,omitempty"`
 	}
 
 	ShippingInfo struct {

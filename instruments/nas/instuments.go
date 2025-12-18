@@ -1,8 +1,6 @@
 package nas
 
 import (
-	"time"
-
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/payments"
 )
@@ -24,7 +22,7 @@ type InstrumentData struct {
 	Currency        common.Currency      `json:"currency,omitempty"`
 	PaymentType     payments.PaymentType `json:"payment_type,omitempty"`
 	MandateId       string               `json:"mandate_id,omitempty"`
-	DateOfSignature *time.Time           `json:"date_of_signature,omitempty"`
+	DateOfSignature *common.APIShortDate `json:"date_of_signature,omitempty"`
 }
 
 type CreateCustomerInstrumentRequest struct {

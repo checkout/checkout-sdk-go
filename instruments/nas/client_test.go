@@ -237,7 +237,9 @@ func getCreateTokenInstrumentRequest() *createTokenInstrumentRequest {
 }
 
 func getCreateSepaInstrumentRequest() *createSepaInstrumentRequest {
-	time := time.Now()
+	// Create APIShortDate with current date
+	apiTime := (*common.APIShortDate)(&time.Time{})
+	*apiTime = common.APIShortDate(time.Now())
 
 	r := NewCreateSepaInstrumentRequest()
 	r.InstrumentData = &InstrumentData{
@@ -246,7 +248,7 @@ func getCreateSepaInstrumentRequest() *createSepaInstrumentRequest {
 		Currency:        common.GBP,
 		PaymentType:     payments.Recurring,
 		MandateId:       "1234567890",
-		DateOfSignature: &time,
+		DateOfSignature: apiTime,
 	}
 	return r
 }

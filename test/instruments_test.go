@@ -1,9 +1,10 @@
 package test
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/errors"
@@ -216,11 +217,18 @@ func TestShouldDeleteInstrument(t *testing.T) {
 
 func createSepaInstrument(t *testing.T) *nas.CreateSepaInstrumentResponse {
 	request := nas.NewCreateSepaInstrumentRequest()
+
+	// Create APIShortDate with YYYY-MM-DD format to test custom date parsing
+	dateOfSignature := &common.APIShortDate{}
+	err := dateOfSignature.UnmarshalJSON([]byte(`"2023-12-15"`))
+	assert.Nil(t, err)
+
 	request.InstrumentData = &nas.InstrumentData{
-		AccountNumber: "FR7630006000011234567890189",
-		Country:       common.FR,
-		Currency:      common.EUR,
-		PaymentType:   payments.Recurring,
+		AccountNumber:   "FR7630006000011234567890189",
+		Country:         common.FR,
+		Currency:        common.EUR,
+		PaymentType:     payments.Recurring,
+		DateOfSignature: dateOfSignature,
 	}
 	request.AccountHolder = &common.AccountHolder{
 		FirstName:      "Ali",

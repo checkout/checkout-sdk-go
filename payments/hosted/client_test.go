@@ -16,7 +16,7 @@ import (
 
 func TestCreateHostedPaymentsPageSession(t *testing.T) {
 	var (
-		hostedPaymentResponse = PaymentHostedResponse{
+		hostedPaymentResponse = HostedPaymentResponse{
 			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Id:           "pay_1234",
 			Reference:    "reference",
@@ -25,14 +25,14 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 
 	cases := []struct {
 		name             string
-		request          PaymentHostedRequest
+		request          HostedPaymentRequest
 		getAuthorization func(*mock.Mock) mock.Call
 		apiPost          func(*mock.Mock) mock.Call
-		checker          func(*PaymentHostedResponse, error)
+		checker          func(*HostedPaymentResponse, error)
 	}{
 		{
 			name: "when request is correct then create hosted payment session",
-			request: PaymentHostedRequest{
+			request: HostedPaymentRequest{
 				Amount:      1000,
 				Currency:    common.GBP,
 				PaymentType: payments.Regular,
@@ -44,14 +44,14 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*PaymentHostedResponse)
+						respMapping := args.Get(4).(*HostedPaymentResponse)
 						*respMapping = hostedPaymentResponse
 					})
 			},
-			checker: func(response *PaymentHostedResponse, err error) {
+			checker: func(response *HostedPaymentResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
@@ -67,7 +67,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
-			checker: func(response *PaymentHostedResponse, err error) {
+			checker: func(response *HostedPaymentResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAuthorizationError)
@@ -76,13 +76,13 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 		},
 		{
 			name:    "when request invalid then return error",
-			request: PaymentHostedRequest{},
+			request: HostedPaymentRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -90,7 +90,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 							Data:       &errors.ErrorDetails{ErrorType: "request_invalid"},
 						})
 			},
-			checker: func(response *PaymentHostedResponse, err error) {
+			checker: func(response *HostedPaymentResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
@@ -105,13 +105,13 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemetry := true
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
-			client := NewClient(config, apiClient)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.CreateHostedPaymentsPageSession(tc.request))
 		})
@@ -120,7 +120,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 
 func TestGetHostedPaymentsPageDetails(t *testing.T) {
 	var (
-		hostedPaymentDetails = PaymentHostedDetails{
+		hostedPaymentDetails = HostedPaymentDetails{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
 			Id:           "pay_1234",
 			Status:       PaymentPending,
@@ -136,7 +136,7 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 		hostedPaymentId  string
 		getAuthorization func(*mock.Mock) mock.Call
 		apiGet           func(*mock.Mock) mock.Call
-		checker          func(*PaymentHostedDetails, error)
+		checker          func(*HostedPaymentDetails, error)
 	}{
 		{
 			name:            "when hostedPaymentId is correct then return hosted payment session details",
@@ -146,14 +146,14 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*PaymentHostedDetails)
+						respMapping := args.Get(3).(*HostedPaymentDetails)
 						*respMapping = hostedPaymentDetails
 					})
 			},
-			checker: func(response *PaymentHostedDetails, err error) {
+			checker: func(response *HostedPaymentDetails, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
@@ -175,7 +175,7 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
-			checker: func(response *PaymentHostedDetails, err error) {
+			checker: func(response *HostedPaymentDetails, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAuthorizationError)
@@ -190,14 +190,14 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
 							Status:     "404 Not Found",
 						})
 			},
-			checker: func(response *PaymentHostedDetails, err error) {
+			checker: func(response *HostedPaymentDetails, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
@@ -212,13 +212,13 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemetry := true
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
-			client := NewClient(config, apiClient)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetHostedPaymentsPageDetails(tc.hostedPaymentId))
 		})

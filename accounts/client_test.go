@@ -56,10 +56,10 @@ func TestCreateEntity(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*OnboardEntityResponse)
+						respMapping := args.Get(4).(*OnboardEntityResponse)
 						*respMapping = onboardEntity
 					})
 			},
@@ -81,7 +81,7 @@ func TestCreateEntity(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -165,10 +165,10 @@ func TestGetSubEntityMembers(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*OnboardSubEntityDetailsResponse)
+						respMapping := args.Get(3).(*OnboardSubEntityDetailsResponse)
 						*respMapping = subEntityDetails
 					})
 			},
@@ -186,10 +186,10 @@ func TestGetSubEntityMembers(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*OnboardSubEntityDetailsResponse)
+						respMapping := args.Get(3).(*OnboardSubEntityDetailsResponse)
 						*respMapping = OnboardSubEntityDetailsResponse{
 							HttpMetadata: mocks.HttpMetadataStatusOk,
 							Data:         []SubEntityMemberData{},
@@ -212,7 +212,7 @@ func TestGetSubEntityMembers(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -285,10 +285,10 @@ func TestReinviteSubEntityMember(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*OnboardSubEntityResponse)
+						respMapping := args.Get(4).(*OnboardSubEntityResponse)
 						*respMapping = reinviteResponse
 					})
 			},
@@ -309,7 +309,7 @@ func TestReinviteSubEntityMember(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -387,10 +387,10 @@ func TestGetEntity(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*OnboardEntityDetails)
+						respMapping := args.Get(3).(*OnboardEntityDetails)
 						*respMapping = entityDetails
 					})
 			},
@@ -416,7 +416,7 @@ func TestGetEntity(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -513,10 +513,10 @@ func TestUpdateEntity(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*OnboardEntityResponse)
+						respMapping := args.Get(4).(*OnboardEntityResponse)
 						*respMapping = onboardEntity
 					})
 			},
@@ -554,7 +554,7 @@ func TestUpdateEntity(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -647,10 +647,10 @@ func TestCreatePaymentInstruments(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.MetadataResponse)
+						respMapping := args.Get(4).(*common.MetadataResponse)
 						*respMapping = metadataResponse
 					})
 			},
@@ -668,7 +668,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusBadRequest,
@@ -690,7 +690,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -717,7 +717,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *common.MetadataResponse, err error) {
@@ -795,10 +795,10 @@ func TestCreatePaymentInstrument(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.IdResponse)
+						respMapping := args.Get(4).(*common.IdResponse)
 						*respMapping = idResponse
 					})
 			},
@@ -817,7 +817,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusBadRequest,
@@ -839,7 +839,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -866,7 +866,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *common.IdResponse, err error) {
@@ -946,10 +946,10 @@ func TestQueryPaymentInstruments(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*PaymentInstrumentQueryResponse)
+						respMapping := args.Get(3).(*PaymentInstrumentQueryResponse)
 						*respMapping = paymentInstrumentQueryResponse
 					})
 			},
@@ -967,7 +967,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusBadRequest,
@@ -989,7 +989,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -1016,7 +1016,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentInstrumentQueryResponse, err error) {
@@ -1088,10 +1088,10 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*PaymentInstrumentDetailsResponse)
+						respMapping := args.Get(3).(*PaymentInstrumentDetailsResponse)
 						*respMapping = paymentInstrumentDetailsResponse
 					})
 			},
@@ -1117,7 +1117,7 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusBadRequest,
@@ -1139,7 +1139,7 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -1166,7 +1166,7 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentInstrumentDetailsResponse, err error) {
@@ -1231,10 +1231,10 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.IdResponse)
+						respMapping := args.Get(4).(*common.IdResponse)
 						*respMapping = idResponse
 					})
 			},
@@ -1259,7 +1259,7 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -1286,7 +1286,7 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Patch", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -1355,10 +1355,10 @@ func TestGetPayoutSchedule(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*PayoutSchedule)
+						respMapping := args.Get(3).(*PayoutSchedule)
 						*respMapping = schedule
 					})
 			},
@@ -1380,7 +1380,7 @@ func TestGetPayoutSchedule(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -1450,10 +1450,10 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*common.IdResponse)
+						respMapping := args.Get(4).(*common.IdResponse)
 						*respMapping = idResponse
 					})
 			},
@@ -1475,7 +1475,7 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,

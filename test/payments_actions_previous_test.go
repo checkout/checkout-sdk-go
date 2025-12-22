@@ -9,6 +9,8 @@ import (
 )
 
 func TestGetPaymentActionsPrevious(t *testing.T) {
+	t.Skip("unavailable")
+
 	paymentResponse := makeCardPaymentPrevious(t, false, 10)
 
 	cases := []struct {

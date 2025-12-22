@@ -1,6 +1,7 @@
 package sepa
 
 import (
+	"context"
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,13 +20,17 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) GetMandate(mandateId string) (*MandateResponse, error) {
+	return c.GetMandateWithContext(context.Background(), mandateId)
+}
+
+func (c *Client) GetMandateWithContext(ctx context.Context, mandateId string) (*MandateResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response MandateResponse
-	err = c.apiClient.Get(common.BuildPath(sepaMandatesPath, mandateId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(sepaMandatesPath, mandateId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +39,18 @@ func (c *Client) GetMandate(mandateId string) (*MandateResponse, error) {
 }
 
 func (c *Client) CancelMandate(mandateId string) (*SepaResource, error) {
+	return c.CancelMandateWithContext(context.Background(), mandateId)
+}
+
+func (c *Client) CancelMandateWithContext(ctx context.Context, mandateId string) (*SepaResource, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response SepaResource
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(sepaMandatesPath, mandateId, cancelPath),
 		auth,
 		nil,
@@ -55,13 +65,17 @@ func (c *Client) CancelMandate(mandateId string) (*SepaResource, error) {
 }
 
 func (c *Client) GetMandateViaPpro(mandateId string) (*MandateResponse, error) {
+	return c.GetMandateViaPproWithContext(context.Background(), mandateId)
+}
+
+func (c *Client) GetMandateViaPproWithContext(ctx context.Context, mandateId string) (*MandateResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response MandateResponse
-	err = c.apiClient.Get(common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -70,13 +84,18 @@ func (c *Client) GetMandateViaPpro(mandateId string) (*MandateResponse, error) {
 }
 
 func (c *Client) CancelMandateViaPpro(mandateId string) (*SepaResource, error) {
+	return c.CancelMandateViaPproWithContext(context.Background(), mandateId)
+}
+
+func (c *Client) CancelMandateViaPproWithContext(ctx context.Context, mandateId string) (*SepaResource, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response SepaResource
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId, cancelPath),
 		auth,
 		nil,

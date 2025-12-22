@@ -120,6 +120,7 @@ func getKlarnaProduct() []map[string]interface{} {
 }
 
 func createCreditSession(t *testing.T) *klarna.CreditSessionResponse {
+	t.Skip("unavailable")
 	request := klarna.CreditSessionRequest{
 		PurchaseCountry: common.GB,
 		Currency:        common.GBP,

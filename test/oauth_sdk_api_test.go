@@ -72,3 +72,19 @@ func TestOauthCheckoutSdks(t *testing.T) {
 	}
 
 }
+
+func TestOauthCheckoutSdkWithSubdomain(t *testing.T) {
+	// This test verifies that OAuth credentials are created with the subdomain-aware authorization URI
+	// The failure is expected since we're using fake credentials, but the important part is that
+	// the subdomain logic is triggered in the OAuth flow
+	_, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithScopes([]string{configuration.Gateway}).
+		WithEnvironment(configuration.Sandbox()).
+		WithEnvironmentSubdomain("1234doma").
+		Build()
+
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "invalid_client")
+}

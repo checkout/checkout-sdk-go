@@ -62,7 +62,11 @@ func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 	}
 
 	if b.AuthorizationUri == "" {
-		b.AuthorizationUri = b.SdkBuilder.Environment.AuthorizationUri()
+		if b.EnvironmentSubdomain != nil {
+			b.AuthorizationUri = b.EnvironmentSubdomain.AuthorizationUrl
+		} else {
+			b.AuthorizationUri = b.SdkBuilder.Environment.AuthorizationUri()
+		}
 	}
 
 	sdkCredentials, err := configuration.NewOAuthSdkCredentials(

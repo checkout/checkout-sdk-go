@@ -15,26 +15,34 @@ type Environment interface {
 }
 
 type EnvironmentSubdomain struct {
-	ApiUrl string
+	ApiUrl           string
+	AuthorizationUrl string
 }
 
 func NewEnvironmentSubdomain(environment Environment, subdomain string) *EnvironmentSubdomain {
-	apiUrl := addSubdomainToApiUrlEnvironment(environment, subdomain)
-	return &EnvironmentSubdomain{ApiUrl: apiUrl}
+	apiUrl := createUrlWithSubdomain(environment.BaseUri(), subdomain)
+	authorizationUrl := createUrlWithSubdomain(environment.AuthorizationUri(), subdomain)
+	return &EnvironmentSubdomain{
+		ApiUrl:           apiUrl,
+		AuthorizationUrl: authorizationUrl,
+	}
 }
 
-func addSubdomainToApiUrlEnvironment(environment Environment, subdomain string) string {
-	apiUrl := environment.BaseUri()
-
-	newEnvironment := apiUrl
+// createUrlWithSubdomain applies subdomain transformation to any given URI.
+// If the subdomain is valid (alphanumeric pattern), prepends it to the host.
+// Otherwise, returns the original URI unchanged.
+func createUrlWithSubdomain(originalUrl string, subdomain string) string {
+	newEnvironment := originalUrl
 
 	regex := regexp.MustCompile("^[0-9a-z]+$")
 
 	if regex.MatchString(subdomain) {
-		merchantApiUrl, _ := url.Parse(apiUrl)
-		merchantApiUrl.Host = subdomain + "." + merchantApiUrl.Host
-
-		newEnvironment = merchantApiUrl.String()
+		merchantUrl, err := url.Parse(originalUrl)
+		if err != nil {
+			return newEnvironment
+		}
+		merchantUrl.Host = subdomain + "." + merchantUrl.Host
+		newEnvironment = merchantUrl.String()
 	}
 
 	return newEnvironment

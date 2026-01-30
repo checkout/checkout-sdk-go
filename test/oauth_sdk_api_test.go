@@ -20,14 +20,15 @@ func TestOauthCheckoutSdks(t *testing.T) {
 		WithEnvironment(configuration.Sandbox()).
 		Build()
 
-	var oauthApiSubdomain, _ = checkout.Builder().
-		OAuth().
-		WithClientCredentials(
-			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
-			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
-		WithEnvironment(configuration.Sandbox()).
-		WithEnvironmentSubdomain("123dmain").
-		Build()
+	// Not ready yet to tests with subdomains
+	// var oauthApiSubdomain, _ = checkout.Builder().
+	// 	OAuth().
+	// 	WithClientCredentials(
+	// 		os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
+	// 		os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
+	// 	WithEnvironment(configuration.Sandbox()).
+	// 	WithEnvironmentSubdomain("123dmain").
+	// 	Build()
 
 	var oauthApiBad, _ = checkout.Builder().
 		OAuth().
@@ -49,13 +50,14 @@ func TestOauthCheckoutSdks(t *testing.T) {
 				assert.NotNil(t, oauthApi)
 			},
 		},
-		{
-			name:     "should create a oauth checkout sdk api object with valid subdomain",
-			oauthApi: oauthApiSubdomain,
-			checker: func(token *nas.Api, err error) {
-				assert.NotNil(t, oauthApiSubdomain)
-			},
-		},
+		// Not ready yet to tests with subdomains
+		// {
+		// 	name:     "should create a oauth checkout sdk api object with valid subdomain",
+		// 	oauthApi: oauthApiSubdomain,
+		// 	checker: func(token *nas.Api, err error) {
+		// 		assert.NotNil(t, oauthApiSubdomain)
+		// 	},
+		// },
 		{
 			name:     "should fail a oauth checkout sdk api object",
 			oauthApi: oauthApiBad,

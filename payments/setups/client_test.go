@@ -41,10 +41,10 @@ func TestCreatePaymentSetup(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*PaymentSetupResponse)
+						respMapping := args.Get(4).(*PaymentSetupResponse)
 						*respMapping = setupResponse
 					})
 			},
@@ -67,7 +67,7 @@ func TestCreatePaymentSetup(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentSetupResponse, err error) {
@@ -126,10 +126,10 @@ func TestUpdatePaymentSetup(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*PaymentSetupResponse)
+						respMapping := args.Get(4).(*PaymentSetupResponse)
 						*respMapping = setupResponse
 					})
 			},
@@ -153,7 +153,7 @@ func TestUpdatePaymentSetup(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization"))
 			},
 			apiPut: func(m *mock.Mock) mock.Call {
-				return *m.On("Put", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentSetupResponse, err error) {
@@ -207,10 +207,10 @@ func TestGetPaymentSetup(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*PaymentSetupResponse)
+						respMapping := args.Get(3).(*PaymentSetupResponse)
 						*respMapping = setupResponse
 					})
 			},
@@ -230,7 +230,7 @@ func TestGetPaymentSetup(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization"))
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentSetupResponse, err error) {
@@ -286,10 +286,10 @@ func TestConfirmPaymentSetup(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*PaymentSetupConfirmResponse)
+						respMapping := args.Get(4).(*PaymentSetupConfirmResponse)
 						*respMapping = confirmResponse
 					})
 			},
@@ -309,7 +309,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentSetupConfirmResponse, err error) {

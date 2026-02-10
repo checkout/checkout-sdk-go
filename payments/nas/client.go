@@ -145,13 +145,23 @@ func (c *Client) IncrementAuthorization(
 	incrementAuthorizationRequest IncrementAuthorizationRequest,
 	idempotencyKey *string,
 ) (*IncrementAuthorizationResponse, error) {
+	return c.IncrementAuthorizationWithContext(context.Background(), paymentId, incrementAuthorizationRequest, idempotencyKey)
+}
+
+func (c *Client) IncrementAuthorizationWithContext(
+	ctx context.Context,
+	paymentId string,
+	incrementAuthorizationRequest IncrementAuthorizationRequest,
+	idempotencyKey *string,
+) (*IncrementAuthorizationResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response IncrementAuthorizationResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(payments.PathPayments, paymentId, "authorizations"),
 		auth,
 		incrementAuthorizationRequest,
@@ -204,13 +214,22 @@ func (c *Client) CapturePaymentWithoutRequest(
 	paymentId string,
 	idempotencyKey *string,
 ) (*payments.CaptureResponse, error) {
+	return c.CapturePaymentWithoutRequestWithContext(context.Background(), paymentId, idempotencyKey)
+}
+
+func (c *Client) CapturePaymentWithoutRequestWithContext(
+	ctx context.Context,
+	paymentId string,
+	idempotencyKey *string,
+) (*payments.CaptureResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response payments.CaptureResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(payments.PathPayments, paymentId, "captures"),
 		auth,
 		nil,

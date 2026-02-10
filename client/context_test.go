@@ -296,3 +296,140 @@ func TestContextDeadline(t *testing.T) {
 	assert.True(t, errors.Is(err, context.DeadlineExceeded),
 		"Should respect explicit deadline, got: %v", err)
 }
+
+// TestReadBodyContextCancellation verifies readBody respects context cancellation before reading
+func TestReadBodyContextCancellation(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		jsonOK(w)
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel() // Cancel before reading
+
+	resp, err := http.Get(server.URL + "/test")
+	assert.Nil(t, err)
+	defer resp.Body.Close()
+
+	// readBody should detect the cancelled context immediately
+	body, err := client.readBody(ctx, resp)
+
+	assert.Nil(t, body)
+	assert.NotNil(t, err)
+	assert.True(t, errors.Is(err, context.Canceled),
+		"readBody should detect cancelled context, got: %v", err)
+}
+
+// TestHandleResponseContextPropagation verifies handleResponse receives and uses context
+func TestHandleResponseContextPropagation(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("cko-request-id", "req-123")
+		w.Header().Set("cko-version", "1.0")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"id":"test-123"}`))
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+
+	resp, err := http.Get(server.URL + "/test")
+	assert.Nil(t, err)
+	defer resp.Body.Close()
+
+	// handleResponse with active context should succeed
+	ctx := context.Background()
+	var result common.IdResponse
+	err = client.handleResponse(ctx, resp, &result)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "test-123", result.Id)
+}
+
+// TestHandleResponseContextCancellation verifies handleResponse aborts on cancelled context
+func TestHandleResponseContextCancellation(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("cko-request-id", "req-123")
+		w.Header().Set("cko-version", "1.0")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"id":"test-123"}`))
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+
+	resp, err := http.Get(server.URL + "/test")
+	assert.Nil(t, err)
+	defer resp.Body.Close()
+
+	// handleResponse with cancelled context should fail
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+
+	var result common.IdResponse
+	err = client.handleResponse(ctx, resp, &result)
+
+	assert.NotNil(t, err)
+	assert.True(t, errors.Is(err, context.Canceled),
+		"handleResponse should detect cancelled context, got: %v", err)
+}
+
+// TestContextPropagationThroughDoRequest verifies context flows through doRequest -> handleResponse -> readBody
+func TestContextPropagationThroughDoRequest(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("cko-request-id", "req-456")
+		w.Header().Set("cko-version", "2.0")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"id":"propagated-123"}`))
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+	auth := testAuth()
+
+	// Create request with context
+	ctx := context.Background()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, server.URL+"/test", nil)
+	assert.Nil(t, err)
+
+	// Add auth header
+	authHeader, err := auth.GetAuthorizationHeader()
+	assert.Nil(t, err)
+	req.Header.Set("Authorization", authHeader)
+
+	var result common.IdResponse
+	err = client.doRequest(ctx, req, &result)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "propagated-123", result.Id)
+}
+
+// TestFullRequestContextFlow verifies complete context flow from GetWithContext to response
+func TestFullRequestContextFlow(t *testing.T) {
+	callCount := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		callCount++
+		w.Header().Set("cko-request-id", "req-789")
+		w.Header().Set("cko-version", "3.0")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok"}`))
+	}))
+	defer server.Close()
+
+	client := newTestClient(server.URL)
+
+	// Request with short timeout that should succeed
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	var resp common.MetadataResponse
+	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 1, callCount)
+}

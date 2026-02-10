@@ -124,7 +124,7 @@ func (a *ApiClient) invoke(
 
 	a.Log.Printf("%s: %s", method, path)
 
-	return a.doRequest(req, responseMapping)
+	return a.doRequest(ctx, req, responseMapping)
 
 }
 
@@ -149,7 +149,7 @@ func (a *ApiClient) submit(
 	}
 
 	a.Log.Printf("post: %s", path)
-	return a.doRequest(req, responseMapping)
+	return a.doRequest(ctx, req, responseMapping)
 }
 
 func (a *ApiClient) buildRequest(
@@ -176,10 +176,10 @@ func (a *ApiClient) buildRequest(
 	return req, nil
 }
 
-func (a *ApiClient) handleResponse(rawResponse *http.Response, responseMapping interface{}) error {
+func (a *ApiClient) handleResponse(ctx context.Context, rawResponse *http.Response, responseMapping interface{}) error {
 	requestId := rawResponse.Header.Get(CkoRequestId)
 	version := rawResponse.Header.Get(CkoVersion)
-	body, err := a.readBody(rawResponse)
+	body, err := a.readBody(ctx, rawResponse)
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,14 @@ func (a *ApiClient) getHeaders(contentType string, authorization string, idempot
 	return headers
 }
 
-func (a *ApiClient) readBody(response *http.Response) ([]byte, error) {
+func (a *ApiClient) readBody(ctx context.Context, response *http.Response) ([]byte, error) {
+	// Check if context is already cancelled before reading
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+	}
+
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
@@ -230,7 +237,7 @@ func (a *ApiClient) readBody(response *http.Response) ([]byte, error) {
 	return body, err
 }
 
-func (a *ApiClient) doRequest(req *http.Request, responseMapping interface{}) error {
+func (a *ApiClient) doRequest(ctx context.Context, req *http.Request, responseMapping interface{}) error {
 	if a.EnableTelemetry {
 		currentRequestId := uuid.New().String()
 		var lastRequestMetric common.RequestMetrics
@@ -253,13 +260,13 @@ func (a *ApiClient) doRequest(req *http.Request, responseMapping interface{}) er
 		lastRequestMetric.PrevRequestDuration = int(elapsed.Milliseconds())
 		lastRequestMetric.PrevRequestId = currentRequestId
 		a.RequestMetricsQueue.Enqueue(lastRequestMetric)
-		return a.handleResponse(resp, responseMapping)
+		return a.handleResponse(ctx, resp, responseMapping)
 	} else {
 		resp, err := a.HttpClient.Do(req)
 		if err != nil {
 			return err
 		}
 
-		return a.handleResponse(resp, responseMapping)
+		return a.handleResponse(ctx, resp, responseMapping)
 	}
 }

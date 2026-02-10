@@ -1,6 +1,8 @@
 package reports
 
 import (
+	"context"
+
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,6 +21,10 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) GetAllReports(query QueryFilter) (*QueryResponse, error) {
+	return c.GetAllReportsWithContext(context.Background(), query)
+}
+
+func (c *Client) GetAllReportsWithContext(ctx context.Context, query QueryFilter) (*QueryResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -30,7 +36,7 @@ func (c *Client) GetAllReports(query QueryFilter) (*QueryResponse, error) {
 	}
 
 	var response QueryResponse
-	err = c.apiClient.Get(url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +45,17 @@ func (c *Client) GetAllReports(query QueryFilter) (*QueryResponse, error) {
 }
 
 func (c *Client) GetReportDetails(reportId string) (*ReportResponse, error) {
+	return c.GetReportDetailsWithContext(context.Background(), reportId)
+}
+
+func (c *Client) GetReportDetailsWithContext(ctx context.Context, reportId string) (*ReportResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response ReportResponse
-	err = c.apiClient.Get(common.BuildPath(reports, reportId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -54,13 +64,17 @@ func (c *Client) GetReportDetails(reportId string) (*ReportResponse, error) {
 }
 
 func (c *Client) GetReportFile(reportId, fileId string) (*common.ContentResponse, error) {
+	return c.GetReportFileWithContext(context.Background(), reportId, fileId)
+}
+
+func (c *Client) GetReportFileWithContext(ctx context.Context, reportId, fileId string) (*common.ContentResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response common.ContentResponse
-	err = c.apiClient.Get(common.BuildPath(reports, reportId, files, fileId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId, files, fileId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

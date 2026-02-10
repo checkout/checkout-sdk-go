@@ -178,13 +178,22 @@ func (c *Client) CapturePaymentWithoutRequest(
 	paymentId string,
 	idempotencyKey *string,
 ) (*payments.CaptureResponse, error) {
+	return c.CapturePaymentWithoutRequestWithContext(context.Background(), paymentId, idempotencyKey)
+}
+
+func (c *Client) CapturePaymentWithoutRequestWithContext(
+	ctx context.Context,
+	paymentId string,
+	idempotencyKey *string,
+) (*payments.CaptureResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response payments.CaptureResponse
-	err = c.apiClient.Post(
+	err = c.apiClient.PostWithContext(
+		ctx,
 		common.BuildPath(payments.PathPayments, paymentId, "captures"),
 		auth,
 		nil,

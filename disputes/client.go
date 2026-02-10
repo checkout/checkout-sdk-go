@@ -160,13 +160,17 @@ func (c *Client) SubmitEvidenceWithContext(ctx context.Context, disputeId string
 }
 
 func (c *Client) GetCompiledSubmittedEvidence(disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
+	return c.GetCompiledSubmittedEvidenceWithContext(context.Background(), disputeId)
+}
+
+func (c *Client) GetCompiledSubmittedEvidenceWithContext(ctx context.Context, disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response DisputeCompiledSubmittedEvidenceResponse
-	err = c.apiClient.Get(common.BuildPath(disputes, disputeId, evidence, submitted), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence, submitted), auth, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -38,10 +38,10 @@ func TestClient_ForwardAnApiRequest(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*ForwardAnApiResponse)
+						respMapping := args.Get(4).(*ForwardAnApiResponse)
 						*respMapping = response
 					})
 			},
@@ -64,7 +64,7 @@ func TestClient_ForwardAnApiRequest(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *ForwardAnApiResponse, err error) {
@@ -82,7 +82,7 @@ func TestClient_ForwardAnApiRequest(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -164,10 +164,10 @@ func TestClient_GetForwardRequest(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*GetForwardResponse)
+						respMapping := args.Get(3).(*GetForwardResponse)
 						*respMapping = response
 					})
 			},
@@ -201,7 +201,7 @@ func TestClient_GetForwardRequest(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *GetForwardResponse, err error) {
@@ -219,7 +219,7 @@ func TestClient_GetForwardRequest(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,

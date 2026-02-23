@@ -44,10 +44,10 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(3).(*PaymentHostedResponse)
+						respMapping := args.Get(4).(*PaymentHostedResponse)
 						*respMapping = hostedPaymentResponse
 					})
 			},
@@ -64,7 +64,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentHostedResponse, err error) {
@@ -82,7 +82,7 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("Post", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusUnprocessableEntity,
@@ -105,13 +105,13 @@ func TestCreateHostedPaymentsPageSession(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemetry := true
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiPost(&apiClient.Mock)
 
-			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
-			client := NewClient(config, apiClient)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.CreateHostedPaymentsPageSession(tc.request))
 		})
@@ -146,10 +146,10 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(2).(*PaymentHostedDetails)
+						respMapping := args.Get(3).(*PaymentHostedDetails)
 						*respMapping = hostedPaymentDetails
 					})
 			},
@@ -172,7 +172,7 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
 			checker: func(response *PaymentHostedDetails, err error) {
@@ -190,7 +190,7 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiGet: func(m *mock.Mock) mock.Call {
-				return *m.On("Get", mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(
 						errors.CheckoutAPIError{
 							StatusCode: http.StatusNotFound,
@@ -212,13 +212,13 @@ func TestGetHostedPaymentsPageDetails(t *testing.T) {
 			apiClient := new(mocks.ApiClientMock)
 			credentials := new(mocks.CredentialsMock)
 			environment := new(mocks.EnvironmentMock)
-			enableTelemetry := true
+			enableTelemertry := true
 
 			tc.getAuthorization(&credentials.Mock)
 			tc.apiGet(&apiClient.Mock)
 
-			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
-			client := NewClient(config, apiClient)
+			configuration := configuration.NewConfiguration(credentials, &enableTelemertry, environment, &http.Client{}, nil)
+			client := NewClient(configuration, apiClient)
 
 			tc.checker(client.GetHostedPaymentsPageDetails(tc.hostedPaymentId))
 		})

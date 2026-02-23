@@ -1,6 +1,8 @@
 package payment_sessions
 
 import (
+	"context"
+
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,13 +21,17 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) RequestPaymentSessions(request PaymentSessionsRequest) (*PaymentSessionsResponse, error) {
+	return c.RequestPaymentSessionsWithContext(context.Background(), request)
+}
+
+func (c *Client) RequestPaymentSessionsWithContext(ctx context.Context, request PaymentSessionsRequest) (*PaymentSessionsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSessionsResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentSessionsPath), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSessionsPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +40,17 @@ func (c *Client) RequestPaymentSessions(request PaymentSessionsRequest) (*Paymen
 }
 
 func (c *Client) RequestPaymentSessionsWithPayment(request PaymentSessionsWithPaymentRequest) (*PaymentSessionPaymentResponse, error) {
+	return c.RequestPaymentSessionsWithPaymentWithContext(context.Background(), request)
+}
+
+func (c *Client) RequestPaymentSessionsWithPaymentWithContext(ctx context.Context, request PaymentSessionsWithPaymentRequest) (*PaymentSessionPaymentResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSessionPaymentResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentSessionsCompletePath), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSessionsCompletePath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,13 +59,17 @@ func (c *Client) RequestPaymentSessionsWithPayment(request PaymentSessionsWithPa
 }
 
 func (c *Client) SubmitPaymentSession(sessionId string, request SubmitPaymentSessionRequest) (*PaymentSessionPaymentResponse, error) {
+	return c.SubmitPaymentSessionWithContext(context.Background(), sessionId, request)
+}
+
+func (c *Client) SubmitPaymentSessionWithContext(ctx context.Context, sessionId string, request SubmitPaymentSessionRequest) (*PaymentSessionPaymentResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSessionPaymentResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentSessionsPath, sessionId, PaymentSessionsSubmitPath), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSessionsPath, sessionId, PaymentSessionsSubmitPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}

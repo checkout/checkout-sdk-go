@@ -1,6 +1,8 @@
 package setups
 
 import (
+	"context"
+
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -28,13 +30,17 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 // customer's journey. For example, the first time they land on the basket
 // page.
 func (c *Client) CreatePaymentSetup(request PaymentSetupRequest) (*PaymentSetupResponse, error) {
+	return c.CreatePaymentSetupWithContext(context.Background(), request)
+}
+
+func (c *Client) CreatePaymentSetupWithContext(ctx context.Context, request PaymentSetupRequest) (*PaymentSetupResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSetupResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentSetupsPath), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSetupsPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -51,13 +57,17 @@ func (c *Client) CreatePaymentSetup(request PaymentSetupRequest) (*PaymentSetupR
 // in the data relevant to the customer's transaction. For example, when the
 // customer makes a change that impacts the total payment amount.
 func (c *Client) UpdatePaymentSetup(setupId string, request PaymentSetupRequest) (*PaymentSetupResponse, error) {
+	return c.UpdatePaymentSetupWithContext(context.Background(), setupId, request)
+}
+
+func (c *Client) UpdatePaymentSetupWithContext(ctx context.Context, setupId string, request PaymentSetupRequest) (*PaymentSetupResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSetupResponse
-	err = c.apiClient.Put(common.BuildPath(PaymentSetupsPath, setupId), auth, request, &response, nil)
+	err = c.apiClient.PutWithContext(ctx, common.BuildPath(PaymentSetupsPath, setupId), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -70,13 +80,17 @@ func (c *Client) UpdatePaymentSetup(setupId string, request PaymentSetupRequest)
 //
 // Retrieves a Payment Setup.
 func (c *Client) GetPaymentSetup(setupId string) (*PaymentSetupResponse, error) {
+	return c.GetPaymentSetupWithContext(context.Background(), setupId)
+}
+
+func (c *Client) GetPaymentSetupWithContext(ctx context.Context, setupId string) (*PaymentSetupResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSetupResponse
-	err = c.apiClient.Get(common.BuildPath(PaymentSetupsPath, setupId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(PaymentSetupsPath, setupId), auth, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -91,13 +105,17 @@ func (c *Client) GetPaymentSetup(setupId string) (*PaymentSetupResponse, error) 
 // Confirm a Payment Setup to begin processing the payment request with your
 // chosen payment method option.
 func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodOptionId string) (*PaymentSetupConfirmResponse, error) {
+	return c.ConfirmPaymentSetupWithContext(context.Background(), setupId, paymentMethodOptionId)
+}
+
+func (c *Client) ConfirmPaymentSetupWithContext(ctx context.Context, setupId string, paymentMethodOptionId string) (*PaymentSetupConfirmResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentSetupConfirmResponse
-	err = c.apiClient.Post(common.BuildPath(PaymentSetupsPath, setupId, ConfirmPath, paymentMethodOptionId), auth, nil, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSetupsPath, setupId, ConfirmPath, paymentMethodOptionId), auth, nil, &response, nil)
 	if err != nil {
 		return nil, err
 	}

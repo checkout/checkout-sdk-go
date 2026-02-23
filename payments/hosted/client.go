@@ -1,6 +1,7 @@
 package hosted
 
 import (
+	"context"
 	"github.com/checkout/checkout-sdk-go/client"
 	"github.com/checkout/checkout-sdk-go/common"
 	"github.com/checkout/checkout-sdk-go/configuration"
@@ -19,13 +20,17 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 func (c *Client) CreateHostedPaymentsPageSession(request PaymentHostedRequest) (*PaymentHostedResponse, error) {
+	return c.CreateHostedPaymentsPageSessionWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateHostedPaymentsPageSessionWithContext(ctx context.Context, request PaymentHostedRequest) (*PaymentHostedResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentHostedResponse
-	err = c.apiClient.Post(common.BuildPath(HostedPaymentsPath), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(HostedPaymentsPath), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +39,17 @@ func (c *Client) CreateHostedPaymentsPageSession(request PaymentHostedRequest) (
 }
 
 func (c *Client) GetHostedPaymentsPageDetails(hostedPaymentId string) (*PaymentHostedDetails, error) {
+	return c.GetHostedPaymentsPageDetailsWithContext(context.Background(), hostedPaymentId)
+}
+
+func (c *Client) GetHostedPaymentsPageDetailsWithContext(ctx context.Context, hostedPaymentId string) (*PaymentHostedDetails, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
 	}
 
 	var response PaymentHostedDetails
-	err = c.apiClient.Get(common.BuildPath(HostedPaymentsPath, hostedPaymentId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(HostedPaymentsPath, hostedPaymentId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

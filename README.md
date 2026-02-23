@@ -11,10 +11,11 @@
 
 ## Getting started
 
-> **Version 1.0.0 is here!**
+> **Version 2.0.0 is here!**
 > <br/><br/>
-> We improved the initialization of SDK making it easier to understand the available options. <br/>
-> Now `NAS` accounts are the default instance for the SDK and `ABC` structure was moved to a `previous` prefixes. <br/>
+> We added comprehensive `context.Context` support across all SDK clients. <br/>
+> All client methods now have `*WithContext` variants for better timeout handling, cancellation support, and request lifecycle control. <br/>
+> Backward compatibility is maintained: existing methods continue to work by using `context.Background()` internally. <br/>
 
 ### Module installer
 Make sure your project is using Go Modules:

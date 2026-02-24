@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/stretchr/testify/assert"
 )
 

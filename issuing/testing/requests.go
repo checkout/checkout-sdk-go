@@ -1,6 +1,6 @@
 package issuing
 
-import "github.com/checkout/checkout-sdk-go/common"
+import "github.com/checkout/checkout-sdk-go/v2/common"
 
 type TransactionType string
 

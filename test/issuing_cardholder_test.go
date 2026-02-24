@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/v2/errors"
 
-	cardholders "github.com/checkout/checkout-sdk-go/issuing/cardholders"
+	cardholders "github.com/checkout/checkout-sdk-go/v2/issuing/cardholders"
 )
 
 func TestCreateCardholder(t *testing.T) {

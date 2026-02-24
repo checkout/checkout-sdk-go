@@ -12,7 +12,7 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 
-	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
 type Purpose string

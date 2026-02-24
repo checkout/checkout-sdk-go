@@ -3,11 +3,11 @@ package test
 import (
 	"testing"
 
-	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/v2/common"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/tokens"
+	"github.com/checkout/checkout-sdk-go/v2/tokens"
 )
 
 func TestShouldRequestCardTokenPrevious(t *testing.T) {

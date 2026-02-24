@@ -2,15 +2,15 @@ package test
 
 import (
 	"fmt"
-	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/v2/common"
 	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/transfers"
+	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v2/transfers"
 )
 
 func TestInitiateTransferOfFounds(t *testing.T) {

@@ -3,7 +3,7 @@ package configuration
 import (
 	"regexp"
 
-	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
 type StaticKeysBuilder struct {

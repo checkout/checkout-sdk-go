@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/payments"
-	payment_sessions "github.com/checkout/checkout-sdk-go/payments/sessions"
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/payments"
+	payment_sessions "github.com/checkout/checkout-sdk-go/v2/payments/sessions"
 )
 
 var (

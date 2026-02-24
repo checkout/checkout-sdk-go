@@ -1,8 +1,8 @@
 package metadata
 
 import (
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/metadata/sources"
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/metadata/sources"
 )
 
 const (

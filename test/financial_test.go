@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/financial"
+	"github.com/checkout/checkout-sdk-go/v2/financial"
 )
 
 func TestGetFinancialActions(t *testing.T) {

@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/forward"
+	"github.com/checkout/checkout-sdk-go/v2/forward"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"

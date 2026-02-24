@@ -3,7 +3,7 @@ package configuration
 import (
 	"net/http"
 
-	"github.com/checkout/checkout-sdk-go/common"
+	"github.com/checkout/checkout-sdk-go/v2/common"
 )
 
 type Configuration struct {

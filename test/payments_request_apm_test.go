@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/errors"
-	"github.com/checkout/checkout-sdk-go/payments"
-	"github.com/checkout/checkout-sdk-go/payments/nas"
-	"github.com/checkout/checkout-sdk-go/payments/nas/sources/apm"
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v2/payments"
+	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
+	"github.com/checkout/checkout-sdk-go/v2/payments/nas/sources/apm"
 )
 
 func TestRequestPaymentsAPM(t *testing.T) {

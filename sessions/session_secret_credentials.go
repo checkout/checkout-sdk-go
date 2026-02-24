@@ -1,8 +1,8 @@
 package sessions
 
 import (
-	"github.com/checkout/checkout-sdk-go/configuration"
-	"github.com/checkout/checkout-sdk-go/errors"
+	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
 type SessionSecretCredentials struct {

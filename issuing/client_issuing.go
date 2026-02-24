@@ -3,13 +3,13 @@ package issuing
 import (
 	"context"
 
-	"github.com/checkout/checkout-sdk-go/client"
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/configuration"
-	cardholders "github.com/checkout/checkout-sdk-go/issuing/cardholders"
-	cards "github.com/checkout/checkout-sdk-go/issuing/cards"
-	controls "github.com/checkout/checkout-sdk-go/issuing/controls"
-	testing "github.com/checkout/checkout-sdk-go/issuing/testing"
+	"github.com/checkout/checkout-sdk-go/v2/client"
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	cardholders "github.com/checkout/checkout-sdk-go/v2/issuing/cardholders"
+	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
+	controls "github.com/checkout/checkout-sdk-go/v2/issuing/controls"
+	testing "github.com/checkout/checkout-sdk-go/v2/issuing/testing"
 )
 
 const (

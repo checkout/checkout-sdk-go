@@ -3,10 +3,10 @@ package sessions
 import (
 	"context"
 
-	"github.com/checkout/checkout-sdk-go/client"
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/configuration"
-	"github.com/checkout/checkout-sdk-go/sessions/channels"
+	"github.com/checkout/checkout-sdk-go/v2/client"
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	"github.com/checkout/checkout-sdk-go/v2/sessions/channels"
 )
 
 type Client struct {

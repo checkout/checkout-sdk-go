@@ -3,7 +3,7 @@ package nas
 import (
 	"net/http"
 
-	"github.com/checkout/checkout-sdk-go/configuration"
+	"github.com/checkout/checkout-sdk-go/v2/configuration"
 )
 
 type CheckoutDefaultSdkBuilder struct {

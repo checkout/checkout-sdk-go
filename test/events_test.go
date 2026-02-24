@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	events "github.com/checkout/checkout-sdk-go/events/abc"
+	events "github.com/checkout/checkout-sdk-go/v2/events/abc"
 )
 
 func TestShouldGetEventTypes(t *testing.T) {

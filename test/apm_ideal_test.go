@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/apm/ideal"
+	"github.com/checkout/checkout-sdk-go/v2/apm/ideal"
 )
 
 /* TODO fix 404 not-found

@@ -1,6 +1,6 @@
 package configuration
 
-import "github.com/checkout/checkout-sdk-go/errors"
+import "github.com/checkout/checkout-sdk-go/v2/errors"
 
 type DefaultKeysSdkCredentials struct {
 	StaticKeys

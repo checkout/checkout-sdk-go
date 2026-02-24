@@ -1,16 +1,16 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/payments/nas"
-	"github.com/checkout/checkout-sdk-go/payments/nas/sources"
+	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
+	"github.com/checkout/checkout-sdk-go/v2/payments/nas/sources"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/common"
-	"github.com/checkout/checkout-sdk-go/disputes"
-	"github.com/checkout/checkout-sdk-go/payments"
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/disputes"
+	"github.com/checkout/checkout-sdk-go/v2/payments"
 )
 
 func TestGetDisputesWithOAuthSdk(t *testing.T) {

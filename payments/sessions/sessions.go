@@ -155,6 +155,7 @@ type (
 		ThreeDsRequest *payments.ThreeDsRequestFlowHostedLinks `json:"3ds,omitempty"`
 		IpAddress      string                                  `json:"ip_address,omitempty"`
 		PaymentType    payments.PaymentType                    `json:"payment_type,omitempty"`
+		Capture        bool                                    `json:"capture,omitempty"`
 		Metadata       map[string]interface{}                  `json:"metadata,omitempty"`
 	}
 

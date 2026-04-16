@@ -76,6 +76,18 @@ type (
 		Reference string `json:"reference,omitempty"`
 	}
 
+	CardPayoutItem struct {
+		Type    payments.ItemType    `json:"type,omitempty"`
+		SubType payments.ItemSubType `json:"sub_type,omitempty"`
+	}
+
+	CardPayoutProcessing struct {
+		AffiliateId     string         `json:"affiliate_id,omitempty"`
+		AffiliateUrl    string         `json:"affiliate_url,omitempty"`
+		ProcessingSpeed string         `json:"processing_speed,omitempty"`
+		PurchaseCountry common.Country `json:"purchase_country,omitempty"`
+	}
+
 	PaymentInstruction struct {
 		Purpose           PaymentPurposeType        `json:"purpose,omitempty"`
 		ChargeBearer      string                    `json:"charge_bearer,omitempty"`
@@ -158,16 +170,20 @@ type (
 	}
 
 	PayoutRequest struct {
-		Source              sources.PayoutSource     `json:"source,omitempty"`
-		Destination         payments.Destination     `json:"destination,omitempty"`
-		Amount              int64                    `json:"amount,omitempty"`
-		Currency            common.Currency          `json:"currency,omitempty"`
-		Reference           string                   `json:"reference,omitempty"`
-		BillingDescriptor   *PayoutBillingDescriptor `json:"billing_descriptor,omitempty"`
-		Sender              Sender                   `json:"sender,omitempty"`
-		Instruction         *PaymentInstruction      `json:"instruction,omitempty"`
-		ProcessingChannelId string                   `json:"processing_channel_id,omitempty"`
-		Metadata            map[string]interface{}   `json:"metadata,omitempty"`
+		Source              sources.PayoutSource      `json:"source,omitempty"`
+		Destination         payments.Destination      `json:"destination,omitempty"`
+		Amount              int64                     `json:"amount,omitempty"`
+		Currency            common.Currency           `json:"currency,omitempty"`
+		Reference           string                    `json:"reference,omitempty"`
+		BillingDescriptor   *PayoutBillingDescriptor  `json:"billing_descriptor,omitempty"`
+		Sender              Sender                    `json:"sender,omitempty"`
+		Instruction         *PaymentInstruction       `json:"instruction,omitempty"`
+		ProcessingChannelId string                    `json:"processing_channel_id,omitempty"`
+		PreviousPaymentId   string                    `json:"previous_payment_id,omitempty"`
+		Items               []CardPayoutItem          `json:"items,omitempty"`
+		Segment             *payments.PaymentSegment  `json:"segment,omitempty"`
+		Processing          *CardPayoutProcessing     `json:"processing,omitempty"`
+		Metadata            map[string]interface{}    `json:"metadata,omitempty"`
 	}
 
 	IncrementAuthorizationRequest struct {

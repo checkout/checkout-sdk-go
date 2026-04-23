@@ -1277,3 +1277,127 @@ func TestVoidPayment(t *testing.T) {
 		})
 	}
 }
+
+// tests
+
+func TestSearchPayments(t *testing.T) {
+	cases := []struct {
+		name             string
+		request          SearchPaymentsRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*SearchPaymentsResponse, error)
+	}{
+		{
+			name:    "when request is correct then return search results",
+			request: buildSearchPaymentsRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*SearchPaymentsResponse)
+						*respMapping = buildSearchPaymentsResponse()
+					})
+			},
+			checker: func(response *SearchPaymentsResponse, err error) {
+				assert.Nil(t, err)
+				assertSearchPaymentsResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *SearchPaymentsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:    "when request invalid then return error",
+			request: SearchPaymentsRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Unprocessable Entity",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "request_invalid",
+							ErrorCodes: []string{"query_invalid"},
+						},
+					})
+			},
+			checker: func(response *SearchPaymentsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.SearchPayments(tc.request))
+		})
+	}
+}
+
+// common methods
+
+func buildSearchPaymentsRequest() SearchPaymentsRequest {
+	return SearchPaymentsRequest{
+		Query: "id:'pay_1234'",
+		Limit: 10,
+	}
+}
+
+func buildSearchPaymentsResponse() SearchPaymentsResponse {
+	return SearchPaymentsResponse{
+		HttpMetadata: mocks.HttpMetadataStatusOk,
+		Data: []GetPaymentResponse{
+			{
+				Id:       paymentId,
+				Amount:   amount,
+				Currency: currency,
+			},
+		},
+	}
+}
+
+func assertSearchPaymentsResponse(t *testing.T, response *SearchPaymentsResponse) {
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	assert.NotEmpty(t, response.Data)
+	assert.Equal(t, paymentId, response.Data[0].Id)
+	assert.Equal(t, amount, response.Data[0].Amount)
+	assert.Equal(t, currency, response.Data[0].Currency)
+}

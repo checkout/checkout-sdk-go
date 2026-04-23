@@ -1326,8 +1326,71 @@ func TestSearchPayments(t *testing.T) {
 			},
 		},
 		{
-			name:    "when request invalid then return error",
-			request: SearchPaymentsRequest{},
+			name:    "when request has invalid input then return bad request",
+			request: buildSearchPaymentsRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusBadRequest,
+						Status:     "400 Bad Request",
+					})
+			},
+			checker: func(response *SearchPaymentsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when unauthorized then return error",
+			request: buildSearchPaymentsRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnauthorized,
+						Status:     "401 Unauthorized",
+					})
+			},
+			checker: func(response *SearchPaymentsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnauthorized, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when forbidden then return error",
+			request: buildSearchPaymentsRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusForbidden,
+						Status:     "403 Forbidden",
+					})
+			},
+			checker: func(response *SearchPaymentsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusForbidden, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when query validation fails then return error",
+			request: SearchPaymentsRequest{Query: "invalid::query"},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)

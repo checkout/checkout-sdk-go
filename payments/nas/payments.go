@@ -206,6 +206,13 @@ type (
 		Processing        *payments.ProcessingSettings `json:"processing,omitempty"`
 		Metadata          map[string]interface{}       `json:"metadata,omitempty"`
 	}
+
+	SearchPaymentsRequest struct {
+		Query string     `json:"query,omitempty"`
+		Limit int        `json:"limit,omitempty"`
+		From  *time.Time `json:"from,omitempty"`
+		To    *time.Time `json:"to,omitempty"`
+	}
 )
 
 // Response
@@ -315,6 +322,12 @@ type (
 		Skip         int                  `json:"skip,omitempty"`
 		TotalCount   int                  `json:"total_count,omitempty"`
 		Data         []GetPaymentResponse `json:"data,omitempty"`
+	}
+
+	SearchPaymentsResponse struct {
+		HttpMetadata common.HttpMetadata
+		Data         []GetPaymentResponse   `json:"data,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
 	}
 
 	IncrementAuthorizationResponse struct {

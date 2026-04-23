@@ -312,3 +312,29 @@ func (c *Client) VoidPaymentWithContext(
 
 	return &response, nil
 }
+
+func (c *Client) SearchPayments(request SearchPaymentsRequest) (*SearchPaymentsResponse, error) {
+	return c.SearchPaymentsWithContext(context.Background(), request)
+}
+
+func (c *Client) SearchPaymentsWithContext(ctx context.Context, request SearchPaymentsRequest) (*SearchPaymentsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response SearchPaymentsResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(payments.PathPayments, "search"),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

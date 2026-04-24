@@ -816,6 +816,15 @@ type (
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}
 
+	CancellationRequest struct {
+		Reference string `json:"reference,omitempty"`
+	}
+
+	PaymentReversalRequest struct {
+		Reference string                 `json:"reference,omitempty"`
+		Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	}
+
 	QueryRequest struct {
 		Limit     int    `url:"limit,10"`
 		Skip      int    `url:"skip,0"`
@@ -840,6 +849,20 @@ type (
 	}
 
 	VoidResponse struct {
+		HttpMetadata common.HttpMetadata
+		ActionId     string                 `json:"action_id,omitempty"`
+		Reference    string                 `json:"reference,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
+	}
+
+	CancellationResponse struct {
+		HttpMetadata common.HttpMetadata
+		ActionId     string                 `json:"action_id,omitempty"`
+		Reference    string                 `json:"reference,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
+	}
+
+	PaymentReversalResponse struct {
 		HttpMetadata common.HttpMetadata
 		ActionId     string                 `json:"action_id,omitempty"`
 		Reference    string                 `json:"reference,omitempty"`

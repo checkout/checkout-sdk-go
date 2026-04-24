@@ -313,6 +313,76 @@ func (c *Client) VoidPaymentWithContext(
 	return &response, nil
 }
 
+func (c *Client) CancelAScheduledRetry(
+	paymentId string,
+	request *payments.CancellationRequest,
+	idempotencyKey *string,
+) (*payments.CancellationResponse, error) {
+	return c.CancelAScheduledRetryWithContext(context.Background(), paymentId, request, idempotencyKey)
+}
+
+func (c *Client) CancelAScheduledRetryWithContext(
+	ctx context.Context,
+	paymentId string,
+	request *payments.CancellationRequest,
+	idempotencyKey *string,
+) (*payments.CancellationResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response payments.CancellationResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(payments.PathPayments, paymentId, "cancellations"),
+		auth,
+		request,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) ReversePayment(
+	paymentId string,
+	request *payments.PaymentReversalRequest,
+	idempotencyKey *string,
+) (*payments.PaymentReversalResponse, error) {
+	return c.ReversePaymentWithContext(context.Background(), paymentId, request, idempotencyKey)
+}
+
+func (c *Client) ReversePaymentWithContext(
+	ctx context.Context,
+	paymentId string,
+	request *payments.PaymentReversalRequest,
+	idempotencyKey *string,
+) (*payments.PaymentReversalResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response payments.PaymentReversalResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(payments.PathPayments, paymentId, "reversals"),
+		auth,
+		request,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) SearchPayments(request SearchPaymentsRequest) (*SearchPaymentsResponse, error) {
 	return c.SearchPaymentsWithContext(context.Background(), request)
 }

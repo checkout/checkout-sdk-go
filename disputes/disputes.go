@@ -10,6 +10,7 @@ const (
 	disputes    = "disputes"
 	accept      = "accept"
 	evidence    = "evidence"
+	arbitration = "arbitration"
 	submitted   = "submitted"
 	files       = "files"
 	schemeFiles = "schemefiles"

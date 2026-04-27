@@ -384,6 +384,125 @@ func (c *Client) UpdatePayoutScheduleWithContext(
 	return &response, nil
 }
 
+func (c *Client) CreateReserveRule(entityId string, request ReserveRuleRequest) (*common.IdResponse, error) {
+	return c.CreateReserveRuleWithContext(context.Background(), entityId, request)
+}
+
+func (c *Client) CreateReserveRuleWithContext(
+	ctx context.Context,
+	entityId string,
+	request ReserveRuleRequest,
+) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.IdResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(accountsPath, entitiesPath, entityId, reserveRulesPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetReserveRules(entityId string) (*ReserveRulesResponse, error) {
+	return c.GetReserveRulesWithContext(context.Background(), entityId)
+}
+
+func (c *Client) GetReserveRulesWithContext(ctx context.Context, entityId string) (*ReserveRulesResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ReserveRulesResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(accountsPath, entitiesPath, entityId, reserveRulesPath),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetReserveRuleDetails(entityId, reserveRuleId string) (*ReserveRuleResponse, error) {
+	return c.GetReserveRuleDetailsWithContext(context.Background(), entityId, reserveRuleId)
+}
+
+func (c *Client) GetReserveRuleDetailsWithContext(
+	ctx context.Context,
+	entityId, reserveRuleId string,
+) (*ReserveRuleResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ReserveRuleResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(accountsPath, entitiesPath, entityId, reserveRulesPath, reserveRuleId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) UpdateReserveRule(
+	entityId, reserveRuleId, etag string,
+	request ReserveRuleRequest,
+) (*common.IdResponse, error) {
+	return c.UpdateReserveRuleWithContext(context.Background(), entityId, reserveRuleId, etag, request)
+}
+
+func (c *Client) UpdateReserveRuleWithContext(
+	ctx context.Context,
+	entityId, reserveRuleId, etag string,
+	request ReserveRuleRequest,
+) (*common.IdResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := struct {
+		ReserveRuleRequest
+		Headers *Headers `json:"headers,omitempty"`
+	}{request, &Headers{IfMatch: etag}}
+
+	var response common.IdResponse
+	err = c.apiClient.PutWithContext(
+		ctx,
+		common.BuildPath(accountsPath, entitiesPath, entityId, reserveRulesPath, reserveRuleId),
+		auth,
+		payload,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	return c.SubmitFileWithContext(context.Background(), file)
 }

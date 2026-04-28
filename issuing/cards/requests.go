@@ -104,3 +104,60 @@ func (c *physicalCardRequest) GetRequestType() CardType {
 func (c *virtualCardRequest) GetRequestType() CardType {
 	return c.Type
 }
+
+type (
+	RenewCardMetadata struct {
+		Udf1 string `json:"udf1,omitempty"`
+		Udf2 string `json:"udf2,omitempty"`
+		Udf3 string `json:"udf3,omitempty"`
+		Udf4 string `json:"udf4,omitempty"`
+		Udf5 string `json:"udf5,omitempty"`
+	}
+
+	renewCardRequestBase struct {
+		DisplayName string             `json:"display_name,omitempty"`
+		Reference   string             `json:"reference,omitempty"`
+		Metadata    *RenewCardMetadata `json:"metadata,omitempty"`
+	}
+
+	physicalCardRenewRequest struct {
+		renewCardRequestBase
+		ShippingInstructions *ShippingInstruction `json:"shipping_instructions,omitempty"`
+	}
+
+	virtualCardRenewRequest struct {
+		renewCardRequestBase
+	}
+
+	RenewCardRequest interface {
+		GetRenewType() CardType
+	}
+)
+
+func NewPhysicalCardRenewRequest() *physicalCardRenewRequest {
+	return &physicalCardRenewRequest{}
+}
+
+func NewVirtualCardRenewRequest() *virtualCardRenewRequest {
+	return &virtualCardRenewRequest{}
+}
+
+func (c *physicalCardRenewRequest) GetRenewType() CardType {
+	return Physical
+}
+
+func (c *virtualCardRenewRequest) GetRenewType() CardType {
+	return Virtual
+}
+
+type (
+	ScheduleRevocationRequest struct {
+		RevocationDate string `json:"revocation_date,omitempty"`
+	}
+
+	CardUpdateRequest struct {
+		Reference   string `json:"reference,omitempty"`
+		ExpiryMonth int    `json:"expiry_month,omitempty"`
+		ExpiryYear  int    `json:"expiry_year,omitempty"`
+	}
+)

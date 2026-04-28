@@ -29,4 +29,20 @@ type (
 	CardSimulationRequest struct {
 		Amount int `json:"amount,omitempty"`
 	}
+
+	SimulateRefundRequest struct {
+		Amount int `json:"amount,omitempty"`
+	}
+
+	OobTransactionDetails struct {
+		LastFour         string          `json:"last_four,omitempty"`
+		MerchantName     string          `json:"merchant_name,omitempty"`
+		PurchaseAmount   float64         `json:"purchase_amount,omitempty"`
+		PurchaseCurrency common.Currency `json:"purchase_currency,omitempty"`
+	}
+
+	SimulateOobAuthenticationRequest struct {
+		CardId             string                 `json:"card_id,omitempty"`
+		TransactionDetails *OobTransactionDetails `json:"transaction_details,omitempty"`
+	}
 )

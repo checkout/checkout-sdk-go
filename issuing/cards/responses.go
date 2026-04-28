@@ -9,6 +9,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
+
 type (
 	CardResponse struct {
 		HttpMetadata    common.HttpMetadata
@@ -88,5 +89,38 @@ type (
 	CardCredentialsResponse struct {
 		Number string `json:"number,omitempty"`
 		Cvc2   string `json:"cvc2,omitempty"`
+	}
+)
+
+type (
+	RenewCardResponse struct {
+		HttpMetadata   common.HttpMetadata
+		Id             string          `json:"id,omitempty"`
+		ParentCardId   string          `json:"parent_card_id,omitempty"`
+		CardholderId   string          `json:"cardholder_id,omitempty"`
+		Status         CardStatus      `json:"status,omitempty"`
+		Type           CardType        `json:"type,omitempty"`
+		ClientId       string          `json:"client_id,omitempty"`
+		EntityId       string          `json:"entity_id,omitempty"`
+		LastFour       string          `json:"last_four,omitempty"`
+		ExpiryYear     int             `json:"expiry_year,omitempty"`
+		ExpiryMonth    int             `json:"expiry_month,omitempty"`
+		DisplayName    string          `json:"display_name,omitempty"`
+		Reference      string          `json:"reference,omitempty"`
+		CreatedDate    *time.Time      `json:"created_date,omitempty"`
+		BillingCurrency common.Currency `json:"billing_currency,omitempty"`
+		IssuingCountry common.Country  `json:"issuing_country,omitempty"`
+		Links          map[string]common.Link `json:"_links,omitempty"`
+	}
+
+	ScheduleRevocationResponse struct {
+		HttpMetadata common.HttpMetadata
+		Links        map[string]common.Link `json:"_links,omitempty"`
+	}
+
+	CardUpdateResponse struct {
+		HttpMetadata     common.HttpMetadata
+		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
+		Links            map[string]common.Link `json:"_links,omitempty"`
 	}
 )

@@ -110,6 +110,47 @@ func TestGetCardholderDetails(t *testing.T) {
 	}
 }
 
+func TestUpdateCardholder(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+	cases := []struct {
+		name         string
+		cardholderId string
+		request      cardholders.CardholderRequest
+		checker      func(*cardholders.CardholderUpdateResponse, error)
+	}{
+		{
+			name:         "when request is correct then should return 200",
+			cardholderId: cardholderResponse.Id,
+			request:      updateCardholderRequest(),
+			checker: func(response *cardholders.CardholderUpdateResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.LastModifiedDate)
+			},
+		},
+		{
+			name:         "when cardholder id not found then return error",
+			cardholderId: "crh_not_found",
+			request:      updateCardholderRequest(),
+			checker: func(response *cardholders.CardholderUpdateResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIssuingClientApi().Issuing
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.UpdateCardholder(tc.cardholderId, tc.request))
+		})
+	}
+}
+
 func TestGetCardholderCards(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
 	cases := []struct {
@@ -138,4 +179,21 @@ func TestGetCardholderCards(t *testing.T) {
 			tc.checker(client.GetCardholderCards(tc.cardholderId))
 		})
 	}
+}
+
+// # common methods
+
+func updateCardholderRequest() cardholders.CardholderRequest {
+	return cardholders.CardholderRequest{
+		FirstName:      "John",
+		LastName:       "Kennedy",
+		Email:          "john.kennedy@myemaildomain.com",
+		PhoneNumber:    Phone(),
+		BillingAddress: Address(),
+	}
+}
+
+func assertCardholderUpdateResponse(t *testing.T, response *cardholders.CardholderUpdateResponse) {
+	assert.NotNil(t, response)
+	assert.NotNil(t, response.LastModifiedDate)
 }

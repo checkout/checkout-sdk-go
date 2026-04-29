@@ -16,7 +16,9 @@ import (
 	instruments "github.com/checkout/checkout-sdk-go/v2/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/v2/issuing"
 	"github.com/checkout/checkout-sdk-go/v2/metadata"
+	"github.com/checkout/checkout-sdk-go/v2/payments/applepay"
 	"github.com/checkout/checkout-sdk-go/v2/payments/contexts"
+	"github.com/checkout/checkout-sdk-go/v2/payments/googlepay"
 	"github.com/checkout/checkout-sdk-go/v2/payments/hosted"
 	"github.com/checkout/checkout-sdk-go/v2/payments/links"
 	payments "github.com/checkout/checkout-sdk-go/v2/payments/nas"
@@ -51,6 +53,8 @@ type Api struct {
 	PaymentSessions *payment_sessions.Client
 	PaymentSetups   *setups.Client
 	Forward         *forward.Client
+	ApplePay        *applepay.Client
+	GooglePay       *googlepay.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -82,6 +86,8 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
 	api.PaymentSetups = setups.NewClient(configuration, apiClient)
 	api.Forward = forward.NewClient(configuration, apiClient)
+	api.ApplePay = applepay.NewClient(configuration, apiClient)
+	api.GooglePay = googlepay.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

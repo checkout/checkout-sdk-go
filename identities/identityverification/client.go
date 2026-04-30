@@ -134,11 +134,11 @@ func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context,
 	return &response, nil
 }
 
-func (c *Client) GetIdentityVerificationAttempt(verificationId string, attemptId string) (*IdentityVerificationAttemptResponse, error) {
+func (c *Client) GetIdentityVerificationAttempt(verificationId, attemptId string) (*IdentityVerificationAttemptResponse, error) {
 	return c.GetIdentityVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
 
-func (c *Client) GetIdentityVerificationAttemptWithContext(ctx context.Context, verificationId string, attemptId string) (*IdentityVerificationAttemptResponse, error) {
+func (c *Client) GetIdentityVerificationAttemptWithContext(ctx context.Context, verificationId, attemptId string) (*IdentityVerificationAttemptResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

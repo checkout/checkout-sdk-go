@@ -115,11 +115,11 @@ func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, f
 	return &response, nil
 }
 
-func (c *Client) GetFaceAuthenticationAttempt(faceAuthenticationId string, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
+func (c *Client) GetFaceAuthenticationAttempt(faceAuthenticationId, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
 	return c.GetFaceAuthenticationAttemptWithContext(context.Background(), faceAuthenticationId, attemptId)
 }
 
-func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, faceAuthenticationId string, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
+func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, faceAuthenticationId, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

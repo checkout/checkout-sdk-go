@@ -995,16 +995,14 @@ func (c *Client) RemoveControlProfileWithContext(
 }
 
 func (c *Client) AddTargetToControlProfile(
-	controlProfileId string,
-	targetId string,
+	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
 	return c.AddTargetToControlProfileWithContext(context.Background(), controlProfileId, targetId)
 }
 
 func (c *Client) AddTargetToControlProfileWithContext(
 	ctx context.Context,
-	controlProfileId string,
-	targetId string,
+	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
@@ -1026,16 +1024,14 @@ func (c *Client) AddTargetToControlProfileWithContext(
 }
 
 func (c *Client) RemoveTargetFromControlProfile(
-	controlProfileId string,
-	targetId string,
+	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
 	return c.RemoveTargetFromControlProfileWithContext(context.Background(), controlProfileId, targetId)
 }
 
 func (c *Client) RemoveTargetFromControlProfileWithContext(
 	ctx context.Context,
-	controlProfileId string,
-	targetId string,
+	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

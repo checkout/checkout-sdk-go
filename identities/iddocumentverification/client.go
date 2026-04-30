@@ -115,11 +115,11 @@ func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Contex
 	return &response, nil
 }
 
-func (c *Client) GetIdDocumentVerificationAttempt(verificationId string, attemptId string) (*IdDocumentVerificationAttemptResponse, error) {
+func (c *Client) GetIdDocumentVerificationAttempt(verificationId, attemptId string) (*IdDocumentVerificationAttemptResponse, error) {
 	return c.GetIdDocumentVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
 
-func (c *Client) GetIdDocumentVerificationAttemptWithContext(ctx context.Context, verificationId string, attemptId string) (*IdDocumentVerificationAttemptResponse, error) {
+func (c *Client) GetIdDocumentVerificationAttemptWithContext(ctx context.Context, verificationId, attemptId string) (*IdDocumentVerificationAttemptResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

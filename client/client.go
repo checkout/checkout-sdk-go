@@ -131,49 +131,52 @@ func (a *ApiClient) invoke(
 }
 
 func applyRequestHeaders(request interface{}, headers http.Header) {
-	if request == nil {
+	v, ok := resolveToStruct(reflect.ValueOf(request))
+	if !ok {
 		return
 	}
-	v := reflect.ValueOf(request)
+	headersField, ok := resolveToStruct(v.FieldByName("Headers"))
+	if !ok {
+		return
+	}
+	setHeadersFromFields(headersField, headers)
+}
+
+func resolveToStruct(v reflect.Value) (reflect.Value, bool) {
+	if !v.IsValid() {
+		return v, false
+	}
 	if v.Kind() == reflect.Ptr {
 		if v.IsNil() {
-			return
+			return v, false
 		}
 		v = v.Elem()
 	}
-	if v.Kind() != reflect.Struct {
-		return
-	}
-	headersField := v.FieldByName("Headers")
-	if !headersField.IsValid() {
-		return
-	}
-	if headersField.Kind() == reflect.Ptr {
-		if headersField.IsNil() {
-			return
-		}
-		headersField = headersField.Elem()
-	}
-	if headersField.Kind() != reflect.Struct {
-		return
-	}
-	t := headersField.Type()
+	return v, v.Kind() == reflect.Struct
+}
+
+func setHeadersFromFields(v reflect.Value, headers http.Header) {
+	t := v.Type()
 	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		value := headersField.Field(i)
-		if value.Kind() != reflect.String || value.String() == "" {
+		name := headerNameFromTag(t.Field(i).Tag.Get("json"))
+		if name == "" {
 			continue
 		}
-		tag := field.Tag.Get("json")
-		if tag == "" || tag == "-" {
-			continue
+		if value := v.Field(i); value.Kind() == reflect.String && value.String() != "" {
+			headers.Set(name, value.String())
 		}
-		headerName := strings.SplitN(tag, ",", 2)[0]
-		if headerName == "" || headerName == "-" {
-			continue
-		}
-		headers.Set(headerName, value.String())
 	}
+}
+
+func headerNameFromTag(tag string) string {
+	if tag == "" || tag == "-" {
+		return ""
+	}
+	name := strings.SplitN(tag, ",", 2)[0]
+	if name == "-" {
+		return ""
+	}
+	return name
 }
 
 // 2026/04/27 DRY - At some point avoid this hardcoding and use reflection to build up the body and content type in buildRequest directly

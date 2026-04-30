@@ -192,8 +192,3 @@ func updateCardholderRequest() cardholders.CardholderRequest {
 		BillingAddress: Address(),
 	}
 }
-
-func assertCardholderUpdateResponse(t *testing.T, response *cardholders.CardholderUpdateResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.LastModifiedDate)
-}

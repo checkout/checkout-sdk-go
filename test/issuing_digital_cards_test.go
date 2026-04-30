@@ -52,12 +52,3 @@ func TestGetDigitalCard(t *testing.T) {
 		})
 	}
 }
-
-// # common methods
-
-func assertGetDigitalCardResponse(t *testing.T, response *digitalcards.GetDigitalCardResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.Id)
-	assert.NotNil(t, response.CardId)
-	assert.NotNil(t, response.Status)
-}

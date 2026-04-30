@@ -1,8 +1,9 @@
 package test
 
 import (
-	"github.com/google/uuid"
 	"testing"
+
+	"github.com/google/uuid"
 
 	"github.com/stretchr/testify/assert"
 
@@ -393,22 +394,6 @@ func paymentCommonAssertions(t *testing.T, response *nas.PaymentResponse) {
 	assertBalances(t, response)
 
 	assertLinks(t, response)
-}
-
-func assertAuthorizedPayment(response *nas.PaymentResponse, t *testing.T) {
-	assert.NotEmpty(t, response.Id)
-	assert.NotEmpty(t, response.ProcessedOn)
-	assert.NotEmpty(t, response.Reference)
-	assert.NotEmpty(t, response.ActionId)
-	assert.NotEmpty(t, response.ResponseCode)
-	assert.NotEmpty(t, response.SchemeId)
-	assert.NotEmpty(t, response.ResponseSummary)
-	assert.Equal(t, payments.Authorized, response.Status)
-	assert.Equal(t, int64(10), response.Amount)
-	assert.True(t, response.Approved)
-	assert.NotEmpty(t, response.AuthCode)
-	assert.NotEmpty(t, response.Currency)
-	assert.Nil(t, response.ThreeDs)
 }
 
 func assertSource(t *testing.T, response *nas.PaymentResponse) {

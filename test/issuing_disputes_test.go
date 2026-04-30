@@ -216,10 +216,3 @@ func escalateDisputeRequest() disputes.EscalateDisputeRequest {
 		},
 	}
 }
-
-func assertIssuingDisputeResponse(t *testing.T, response *disputes.IssuingDisputeResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.Id)
-	assert.NotNil(t, response.Status)
-	assert.NotNil(t, response.TransactionId)
-}

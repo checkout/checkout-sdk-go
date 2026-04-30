@@ -3,6 +3,11 @@ package nas
 import (
 	"github.com/checkout/checkout-sdk-go/v2/accounts"
 	"github.com/checkout/checkout-sdk-go/v2/agenticcommerce"
+	"github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
+	"github.com/checkout/checkout-sdk-go/v2/identities/applicants"
+	"github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
+	"github.com/checkout/checkout-sdk-go/v2/identities/iddocumentverification"
+	"github.com/checkout/checkout-sdk-go/v2/identities/identityverification"
 	"github.com/checkout/checkout-sdk-go/v2/apm/ideal"
 	"github.com/checkout/checkout-sdk-go/v2/apm/klarna"
 	"github.com/checkout/checkout-sdk-go/v2/apm/sepa"
@@ -65,6 +70,11 @@ type Api struct {
 	AgenticCommerce          *agenticcommerce.Client
 	ComplianceRequests       *compliancerequests.Client
 	PaymentMethods           *paymentmethods.Client
+	AmlScreening             *amlscreening.Client
+	Applicants               *applicants.Client
+	FaceAuthentication       *faceauthentication.Client
+	IdDocumentVerification   *iddocumentverification.Client
+	IdentityVerification     *identityverification.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -103,6 +113,11 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.AgenticCommerce = agenticcommerce.NewClient(configuration, apiClient)
 	api.ComplianceRequests = compliancerequests.NewClient(configuration, apiClient)
 	api.PaymentMethods = paymentmethods.NewClient(configuration, apiClient)
+	api.AmlScreening = amlscreening.NewClient(configuration, apiClient)
+	api.Applicants = applicants.NewClient(configuration, apiClient)
+	api.FaceAuthentication = faceauthentication.NewClient(configuration, apiClient)
+	api.IdDocumentVerification = iddocumentverification.NewClient(configuration, apiClient)
+	api.IdentityVerification = identityverification.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

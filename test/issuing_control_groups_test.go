@@ -173,9 +173,3 @@ func controlGroupRequest(t *testing.T) *controlgroups.ControlGroupResponse {
 
 	return response
 }
-
-func assertControlGroupResponse(t *testing.T, response *controlgroups.ControlGroupResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.Id)
-	assert.NotNil(t, response.Description)
-}

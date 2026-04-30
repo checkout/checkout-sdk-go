@@ -240,9 +240,3 @@ func controlProfileRequest(t *testing.T) *controlprofiles.ControlProfileResponse
 
 	return response
 }
-
-func assertControlProfileResponse(t *testing.T, response *controlprofiles.ControlProfileResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.Id)
-	assert.NotNil(t, response.Name)
-}

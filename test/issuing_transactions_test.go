@@ -99,10 +99,3 @@ func listTransactionsQuery() transactions.TransactionsQuery {
 		CardId: virtualCardId,
 	}
 }
-
-func assertTransactionResponse(t *testing.T, response *transactions.TransactionResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.Id)
-	assert.NotNil(t, response.Status)
-	assert.NotNil(t, response.TransactionType)
-}

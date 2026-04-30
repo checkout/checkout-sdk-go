@@ -470,11 +470,3 @@ func scheduleRevocationRequest() cards.ScheduleRevocationRequest {
 		RevocationDate: "2026-12-31",
 	}
 }
-
-func assertRenewCardResponse(t *testing.T, response *cards.RenewCardResponse) {
-	assert.NotNil(t, response)
-	assert.NotNil(t, response.Id)
-	assert.NotNil(t, response.ParentCardId)
-	assert.NotNil(t, response.Status)
-}
-

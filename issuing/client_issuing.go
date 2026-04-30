@@ -8,24 +8,43 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
 	cardholders "github.com/checkout/checkout-sdk-go/v2/issuing/cardholders"
 	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
+	controlgroups "github.com/checkout/checkout-sdk-go/v2/issuing/controlgroups"
+	controlprofiles "github.com/checkout/checkout-sdk-go/v2/issuing/controlprofiles"
 	controls "github.com/checkout/checkout-sdk-go/v2/issuing/controls"
+	digitalcards "github.com/checkout/checkout-sdk-go/v2/issuing/digitalcards"
+	disputes "github.com/checkout/checkout-sdk-go/v2/issuing/disputes"
 	testing "github.com/checkout/checkout-sdk-go/v2/issuing/testing"
+	transactions "github.com/checkout/checkout-sdk-go/v2/issuing/transactions"
 )
 
 const (
-	issuingPath           = "issuing"
-	cardholdersPath       = "cardholders"
-	cardsPath             = "cards"
-	threeDSEnrollmentPath = "3ds-enrollment"
-	activatePath          = "activate"
-	credentialsPath       = "credentials"
-	revokePath            = "revoke"
-	suspendPath           = "suspend"
-	controlsPath          = "controls"
-	simulatePath          = "simulate"
-	authorizationsPath    = "authorizations"
-	presentmentsPath      = "presentments"
-	reversalsPath         = "reversals"
+	issuingPath            = "issuing"
+	cardholdersPath        = "cardholders"
+	cardsPath              = "cards"
+	threeDSEnrollmentPath  = "3ds-enrollment"
+	activatePath           = "activate"
+	credentialsPath        = "credentials"
+	revokePath             = "revoke"
+	renewPath              = "renew"
+	scheduleRevocationPath = "schedule-revocation"
+	suspendPath            = "suspend"
+	controlsPath           = "controls"
+	controlGroupsPath      = "control-groups"
+	controlProfilesPath    = "control-profiles"
+	addPath                = "add"
+	removePath             = "remove"
+	digitalCardsPath       = "digital-cards"
+	disputesPath           = "disputes"
+	cancelPath             = "cancel"
+	escalatePath           = "escalate"
+	simulatePath           = "simulate"
+	authorizationsPath     = "authorizations"
+	presentmentsPath       = "presentments"
+	refundsPath            = "refunds"
+	reversalsPath          = "reversals"
+	oobPath                = "oob"
+	authenticationPath     = "authentication"
+	transactionsPath       = "transactions"
 )
 
 type Client struct {
@@ -612,6 +631,673 @@ func (c *Client) SimulateReversalWithContext(
 		request,
 		&response,
 		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) UpdateCardholder(
+	cardholderId string,
+	request cardholders.CardholderRequest,
+) (*cardholders.CardholderUpdateResponse, error) {
+	return c.UpdateCardholderWithContext(context.Background(), cardholderId, request)
+}
+
+func (c *Client) UpdateCardholderWithContext(
+	ctx context.Context,
+	cardholderId string,
+	request cardholders.CardholderRequest,
+) (*cardholders.CardholderUpdateResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response cardholders.CardholderUpdateResponse
+	err = c.apiClient.PatchWithContext(
+		ctx,
+		common.BuildPath(issuingPath, cardholdersPath, cardholderId),
+		auth,
+		request,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) RenewCard(cardId string, request cards.RenewCardRequest) (*cards.RenewCardResponse, error) {
+	return c.RenewCardWithContext(context.Background(), cardId, request)
+}
+
+func (c *Client) RenewCardWithContext(
+	ctx context.Context,
+	cardId string,
+	request cards.RenewCardRequest,
+) (*cards.RenewCardResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response cards.RenewCardResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, cardsPath, cardId, renewPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) ScheduleCardRevocation(
+	cardId string,
+	request cards.ScheduleRevocationRequest,
+) (*cards.ScheduleRevocationResponse, error) {
+	return c.ScheduleCardRevocationWithContext(context.Background(), cardId, request)
+}
+
+func (c *Client) ScheduleCardRevocationWithContext(
+	ctx context.Context,
+	cardId string,
+	request cards.ScheduleRevocationRequest,
+) (*cards.ScheduleRevocationResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response cards.ScheduleRevocationResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, cardsPath, cardId, scheduleRevocationPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) DeleteScheduledRevocation(cardId string) (*cards.ScheduleRevocationResponse, error) {
+	return c.DeleteScheduledRevocationWithContext(context.Background(), cardId)
+}
+
+func (c *Client) DeleteScheduledRevocationWithContext(
+	ctx context.Context,
+	cardId string,
+) (*cards.ScheduleRevocationResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response cards.ScheduleRevocationResponse
+	err = c.apiClient.DeleteWithContext(
+		ctx,
+		common.BuildPath(issuingPath, cardsPath, cardId, scheduleRevocationPath),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetControlGroups(
+	query controlgroups.ControlGroupsQuery,
+) (*controlgroups.ControlGroupsResponse, error) {
+	return c.GetControlGroupsWithContext(context.Background(), query)
+}
+
+func (c *Client) GetControlGroupsWithContext(
+	ctx context.Context,
+	query controlgroups.ControlGroupsQuery,
+) (*controlgroups.ControlGroupsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlgroups.ControlGroupsResponse
+	url, err := common.BuildQueryPath(common.BuildPath(issuingPath, controlsPath, controlGroupsPath), query)
+	if err != nil {
+		return nil, err
+	}
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) CreateControlGroup(
+	request controlgroups.CreateControlGroupRequest,
+) (*controlgroups.ControlGroupResponse, error) {
+	return c.CreateControlGroupWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateControlGroupWithContext(
+	ctx context.Context,
+	request controlgroups.CreateControlGroupRequest,
+) (*controlgroups.ControlGroupResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlgroups.ControlGroupResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlGroupsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetControlGroupDetails(controlGroupId string) (*controlgroups.ControlGroupResponse, error) {
+	return c.GetControlGroupDetailsWithContext(context.Background(), controlGroupId)
+}
+
+func (c *Client) GetControlGroupDetailsWithContext(
+	ctx context.Context,
+	controlGroupId string,
+) (*controlgroups.ControlGroupResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlgroups.ControlGroupResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlGroupsPath, controlGroupId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) RemoveControlGroup(controlGroupId string) (*common.MetadataResponse, error) {
+	return c.RemoveControlGroupWithContext(context.Background(), controlGroupId)
+}
+
+func (c *Client) RemoveControlGroupWithContext(
+	ctx context.Context,
+	controlGroupId string,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.DeleteWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlGroupsPath, controlGroupId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetAllControlProfiles(
+	query controlprofiles.ControlProfilesQuery,
+) (*controlprofiles.ControlProfilesResponse, error) {
+	return c.GetAllControlProfilesWithContext(context.Background(), query)
+}
+
+func (c *Client) GetAllControlProfilesWithContext(
+	ctx context.Context,
+	query controlprofiles.ControlProfilesQuery,
+) (*controlprofiles.ControlProfilesResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlprofiles.ControlProfilesResponse
+	url, err := common.BuildQueryPath(common.BuildPath(issuingPath, controlsPath, controlProfilesPath), query)
+	if err != nil {
+		return nil, err
+	}
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) CreateControlProfile(
+	request controlprofiles.ControlProfileRequest,
+) (*controlprofiles.ControlProfileResponse, error) {
+	return c.CreateControlProfileWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateControlProfileWithContext(
+	ctx context.Context,
+	request controlprofiles.ControlProfileRequest,
+) (*controlprofiles.ControlProfileResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlprofiles.ControlProfileResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlProfilesPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetControlProfileDetails(
+	controlProfileId string,
+) (*controlprofiles.ControlProfileResponse, error) {
+	return c.GetControlProfileDetailsWithContext(context.Background(), controlProfileId)
+}
+
+func (c *Client) GetControlProfileDetailsWithContext(
+	ctx context.Context,
+	controlProfileId string,
+) (*controlprofiles.ControlProfileResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlprofiles.ControlProfileResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlProfilesPath, controlProfileId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) UpdateControlProfile(
+	controlProfileId string,
+	request controlprofiles.ControlProfileRequest,
+) (*controlprofiles.ControlProfileResponse, error) {
+	return c.UpdateControlProfileWithContext(context.Background(), controlProfileId, request)
+}
+
+func (c *Client) UpdateControlProfileWithContext(
+	ctx context.Context,
+	controlProfileId string,
+	request controlprofiles.ControlProfileRequest,
+) (*controlprofiles.ControlProfileResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response controlprofiles.ControlProfileResponse
+	err = c.apiClient.PatchWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlProfilesPath, controlProfileId),
+		auth,
+		request,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) RemoveControlProfile(controlProfileId string) (*common.MetadataResponse, error) {
+	return c.RemoveControlProfileWithContext(context.Background(), controlProfileId)
+}
+
+func (c *Client) RemoveControlProfileWithContext(
+	ctx context.Context,
+	controlProfileId string,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.DeleteWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlProfilesPath, controlProfileId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) AddTargetToControlProfile(
+	controlProfileId, targetId string,
+) (*common.MetadataResponse, error) {
+	return c.AddTargetToControlProfileWithContext(context.Background(), controlProfileId, targetId)
+}
+
+func (c *Client) AddTargetToControlProfileWithContext(
+	ctx context.Context,
+	controlProfileId, targetId string,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlProfilesPath, controlProfileId, addPath, targetId),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) RemoveTargetFromControlProfile(
+	controlProfileId, targetId string,
+) (*common.MetadataResponse, error) {
+	return c.RemoveTargetFromControlProfileWithContext(context.Background(), controlProfileId, targetId)
+}
+
+func (c *Client) RemoveTargetFromControlProfileWithContext(
+	ctx context.Context,
+	controlProfileId, targetId string,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, controlsPath, controlProfilesPath, controlProfileId, removePath, targetId),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetDigitalCard(digitalCardId string) (*digitalcards.GetDigitalCardResponse, error) {
+	return c.GetDigitalCardWithContext(context.Background(), digitalCardId)
+}
+
+func (c *Client) GetDigitalCardWithContext(
+	ctx context.Context,
+	digitalCardId string,
+) (*digitalcards.GetDigitalCardResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response digitalcards.GetDigitalCardResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(issuingPath, digitalCardsPath, digitalCardId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) CreateDispute(
+	request disputes.CreateDisputeRequest,
+	idempotencyKey *string,
+) (*disputes.IssuingDisputeResponse, error) {
+	return c.CreateDisputeWithContext(context.Background(), request, idempotencyKey)
+}
+
+func (c *Client) CreateDisputeWithContext(
+	ctx context.Context,
+	request disputes.CreateDisputeRequest,
+	idempotencyKey *string,
+) (*disputes.IssuingDisputeResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response disputes.IssuingDisputeResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, disputesPath),
+		auth,
+		request,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetDispute(disputeId string) (*disputes.IssuingDisputeResponse, error) {
+	return c.GetDisputeWithContext(context.Background(), disputeId)
+}
+
+func (c *Client) GetDisputeWithContext(
+	ctx context.Context,
+	disputeId string,
+) (*disputes.IssuingDisputeResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response disputes.IssuingDisputeResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(issuingPath, disputesPath, disputeId),
+		auth,
+		&response,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) CancelDispute(disputeId string, idempotencyKey *string) (*common.MetadataResponse, error) {
+	return c.CancelDisputeWithContext(context.Background(), disputeId, idempotencyKey)
+}
+
+func (c *Client) CancelDisputeWithContext(
+	ctx context.Context,
+	disputeId string,
+	idempotencyKey *string,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, disputesPath, disputeId, cancelPath),
+		auth,
+		nil,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) EscalateDispute(
+	disputeId string,
+	request disputes.EscalateDisputeRequest,
+	idempotencyKey *string,
+) (*common.MetadataResponse, error) {
+	return c.EscalateDisputeWithContext(context.Background(), disputeId, request, idempotencyKey)
+}
+
+func (c *Client) EscalateDisputeWithContext(
+	ctx context.Context,
+	disputeId string,
+	request disputes.EscalateDisputeRequest,
+	idempotencyKey *string,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, disputesPath, disputeId, escalatePath),
+		auth,
+		request,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) SimulateRefund(
+	transactionId string,
+	request testing.SimulateRefundRequest,
+) (*common.MetadataResponse, error) {
+	return c.SimulateRefundWithContext(context.Background(), transactionId, request)
+}
+
+func (c *Client) SimulateRefundWithContext(
+	ctx context.Context,
+	transactionId string,
+	request testing.SimulateRefundRequest,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, simulatePath, authorizationsPath, transactionId, refundsPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) SimulateOobAuthentication(
+	request testing.SimulateOobAuthenticationRequest,
+) (*common.MetadataResponse, error) {
+	return c.SimulateOobAuthenticationWithContext(context.Background(), request)
+}
+
+func (c *Client) SimulateOobAuthenticationWithContext(
+	ctx context.Context,
+	request testing.SimulateOobAuthenticationRequest,
+) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, simulatePath, oobPath, authenticationPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetListTransactions(
+	query transactions.TransactionsQuery,
+) (*transactions.TransactionsListResponse, error) {
+	return c.GetListTransactionsWithContext(context.Background(), query)
+}
+
+func (c *Client) GetListTransactionsWithContext(
+	ctx context.Context,
+	query transactions.TransactionsQuery,
+) (*transactions.TransactionsListResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response transactions.TransactionsListResponse
+	url, err := common.BuildQueryPath(common.BuildPath(issuingPath, transactionsPath), query)
+	if err != nil {
+		return nil, err
+	}
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) GetSingleTransaction(transactionId string) (*transactions.TransactionResponse, error) {
+	return c.GetSingleTransactionWithContext(context.Background(), transactionId)
+}
+
+func (c *Client) GetSingleTransactionWithContext(
+	ctx context.Context,
+	transactionId string,
+) (*transactions.TransactionResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response transactions.TransactionResponse
+	err = c.apiClient.GetWithContext(
+		ctx,
+		common.BuildPath(issuingPath, transactionsPath, transactionId),
+		auth,
+		&response,
 	)
 	if err != nil {
 		return nil, err

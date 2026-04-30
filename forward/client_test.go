@@ -1,15 +1,19 @@
 package forward
 
 import (
+	"net/http"
+	"testing"
+	"time"
+
+	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 	"github.com/checkout/checkout-sdk-go/v2/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"net/http"
-	"testing"
-	"time"
 )
+
+// tests
 
 func TestClient_ForwardAnApiRequest(t *testing.T) {
 	var response = ForwardAnApiResponse{
@@ -120,7 +124,6 @@ func TestClient_ForwardAnApiRequest(t *testing.T) {
 			tc.checker(client.ForwardAnApiRequest(tc.request))
 		})
 	}
-
 }
 
 func TestClient_GetForwardRequest(t *testing.T) {
@@ -250,5 +253,467 @@ func TestClient_GetForwardRequest(t *testing.T) {
 
 			tc.checker(client.GetForwardRequest(tc.forwardId))
 		})
+	}
+}
+
+func TestClient_CreateSecret(t *testing.T) {
+	var (
+		secretResponse = SingleSecretResponse{
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
+			SecretResponse: SecretResponse{
+				Name:      "secret_name",
+				CreatedAt: time.Date(2025, 10, 14, 0, 0, 0, 0, time.UTC),
+				UpdatedAt: time.Date(2025, 10, 14, 0, 0, 0, 0, time.UTC),
+				Version:   1,
+				EntityId:  "ent_123",
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		request          CreateSecretRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*SingleSecretResponse, error)
+	}{
+		{
+			name:    "when request is valid then create secret",
+			request: validCreateSecretRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*SingleSecretResponse)
+						*respMapping = secretResponse
+					})
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.Equal(t, "secret_name", response.Name)
+				assert.Equal(t, 1, response.Version)
+				assert.Equal(t, "ent_123", response.EntityId)
+				assert.NotZero(t, response.CreatedAt)
+				assert.NotZero(t, response.UpdatedAt)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:    "when request invalid then return error",
+			request: CreateSecretRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Unprocessable Entity",
+							Data: &errors.ErrorDetails{
+								ErrorType:  "request_invalid",
+								ErrorCodes: []string{"name_required", "value_required"},
+							},
+						})
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "name_required")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.CreateSecret(tc.request))
+		})
+	}
+}
+
+func TestClient_ListSecrets(t *testing.T) {
+	var (
+		listResponse = ListSecretsResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Data: []SecretResponse{
+				{
+					Name:      "secret_name",
+					CreatedAt: time.Date(2025, 10, 14, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2025, 10, 14, 0, 0, 0, 0, time.UTC),
+					Version:   1,
+					EntityId:  "ent_123",
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*ListSecretsResponse, error)
+	}{
+		{
+			name: "when secrets exist then return list of secrets",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*ListSecretsResponse)
+						*respMapping = listResponse
+					})
+			},
+			checker: func(response *ListSecretsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotEmpty(t, response.Data)
+				assert.Equal(t, "secret_name", response.Data[0].Name)
+				assert.Equal(t, 1, response.Data[0].Version)
+				assert.Equal(t, "ent_123", response.Data[0].EntityId)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *ListSecretsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name: "when unauthorized then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnauthorized,
+							Status:     "401 Unauthorized",
+						})
+			},
+			checker: func(response *ListSecretsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnauthorized, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.ListSecrets())
+		})
+	}
+}
+
+func TestClient_UpdateSecret(t *testing.T) {
+	var (
+		secretResponse = SingleSecretResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			SecretResponse: SecretResponse{
+				Name:      "secret_name",
+				CreatedAt: time.Date(2025, 10, 14, 0, 0, 0, 0, time.UTC),
+				UpdatedAt: time.Date(2025, 10, 15, 0, 0, 0, 0, time.UTC),
+				Version:   2,
+				EntityId:  "ent_123",
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		secretName       string
+		request          UpdateSecretRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPatch         func(*mock.Mock) mock.Call
+		checker          func(*SingleSecretResponse, error)
+	}{
+		{
+			name:       "when request is valid then update secret",
+			secretName: "secret_name",
+			request:    validUpdateSecretRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*SingleSecretResponse)
+						*respMapping = secretResponse
+					})
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, "secret_name", response.Name)
+				assert.Equal(t, 2, response.Version)
+				assert.NotZero(t, response.UpdatedAt)
+			},
+		},
+		{
+			name:       "when credentials invalid then return error",
+			secretName: "secret_name",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:       "when secret not found then return error",
+			secretName: "nonexistent_secret",
+			request:    validUpdateSecretRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:       "when request invalid then return error",
+			secretName: "secret_name",
+			request:    UpdateSecretRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Unprocessable Entity",
+							Data: &errors.ErrorDetails{
+								ErrorType:  "request_invalid",
+								ErrorCodes: []string{"value_or_entity_id_required"},
+							},
+						})
+			},
+			checker: func(response *SingleSecretResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPatch(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.UpdateSecret(tc.secretName, tc.request))
+		})
+	}
+}
+
+func TestClient_DeleteSecret(t *testing.T) {
+	var (
+		metadataResponse = common.MetadataResponse{HttpMetadata: mocks.HttpMetadataStatusNoContent}
+	)
+
+	cases := []struct {
+		name             string
+		secretName       string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiDelete        func(*mock.Mock) mock.Call
+		checker          func(*common.MetadataResponse, error)
+	}{
+		{
+			name:       "when secret exists then delete secret",
+			secretName: "secret_name",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiDelete: func(m *mock.Mock) mock.Call {
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*common.MetadataResponse)
+						*respMapping = metadataResponse
+					})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:       "when credentials invalid then return error",
+			secretName: "secret_name",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiDelete: func(m *mock.Mock) mock.Call {
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:       "when secret not found then return error",
+			secretName: "nonexistent_secret",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiDelete: func(m *mock.Mock) mock.Call {
+				return *m.On("DeleteWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusNotFound,
+							Status:     "404 Not Found",
+						})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiDelete(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.DeleteSecret(tc.secretName))
+		})
+	}
+}
+
+// common methods
+
+func validCreateSecretRequest() CreateSecretRequest {
+	return CreateSecretRequest{
+		Name:     "secret_name",
+		Value:    "plaintext_value",
+		EntityId: "ent_123",
+	}
+}
+
+func validUpdateSecretRequest() UpdateSecretRequest {
+	return UpdateSecretRequest{
+		Value:    "new_value",
+		EntityId: "ent_123",
 	}
 }

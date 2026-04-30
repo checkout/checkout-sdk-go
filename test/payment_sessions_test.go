@@ -122,7 +122,20 @@ func TestSubmitPaymentSession(t *testing.T) {
 	submitPaymentSessionRequest := payment_sessions.SubmitPaymentSessionRequest{
 		SessionData: "test_session_data",
 		Amount:      int64(2000),
+		Currency:    common.GBP,
 		Reference:   "ORD-123A",
+		Billing:     &payments.BillingInformation{Address: Address()},
+		SuccessUrl:  "https://example.com/payments/success",
+		FailureUrl:  "https://example.com/payments/fail",
+		PaymentType: payments.Regular,
+		Customer: &common.CustomerRequest{
+			Email: "bruce@wayne-enterprises.com",
+			Name:  "Bruce Wayne",
+		},
+		Shipping: &payments.ShippingDetailsFlowHostedLinks{
+			Address: Address(),
+			Phone:   Phone(),
+		},
 		Items: []payments.Product{
 			{
 				Name:        "Test Product",
@@ -138,8 +151,6 @@ func TestSubmitPaymentSession(t *testing.T) {
 			Exemption:          payments.LowValue,
 			AllowUpgrade:       true,
 		},
-		IpAddress:   "192.168.0.1",
-		PaymentType: payments.Regular,
 	}
 
 	cases := []struct {

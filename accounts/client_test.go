@@ -1509,3 +1509,653 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateReserveRule(t *testing.T) {
+	var (
+		entityId   = "ent_test_12345"
+		idResponse = common.IdResponse{
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
+			Id:           "rul_test_67890",
+			Links:        map[string]common.Link{"self": {HRef: &[]string{"https://www.test-link.com"}[0]}},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		request          ReserveRuleRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*common.IdResponse, error)
+	}{
+		{
+			name:     "when request is valid then create reserve rule",
+			entityId: entityId,
+			request:  buildReserveRuleRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*common.IdResponse)
+						*respMapping = idResponse
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assertReserveRuleIdResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:     "when send a bad request then return error",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusBadRequest,
+						Status:     "400 Bad Request",
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:     "when entity not found then return error",
+			entityId: "ent_not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:     "when request is not correct then return error",
+			entityId: entityId,
+			request:  ReserveRuleRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Unprocessable",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "invalid_request",
+							ErrorCodes: []string{"type_required"},
+						},
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "type_required")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.CreateReserveRule(tc.entityId, tc.request))
+		})
+	}
+}
+
+func TestGetReserveRules(t *testing.T) {
+	var (
+		entityId = "ent_test_12345"
+
+		reserveRulesResponse = ReserveRulesResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Data: []ReserveRuleResponse{
+				{Id: "rul_test_67890", Type: "rolling"},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*ReserveRulesResponse, error)
+	}{
+		{
+			name:     "when entity exists then return reserve rules",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*ReserveRulesResponse)
+						*respMapping = reserveRulesResponse
+					})
+			},
+			checker: func(response *ReserveRulesResponse, err error) {
+				assert.Nil(t, err)
+				assertReserveRulesResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *ReserveRulesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:     "when send a bad request then return error",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusBadRequest,
+						Status:     "400 Bad Request",
+					})
+			},
+			checker: func(response *ReserveRulesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:     "when entity not found then return error",
+			entityId: "ent_not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *ReserveRulesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:     "when request is not correct then return error",
+			entityId: entityId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Unprocessable",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "invalid_request",
+							ErrorCodes: []string{"entity_id_required"},
+						},
+					})
+			},
+			checker: func(response *ReserveRulesResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "entity_id_required")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.GetReserveRules(tc.entityId))
+		})
+	}
+}
+
+func TestGetReserveRuleDetails(t *testing.T) {
+	var (
+		entityId      = "ent_test_12345"
+		reserveRuleId = "rul_test_67890"
+
+		percentage = 10.5
+		weeks      = 12
+
+		reserveRuleResponse = ReserveRuleResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Id:           reserveRuleId,
+			Type:         "rolling",
+			Rolling: &RollingReserveRule{
+				Percentage:      &percentage,
+				HoldingDuration: &HoldingDuration{Weeks: &weeks},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		reserveRuleId    string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*ReserveRuleResponse, error)
+	}{
+		{
+			name:          "when ids are valid then return reserve rule details",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*ReserveRuleResponse)
+						*respMapping = reserveRuleResponse
+					})
+			},
+			checker: func(response *ReserveRuleResponse, err error) {
+				assert.Nil(t, err)
+				assertReserveRuleResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *ReserveRuleResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:          "when send a bad request then return error",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusBadRequest,
+						Status:     "400 Bad Request",
+					})
+			},
+			checker: func(response *ReserveRuleResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:          "when reserve rule not found then return error",
+			entityId:      entityId,
+			reserveRuleId: "rul_not_found",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *ReserveRuleResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:          "when request is not correct then return error",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Unprocessable",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "invalid_request",
+							ErrorCodes: []string{"reserve_rule_id_required"},
+						},
+					})
+			},
+			checker: func(response *ReserveRuleResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "reserve_rule_id_required")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.GetReserveRuleDetails(tc.entityId, tc.reserveRuleId))
+		})
+	}
+}
+
+func TestUpdateReserveRule(t *testing.T) {
+	var (
+		entityId      = "ent_test_12345"
+		reserveRuleId = "rul_test_67890"
+		etag          = "Y3Y9MCZydj0w"
+
+		idResponse = common.IdResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Id:           reserveRuleId,
+			Links:        map[string]common.Link{"self": {HRef: &[]string{"https://www.test-link.com"}[0]}},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		reserveRuleId    string
+		etag             string
+		request          ReserveRuleRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPut           func(*mock.Mock) mock.Call
+		checker          func(*common.IdResponse, error)
+	}{
+		{
+			name:          "when request is valid then update reserve rule",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
+			etag:          etag,
+			request:       buildReserveRuleRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*common.IdResponse)
+						*respMapping = idResponse
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assertReserveRuleIdResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:          "when send a bad request then return error",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
+			etag:          etag,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusBadRequest,
+						Status:     "400 Bad Request",
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusBadRequest, chkErr.StatusCode)
+			},
+		},
+		{
+			name:          "when reserve rule not found then return error",
+			entityId:      entityId,
+			reserveRuleId: "rul_not_found",
+			etag:          etag,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:          "when request is not correct then return error",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
+			etag:          etag,
+			request:       ReserveRuleRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Unprocessable",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "invalid_request",
+							ErrorCodes: []string{"type_required"},
+						},
+					})
+			},
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "invalid_request", chkErr.Data.ErrorType)
+				assert.Contains(t, chkErr.Data.ErrorCodes, "type_required")
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			filesClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPut(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.UpdateReserveRule(tc.entityId, tc.reserveRuleId, tc.etag, tc.request))
+		})
+	}
+}
+
+// common methods
+
+func buildReserveRuleRequest() ReserveRuleRequest {
+	percentage := 10.5
+	weeks := 12
+	return ReserveRuleRequest{
+		Type: "rolling",
+		Rolling: &RollingReserveRule{
+			Percentage:      &percentage,
+			HoldingDuration: &HoldingDuration{Weeks: &weeks},
+		},
+	}
+}
+
+func assertReserveRuleIdResponse(t *testing.T, response *common.IdResponse) {
+	assert.NotNil(t, response)
+	assert.NotEmpty(t, response.Id)
+	assert.NotEmpty(t, response.Links)
+}
+
+func assertReserveRulesResponse(t *testing.T, response *ReserveRulesResponse) {
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	assert.NotEmpty(t, response.Data)
+	assert.NotEmpty(t, response.Data[0].Id)
+}
+
+func assertReserveRuleResponse(t *testing.T, response *ReserveRuleResponse) {
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	assert.NotEmpty(t, response.Id)
+	assert.NotEmpty(t, response.Type)
+	assert.NotNil(t, response.Rolling)
+	assert.NotNil(t, response.Rolling.Percentage)
+	assert.NotNil(t, response.Rolling.HoldingDuration)
+}

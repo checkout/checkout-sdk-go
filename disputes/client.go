@@ -221,6 +221,51 @@ func (c *Client) GetFileDetailsWithContext(ctx context.Context, fileId string) (
 	return &response, nil
 }
 
+func (c *Client) SubmitArbitrationEvidence(disputeId string) (*common.MetadataResponse, error) {
+	return c.SubmitArbitrationEvidenceWithContext(context.Background(), disputeId)
+}
+
+func (c *Client) SubmitArbitrationEvidenceWithContext(ctx context.Context, disputeId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(disputes, disputeId, evidence, arbitration),
+		auth,
+		nil,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetSubmittedArbitrationEvidence(disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
+	return c.GetSubmittedArbitrationEvidenceWithContext(context.Background(), disputeId)
+}
+
+func (c *Client) GetSubmittedArbitrationEvidenceWithContext(ctx context.Context, disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response DisputeCompiledSubmittedEvidenceResponse
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence, arbitration, submitted), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func (c *Client) GetDisputeSchemeFiles(disputeId string) (*SchemeFilesResponse, error) {
 	return c.GetDisputeSchemeFilesWithContext(context.Background(), disputeId)
 }

@@ -1,12 +1,14 @@
 package forward
 
 import (
-	"github.com/checkout/checkout-sdk-go/v2/common"
 	"time"
+
+	"github.com/checkout/checkout-sdk-go/v2/common"
 )
 
 const (
 	forward = "forward"
+	secrets = "secrets"
 )
 
 type SourceType string
@@ -206,3 +208,44 @@ func (s *tokenSource) GetType() SourceType {
 func (s *dlocalSignature) GetType() SignatureType {
 	return s.Type
 }
+
+type (
+	CreateSecretRequest struct {
+		// Secret name. Format – 1-64 characters. Alphanumeric and underscore. (Required)
+		Name string `json:"name"`
+		// Plaintext secret value. Max 8KB. (Required)
+		Value string `json:"value"`
+		// When provided, the secret is scoped to this entity. (Optional)
+		EntityId string `json:"entity_id,omitempty"`
+	}
+
+	UpdateSecretRequest struct {
+		// New plaintext secret value. Max 8KB. (Optional)
+		Value string `json:"value,omitempty"`
+		// Update the entity scope. (Optional)
+		EntityId string `json:"entity_id,omitempty"`
+	}
+
+	SecretResponse struct {
+		// Secret name (1-64 characters, alphanumeric and underscore)
+		Name string `json:"name,omitempty"`
+		// Timestamp when the secret was created.
+		CreatedAt time.Time `json:"created_at,omitempty"`
+		// Timestamp when the secret was last updated.
+		UpdatedAt time.Time `json:"updated_at,omitempty"`
+		// Version number.
+		Version int `json:"version,omitempty"`
+		// Entity ID if the secret is scoped to a specific entity.
+		EntityId string `json:"entity_id,omitempty"`
+	}
+
+	SingleSecretResponse struct {
+		HttpMetadata common.HttpMetadata
+		SecretResponse
+	}
+
+	ListSecretsResponse struct {
+		HttpMetadata common.HttpMetadata
+		Data         []SecretResponse `json:"data,omitempty"`
+	}
+)

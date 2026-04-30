@@ -84,4 +84,10 @@ type (
 		HttpMetadata common.HttpMetadata
 		Cards        []cards.CardDetailsResponse `json:"cards,omitempty"`
 	}
+
+	CardholderUpdateResponse struct {
+		HttpMetadata     common.HttpMetadata
+		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
+		Links            map[string]common.Link `json:"_links,omitempty"`
+	}
 )

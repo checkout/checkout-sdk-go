@@ -2,11 +2,18 @@ package nas
 
 import (
 	"github.com/checkout/checkout-sdk-go/v2/accounts"
+	"github.com/checkout/checkout-sdk-go/v2/agenticcommerce"
+	"github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
+	"github.com/checkout/checkout-sdk-go/v2/identities/applicants"
+	"github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
+	"github.com/checkout/checkout-sdk-go/v2/identities/iddocumentverification"
+	"github.com/checkout/checkout-sdk-go/v2/identities/identityverification"
 	"github.com/checkout/checkout-sdk-go/v2/apm/ideal"
 	"github.com/checkout/checkout-sdk-go/v2/apm/klarna"
 	"github.com/checkout/checkout-sdk-go/v2/apm/sepa"
 	"github.com/checkout/checkout-sdk-go/v2/balances"
 	"github.com/checkout/checkout-sdk-go/v2/client"
+	"github.com/checkout/checkout-sdk-go/v2/compliancerequests"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
 	"github.com/checkout/checkout-sdk-go/v2/customers"
 	"github.com/checkout/checkout-sdk-go/v2/disputes"
@@ -16,7 +23,11 @@ import (
 	instruments "github.com/checkout/checkout-sdk-go/v2/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/v2/issuing"
 	"github.com/checkout/checkout-sdk-go/v2/metadata"
+	"github.com/checkout/checkout-sdk-go/v2/networktokens"
+	"github.com/checkout/checkout-sdk-go/v2/paymentmethods"
+	"github.com/checkout/checkout-sdk-go/v2/payments/applepay"
 	"github.com/checkout/checkout-sdk-go/v2/payments/contexts"
+	"github.com/checkout/checkout-sdk-go/v2/payments/googlepay"
 	"github.com/checkout/checkout-sdk-go/v2/payments/hosted"
 	"github.com/checkout/checkout-sdk-go/v2/payments/links"
 	payments "github.com/checkout/checkout-sdk-go/v2/payments/nas"
@@ -24,6 +35,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/payments/setups"
 	"github.com/checkout/checkout-sdk-go/v2/reports"
 	"github.com/checkout/checkout-sdk-go/v2/sessions"
+	"github.com/checkout/checkout-sdk-go/v2/standaloneaccountupdater"
 	"github.com/checkout/checkout-sdk-go/v2/tokens"
 	"github.com/checkout/checkout-sdk-go/v2/transfers"
 	"github.com/checkout/checkout-sdk-go/v2/workflows"
@@ -51,6 +63,18 @@ type Api struct {
 	PaymentSessions *payment_sessions.Client
 	PaymentSetups   *setups.Client
 	Forward         *forward.Client
+	ApplePay                 *applepay.Client
+	GooglePay                *googlepay.Client
+	NetworkTokens            *networktokens.Client
+	StandaloneAccountUpdater *standaloneaccountupdater.Client
+	AgenticCommerce          *agenticcommerce.Client
+	ComplianceRequests       *compliancerequests.Client
+	PaymentMethods           *paymentmethods.Client
+	AmlScreening             *amlscreening.Client
+	Applicants               *applicants.Client
+	FaceAuthentication       *faceauthentication.Client
+	IdDocumentVerification   *iddocumentverification.Client
+	IdentityVerification     *identityverification.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -82,6 +106,18 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
 	api.PaymentSetups = setups.NewClient(configuration, apiClient)
 	api.Forward = forward.NewClient(configuration, apiClient)
+	api.ApplePay = applepay.NewClient(configuration, apiClient)
+	api.GooglePay = googlepay.NewClient(configuration, apiClient)
+	api.NetworkTokens = networktokens.NewClient(configuration, apiClient)
+	api.StandaloneAccountUpdater = standaloneaccountupdater.NewClient(configuration, apiClient)
+	api.AgenticCommerce = agenticcommerce.NewClient(configuration, apiClient)
+	api.ComplianceRequests = compliancerequests.NewClient(configuration, apiClient)
+	api.PaymentMethods = paymentmethods.NewClient(configuration, apiClient)
+	api.AmlScreening = amlscreening.NewClient(configuration, apiClient)
+	api.Applicants = applicants.NewClient(configuration, apiClient)
+	api.FaceAuthentication = faceauthentication.NewClient(configuration, apiClient)
+	api.IdDocumentVerification = iddocumentverification.NewClient(configuration, apiClient)
+	api.IdentityVerification = identityverification.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

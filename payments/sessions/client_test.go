@@ -185,6 +185,47 @@ func TestRequestPaymentSessionsWithPayment(t *testing.T) {
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
 			},
 		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *PaymentSessionPaymentResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:    "when request invalid then return error",
+			request: PaymentSessionsWithPaymentRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Invalid Request",
+							Data:       &errors.ErrorDetails{ErrorType: "request_invalid"},
+						})
+			},
+			checker: func(response *PaymentSessionPaymentResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+			},
+		},
 	}
 
 	for _, tc := range cases {
@@ -229,7 +270,19 @@ func TestSubmitPaymentSession(t *testing.T) {
 			request: SubmitPaymentSessionRequest{
 				SessionData: "session_data_token",
 				Amount:      2000,
+				Currency:    common.GBP,
 				Reference:   "ORD-123A",
+				Billing: &payments.BillingInformation{Address: &common.Address{
+					Country: common.GB,
+				}},
+				Customer: &common.CustomerRequest{
+					Email: "bruce@wayne-enterprises.com",
+					Name:  "Bruce Wayne",
+				},
+				SuccessUrl:          "https://example.com/payments/success",
+				FailureUrl:          "https://example.com/payments/failure",
+				ProcessingChannelId: "pc_5jp2az55l3cuths25t5p3xhwga",
+				Metadata:            map[string]interface{}{"order_id": "ORD-123A"},
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -247,6 +300,49 @@ func TestSubmitPaymentSession(t *testing.T) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:      "when credentials invalid then return error",
+			sessionId: "ps_2Un6I6lRpIAiIEwQIyxWVnV9CqQ",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *PaymentSessionPaymentResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:      "when request invalid then return error",
+			sessionId: "ps_2Un6I6lRpIAiIEwQIyxWVnV9CqQ",
+			request:   SubmitPaymentSessionRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(
+						errors.CheckoutAPIError{
+							StatusCode: http.StatusUnprocessableEntity,
+							Status:     "422 Invalid Request",
+							Data:       &errors.ErrorDetails{ErrorType: "request_invalid"},
+						})
+			},
+			checker: func(response *PaymentSessionPaymentResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
 			},
 		},
 	}

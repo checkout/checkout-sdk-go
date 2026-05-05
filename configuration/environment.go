@@ -11,6 +11,7 @@ type Environment interface {
 	FilesUri() string
 	TransfersUri() string
 	BalancesUri() string
+	ForwardUri() string
 	IsSandbox() bool
 }
 
@@ -34,7 +35,7 @@ func NewEnvironmentSubdomain(environment Environment, subdomain string) *Environ
 func createUrlWithSubdomain(originalUrl string, subdomain string) string {
 	newEnvironment := originalUrl
 
-	regex := regexp.MustCompile("^[0-9a-z]+$")
+	regex := regexp.MustCompile("^[a-z0-9]+(-[a-z0-9]+)*$")
 
 	if regex.MatchString(subdomain) {
 		merchantUrl, err := url.Parse(originalUrl)
@@ -54,6 +55,7 @@ type CheckoutEnv struct {
 	filesUri         string
 	transfersUri     string
 	balancesUri      string
+	forwardUri       string
 	isSandbox        bool
 }
 
@@ -77,6 +79,10 @@ func (e *CheckoutEnv) BalancesUri() string {
 	return e.balancesUri
 }
 
+func (e *CheckoutEnv) ForwardUri() string {
+	return e.forwardUri
+}
+
 func (e *CheckoutEnv) IsSandbox() bool {
 	return e.isSandbox
 }
@@ -87,6 +93,7 @@ func NewEnvironment(
 	filesUri string,
 	transfersUri string,
 	balancesUri string,
+	forwardUri string,
 	isSandbox bool,
 ) *CheckoutEnv {
 	return &CheckoutEnv{
@@ -95,15 +102,18 @@ func NewEnvironment(
 		filesUri:         filesUri,
 		transfersUri:     transfersUri,
 		balancesUri:      balancesUri,
+		forwardUri:       forwardUri,
 		isSandbox:        isSandbox}
 }
 
 func Sandbox() *CheckoutEnv {
-	return NewEnvironment("https://api.sandbox.checkout.com",
+	return NewEnvironment(
+		"https://api.sandbox.checkout.com",
 		"https://access.sandbox.checkout.com/connect/token",
 		"https://files.sandbox.checkout.com",
 		"https://transfers.sandbox.checkout.com",
 		"https://balances.sandbox.checkout.com",
+		"https://forward.sandbox.checkout.com",
 		true)
 }
 
@@ -114,5 +124,6 @@ func Production() *CheckoutEnv {
 		"https://files.checkout.com/",
 		"https://transfers.checkout.com/",
 		"https://balances.checkout.com/",
+		"https://forward.checkout.com",
 		false)
 }

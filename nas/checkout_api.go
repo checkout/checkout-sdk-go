@@ -108,7 +108,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Contexts = contexts.NewClient(configuration, apiClient)
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
 	api.PaymentSetups = setups.NewClient(configuration, apiClient)
-	api.Forward = forward.NewClient(configuration, apiClient)
+	api.Forward = forward.NewClient(configuration, buildForwardClient(configuration))
 	api.ApplePay = applepay.NewClient(configuration, apiClient)
 	api.GooglePay = googlepay.NewClient(configuration, apiClient)
 	api.NetworkTokens = networktokens.NewClient(configuration, apiClient)
@@ -145,4 +145,8 @@ func buildBalancesClient(configuration *configuration.Configuration) client.Http
 
 func buildTransfersClient(configuration *configuration.Configuration) client.HttpClient {
 	return client.NewApiClient(configuration, configuration.Environment.TransfersUri())
+}
+
+func buildForwardClient(configuration *configuration.Configuration) client.HttpClient {
+	return client.NewApiClient(configuration, configuration.Environment.ForwardUri())
 }

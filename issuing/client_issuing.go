@@ -271,19 +271,19 @@ func (c *Client) GetCardThreeDSDetailsWithContext(
 	return &response, nil
 }
 
-func (c *Client) ActivateCard(cardId string) (*common.IdResponse, error) {
+func (c *Client) ActivateCard(cardId string) (*cards.ActivateCardResponse, error) {
 	return c.ActivateCardWithContext(context.Background(), cardId)
 }
 
 func (c *Client) ActivateCardWithContext(
 	ctx context.Context,
 	cardId string,
-) (*common.IdResponse, error) {
+) (*cards.ActivateCardResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
-	var response common.IdResponse
+	var response cards.ActivateCardResponse
 	err = c.apiClient.PostWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardsPath, cardId, activatePath),
@@ -332,7 +332,7 @@ func (c *Client) GetCardCredentialsWithContext(
 func (c *Client) RevokeCard(
 	cardId string,
 	revokeCardRequest cards.RevokeCardRequest,
-) (*common.IdResponse, error) {
+) (*cards.RevokeCardResponse, error) {
 	return c.RevokeCardWithContext(context.Background(), cardId, revokeCardRequest)
 }
 
@@ -340,12 +340,12 @@ func (c *Client) RevokeCardWithContext(
 	ctx context.Context,
 	cardId string,
 	revokeCardRequest cards.RevokeCardRequest,
-) (*common.IdResponse, error) {
+) (*cards.RevokeCardResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
-	var response common.IdResponse
+	var response cards.RevokeCardResponse
 	err = c.apiClient.PostWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardsPath, cardId, revokePath),
@@ -360,26 +360,60 @@ func (c *Client) RevokeCardWithContext(
 	return &response, nil
 }
 
-func (c *Client) SuspendCard(cardId string) (*common.IdResponse, error) {
-	return c.SuspendCardWithContext(context.Background(), cardId)
+func (c *Client) SuspendCard(
+	cardId string,
+	suspendCardRequest cards.SuspendCardRequest,
+) (*cards.SuspendCardResponse, error) {
+	return c.SuspendCardWithContext(context.Background(), cardId, suspendCardRequest)
 }
 
 func (c *Client) SuspendCardWithContext(
 	ctx context.Context,
 	cardId string,
-) (*common.IdResponse, error) {
+	suspendCardRequest cards.SuspendCardRequest,
+) (*cards.SuspendCardResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
-	var response common.IdResponse
+	var response cards.SuspendCardResponse
 	err = c.apiClient.PostWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardsPath, cardId, suspendPath),
 		auth,
-		nil,
+		suspendCardRequest,
 		&response,
 		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+func (c *Client) UpdateCard(
+	cardId string,
+	request cards.CardUpdateRequest,
+) (*cards.CardUpdateResponse, error) {
+	return c.UpdateCardWithContext(context.Background(), cardId, request)
+}
+
+func (c *Client) UpdateCardWithContext(
+	ctx context.Context,
+	cardId string,
+	request cards.CardUpdateRequest,
+) (*cards.CardUpdateResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response cards.CardUpdateResponse
+	err = c.apiClient.PatchWithContext(
+		ctx,
+		common.BuildPath(issuingPath, cardsPath, cardId),
+		auth,
+		request,
+		&response,
 	)
 	if err != nil {
 		return nil, err

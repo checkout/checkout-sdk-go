@@ -134,7 +134,7 @@ func getHostedPaymentRequest() *hosted.PaymentHostedRequest {
 				},
 			},
 		},
-		Customer: &common.CustomerRequest{
+		Customer: &hosted.PaymentHostedCustomer{
 			Email: GenerateRandomEmail(),
 			Name:  "Customer Name",
 		},

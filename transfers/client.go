@@ -23,14 +23,31 @@ func NewClient(
 	}
 }
 
+// Deprecated: Use InitiateTransferOfFunds instead.
 func (c *Client) InitiateTransferOfFounds(
 	request TransferRequest,
 	idempotencyKey *string,
 ) (*TransferResponse, error) {
-	return c.InitiateTransferOfFoundsWithContext(context.Background(), request, idempotencyKey)
+	return c.InitiateTransferOfFundsWithContext(context.Background(), request, idempotencyKey)
 }
 
+// Deprecated: Use InitiateTransferOfFundsWithContext instead.
 func (c *Client) InitiateTransferOfFoundsWithContext(
+	ctx context.Context,
+	request TransferRequest,
+	idempotencyKey *string,
+) (*TransferResponse, error) {
+	return c.InitiateTransferOfFundsWithContext(ctx, request, idempotencyKey)
+}
+
+func (c *Client) InitiateTransferOfFunds(
+	request TransferRequest,
+	idempotencyKey *string,
+) (*TransferResponse, error) {
+	return c.InitiateTransferOfFundsWithContext(context.Background(), request, idempotencyKey)
+}
+
+func (c *Client) InitiateTransferOfFundsWithContext(
 	ctx context.Context,
 	request TransferRequest,
 	idempotencyKey *string,

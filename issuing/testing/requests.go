@@ -8,6 +8,13 @@ const (
 	Purchase TransactionType = "purchase"
 )
 
+type AuthorizationType string
+
+const (
+	Authorization    AuthorizationType = "authorization"
+	PreAuthorization AuthorizationType = "pre_authorization"
+)
+
 type (
 	CardSimulation struct {
 		Id          string `json:"id,omitempty"`
@@ -15,10 +22,16 @@ type (
 		ExpiryYear  int    `json:"expiry_year,omitempty"`
 	}
 
+	SimulationMerchant struct {
+		CategoryCode string `json:"category_code,omitempty"`
+	}
+
 	TransactionSimulation struct {
-		Type     TransactionType `json:"type,omitempty"`
-		Amount   int             `json:"amount,omitempty"`
-		Currency common.Currency `json:"currency,omitempty"`
+		Type              TransactionType   `json:"type,omitempty"`
+		Amount            int               `json:"amount,omitempty"`
+		Currency          common.Currency   `json:"currency,omitempty"`
+		Merchant          *SimulationMerchant `json:"merchant,omitempty"`
+		AuthorizationType AuthorizationType `json:"authorization_type,omitempty"`
 	}
 
 	CardAuthorizationRequest struct {

@@ -64,14 +64,24 @@ type (
 		CardRequest
 	}
 
+	CardMetadata struct {
+		Udf1 string `json:"udf1,omitempty"`
+		Udf2 string `json:"udf2,omitempty"`
+		Udf3 string `json:"udf3,omitempty"`
+		Udf4 string `json:"udf4,omitempty"`
+		Udf5 string `json:"udf5,omitempty"`
+	}
+
 	CardDetailsRequest struct {
-		Type          CardType     `json:"type,omitempty"`
-		CardholderId  string       `json:"cardholder_id,omitempty"`
-		Lifetime      CardLifetime `json:"lifetime"`
-		Reference     string       `json:"reference,omitempty"`
-		CardProductId string       `json:"card_product_id,omitempty"`
-		DisplayName   string       `json:"display_name,omitempty"`
-		ActivateCard  bool         `json:"activate_card,omitempty"`
+		Type           CardType     `json:"type,omitempty"`
+		CardholderId   string       `json:"cardholder_id,omitempty"`
+		Lifetime       CardLifetime `json:"lifetime"`
+		Reference      string       `json:"reference,omitempty"`
+		CardProductId  string       `json:"card_product_id,omitempty"`
+		DisplayName    string       `json:"display_name,omitempty"`
+		ActivateCard   bool         `json:"activate_card,omitempty"`
+		Metadata       *CardMetadata `json:"metadata,omitempty"`
+		RevocationDate string        `json:"revocation_date,omitempty"`
 	}
 
 	physicalCardRequest struct {
@@ -81,7 +91,9 @@ type (
 
 	virtualCardRequest struct {
 		CardDetailsRequest
-		IsSingleUse bool `json:"is_single_use,omitempty"`
+		IsSingleUse      bool     `json:"is_single_use,omitempty"`
+		ReturnCredentials []string `json:"return_credentials,omitempty"`
+		ControlProfiles   []string `json:"control_profiles,omitempty"`
 	}
 )
 
@@ -106,18 +118,12 @@ func (c *virtualCardRequest) GetRequestType() CardType {
 }
 
 type (
-	RenewCardMetadata struct {
-		Udf1 string `json:"udf1,omitempty"`
-		Udf2 string `json:"udf2,omitempty"`
-		Udf3 string `json:"udf3,omitempty"`
-		Udf4 string `json:"udf4,omitempty"`
-		Udf5 string `json:"udf5,omitempty"`
-	}
+	RenewCardMetadata = CardMetadata
 
 	renewCardRequestBase struct {
-		DisplayName string             `json:"display_name,omitempty"`
-		Reference   string             `json:"reference,omitempty"`
-		Metadata    *RenewCardMetadata `json:"metadata,omitempty"`
+		DisplayName string        `json:"display_name,omitempty"`
+		Reference   string        `json:"reference,omitempty"`
+		Metadata    *CardMetadata `json:"metadata,omitempty"`
 	}
 
 	physicalCardRenewRequest struct {

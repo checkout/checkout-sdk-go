@@ -54,8 +54,8 @@ type WebhookSignature struct {
 // Responses
 type (
 	ActionsResponse struct {
-		Id   string
-		Type WorkflowActionType
+		Id    string             `json:"id,omitempty"`
+		Type  WorkflowActionType `json:"type,omitempty"`
 		Actions
 		Links map[string]common.Link `json:"_links,omitempty"`
 	}

@@ -22,7 +22,12 @@ type (
 
 	mccCardControlRequest struct {
 		CardControlCommon
-		MccLimit MccLimit
+		MccLimit MccLimit `json:"mcc_limit,omitempty"`
+	}
+
+	midCardControlRequest struct {
+		CardControlCommon
+		MidLimit MidLimit `json:"mid_limit,omitempty"`
 	}
 )
 
@@ -38,11 +43,21 @@ func NewMccCardControlRequest() *mccCardControlRequest {
 	}
 }
 
+func NewMidCardControlRequest() *midCardControlRequest {
+	return &midCardControlRequest{
+		CardControlCommon: CardControlCommon{ControlType: MidLimitType},
+	}
+}
+
 func (c *velocityCardControlRequest) GetControlType() ControlType {
 	return c.ControlType
 }
 
 func (c *mccCardControlRequest) GetControlType() ControlType {
+	return c.ControlType
+}
+
+func (c *midCardControlRequest) GetControlType() ControlType {
 	return c.ControlType
 }
 
@@ -57,5 +72,6 @@ type (
 		Description   string         `json:"description,omitempty"`
 		VelocityLimit *VelocityLimit `json:"velocity_limit,omitempty"`
 		MccLimit      *MccLimit      `json:"mcc_limit,omitempty"`
+		MidLimit      *MidLimit      `json:"mid_limit,omitempty"`
 	}
 )

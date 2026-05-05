@@ -19,29 +19,33 @@ type (
 		GetCardInstrumentResponse        *GetCardInstrumentResponse
 		GetSepaInstrumentResponse        *GetSepaInstrumentResponse
 		GetBankAccountInstrumentResponse *GetBankAccountInstrumentResponse
+		GetAchInstrumentResponse         *GetAchInstrumentResponse
 		AlternativeResponse              *common.AlternativeResponse
 	}
 
 	GetCardInstrumentResponse struct {
-		Type          common.InstrumentType                   `json:"type" binding:"required"`
-		Id            string                                  `json:"id,omitempty"`
-		Fingerprint   string                                  `json:"fingerprint,omitempty"`
-		Customer      *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
-		AccountHolder *common.AccountHolder                   `json:"account_holder,omitempty"`
-
-		ExpiryMonth   int                 `json:"expiry_month,omitempty"`
-		ExpiryYear    int                 `json:"expiry_year,omitempty"`
-		Name          string              `json:"name,omitempty"`
-		Scheme        string              `json:"scheme,omitempty"`
-		SchemeLocal   string              `json:"scheme_local,omitempty"`
-		Last4         string              `json:"last4,omitempty"`
-		Bin           string              `json:"bin,omitempty"`
-		CardType      common.CardType     `json:"card_type,omitempty"`
-		CardCategory  common.CardCategory `json:"card_category,omitempty"`
-		Issuer        string              `json:"issuer,omitempty"`
-		IssuerCountry common.Country      `json:"issuer_country,omitempty"`
-		ProductId     string              `json:"product_id,omitempty"`
-		ProductType   string              `json:"product_type,omitempty"`
+		Type                common.InstrumentType                   `json:"type" binding:"required"`
+		Id                  string                                  `json:"id,omitempty"`
+		Fingerprint         string                                  `json:"fingerprint,omitempty"`
+		Customer            *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
+		AccountHolder       *common.AccountHolder                   `json:"account_holder,omitempty"`
+		EncryptedCardNumber string                                  `json:"encrypted_card_number,omitempty"`
+		ExpiryMonth         int                                     `json:"expiry_month,omitempty"`
+		ExpiryYear          int                                     `json:"expiry_year,omitempty"`
+		Name                string                                  `json:"name,omitempty"`
+		Scheme              string                                  `json:"scheme,omitempty"`
+		SchemeLocal         string                                  `json:"scheme_local,omitempty"`
+		Last4               string                                  `json:"last4,omitempty"`
+		Bin                 string                                  `json:"bin,omitempty"`
+		CardType            common.CardType                         `json:"card_type,omitempty"`
+		CardCategory        common.CardCategory                     `json:"card_category,omitempty"`
+		Issuer              string                                  `json:"issuer,omitempty"`
+		IssuerCountry       common.Country                          `json:"issuer_country,omitempty"`
+		ProductId           string                                  `json:"product_id,omitempty"`
+		ProductType         string                                  `json:"product_type,omitempty"`
+		NetworkToken        *NetworkTokenResponse                   `json:"network_token,omitempty"`
+		CardWalletType      string                                  `json:"card_wallet_type,omitempty"`
+		RegulatedIndicator  bool                                    `json:"regulated_indicator,omitempty"`
 	}
 
 	GetSepaInstrumentResponse struct {
@@ -61,16 +65,27 @@ type (
 		Fingerprint   string                                  `json:"fingerprint,omitempty"`
 		Customer      *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
 		AccountHolder *common.AccountHolder                   `json:"account_holder,omitempty"`
+		AccountType   common.AccountType                      `json:"account_type,omitempty"`
+		AccountNumber string                                  `json:"account_number,omitempty"`
+		BankCode      string                                  `json:"bank_code,omitempty"`
+		Iban          string                                  `json:"iban,omitempty"`
+		Bban          string                                  `json:"bban,omitempty"`
+		SwiftBic      string                                  `json:"swift_bic,omitempty"`
+		Currency      common.Currency                         `json:"currency,omitempty"`
+		Country       common.Country                          `json:"country,omitempty"`
+		BankDetails   *common.BankDetails                     `json:"bank,omitempty"`
+	}
 
-		AccountType   common.AccountType  `json:"account_type,omitempty"`
-		AccountNumber string              `json:"account_number,omitempty"`
-		BankCode      string              `json:"bank_code,omitempty"`
-		Iban          string              `json:"iban,omitempty"`
-		Bban          string              `json:"bban,omitempty"`
-		SwiftBic      string              `json:"swift_bic,omitempty"`
-		Currency      common.Currency     `json:"currency,omitempty"`
-		Country       common.Country      `json:"country,omitempty"`
-		BankDetails   *common.BankDetails `json:"bank,omitempty"`
+	GetAchInstrumentResponse struct {
+		Type           common.InstrumentType                   `json:"type" binding:"required"`
+		Id             string                                  `json:"id,omitempty"`
+		Fingerprint    string                                  `json:"fingerprint,omitempty"`
+		CreatedOn      *time.Time                              `json:"created_on,omitempty"`
+		ModifiedOn     *time.Time                              `json:"modified_on,omitempty"`
+		VaultId        string                                  `json:"vault_id,omitempty"`
+		InstrumentData *AchInstrumentData                      `json:"instrument_data,omitempty"`
+		AccountHolder  *common.AccountHolder                   `json:"account_holder,omitempty"`
+		Customer       *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
 	}
 
 	InstrumentSectionFieldAllowedOption struct {
@@ -133,6 +148,12 @@ func (s *GetInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.GetSepaInstrumentResponse = &response
+	case string(common.Ach):
+		var response GetAchInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.GetAchInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

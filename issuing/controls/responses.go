@@ -12,12 +12,14 @@ import (
 type (
 	CardControlData struct {
 		HttpMetadata     common.HttpMetadata
-		ControlType      ControlType `json:"control_type,omitempty"`
-		Id               string      `json:"id,omitempty"`
-		Description      string      `json:"description,omitempty"`
-		TargetId         string      `json:"target_id,omitempty"`
-		CreatedDate      *time.Time  `json:"created_date,omitempty"`
-		LastModifiedDate *time.Time  `json:"last_modified_date,omitempty"`
+		ControlType      ControlType            `json:"control_type,omitempty"`
+		Id               string                 `json:"id,omitempty"`
+		Description      string                 `json:"description,omitempty"`
+		TargetId         string                 `json:"target_id,omitempty"`
+		IsEditable       bool                   `json:"is_editable,omitempty"`
+		CreatedDate      *time.Time             `json:"created_date,omitempty"`
+		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
+		Links            map[string]common.Link `json:"_links,omitempty"`
 	}
 
 	CardControlResponse struct {
@@ -35,6 +37,9 @@ func (l VelocityLimit) GetType() ControlType {
 }
 func (l MccLimit) GetType() ControlType {
 	return MccLimitType
+}
+func (l MidLimit) GetType() ControlType {
+	return MidLimitType
 }
 
 func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
@@ -61,6 +66,14 @@ func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.Limit = limit.MccLimit
+	case MidLimitType:
+		var limit = struct {
+			MidLimit MidLimit `json:"mid_limit,omitempty"`
+		}{}
+		if err := json.Unmarshal(data, &limit); err != nil {
+			return nil
+		}
+		s.Limit = limit.MidLimit
 	default:
 		return errors.UnsupportedTypeError(fmt.Sprintf("%s unsupported", controlData.ControlType))
 	}

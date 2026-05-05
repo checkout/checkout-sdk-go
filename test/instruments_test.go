@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	instrumentToken *nas.CreateTokenInstrumentResponse
+	instrumentToken *nas.CreateCardInstrumentResponse
 )
 
 func TestSetupInstrument(t *testing.T) {
@@ -246,7 +246,7 @@ func createSepaInstrument(t *testing.T) *nas.CreateSepaInstrumentResponse {
 	return response.CreateSepaInstrumentResponse
 }
 
-func createTokenInstrument(t *testing.T, token *tokens.CardTokenResponse) *nas.CreateTokenInstrumentResponse {
+func createTokenInstrument(t *testing.T, token *tokens.CardTokenResponse) *nas.CreateCardInstrumentResponse {
 	request := nas.NewCreateTokenInstrumentRequest()
 	request.Token = token.Token
 	request.AccountHolder = &common.AccountHolder{
@@ -258,18 +258,19 @@ func createTokenInstrument(t *testing.T, token *tokens.CardTokenResponse) *nas.C
 
 	response, err := DefaultApi().Instruments.Create(request)
 	assert.Nil(t, err)
-	assert.NotNil(t, response.CreateTokenInstrumentResponse)
-	assert.Equal(t, common.Card, response.CreateTokenInstrumentResponse.Type)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Id)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Fingerprint)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.ExpiryMonth)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.ExpiryYear)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Scheme)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Last4)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.Bin)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.CardType)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.CardCategory)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.ProductId)
-	assert.NotEmpty(t, response.CreateTokenInstrumentResponse.ProductType)
-	return response.CreateTokenInstrumentResponse
+	// The API resolves a token instrument to a card, so the response carries type "card".
+	assert.NotNil(t, response.CreateCardInstrumentResponse)
+	assert.Equal(t, common.Card, response.CreateCardInstrumentResponse.Type)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.Id)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.Fingerprint)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.ExpiryMonth)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.ExpiryYear)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.Scheme)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.Last4)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.Bin)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.CardType)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.CardCategory)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.ProductId)
+	assert.NotEmpty(t, response.CreateCardInstrumentResponse.ProductType)
+	return response.CreateCardInstrumentResponse
 }

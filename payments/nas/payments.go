@@ -128,6 +128,14 @@ type (
 	Authentication struct {
 		PreferredExperiences []PreferredExperiencesType `json:"preferred_experiences,omitempty"`
 	}
+
+	PaymentRoutingAttempt struct {
+		Scheme string `json:"scheme,omitempty"`
+	}
+
+	PaymentRouting struct {
+		Attempts []PaymentRoutingAttempt `json:"attempts,omitempty"`
+	}
 )
 
 // Request
@@ -136,6 +144,7 @@ type (
 		PaymentContextId     string                        `json:"payment_context_id,omitempty"`
 		Currency             common.Currency               `json:"currency,omitempty"`
 		Source               payments.PaymentSource        `json:"source,omitempty"`
+		FallbackSource       payments.PaymentSource        `json:"fallback_source,omitempty"`
 		Amount               int64                         `json:"amount"`
 		PaymentType          payments.PaymentType          `json:"payment_type,omitempty" default:"Regular"`
 		PaymentPlan          payments.PaymentPlan          `json:"payment_plan,omitempty"`
@@ -146,6 +155,7 @@ type (
 		PartialAuthorization *PartialAuthorization         `json:"partial_authorization,omitempty"`
 		Capture              bool                          `json:"capture" default:"true"`
 		CaptureOn            *time.Time                    `json:"capture_on,omitempty"`
+		ExpireOn             *time.Time                    `json:"expire_on,omitempty"`
 		Customer             *common.CustomerRequest       `json:"customer,omitempty"`
 		BillingDescriptor    *payments.BillingDescriptor   `json:"billing_descriptor,omitempty"`
 		ShippingDetails      *payments.ShippingDetails     `json:"shipping,omitempty"`
@@ -156,17 +166,20 @@ type (
 		Risk                 *payments.RiskRequest         `json:"risk,omitempty"`
 		SuccessUrl           string                        `json:"success_url,omitempty"`
 		FailureUrl           string                        `json:"failure_url,omitempty"`
-		PaymentIp            string                        `json:"payment_ip,omitempty"`
-		Sender               Sender                        `json:"sender,omitempty"`
-		Recipient            *payments.PaymentRecipient    `json:"recipient,omitempty"`
-		Marketplace          *common.MarketplaceData       `json:"marketplace,omitempty"`
-		AmountAllocations    []common.AmountAllocations    `json:"amount_allocations,omitempty"`
-		Processing           *payments.ProcessingSettings  `json:"processing,omitempty"`
-		Items                []payments.Product            `json:"items,omitempty"`
-		Retry                *payments.PaymentRetryRequest `json:"retry,omitempty"`
-		Metadata             map[string]interface{}        `json:"metadata,omitempty"`
-		Segment              *payments.PaymentSegment      `json:"segment,omitempty"`
-		Instruction          *PaymentInstruction           `json:"instruction,omitempty"`
+		// Deprecated: Use customer.email instead.
+		PaymentIp         string                        `json:"payment_ip,omitempty"`
+		Sender            Sender                        `json:"sender,omitempty"`
+		Recipient         *payments.PaymentRecipient    `json:"recipient,omitempty"`
+		Marketplace       *common.MarketplaceData       `json:"marketplace,omitempty"`
+		AmountAllocations []common.AmountAllocations    `json:"amount_allocations,omitempty"`
+		Processing        *payments.ProcessingSettings  `json:"processing,omitempty"`
+		Items             []payments.Product            `json:"items,omitempty"`
+		Retry             *payments.PaymentRetryRequest `json:"retry,omitempty"`
+		Metadata          map[string]interface{}        `json:"metadata,omitempty"`
+		Segment           *payments.PaymentSegment      `json:"segment,omitempty"`
+		Instruction       *PaymentInstruction           `json:"instruction,omitempty"`
+		Routing           *PaymentRouting               `json:"routing,omitempty"`
+		Subscription      *payments.Subscription        `json:"subscription,omitempty"`
 	}
 
 	PayoutRequest struct {
@@ -199,12 +212,12 @@ type (
 		Customer          *common.CustomerRequest      `json:"customer,omitempty"`
 		Description       string                       `json:"description,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor  `json:"billing_descriptor,omitempty"`
-		Shipping          *payments.ShippingDetails    `json:"shipping,omitempty"`
-		Items             []payments.Product           `json:"items,omitempty"`
-		Marketplace       *common.MarketplaceData      `json:"marketplace,omitempty"`
-		AmountAllocations []common.AmountAllocations   `json:"amount_allocations,omitempty"`
-		Processing        *payments.ProcessingSettings `json:"processing,omitempty"`
-		Metadata          map[string]interface{}       `json:"metadata,omitempty"`
+		Shipping          *payments.CaptureShipping            `json:"shipping,omitempty"`
+		Items             []payments.Product                   `json:"items,omitempty"`
+		Marketplace       *common.MarketplaceData              `json:"marketplace,omitempty"`
+		AmountAllocations []common.AmountAllocations           `json:"amount_allocations,omitempty"`
+		Processing        *payments.CaptureProcessingSettings  `json:"processing,omitempty"`
+		Metadata          map[string]interface{}               `json:"metadata,omitempty"`
 	}
 
 	SearchPaymentsRequest struct {
@@ -275,9 +288,10 @@ type (
 		Risk                     *payments.RiskAssessment        `json:"risk,omitempty"`
 		Customer                 *common.CustomerResponse        `json:"customer,omitempty"`
 		BillingDescriptor        *payments.BillingDescriptor     `json:"billing_descriptor,omitempty"`
-		ShippingDetails          *payments.ShippingDetails       `json:"shipping,omitempty"`
-		PaymentIp                string                          `json:"payment_ip,omitempty"`
-		Marketplace              *common.MarketplaceData         `json:"marketplace,omitempty"`
+		ShippingDetails *payments.ShippingDetails `json:"shipping,omitempty"`
+		// Deprecated: Use customer.email instead.
+		PaymentIp         string                  `json:"payment_ip,omitempty"`
+		Marketplace       *common.MarketplaceData `json:"marketplace,omitempty"`
 		AmountAllocations        []common.AmountAllocations      `json:"amount_allocations,omitempty"`
 		Recipient                *payments.PaymentRecipient      `json:"recipient,omitempty"`
 		ProcessingData           *payments.ProcessingData        `json:"processing,omitempty"`

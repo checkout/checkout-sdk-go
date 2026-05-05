@@ -484,7 +484,7 @@ func (c *Client) UpdateReserveRuleWithContext(
 
 	payload := struct {
 		ReserveRuleRequest
-		Headers *Headers `json:"headers,omitempty"`
+		Headers *Headers `json:"-,omitempty"`
 	}{request, &Headers{IfMatch: etag}}
 
 	var response common.IdResponse
@@ -544,15 +544,13 @@ func (c *Client) UploadFileWithContext(
 		return nil, err
 	}
 
+	req, err := common.BuildFileUploadRequest(&request)
+	if err != nil {
+		return nil, err
+	}
+
 	var response UploadFileResponse
-	err = c.apiClient.PostWithContext(
-		ctx,
-		common.BuildPath(accountsPath, entityId, filesPath),
-		auth,
-		request,
-		&response,
-		nil,
-	)
+	err = c.filesClient.UploadWithContext(ctx, common.BuildPath(entitiesPath, entityId, filesPath), auth, req, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -571,7 +569,7 @@ func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId s
 	}
 
 	var response FileDetailsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entityId, filesPath, fileId), auth, &response)
+	err = c.filesClient.GetWithContext(ctx, common.BuildPath(entitiesPath, entityId, filesPath, fileId), auth, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -15,3 +15,10 @@ const (
 	CardRevoked   CardStatus = "revoked"
 	CardSuspended CardStatus = "suspended"
 )
+
+type CardScheme string
+
+const (
+	MastercardScheme CardScheme = "mastercard"
+	VisaScheme       CardScheme = "visa"
+)

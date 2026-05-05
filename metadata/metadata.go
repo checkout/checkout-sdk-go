@@ -41,8 +41,9 @@ const (
 
 type (
 	CardMetadataRequest struct {
-		Source sources.SourceRequest `json:"source,omitempty"`
-		Format Format                `json:"format,omitempty"`
+		Source    sources.SourceRequest `json:"source,omitempty"`
+		Format    Format                `json:"format,omitempty"`
+		Reference string                `json:"reference,omitempty"`
 	}
 )
 
@@ -102,10 +103,13 @@ type (
 		ProductId                 string                     `json:"product_id,omitempty"`
 		ProductType               string                     `json:"product_type,omitempty"`
 		SubproductId              string                     `json:"subproduct_id,omitempty"`
-		RegulatedIndicator        bool                       `json:"regulated_indicator,omitempty"`
-		RegulatedType             string                     `json:"regulated_type,omitempty"`
-		CardPayouts               *CardMetadataPayouts       `json:"card_payouts,omitempty"`
-		SchemeMetadata            *SchemeMetadata            `json:"scheme_metadata,omitempty"`
-		AccountFundingTransaction *AccountFundingTransaction `json:"account_funding_transaction,omitempty"`
+		RegulatedIndicator           bool                       `json:"regulated_indicator,omitempty"`
+		RegulatedType                string                     `json:"regulated_type,omitempty"`
+		IsComboCard                  bool                       `json:"is_combo_card,omitempty"`
+		IsReloadablePrepaid          bool                       `json:"is_reloadable_prepaid,omitempty"`
+		AnonymousPrepaidDescription  string                     `json:"anonymous_prepaid_description,omitempty"`
+		CardPayouts                  *CardMetadataPayouts       `json:"card_payouts,omitempty"`
+		SchemeMetadata               *SchemeMetadata            `json:"scheme_metadata,omitempty"`
+		AccountFundingTransaction    *AccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 	}
 )

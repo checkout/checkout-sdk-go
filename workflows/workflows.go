@@ -33,6 +33,10 @@ type (
 		Conditions []conditions.ConditionsRequest `json:"conditions,omitempty"`
 		Actions    []actions.ActionsRequest       `json:"actions,omitempty"`
 	}
+
+	TestWorkflowRequest struct {
+		EventTypes map[string][]string `json:"event_types,omitempty"`
+	}
 )
 
 type Workflow struct {

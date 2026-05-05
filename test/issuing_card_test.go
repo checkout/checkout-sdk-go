@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 
 	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
@@ -203,12 +202,12 @@ func TestActivateCard(t *testing.T) {
 	cases := []struct {
 		name    string
 		cardId  string
-		checker func(*common.IdResponse, error)
+		checker func(*cards.ActivateCardResponse, error)
 	}{
 		{
 			name:   "when activate a card and this request is correct then should return a response",
 			cardId: virtualCardId,
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.ActivateCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Links)
@@ -273,15 +272,16 @@ func TestGetCardCredentials(t *testing.T) {
 
 func TestSuspendCard(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
+	suspendRequest := cards.SuspendCardRequest{Reason: cards.SuspectedStolen}
 	cases := []struct {
 		name    string
 		cardId  string
-		checker func(*common.IdResponse, error)
+		checker func(*cards.SuspendCardResponse, error)
 	}{
 		{
 			name:   "when suspend a card and this request is correct then should return a response",
 			cardId: virtualCardId,
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.SuspendCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Links)
@@ -295,10 +295,10 @@ func TestSuspendCard(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cardDetails, _ := client.GetCardDetails(tc.cardId)
 			if cardDetails.Status == cards.CardActive {
-				tc.checker(client.SuspendCard(tc.cardId))
+				tc.checker(client.SuspendCard(tc.cardId, suspendRequest))
 			} else {
 				client.ActivateCard(tc.cardId)
-				tc.checker(client.SuspendCard(tc.cardId))
+				tc.checker(client.SuspendCard(tc.cardId, suspendRequest))
 			}
 		})
 	}
@@ -312,13 +312,13 @@ func TestRevokeCard(t *testing.T) {
 		name    string
 		cardId  string
 		request cards.RevokeCardRequest
-		checker func(*common.IdResponse, error)
+		checker func(*cards.RevokeCardResponse, error)
 	}{
 		{
 			name:    "when revoke a card and this request is correct then should return a response",
 			cardId:  virtualCardId,
 			request: request,
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.RevokeCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Links)

@@ -70,3 +70,55 @@ func (c *Client) RequestWalletTokenWithContext(ctx context.Context, request Wall
 
 	return &response, nil
 }
+
+func (c *Client) RequestCvvToken(request CvvTokenRequest) (*CvvTokenResponse, error) {
+	return c.RequestCvvTokenWithContext(context.Background(), request)
+}
+
+func (c *Client) RequestCvvTokenWithContext(ctx context.Context, request CvvTokenRequest) (*CvvTokenResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var response CvvTokenResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(tokensPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) RequestPinToken(request PinTokenRequest) (*PinTokenResponse, error) {
+	return c.RequestPinTokenWithContext(context.Background(), request)
+}
+
+func (c *Client) RequestPinTokenWithContext(ctx context.Context, request PinTokenRequest) (*PinTokenResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.PublicKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var response PinTokenResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(tokensPath),
+		auth,
+		request,
+		&response,
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

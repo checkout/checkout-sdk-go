@@ -25,6 +25,23 @@ type InstrumentData struct {
 	DateOfSignature *common.APIShortDate `json:"date_of_signature,omitempty"`
 }
 
+type AchInstrumentData struct {
+	AccountType   string          `json:"account_type,omitempty"`
+	AccountNumber string          `json:"account_number,omitempty"`
+	BankCode      string          `json:"bank_code,omitempty"`
+	Currency      common.Currency `json:"currency,omitempty"`
+	Country       common.Country  `json:"country,omitempty"`
+}
+
+type ProvisionNetworkToken struct {
+	Provision bool `json:"provision,omitempty"`
+}
+
+type NetworkTokenResponse struct {
+	Id    string `json:"id,omitempty"`
+	State string `json:"state,omitempty"`
+}
+
 type CreateCustomerInstrumentRequest struct {
 	Id      string        `json:"id,omitempty"`
 	Email   string        `json:"email,omitempty"`

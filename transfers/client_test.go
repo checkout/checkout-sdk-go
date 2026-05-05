@@ -31,7 +31,7 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 		checker          func(*TransferResponse, error)
 	}{
 		{
-			name: "when request is correct then create transfer of founds",
+			name: "when request is correct then create transfer of funds via deprecated method",
 			request: TransferRequest{
 				Reference:    "reference",
 				TransferType: Commission,
@@ -117,6 +117,87 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 			client := NewClient(conf, apiClient)
 
 			tc.checker(client.InitiateTransferOfFounds(tc.request, nil))
+		})
+	}
+}
+
+func TestInitiateTransferOfFunds(t *testing.T) {
+	var (
+		transfer = TransferResponse{
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
+			Id:           "tra_y3oqhf46pyzuxjbcn2giaqnb4",
+			Status:       "pending",
+		}
+	)
+
+	cases := []struct {
+		name             string
+		request          TransferRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*TransferResponse, error)
+	}{
+		{
+			name: "when request is correct then create transfer of funds",
+			request: TransferRequest{
+				Reference:    "reference",
+				TransferType: Commission,
+				Source:       &TransferSourceRequest{},
+				Destination:  &TransferDestinationRequest{},
+			},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*TransferResponse)
+						*respMapping = transfer
+					})
+			},
+			checker: func(response *TransferResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.Equal(t, transfer.Id, response.Id)
+				assert.Equal(t, transfer.Status, response.Status)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *TransferResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			conf := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(conf, apiClient)
+
+			tc.checker(client.InitiateTransferOfFunds(tc.request, nil))
 		})
 	}
 }

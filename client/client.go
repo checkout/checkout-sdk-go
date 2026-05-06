@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -304,7 +305,7 @@ func (a *ApiClient) readBody(ctx context.Context, response *http.Response) ([]by
 	default:
 	}
 
-	body, err := io.ReadAll(response.Body)
+	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}

@@ -484,7 +484,7 @@ func (c *Client) UpdateReserveRuleWithContext(
 
 	payload := struct {
 		ReserveRuleRequest
-		Headers *Headers `json:"-,omitempty"`
+		Headers *Headers `json:"-"`
 	}{request, &Headers{IfMatch: etag}}
 
 	var response common.IdResponse

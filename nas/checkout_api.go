@@ -22,6 +22,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/forward"
 	instruments "github.com/checkout/checkout-sdk-go/v2/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/v2/issuing"
+	"github.com/checkout/checkout-sdk-go/v2/issuing/cardholdertokens"
 	"github.com/checkout/checkout-sdk-go/v2/metadata"
 	"github.com/checkout/checkout-sdk-go/v2/networktokens"
 	"github.com/checkout/checkout-sdk-go/v2/paymentmethods"
@@ -58,7 +59,8 @@ type Api struct {
 	Transfers       *transfers.Client
 	WorkFlows       *workflows.Client
 	Reports         *reports.Client
-	Issuing         *issuing.Client
+	Issuing            *issuing.Client
+	CardholderTokens   *cardholdertokens.Client
 	Contexts        *contexts.Client
 	PaymentSessions *payment_sessions.Client
 	PaymentSetups   *setups.Client
@@ -102,6 +104,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.WorkFlows = workflows.NewClient(configuration, apiClient)
 	api.Reports = reports.NewClient(configuration, apiClient)
 	api.Issuing = issuing.NewClient(configuration, apiClient)
+	api.CardholderTokens = cardholdertokens.NewClient(configuration, apiClient)
 	api.Contexts = contexts.NewClient(configuration, apiClient)
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
 	api.PaymentSetups = setups.NewClient(configuration, apiClient)

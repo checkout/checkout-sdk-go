@@ -2,6 +2,8 @@ package mocks
 
 import (
 	"context"
+	"net/url"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/checkout/checkout-sdk-go/v2/common"
@@ -88,6 +90,20 @@ func (m *ApiClientMock) Upload(path string, authorization *configuration.SdkAuth
 
 func (m *ApiClientMock) UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
 	args := m.Called(ctx, path, authorization, request, responseMapping)
+
+	if args.Get(0) != nil {
+		return args.Get(0).(error)
+	}
+
+	return nil
+}
+
+func (m *ApiClientMock) PostForm(path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
+	return m.PostFormWithContext(context.Background(), path, authorization, formData, responseMapping)
+}
+
+func (m *ApiClientMock) PostFormWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
+	args := m.Called(ctx, path, authorization, formData, responseMapping)
 
 	if args.Get(0) != nil {
 		return args.Get(0).(error)

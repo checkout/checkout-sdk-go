@@ -5,8 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strings"
 	"time"
@@ -31,6 +31,8 @@ type HttpClient interface {
 	DeleteWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
 	Upload(path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error
 	UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error
+	PostForm(path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error
+	PostFormWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error
 }
 
 type ApiClient struct {
@@ -103,6 +105,14 @@ func (a *ApiClient) Upload(path string, authorization *configuration.SdkAuthoriz
 
 func (a *ApiClient) UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
 	return a.submit(ctx, path, authorization, request, responseMapping)
+}
+
+func (a *ApiClient) PostForm(path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
+	return a.PostFormWithContext(context.Background(), path, authorization, formData, responseMapping)
+}
+
+func (a *ApiClient) PostFormWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
+	return a.submitForm(ctx, path, authorization, formData, responseMapping)
 }
 
 func (a *ApiClient) invoke(
@@ -197,6 +207,23 @@ func (a *ApiClient) submit(
 	return a.doRequest(ctx, req, responseMapping)
 }
 
+func (a *ApiClient) submitForm(
+	ctx context.Context,
+	path string,
+	authorization *configuration.SdkAuthorization,
+	formData url.Values,
+	responseMapping interface{},
+) error {
+	body := bytes.NewBufferString(formData.Encode())
+	req, err := a.buildRequest(ctx, http.MethodPost, path, authorization, "application/x-www-form-urlencoded", body, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	a.Log.Printf("post: %s", path)
+	return a.doRequest(ctx, req, responseMapping)
+}
+
 func (a *ApiClient) buildRequest(
 	ctx context.Context,
 	method string,
@@ -212,9 +239,12 @@ func (a *ApiClient) buildRequest(
 		return nil, err
 	}
 
-	authorizationHeader, err := authorization.GetAuthorizationHeader()
-	if err != nil {
-		return nil, err
+	var authorizationHeader string
+	if authorization != nil {
+		authorizationHeader, err = authorization.GetAuthorizationHeader()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	req.Header = a.getHeaders(contentType, authorizationHeader, idempotencyKey, request)
@@ -254,7 +284,9 @@ func (a *ApiClient) getHeaders(contentType string, authorization string, idempot
 	headers.Set("User-Agent", "checkout-sdk-go/"+SDK_VERSION)
 	headers.Set("Accept", "application/json")
 	headers.Set("Content-Type", contentType)
-	headers.Set("Authorization", authorization)
+	if authorization != "" {
+		headers.Set("Authorization", authorization)
+	}
 	if idempotencyKey != nil {
 		headers.Set("Cko-Idempotency-Key", *idempotencyKey)
 	}
@@ -272,7 +304,7 @@ func (a *ApiClient) readBody(ctx context.Context, response *http.Response) ([]by
 	default:
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
 	}

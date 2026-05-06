@@ -227,15 +227,15 @@ type (
 	}
 
 	SecretResponse struct {
-		// Secret name (1-64 characters, alphanumeric and underscore)
-		Name string `json:"name,omitempty"`
-		// Timestamp when the secret was created.
-		CreatedAt time.Time `json:"created_at,omitempty"`
-		// Timestamp when the secret was last updated.
-		UpdatedAt time.Time `json:"updated_at,omitempty"`
-		// Version number.
-		Version int `json:"version,omitempty"`
-		// Entity ID if the secret is scoped to a specific entity.
+		// Secret name (1-64 characters, alphanumeric and underscore). Required.
+		Name string `json:"name"`
+		// Timestamp when the secret was created. Required.
+		CreatedAt time.Time `json:"created_at"`
+		// Timestamp when the secret was last updated. Required.
+		UpdatedAt time.Time `json:"updated_at"`
+		// Version number. Required.
+		Version int `json:"version"`
+		// Entity ID if the secret is scoped to a specific entity. Optional.
 		EntityId string `json:"entity_id,omitempty"`
 	}
 

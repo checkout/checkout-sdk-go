@@ -2,73 +2,51 @@ package cardholdertokens
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
-	"strings"
-	"time"
 
+	"github.com/checkout/checkout-sdk-go/v2/client"
+	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
 )
 
+// Client holds the dependencies for making cardholder token API requests.
 type Client struct {
 	configuration *configuration.Configuration
-	httpClient    *http.Client
+	apiClient     client.HttpClient
 }
 
-func NewClient(cfg *configuration.Configuration) *Client {
+// NewClient creates a cardholder tokens Client using the provided configuration and HTTP client.
+func NewClient(configuration *configuration.Configuration, apiClient client.HttpClient) *Client {
 	return &Client{
-		configuration: cfg,
-		httpClient:    &http.Client{Timeout: 10 * time.Second},
+		configuration: configuration,
+		apiClient:     apiClient,
 	}
 }
 
+// RequestCardholderToken issues a short-lived access token bound to a specific cardholder.
+// The endpoint is OAuth-style: credentials are passed in the form body, not in an Authorization
+// header, and the request uses application/x-www-form-urlencoded encoding.
 func (c *Client) RequestCardholderToken(request CardholderTokenRequest) (*CardholderTokenResponse, error) {
 	return c.RequestCardholderTokenWithContext(context.Background(), request)
 }
 
+// RequestCardholderTokenWithContext is like RequestCardholderToken but accepts a context for
+// cancellation and deadline propagation.
 func (c *Client) RequestCardholderTokenWithContext(ctx context.Context, request CardholderTokenRequest) (*CardholderTokenResponse, error) {
-	var baseUri string
-	if c.configuration.EnvironmentSubdomain != nil {
-		baseUri = c.configuration.EnvironmentSubdomain.ApiUrl
-	}
-	if baseUri == "" {
-		baseUri = c.configuration.Environment.BaseUri()
-	}
-
-	data := url.Values{}
-	data.Set("grant_type", request.GrantType)
-	data.Set("client_id", request.ClientId)
-	data.Set("client_secret", request.ClientSecret)
-	data.Set("cardholder_id", request.CardholderId)
+	formData := url.Values{}
+	formData.Set("grant_type", request.GrantType)
+	formData.Set("client_id", request.ClientId)
+	formData.Set("client_secret", request.ClientSecret)
+	formData.Set("cardholder_id", request.CardholderId)
 	if request.SingleUse {
-		data.Set("single_use", "true")
+		formData.Set("single_use", "true")
 	}
 
-	reqURL := fmt.Sprintf("%s/%s", strings.TrimRight(baseUri, "/"), cardholderTokenPath)
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, reqURL, strings.NewReader(data.Encode()))
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
+	var response CardholderTokenResponse
+	err := c.apiClient.PostFormWithContext(ctx, common.BuildPath(cardholderTokenPath), nil, formData, &response)
 	if err != nil {
 		return nil, err
 	}
 
-	var tokenResp CardholderTokenResponse
-	if err := json.Unmarshal(body, &tokenResp); err != nil {
-		return nil, err
-	}
-
-	return &tokenResp, nil
+	return &response, nil
 }

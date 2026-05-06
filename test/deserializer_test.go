@@ -3,14 +3,15 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
-	"io/ioutil"
+	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCardsUnmarshallJson(t *testing.T) {
-	physical, _ := ioutil.ReadFile("resources/card_details_physical_response.json")
-	virtual, _ := ioutil.ReadFile("resources/card_details_virtual_response.json")
+	physical, _ := os.ReadFile("resources/card_details_physical_response.json")
+	virtual, _ := os.ReadFile("resources/card_details_virtual_response.json")
 
 	cases := []struct {
 		name    string
@@ -59,8 +60,8 @@ func TestCardsUnmarshallJson(t *testing.T) {
 }
 
 func TestControlsUnmarshallJson(t *testing.T) {
-	mccLimit, _ := ioutil.ReadFile("resources/card_control_mcc_limit_response.json")
-	velocityLimit, _ := ioutil.ReadFile("resources/card_control_velocity_limit_response.json")
+	mccLimit, _ := os.ReadFile("resources/card_control_mcc_limit_response.json")
+	velocityLimit, _ := os.ReadFile("resources/card_control_velocity_limit_response.json")
 
 	cases := []struct {
 		name    string
@@ -109,7 +110,7 @@ func TestControlsUnmarshallJson(t *testing.T) {
 }
 
 func TestPaymentContextUnmarshallJson(t *testing.T) {
-	paypalResponse, _ := ioutil.ReadFile("resources/payment_context_paypal_details_response.json")
+	paypalResponse, _ := os.ReadFile("resources/payment_context_paypal_details_response.json")
 
 	cases := []struct {
 		name    string

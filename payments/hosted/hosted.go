@@ -20,6 +20,26 @@ const (
 )
 
 type (
+	PaymentHostedCustomerSummary struct {
+		RegistrationDate     string  `json:"registration_date,omitempty"`
+		FirstTransactionDate string  `json:"first_transaction_date,omitempty"`
+		LastPaymentDate      string  `json:"last_payment_date,omitempty"`
+		TotalOrderCount      int     `json:"total_order_count,omitempty"`
+		LastPaymentAmount    float64 `json:"last_payment_amount,omitempty"`
+		IsPremiumCustomer    bool    `json:"is_premium_customer,omitempty"`
+		IsReturningCustomer  bool    `json:"is_returning_customer,omitempty"`
+		LifetimeValue        float64 `json:"lifetime_value,omitempty"`
+	}
+
+	PaymentHostedCustomer struct {
+		Email   string                        `json:"email,omitempty"`
+		Name    string                        `json:"name,omitempty"`
+		Phone   *common.Phone                 `json:"phone,omitempty"`
+		Summary *PaymentHostedCustomerSummary `json:"summary,omitempty"`
+	}
+)
+
+type (
 	PaymentHostedRequest struct {
 		Currency                   common.Currency                          `json:"currency,omitempty"`
 		Billing                    *payments.BillingInformation             `json:"billing,omitempty"`
@@ -28,6 +48,7 @@ type (
 		FailureUrl                 string                                   `json:"failure_url,omitempty"`
 		Amount                     int                                      `json:"amount,omitempty"`
 		PaymentType                payments.PaymentType                     `json:"payment_type,omitempty,omitempty"`
+		// Deprecated: Use customer.email instead.
 		PaymentIp                  string                                   `json:"payment_ip,omitempty"`
 		BillingDescriptor          *payments.BillingDescriptor              `json:"billing_descriptor,omitempty"`
 		Reference                  string                                   `json:"reference,omitempty"`
@@ -35,7 +56,7 @@ type (
 		DisplayName                string                                   `json:"display_name,omitempty"`
 		ProcessingChannelId        string                                   `json:"processing_channel_id,omitempty"`
 		AmountAllocations          []common.AmountAllocations               `json:"amount_allocations,omitempty"`
-		Customer                   *common.CustomerRequest                  `json:"customer,omitempty"`
+		Customer                   *PaymentHostedCustomer                   `json:"customer,omitempty"`
 		Shipping                   *payments.ShippingDetailsFlowHostedLinks `json:"shipping,omitempty"`
 		Recipient                  *payments.PaymentRecipient               `json:"recipient,omitempty"`
 		Processing                 *payments.ProcessingSettings             `json:"processing,omitempty"`

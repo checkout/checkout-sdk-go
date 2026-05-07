@@ -181,7 +181,7 @@ func getOAuthScopes() []string {
 		configuration.Marketplace, configuration.SessionsApp, configuration.SessionsBrowser,
 		configuration.Vault, configuration.PayoutsBankDetails, configuration.Disputes,
 		configuration.TransfersCreate, configuration.TransfersView, configuration.Balances,
-		configuration.VaultCardMetadata, configuration.FinancialActions}
+		configuration.VaultCardMetadata, configuration.FinancialActions, configuration.PaymentsSearch}
 }
 
 func Bool(v bool) *bool { return &v }

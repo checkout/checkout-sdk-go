@@ -753,6 +753,7 @@ type (
 	Applepay struct {
 		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
 		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+		TotalType           string                  `json:"total_type,omitempty"`
 	}
 
 	Card struct {
@@ -763,6 +764,7 @@ type (
 	Googlepay struct {
 		AccountHolder       *common.AccountHolder   `json:"account_holder,omitempty"`
 		StorePaymentDetails StorePaymentDetailsType `json:"store_payment_details,omitempty"`
+		TotalPriceStatus    string                  `json:"total_price_status,omitempty"`
 	}
 
 	StoredCard struct {
@@ -816,6 +818,16 @@ type (
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}
 
+	CancellationRequest struct {
+		Reference string `json:"reference,omitempty"`
+	}
+
+	PaymentReversalRequest struct {
+		Amount    int64                  `json:"amount,omitempty"`
+		Reference string                 `json:"reference,omitempty"`
+		Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	}
+
 	QueryRequest struct {
 		Limit     int    `url:"limit,10"`
 		Skip      int    `url:"skip,0"`
@@ -840,6 +852,20 @@ type (
 	}
 
 	VoidResponse struct {
+		HttpMetadata common.HttpMetadata
+		ActionId     string                 `json:"action_id,omitempty"`
+		Reference    string                 `json:"reference,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
+	}
+
+	CancellationResponse struct {
+		HttpMetadata common.HttpMetadata
+		ActionId     string                 `json:"action_id,omitempty"`
+		Reference    string                 `json:"reference,omitempty"`
+		Links        map[string]common.Link `json:"_links"`
+	}
+
+	PaymentReversalResponse struct {
 		HttpMetadata common.HttpMetadata
 		ActionId     string                 `json:"action_id,omitempty"`
 		Reference    string                 `json:"reference,omitempty"`
@@ -887,5 +913,38 @@ type (
 
 	SenderTypeMapping struct {
 		Sender string `json:"sender"`
+	}
+
+	Subscription struct {
+		Id string `json:"id,omitempty"`
+	}
+
+	TrackingInfo struct {
+		ShippingCompany       string `json:"shipping_company,omitempty"`
+		TrackingNumber        string `json:"tracking_number,omitempty"`
+		TrackingUri           string `json:"tracking_uri,omitempty"`
+		ReturnShippingCompany string `json:"return_shipping_company,omitempty"`
+		ReturnTrackingNumber  string `json:"return_tracking_number,omitempty"`
+		ReturnTrackingUri     string `json:"return_tracking_uri,omitempty"`
+	}
+
+	CaptureShipping struct {
+		Address        *common.Address `json:"address,omitempty"`
+		Phone          *common.Phone   `json:"phone,omitempty"`
+		FromAddressZip string          `json:"from_address_zip,omitempty"`
+		TrackingInfo   []TrackingInfo  `json:"tracking_info,omitempty"`
+	}
+
+	CaptureProcessingSettings struct {
+		OrderId              string         `json:"order_id,omitempty"`
+		OtpValue             string         `json:"otp_value,omitempty"`
+		TaxAmount            int64          `json:"tax_amount,omitempty"`
+		SurchargeAmount      int64          `json:"surcharge_amount,omitempty"`
+		DiscountAmount       int64          `json:"discount_amount,omitempty"`
+		DutyAmount           int64          `json:"duty_amount,omitempty"`
+		ShippingAmount       int64          `json:"shipping_amount,omitempty"`
+		ShippingTaxAmount    int64          `json:"shipping_tax_amount,omitempty"`
+		PurchaseCountry      common.Country `json:"purchase_country,omitempty"`
+		ForeignRetailerAmount int64         `json:"foreign_retailer_amount,omitempty"`
 	}
 )

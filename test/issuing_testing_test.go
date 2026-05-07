@@ -12,6 +12,8 @@ import (
 	issuingTesting "github.com/checkout/checkout-sdk-go/v2/issuing/testing"
 )
 
+// # tests
+
 func TestSimulateAuthorization(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
 
@@ -179,6 +181,103 @@ func TestSimulateReversal(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.checker(client.SimulateReversal(tc.transactionId, tc.request))
+		})
+	}
+}
+
+func TestSimulateRefund(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+
+	transactionId := cardSimulation(t, *virtualCardResponse)
+
+	cases := []struct {
+		name          string
+		transactionId string
+		request       issuingTesting.SimulateRefundRequest
+		checker       func(*common.MetadataResponse, error)
+	}{
+		{
+			name:          "when simulating a refund with valid request then return response",
+			transactionId: transactionId.Id,
+			request:       issuingTesting.SimulateRefundRequest{Amount: 100},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusAccepted, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:          "when simulating a refund with invalid transactionId then return error",
+			transactionId: "not_found",
+			request:       issuingTesting.SimulateRefundRequest{Amount: 100},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIssuingClientApi().Issuing
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.SimulateRefund(tc.transactionId, tc.request))
+		})
+	}
+}
+
+func TestSimulateOobAuthentication(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+
+	cases := []struct {
+		name    string
+		request issuingTesting.SimulateOobAuthenticationRequest
+		checker func(*common.MetadataResponse, error)
+	}{
+		{
+			name: "when simulating OOB authentication with valid request then return response",
+			request: issuingTesting.SimulateOobAuthenticationRequest{
+				CardId: virtualCardId,
+				TransactionDetails: &issuingTesting.OobTransactionDetails{
+					LastFour:         virtualCardResponse.LastFour,
+					MerchantName:     "Test Merchant",
+					PurchaseAmount:   100.00,
+					PurchaseCurrency: common.GBP,
+				},
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusAccepted, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name: "when simulating OOB authentication with invalid card id then return error",
+			request: issuingTesting.SimulateOobAuthenticationRequest{
+				CardId: "crd_not_found",
+				TransactionDetails: &issuingTesting.OobTransactionDetails{
+					LastFour:         "1234",
+					MerchantName:     "Test Merchant",
+					PurchaseAmount:   100.00,
+					PurchaseCurrency: common.GBP,
+				},
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIssuingClientApi().Issuing
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.SimulateOobAuthentication(tc.request))
 		})
 	}
 }

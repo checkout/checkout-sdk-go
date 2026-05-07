@@ -15,7 +15,11 @@ import (
 
 	cardholders "github.com/checkout/checkout-sdk-go/v2/issuing/cardholders"
 	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
+	controlgroups "github.com/checkout/checkout-sdk-go/v2/issuing/controlgroups"
+	controlprofiles "github.com/checkout/checkout-sdk-go/v2/issuing/controlprofiles"
 	controls "github.com/checkout/checkout-sdk-go/v2/issuing/controls"
+	disputes "github.com/checkout/checkout-sdk-go/v2/issuing/disputes"
+	transactions "github.com/checkout/checkout-sdk-go/v2/issuing/transactions"
 )
 
 var (
@@ -25,6 +29,11 @@ var (
 	cardholderResponse  *cardholders.CardholderResponse
 	virtualCardResponse *cards.CardResponse
 	cardControlResponse *controls.CardControlResponse
+
+	controlGroupResponse  *controlgroups.ControlGroupResponse
+	controlProfileResponse *controlprofiles.ControlProfileResponse
+	disputeResponse        *disputes.IssuingDisputeResponse
+	transactionResponse    *transactions.TransactionResponse
 
 	virtualCardId string
 )

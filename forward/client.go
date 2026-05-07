@@ -57,3 +57,79 @@ func (c *Client) GetForwardRequestWithContext(ctx context.Context, forwardId str
 
 	return &response, nil
 }
+
+func (c *Client) CreateSecret(request CreateSecretRequest) (*SingleSecretResponse, error) {
+	return c.CreateSecretWithContext(context.Background(), request)
+}
+
+func (c *Client) CreateSecretWithContext(ctx context.Context, request CreateSecretRequest) (*SingleSecretResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response SingleSecretResponse
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(forward, secrets), auth, request, &response, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) ListSecrets() (*ListSecretsResponse, error) {
+	return c.ListSecretsWithContext(context.Background())
+}
+
+func (c *Client) ListSecretsWithContext(ctx context.Context) (*ListSecretsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response ListSecretsResponse
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(forward, secrets), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) UpdateSecret(name string, request UpdateSecretRequest) (*SingleSecretResponse, error) {
+	return c.UpdateSecretWithContext(context.Background(), name, request)
+}
+
+func (c *Client) UpdateSecretWithContext(ctx context.Context, name string, request UpdateSecretRequest) (*SingleSecretResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response SingleSecretResponse
+	err = c.apiClient.PatchWithContext(ctx, common.BuildPath(forward, secrets, name), auth, request, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) DeleteSecret(name string) (*common.MetadataResponse, error) {
+	return c.DeleteSecretWithContext(context.Background(), name)
+}
+
+func (c *Client) DeleteSecretWithContext(ctx context.Context, name string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.DeleteWithContext(ctx, common.BuildPath(forward, secrets, name), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

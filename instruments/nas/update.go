@@ -37,7 +37,19 @@ type (
 
 	updateTokenInstrumentRequest struct {
 		Type  common.InstrumentType `json:"type" binding:"required"`
-		Token string                `json:"account_number,omitempty"`
+		Token string                `json:"token,omitempty"`
+	}
+
+	updateSepaInstrumentRequest struct {
+		Type           common.InstrumentType `json:"type" binding:"required"`
+		InstrumentData *InstrumentData       `json:"instrument_data,omitempty"`
+		AccountHolder  *common.AccountHolder `json:"account_holder,omitempty"`
+	}
+
+	updateAchInstrumentRequest struct {
+		Type           common.InstrumentType `json:"type" binding:"required"`
+		InstrumentData *AchInstrumentData    `json:"instrument_data,omitempty"`
+		AccountHolder  *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 )
 
@@ -59,23 +71,47 @@ func NewUpdateTokenInstrumentRequest() *updateTokenInstrumentRequest {
 	}
 }
 
+func NewUpdateSepaInstrumentRequest() *updateSepaInstrumentRequest {
+	return &updateSepaInstrumentRequest{
+		Type: common.Sepa,
+	}
+}
+
+func NewUpdateAchInstrumentRequest() *updateAchInstrumentRequest {
+	return &updateAchInstrumentRequest{
+		Type: common.Ach,
+	}
+}
+
 type (
 	UpdateInstrumentResponse struct {
 		HttpMetadata                        common.HttpMetadata
 		UpdateCardInstrumentResponse        *UpdateCardInstrumentResponse
 		UpdateBankAccountInstrumentResponse *UpdateBankAccountInstrumentResponse
+		UpdateSepaInstrumentResponse        *UpdateSepaInstrumentResponse
+		UpdateAchInstrumentResponse         *UpdateAchInstrumentResponse
 		AlternativeResponse                 *common.AlternativeResponse
 	}
 
-	// UpdateCardInstrumentResponse TODO review this response struct to check if we need both
 	UpdateCardInstrumentResponse struct {
 		Type        common.InstrumentType `json:"type" binding:"required"`
 		Id          string                `json:"id,omitempty"`
 		Fingerprint string                `json:"fingerprint,omitempty"`
 	}
 
-	// UpdateBankAccountInstrumentResponse TODO review this response struct to check if we need both
 	UpdateBankAccountInstrumentResponse struct {
+		Type        common.InstrumentType `json:"type" binding:"required"`
+		Id          string                `json:"id,omitempty"`
+		Fingerprint string                `json:"fingerprint,omitempty"`
+	}
+
+	UpdateSepaInstrumentResponse struct {
+		Type        common.InstrumentType `json:"type" binding:"required"`
+		Id          string                `json:"id,omitempty"`
+		Fingerprint string                `json:"fingerprint,omitempty"`
+	}
+
+	UpdateAchInstrumentResponse struct {
 		Type        common.InstrumentType `json:"type" binding:"required"`
 		Id          string                `json:"id,omitempty"`
 		Fingerprint string                `json:"fingerprint,omitempty"`
@@ -101,6 +137,18 @@ func (s *UpdateInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.UpdateCardInstrumentResponse = &response
+	case string(common.Sepa):
+		var response UpdateSepaInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.UpdateSepaInstrumentResponse = &response
+	case string(common.Ach):
+		var response UpdateAchInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.UpdateAchInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

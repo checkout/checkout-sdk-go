@@ -10,12 +10,11 @@ const Path = "customers"
 
 type (
 	CustomerRequest struct {
-		Email       string                 `json:"email,omitempty"`
-		Name        string                 `json:"name,omitempty"`
-		Phone       *common.Phone          `json:"phone,omitempty"`
-		Metadata    map[string]interface{} `json:"metadata,omitempty"`
-		DefaultId   string                 `json:"default,omitempty"`
-		Instruments []string               `json:"instruments,omitempty"`
+		Email     string                 `json:"email,omitempty"`
+		Name      string                 `json:"name,omitempty"`
+		Phone     *common.Phone          `json:"phone,omitempty"`
+		Metadata  map[string]interface{} `json:"metadata,omitempty"`
+		DefaultId string                 `json:"default,omitempty"`
 	}
 
 	GetCustomerResponse struct {

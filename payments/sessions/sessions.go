@@ -46,6 +46,7 @@ const (
 	VippsPMT      PaymentMethodsType = "vipps"
 	WechatpayPMT  PaymentMethodsType = "wechatpay"
 	PaynowPMT     PaymentMethodsType = "paynow"
+	OctopusPMT    PaymentMethodsType = "octopus"
 )
 
 const (
@@ -99,7 +100,8 @@ type (
 		EnabledPaymentMethods      []PaymentMethodsType                     `json:"enabled_payment_methods,omitempty"`
 		DisabledPaymentMethods     []PaymentMethodsType                     `json:"disabled_payment_methods,omitempty"`
 		CustomerRetry              *payments.PaymentRetryRequest            `json:"customer_retry,omitempty"`
-		IpAddress                  string                                   `json:"ip_address,omitempty"`
+		// Deprecated: IpAddress is deprecated. Use alternative fields for client identification.
+		IpAddress string `json:"ip_address,omitempty"`
 	}
 )
 
@@ -148,13 +150,29 @@ type (
 	}
 
 	SubmitPaymentSessionRequest struct {
-		SessionData    string                                  `json:"session_data"`
-		Amount         int64                                   `json:"amount,omitempty"`
-		Reference      string                                  `json:"reference,omitempty"`
-		Items          []payments.Product                      `json:"items,omitempty"`
-		ThreeDsRequest *payments.ThreeDsRequestFlowHostedLinks `json:"3ds,omitempty"`
-		IpAddress      string                                  `json:"ip_address,omitempty"`
-		PaymentType    payments.PaymentType                    `json:"payment_type,omitempty"`
+		SessionData                string                                   `json:"session_data"`
+		Amount                     int64                                    `json:"amount,omitempty"`
+		Currency                   common.Currency                          `json:"currency,omitempty"`
+		Billing                    *payments.BillingInformation             `json:"billing,omitempty"`
+		SuccessUrl                 string                                   `json:"success_url,omitempty"`
+		FailureUrl                 string                                   `json:"failure_url,omitempty"`
+		PaymentType                payments.PaymentType                     `json:"payment_type,omitempty"`
+		BillingDescriptor          *payments.BillingDescriptor              `json:"billing_descriptor,omitempty"`
+		Reference                  string                                   `json:"reference,omitempty"`
+		Customer                   *common.CustomerRequest                  `json:"customer,omitempty"`
+		Shipping                   *payments.ShippingDetailsFlowHostedLinks `json:"shipping,omitempty"`
+		Items                      []payments.Product                       `json:"items,omitempty"`
+		ThreeDsRequest             *payments.ThreeDsRequestFlowHostedLinks  `json:"3ds,omitempty"`
+		// Deprecated: IpAddress is deprecated. Use alternative fields for client identification.
+		IpAddress                  string                                   `json:"ip_address,omitempty"`
+		PaymentMethodConfiguration *payments.PaymentMethodConfiguration     `json:"payment_method_configuration,omitempty"`
+		Recipient                  *payments.PaymentRecipient               `json:"recipient,omitempty"`
+		Instruction                *payments.PaymentInstruction             `json:"instruction,omitempty"`
+		ProcessingChannelId        string                                   `json:"processing_channel_id,omitempty"`
+		Metadata                   map[string]interface{}                   `json:"metadata,omitempty"`
+		Sender                     *nas.Sender                              `json:"sender,omitempty"`
+		Capture                    bool                                     `json:"capture"`
+		CaptureOn                  *time.Time                               `json:"capture_on,omitempty"`
 	}
 
 	// Response structures for payment session submit/complete endpoints

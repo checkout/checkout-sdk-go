@@ -6,11 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 
 	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
 )
+
+// # tests
 
 func TestCreateCard(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
@@ -201,12 +202,12 @@ func TestActivateCard(t *testing.T) {
 	cases := []struct {
 		name    string
 		cardId  string
-		checker func(*common.IdResponse, error)
+		checker func(*cards.ActivateCardResponse, error)
 	}{
 		{
 			name:   "when activate a card and this request is correct then should return a response",
 			cardId: virtualCardId,
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.ActivateCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Links)
@@ -271,15 +272,16 @@ func TestGetCardCredentials(t *testing.T) {
 
 func TestSuspendCard(t *testing.T) {
 	t.Skip("Avoid creating cards all the time")
+	suspendRequest := cards.SuspendCardRequest{Reason: cards.SuspectedStolen}
 	cases := []struct {
 		name    string
 		cardId  string
-		checker func(*common.IdResponse, error)
+		checker func(*cards.SuspendCardResponse, error)
 	}{
 		{
 			name:   "when suspend a card and this request is correct then should return a response",
 			cardId: virtualCardId,
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.SuspendCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Links)
@@ -293,10 +295,10 @@ func TestSuspendCard(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			cardDetails, _ := client.GetCardDetails(tc.cardId)
 			if cardDetails.Status == cards.CardActive {
-				tc.checker(client.SuspendCard(tc.cardId))
+				tc.checker(client.SuspendCard(tc.cardId, suspendRequest))
 			} else {
 				client.ActivateCard(tc.cardId)
-				tc.checker(client.SuspendCard(tc.cardId))
+				tc.checker(client.SuspendCard(tc.cardId, suspendRequest))
 			}
 		})
 	}
@@ -310,13 +312,13 @@ func TestRevokeCard(t *testing.T) {
 		name    string
 		cardId  string
 		request cards.RevokeCardRequest
-		checker func(*common.IdResponse, error)
+		checker func(*cards.RevokeCardResponse, error)
 	}{
 		{
 			name:    "when revoke a card and this request is correct then should return a response",
 			cardId:  virtualCardId,
 			request: request,
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.RevokeCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Links)
@@ -330,5 +332,141 @@ func TestRevokeCard(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.checker(client.RevokeCard(tc.cardId, tc.request))
 		})
+	}
+}
+
+func TestRenewCard(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+	cases := []struct {
+		name    string
+		cardId  string
+		request cards.RenewCardRequest
+		checker func(*cards.RenewCardResponse, error)
+	}{
+		{
+			name:    "when request is correct then should return 201",
+			cardId:  virtualCardId,
+			request: virtualRenewCardRequest(),
+			checker: func(response *cards.RenewCardResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Id)
+				assert.NotNil(t, response.ParentCardId)
+				assert.Equal(t, virtualCardId, response.ParentCardId)
+				assert.NotNil(t, response.Status)
+			},
+		},
+		{
+			name:    "when card not found then return error",
+			cardId:  "crd_not_found",
+			request: virtualRenewCardRequest(),
+			checker: func(response *cards.RenewCardResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIssuingClientApi().Issuing
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.RenewCard(tc.cardId, tc.request))
+		})
+	}
+}
+
+func TestScheduleCardRevocation(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+	cases := []struct {
+		name    string
+		cardId  string
+		request cards.ScheduleRevocationRequest
+		checker func(*cards.ScheduleRevocationResponse, error)
+	}{
+		{
+			name:    "when request is correct then should return 201",
+			cardId:  virtualCardId,
+			request: scheduleRevocationRequest(),
+			checker: func(response *cards.ScheduleRevocationResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:    "when card not found then return error",
+			cardId:  "crd_not_found",
+			request: scheduleRevocationRequest(),
+			checker: func(response *cards.ScheduleRevocationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIssuingClientApi().Issuing
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.ScheduleCardRevocation(tc.cardId, tc.request))
+		})
+	}
+}
+
+func TestDeleteScheduledRevocation(t *testing.T) {
+	t.Skip("Avoid creating cards all the time")
+	cases := []struct {
+		name    string
+		cardId  string
+		checker func(*cards.ScheduleRevocationResponse, error)
+	}{
+		{
+			name:   "when request is correct then should return 200",
+			cardId: virtualCardId,
+			checker: func(response *cards.ScheduleRevocationResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:   "when card not found then return error",
+			cardId: "crd_not_found",
+			checker: func(response *cards.ScheduleRevocationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIssuingClientApi().Issuing
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.DeleteScheduledRevocation(tc.cardId))
+		})
+	}
+}
+
+// # common methods
+
+func virtualRenewCardRequest() cards.RenewCardRequest {
+	req := cards.NewVirtualCardRenewRequest()
+	req.DisplayName = "John Kennedy"
+	req.Reference = "X-123456-N11"
+	return req
+}
+
+func scheduleRevocationRequest() cards.ScheduleRevocationRequest {
+	return cards.ScheduleRevocationRequest{
+		RevocationDate: "2026-12-31",
 	}
 }

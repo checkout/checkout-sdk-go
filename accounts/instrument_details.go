@@ -44,6 +44,7 @@ type (
 	PaymentInstrumentQueryResponse struct {
 		HttpMetadata common.HttpMetadata
 		Data         []PaymentInstrumentDetailsResponse `json:"data,omitempty"`
+		Links        map[string]common.Link             `json:"_links"`
 	}
 )
 

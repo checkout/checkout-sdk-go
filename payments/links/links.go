@@ -19,11 +19,32 @@ const (
 )
 
 type (
+	PaymentInterfacesCustomerSummary struct {
+		RegistrationDate    string  `json:"registration_date,omitempty"`
+		FirstTransactionDate string `json:"first_transaction_date,omitempty"`
+		LastPaymentDate     string  `json:"last_payment_date,omitempty"`
+		TotalOrderCount     int     `json:"total_order_count,omitempty"`
+		LastPaymentAmount   float64 `json:"last_payment_amount,omitempty"`
+		IsPremiumCustomer   bool    `json:"is_premium_customer,omitempty"`
+		IsReturningCustomer bool    `json:"is_returning_customer,omitempty"`
+		LifetimeValue       float64 `json:"lifetime_value,omitempty"`
+	}
+
+	PaymentLinkCustomer struct {
+		Email   string                            `json:"email,omitempty"`
+		Name    string                            `json:"name,omitempty"`
+		Phone   *common.Phone                     `json:"phone,omitempty"`
+		Summary *PaymentInterfacesCustomerSummary `json:"summary,omitempty"`
+	}
+)
+
+type (
 	PaymentLinkRequest struct {
 		Amount                     int                                      `json:"amount,omitempty"`
 		Currency                   common.Currency                          `json:"currency,omitempty"`
 		Billing                    *payments.BillingInformation             `json:"billing,omitempty"`
 		PaymentType                payments.PaymentType                     `json:"payment_type,omitempty,omitempty"`
+		// Deprecated: Use customer.email instead.
 		PaymentIp                  string                                   `json:"payment_ip,omitempty"`
 		BillingDescriptor          *payments.BillingDescriptor              `json:"billing_descriptor,omitempty"`
 		Reference                  string                                   `json:"reference,omitempty"`
@@ -32,7 +53,7 @@ type (
 		ProcessingChannelId        string                                   `json:"processing_channel_id,omitempty"`
 		AmountAllocations          []common.AmountAllocations               `json:"amount_allocations,omitempty"`
 		ExpiresIn                  int                                      `json:"expires_in,omitempty"`
-		Customer                   *common.CustomerRequest                  `json:"customer,omitempty"`
+		Customer                   *PaymentLinkCustomer                     `json:"customer,omitempty"`
 		Shipping                   *payments.ShippingDetailsFlowHostedLinks `json:"shipping,omitempty"`
 		Recipient                  *payments.PaymentRecipient               `json:"recipient,omitempty"`
 		Processing                 *payments.ProcessingSettings             `json:"processing,omitempty"`

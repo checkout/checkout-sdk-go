@@ -7,6 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"reflect"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,6 +32,8 @@ type HttpClient interface {
 	DeleteWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
 	Upload(path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error
 	UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error
+	PostForm(path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error
+	PostFormWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error
 }
 
 type ApiClient struct {
@@ -103,6 +108,14 @@ func (a *ApiClient) UploadWithContext(ctx context.Context, path string, authoriz
 	return a.submit(ctx, path, authorization, request, responseMapping)
 }
 
+func (a *ApiClient) PostForm(path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
+	return a.PostFormWithContext(context.Background(), path, authorization, formData, responseMapping)
+}
+
+func (a *ApiClient) PostFormWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
+	return a.submitForm(ctx, path, authorization, formData, responseMapping)
+}
+
 func (a *ApiClient) invoke(
 	ctx context.Context,
 	method string,
@@ -117,7 +130,7 @@ func (a *ApiClient) invoke(
 		return err
 	}
 
-	req, err := a.buildRequest(ctx, method, path, authorization, "application/json", body, idempotencyKey)
+	req, err := a.buildRequest(ctx, method, path, authorization, "application/json", body, idempotencyKey, request)
 	if err != nil {
 		return err
 	}
@@ -128,6 +141,57 @@ func (a *ApiClient) invoke(
 
 }
 
+func applyRequestHeaders(request interface{}, headers http.Header) {
+	v, ok := resolveToStruct(reflect.ValueOf(request))
+	if !ok {
+		return
+	}
+	headersField, ok := resolveToStruct(v.FieldByName("Headers"))
+	if !ok {
+		return
+	}
+	setHeadersFromFields(headersField, headers)
+}
+
+func resolveToStruct(v reflect.Value) (reflect.Value, bool) {
+	if !v.IsValid() {
+		return v, false
+	}
+	if v.Kind() == reflect.Ptr {
+		if v.IsNil() {
+			return v, false
+		}
+		v = v.Elem()
+	}
+	return v, v.Kind() == reflect.Struct
+}
+
+func setHeadersFromFields(v reflect.Value, headers http.Header) {
+	t := v.Type()
+	for i := 0; i < t.NumField(); i++ {
+		name := headerNameFromTag(t.Field(i).Tag.Get("json"))
+		if name == "" {
+			continue
+		}
+		if value := v.Field(i); value.Kind() == reflect.String && value.String() != "" {
+			headers.Set(name, value.String())
+		}
+	}
+}
+
+func headerNameFromTag(tag string) string {
+	if tag == "" || tag == "-" {
+		return ""
+	}
+	name := strings.SplitN(tag, ",", 2)[0]
+	if name == "-" {
+		return ""
+	}
+	return name
+}
+
+// 2026/04/27 DRY - At some point avoid this hardcoding and use reflection to build up the body and content type in buildRequest directly
+// we do not need here to know about FileUploadRequest object!!!
 func (a *ApiClient) submit(
 	ctx context.Context,
 	path string,
@@ -135,15 +199,24 @@ func (a *ApiClient) submit(
 	request *common.FileUploadRequest,
 	responseMapping interface{},
 ) error {
-	req, err := a.buildRequest(
-		ctx,
-		http.MethodPost,
-		path,
-		authorization,
-		request.W.FormDataContentType(),
-		request.B,
-		nil,
-	)
+	req, err := a.buildRequest(ctx, http.MethodPost, path, authorization, request.W.FormDataContentType(), request.B, nil, request)
+	if err != nil {
+		return err
+	}
+
+	a.Log.Printf("post: %s", path)
+	return a.doRequest(ctx, req, responseMapping)
+}
+
+func (a *ApiClient) submitForm(
+	ctx context.Context,
+	path string,
+	authorization *configuration.SdkAuthorization,
+	formData url.Values,
+	responseMapping interface{},
+) error {
+	body := bytes.NewBufferString(formData.Encode())
+	req, err := a.buildRequest(ctx, http.MethodPost, path, authorization, "application/x-www-form-urlencoded", body, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -160,18 +233,22 @@ func (a *ApiClient) buildRequest(
 	contentType string,
 	body *bytes.Buffer,
 	idempotencyKey *string,
+	request interface{},
 ) (*http.Request, error) {
 	req, err := http.NewRequestWithContext(ctx, method, a.BaseUri+path, body)
 	if err != nil {
 		return nil, err
 	}
 
-	authorizationHeader, err := authorization.GetAuthorizationHeader()
-	if err != nil {
-		return nil, err
+	var authorizationHeader string
+	if authorization != nil {
+		authorizationHeader, err = authorization.GetAuthorizationHeader()
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	req.Header = a.getHeaders(contentType, authorizationHeader, idempotencyKey)
+	req.Header = a.getHeaders(contentType, authorizationHeader, idempotencyKey, request)
 
 	return req, nil
 }
@@ -202,16 +279,20 @@ func (a *ApiClient) handleResponse(ctx context.Context, rawResponse *http.Respon
 	return common.Unmarshal(metadata, responseMapping)
 }
 
-func (a *ApiClient) getHeaders(contentType string, authorization string, idempotencyKey *string) http.Header {
+func (a *ApiClient) getHeaders(contentType string, authorization string, idempotencyKey *string, request interface{}) http.Header {
 	headers := make(http.Header)
 
 	headers.Set("User-Agent", "checkout-sdk-go/"+SDK_VERSION)
 	headers.Set("Accept", "application/json")
 	headers.Set("Content-Type", contentType)
-	headers.Set("Authorization", authorization)
+	if authorization != "" {
+		headers.Set("Authorization", authorization)
+	}
 	if idempotencyKey != nil {
 		headers.Set("Cko-Idempotency-Key", *idempotencyKey)
 	}
+
+	applyRequestHeaders(request, headers)
 
 	return headers
 }

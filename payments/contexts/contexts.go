@@ -26,6 +26,9 @@ type (
 		LastPaymentDate      *time.Time `json:"last_payment_date,omitempty"`
 		TotalOrderCount      int64      `json:"total_order_count,omitempty"`
 		LastPaymentAmount    float64    `json:"last_payment_amount,omitempty"`
+		IsPremiumCustomer    bool       `json:"is_premium_customer,omitempty"`
+		IsReturningCustomer  bool       `json:"is_returning_customer,omitempty"`
+		LifetimeValue        float64    `json:"lifetime_value,omitempty"`
 	}
 
 	PaymentContextCustomerRequest struct {
@@ -52,6 +55,7 @@ type (
 		SuccessUrl          string                         `json:"success_url,omitempty"`
 		FailureUrl          string                         `json:"failure_url,omitempty"`
 		Items               []PaymentContextsItems         `json:"items,omitempty"`
+		Metadata            map[string]interface{}         `json:"metadata,omitempty"`
 	}
 )
 

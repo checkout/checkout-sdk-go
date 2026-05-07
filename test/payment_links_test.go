@@ -120,7 +120,7 @@ func getPaymentLinkRequest() *links.PaymentLinkRequest {
 		Reference:   Reference,
 		Description: Description,
 		ExpiresIn:   604800,
-		Customer: &common.CustomerRequest{
+		Customer: &links.PaymentLinkCustomer{
 			Email: GenerateRandomEmail(),
 			Name:  Name,
 			Phone: Phone(),

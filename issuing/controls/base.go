@@ -5,6 +5,7 @@ type ControlType string
 const (
 	VelocityLimitType ControlType = "velocity_limit"
 	MccLimitType      ControlType = "mcc_limit"
+	MidLimitType      ControlType = "mid_limit"
 )
 
 type VelocityWindowType string
@@ -25,17 +26,23 @@ const (
 
 type (
 	VelocityWindow struct {
-		Type VelocityWindowType `json:"type,omitempty" :"type"`
+		Type VelocityWindowType `json:"type,omitempty"`
 	}
 
 	VelocityLimit struct {
-		AmountLimit    int            `json:"amount_limit,omitempty"`
+		AmountLimit    int64          `json:"amount_limit,omitempty"`
 		VelocityWindow VelocityWindow `json:"velocity_window"`
 		MccList        []string       `json:"mcc_list,omitempty"`
+		MidList        []string       `json:"mid_list,omitempty"`
 	}
 
 	MccLimit struct {
 		Type    MccControlType `json:"type,omitempty"`
 		MccList []string       `json:"mcc_list,omitempty"`
+	}
+
+	MidLimit struct {
+		Type    MccControlType `json:"type,omitempty"`
+		MidList []string       `json:"mid_list,omitempty"`
 	}
 )

@@ -11,21 +11,21 @@ import (
 type Frequency string
 
 const (
-	Weekly  Frequency = "Weekly"
-	Daily   Frequency = "Daily"
-	Monthly Frequency = "Monthly"
+	Weekly  Frequency = "weekly"
+	Daily   Frequency = "daily"
+	Monthly Frequency = "monthly"
 )
 
 type DaySchedule string
 
 const (
-	Monday    DaySchedule = "Monday"
-	Tuesday   DaySchedule = "Tuesday"
-	Wednesday DaySchedule = "Wednesday"
-	Thursday  DaySchedule = "Thursday"
-	Friday    DaySchedule = "Friday"
-	Saturday  DaySchedule = "Saturday"
-	Sunday    DaySchedule = "Sunday"
+	Monday    DaySchedule = "monday"
+	Tuesday   DaySchedule = "tuesday"
+	Wednesday DaySchedule = "wednesday"
+	Thursday  DaySchedule = "thursday"
+	Friday    DaySchedule = "friday"
+	Saturday  DaySchedule = "saturday"
+	Sunday    DaySchedule = "sunday"
 )
 
 type (
@@ -82,9 +82,10 @@ func (s scheduleFrequencyMonthly) GetSchedule() Frequency {
 
 type (
 	CurrencySchedule struct {
-		Enabled    bool       `json:"enabled,omitempty"`
-		Threshold  int        `json:"threshold,omitempty"`
-		Recurrence Recurrence `json:"recurrence,omitempty"`
+		Enabled              bool       `json:"enabled,omitempty"`
+		Threshold            int        `json:"threshold,omitempty"`
+		PaymentInstrumentId  string     `json:"payment_instrument_id,omitempty"`
+		Recurrence           Recurrence `json:"recurrence,omitempty"`
 	}
 
 	PayoutSchedule struct {

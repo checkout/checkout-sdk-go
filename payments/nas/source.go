@@ -2,6 +2,7 @@ package nas
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/payments"
@@ -54,6 +55,36 @@ type (
 		Type payments.SourceType `json:"type,omitempty"`
 	}
 )
+
+// UnmarshalJSON handles expiry_month/expiry_year being returned as either a
+// JSON number (regular payment endpoints) or a JSON string (search endpoint).
+func (r *ResponseCardSource) UnmarshalJSON(data []byte) error {
+	type Alias ResponseCardSource
+	aux := struct {
+		ExpiryMonth interface{} `json:"expiry_month"`
+		ExpiryYear  interface{} `json:"expiry_year"`
+		*Alias
+	}{Alias: (*Alias)(r)}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	r.ExpiryMonth = toIntField(aux.ExpiryMonth)
+	r.ExpiryYear = toIntField(aux.ExpiryYear)
+	return nil
+}
+
+func toIntField(v interface{}) int {
+	switch val := v.(type) {
+	case float64:
+		return int(val)
+	case string:
+		if i, err := strconv.Atoi(val); err == nil {
+			return i
+		}
+	}
+	return 0
+}
 
 func (s *SourceResponse) UnmarshalJSON(data []byte) error {
 	var typeMapping common.TypeMapping

@@ -654,14 +654,16 @@ func TestGetCardThreeDSDetails(t *testing.T) {
 }
 
 func TestActivateCard(t *testing.T) {
-	response := common.IdResponse{}
+	response := cards.ActivateCardResponse{
+		HttpMetadata: mocks.HttpMetadataStatusOk,
+	}
 
 	cases := []struct {
 		name             string
 		cardId           string
 		getAuthorization func(*mock.Mock) mock.Call
 		apiPost          func(*mock.Mock) mock.Call
-		checker          func(*common.IdResponse, error)
+		checker          func(*cards.ActivateCardResponse, error)
 	}{
 		{
 			name:   "when activate a card and this request is correct then should return a response",
@@ -674,13 +676,14 @@ func TestActivateCard(t *testing.T) {
 				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(4).(*common.IdResponse)
+						respMapping := args.Get(4).(*cards.ActivateCardResponse)
 						*respMapping = response
 					})
 			},
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.ActivateCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
 			},
 		},
 	}
@@ -757,7 +760,9 @@ func TestGetCardCredentials(t *testing.T) {
 
 func TestRevokeCard(t *testing.T) {
 	request := cards.RevokeCardRequest{}
-	response := common.IdResponse{}
+	response := cards.RevokeCardResponse{
+		HttpMetadata: mocks.HttpMetadataStatusOk,
+	}
 
 	cases := []struct {
 		name             string
@@ -765,7 +770,7 @@ func TestRevokeCard(t *testing.T) {
 		request          cards.RevokeCardRequest
 		getAuthorization func(*mock.Mock) mock.Call
 		apiPost          func(*mock.Mock) mock.Call
-		checker          func(*common.IdResponse, error)
+		checker          func(*cards.RevokeCardResponse, error)
 	}{
 		{
 			name:    "when revoke a card and this request is correct then should return a response",
@@ -779,13 +784,14 @@ func TestRevokeCard(t *testing.T) {
 				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(4).(*common.IdResponse)
+						respMapping := args.Get(4).(*cards.RevokeCardResponse)
 						*respMapping = response
 					})
 			},
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.RevokeCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
 			},
 		},
 	}
@@ -809,18 +815,23 @@ func TestRevokeCard(t *testing.T) {
 }
 
 func TestSuspendCard(t *testing.T) {
-	response := common.IdResponse{}
+	request := cards.SuspendCardRequest{Reason: cards.SuspectedStolen}
+	response := cards.SuspendCardResponse{
+		HttpMetadata: mocks.HttpMetadataStatusOk,
+	}
 
 	cases := []struct {
 		name             string
 		cardId           string
+		request          cards.SuspendCardRequest
 		getAuthorization func(*mock.Mock) mock.Call
 		apiPost          func(*mock.Mock) mock.Call
-		checker          func(*common.IdResponse, error)
+		checker          func(*cards.SuspendCardResponse, error)
 	}{
 		{
-			name:   "when suspend a card and this request is correct then should return a response",
-			cardId: "crd_fa6psq242dcd6fdn5gifcq1491",
+			name:    "when suspend a card and this request is correct then should return a response",
+			cardId:  "crd_fa6psq242dcd6fdn5gifcq1491",
+			request: request,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -829,13 +840,14 @@ func TestSuspendCard(t *testing.T) {
 				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(4).(*common.IdResponse)
+						respMapping := args.Get(4).(*cards.SuspendCardResponse)
 						*respMapping = response
 					})
 			},
-			checker: func(response *common.IdResponse, err error) {
+			checker: func(response *cards.SuspendCardResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
 			},
 		},
 	}
@@ -853,7 +865,7 @@ func TestSuspendCard(t *testing.T) {
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient)
 
-			tc.checker(client.SuspendCard(tc.cardId))
+			tc.checker(client.SuspendCard(tc.cardId, tc.request))
 		})
 	}
 }
@@ -1449,6 +1461,84 @@ func TestSimulateReversal(t *testing.T) {
 			client := NewClient(config, apiClient)
 
 			tc.checker(client.SimulateReversal(tc.transactionId, tc.request))
+		})
+	}
+}
+
+func TestUpdateCard(t *testing.T) {
+	request := cards.CardUpdateRequest{
+		Reference:   "ref-updated",
+		ExpiryMonth: 12,
+		ExpiryYear:  2030,
+	}
+	response := cards.CardUpdateResponse{
+		HttpMetadata: mocks.HttpMetadataStatusOk,
+	}
+
+	cases := []struct {
+		name             string
+		cardId           string
+		request          cards.CardUpdateRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPatch         func(*mock.Mock) mock.Call
+		checker          func(*cards.CardUpdateResponse, error)
+	}{
+		{
+			name:    "when update a card and this request is correct then should return a response",
+			cardId:  "crd_fa6psq242dcd6fdn5gifcq1491",
+			request: request,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*cards.CardUpdateResponse)
+						*respMapping = response
+					})
+			},
+			checker: func(response *cards.CardUpdateResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:   "when credentials invalid then return error",
+			cardId: "crd_fa6psq242dcd6fdn5gifcq1491",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *cards.CardUpdateResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPatch(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.UpdateCard(tc.cardId, tc.request))
 		})
 	}
 }

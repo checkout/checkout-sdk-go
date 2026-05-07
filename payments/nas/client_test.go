@@ -1434,6 +1434,272 @@ func TestSearchPayments(t *testing.T) {
 	}
 }
 
+func TestCancelAScheduledRetry(t *testing.T) {
+	cases := []struct {
+		name             string
+		paymentId        string
+		request          payments.CancellationRequest
+		idempotencyKey   *string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*payments.CancellationResponse, error)
+	}{
+		{
+			name:      "when request is correct then cancel scheduled retry",
+			paymentId: paymentId,
+			request:   buildCancellationRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*payments.CancellationResponse)
+						*respMapping = buildCancellationResponse()
+					})
+			},
+			checker: func(response *payments.CancellationResponse, err error) {
+				assert.Nil(t, err)
+				assertCancellationResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *payments.CancellationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:    "when cancellation not allowed then return error",
+			request: payments.CancellationRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{StatusCode: http.StatusForbidden})
+			},
+			checker: func(response *payments.CancellationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusForbidden, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when payment not found then return error",
+			request: payments.CancellationRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *payments.CancellationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when request invalid then return error",
+			request: payments.CancellationRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Invalid Request",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "request_invalid",
+							ErrorCodes: []string{"payment_source_required"},
+						},
+					})
+			},
+			checker: func(response *payments.CancellationResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.CancelAScheduledRetry(tc.paymentId, &tc.request, tc.idempotencyKey))
+		})
+	}
+}
+
+func TestReversePayment(t *testing.T) {
+	cases := []struct {
+		name             string
+		paymentId        string
+		request          payments.PaymentReversalRequest
+		idempotencyKey   *string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*payments.PaymentReversalResponse, error)
+	}{
+		{
+			name:      "when request is correct then reverse payment",
+			paymentId: paymentId,
+			request:   buildPaymentReversalRequest(),
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*payments.PaymentReversalResponse)
+						*respMapping = buildPaymentReversalResponse()
+					})
+			},
+			checker: func(response *payments.PaymentReversalResponse, err error) {
+				assert.Nil(t, err)
+				assertPaymentReversalResponse(t, response)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *payments.PaymentReversalResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:    "when reversal not allowed then return error",
+			request: payments.PaymentReversalRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{StatusCode: http.StatusForbidden})
+			},
+			checker: func(response *payments.PaymentReversalResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusForbidden, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when payment not found then return error",
+			request: payments.PaymentReversalRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *payments.PaymentReversalResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+		{
+			name:    "when request invalid then return error",
+			request: payments.PaymentReversalRequest{},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusUnprocessableEntity,
+						Status:     "422 Invalid Request",
+						Data: &errors.ErrorDetails{
+							ErrorType:  "request_invalid",
+							ErrorCodes: []string{"payment_source_required"},
+						},
+					})
+			},
+			checker: func(response *payments.PaymentReversalResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusUnprocessableEntity, chkErr.StatusCode)
+				assert.Equal(t, "request_invalid", chkErr.Data.ErrorType)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.ReversePayment(tc.paymentId, &tc.request, tc.idempotencyKey))
+		})
+	}
+}
+
 // common methods
 
 func buildSearchPaymentsRequest() SearchPaymentsRequest {
@@ -1463,4 +1729,60 @@ func assertSearchPaymentsResponse(t *testing.T, response *SearchPaymentsResponse
 	assert.Equal(t, paymentId, response.Data[0].Id)
 	assert.Equal(t, amount, response.Data[0].Amount)
 	assert.Equal(t, currency, response.Data[0].Currency)
+}
+
+func buildCancellationRequest() payments.CancellationRequest {
+	return payments.CancellationRequest{
+		Reference: reference,
+	}
+}
+
+func buildCancellationResponse() payments.CancellationResponse {
+	return payments.CancellationResponse{
+		HttpMetadata: mocks.HttpMetadataStatusAccepted,
+		ActionId:     actionId,
+		Reference:    reference,
+		Links: map[string]common.Link{
+			"payment": {HRef: &[]string{"https://www.test-link.com"}[0]},
+		},
+	}
+}
+
+func assertCancellationResponse(t *testing.T, response *payments.CancellationResponse) {
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusAccepted, response.HttpMetadata.StatusCode)
+	assert.Equal(t, actionId, response.ActionId)
+	assert.Equal(t, reference, response.Reference)
+	assert.NotEmpty(t, response.Links)
+	assert.NotEmpty(t, response.Links["payment"])
+}
+
+func buildPaymentReversalRequest() payments.PaymentReversalRequest {
+	return payments.PaymentReversalRequest{
+		Reference: reference,
+		Metadata: map[string]interface{}{
+			"coupon_code": "NY2018",
+			"partner_id":  123989,
+		},
+	}
+}
+
+func buildPaymentReversalResponse() payments.PaymentReversalResponse {
+	return payments.PaymentReversalResponse{
+		HttpMetadata: mocks.HttpMetadataStatusAccepted,
+		ActionId:     actionId,
+		Reference:    reference,
+		Links: map[string]common.Link{
+			"payment": {HRef: &[]string{"https://www.test-link.com"}[0]},
+		},
+	}
+}
+
+func assertPaymentReversalResponse(t *testing.T, response *payments.PaymentReversalResponse) {
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusAccepted, response.HttpMetadata.StatusCode)
+	assert.Equal(t, actionId, response.ActionId)
+	assert.Equal(t, reference, response.Reference)
+	assert.NotEmpty(t, response.Links)
+	assert.NotEmpty(t, response.Links["payment"])
 }

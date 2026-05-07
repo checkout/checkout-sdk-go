@@ -38,29 +38,32 @@ func NewSecurityQuestionThreeDSEnrollmentRequest() *securityQuestionThreeDSEnrol
 
 type (
 	ThreeDSUpdateRequest struct {
-		SecurityPair SecurityPair
-		Password     string
-		Locale       string
-		PhoneNumber  *common.Phone
+		SecurityPair SecurityPair  `json:"security_pair,omitempty"`
+		Password     string        `json:"password,omitempty"`
+		Locale       string        `json:"locale,omitempty"`
+		PhoneNumber  *common.Phone `json:"phone_number,omitempty"`
 	}
 
 	ThreeDSUpdateResponse struct {
 		HttpMetadata     common.HttpMetadata
-		LastModifiedDate *time.Time `json:"last_modified_date,omitempty"`
+		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
+		Links            map[string]common.Link `json:"_links,omitempty"`
 	}
 )
 
 type (
 	ThreeDSEnrollmentResponse struct {
 		HttpMetadata common.HttpMetadata
-		CreatedDate  *time.Time `json:"created_date,omitempty"`
+		CreatedDate  *time.Time             `json:"created_date,omitempty"`
+		Links        map[string]common.Link `json:"_links,omitempty"`
 	}
 
 	ThreeDSEnrollmentDetailsResponse struct {
 		HttpMetadata     common.HttpMetadata
-		Locale           string        `json:"locale,omitempty"`
-		Phone            *common.Phone `json:"phone,omitempty"`
-		CreatedDate      *time.Time    `json:"created_date,omitempty"`
-		LastModifiedDate *time.Time    `json:"last_modified_date,omitempty"`
+		Locale           string                 `json:"locale,omitempty"`
+		PhoneNumber      *common.Phone          `json:"phone_number,omitempty"`
+		CreatedDate      *time.Time             `json:"created_date,omitempty"`
+		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
+		Links            map[string]common.Link `json:"_links,omitempty"`
 	}
 )

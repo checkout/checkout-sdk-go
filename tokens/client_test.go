@@ -141,3 +141,165 @@ func TestRequestCardToken(t *testing.T) {
 		})
 	}
 }
+
+func TestRequestCvvToken(t *testing.T) {
+	var (
+		cvvTokenRequest = CvvTokenRequest{
+			Type:      Cvv,
+			TokenData: CvvTokenData{Cvv: "100"},
+		}
+
+		cvvTokenResponse = CvvTokenResponse{
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
+			Type:         Cvv,
+			Token:        tokenId,
+		}
+	)
+
+	cases := []struct {
+		name             string
+		request          CvvTokenRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*CvvTokenResponse, error)
+	}{
+		{
+			name:    "when request is correct then return cvv token",
+			request: cvvTokenRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*CvvTokenResponse)
+						*respMapping = cvvTokenResponse
+					})
+			},
+			checker: func(response *CvvTokenResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.Equal(t, Cvv, response.Type)
+				assert.Equal(t, tokenId, response.Token)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *CvvTokenResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.RequestCvvToken(tc.request))
+		})
+	}
+}
+
+func TestRequestPinToken(t *testing.T) {
+	var (
+		pinTokenRequest = PinTokenRequest{
+			Type:      Pin,
+			TokenData: PinTokenData{Pin: "1234"},
+		}
+
+		pinTokenResponse = PinTokenResponse{
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
+			Type:         Pin,
+			Token:        tokenId,
+		}
+	)
+
+	cases := []struct {
+		name             string
+		request          PinTokenRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*PinTokenResponse, error)
+	}{
+		{
+			name:    "when request is correct then return pin token",
+			request: pinTokenRequest,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*PinTokenResponse)
+						*respMapping = pinTokenResponse
+					})
+			},
+			checker: func(response *PinTokenResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+				assert.Equal(t, Pin, response.Type)
+				assert.Equal(t, tokenId, response.Token)
+			},
+		},
+		{
+			name: "when credentials invalid then return error",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *PinTokenResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.RequestPinToken(tc.request))
+		})
+	}
+}

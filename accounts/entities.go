@@ -379,6 +379,7 @@ type (
 	Capabilities struct {
 		Payments *Payments `json:"payments,omitempty"`
 		Payouts  *Payouts  `json:"payouts,omitempty"`
+		Issuing  *Issuing  `json:"issuing,omitempty"`
 	}
 
 	Payments struct {
@@ -387,6 +388,11 @@ type (
 	}
 
 	Payouts struct {
+		Available bool `json:"available,omitempty"`
+		Enabled   bool `json:"enabled,omitempty"`
+	}
+
+	Issuing struct {
 		Available bool `json:"available,omitempty"`
 		Enabled   bool `json:"enabled,omitempty"`
 	}
@@ -425,7 +431,6 @@ type (
 		Individual        *Individual                `json:"individual,omitempty"`
 		Documents         *OnboardSubEntityDocuments `json:"documents,omitempty"`
 		ProcessingDetails *ProcessingDetails         `json:"processing_details,omitempty"`
-		Draft             bool                       `json:"draft,omitempty"`
 		IsDraft           bool                       `json:"is_draft,omitempty"`
 		AdditionalInfo    *AdditionalInfo            `json:"additional_info,omitempty"`
 	}
@@ -475,10 +480,9 @@ type (
 		Id            string                 `json:"id,omitempty"`
 		Status        string                 `json:"status,omitempty"`
 		StatusReasons []string               `json:"status_reasons,omitempty"`
-		Size          string                 `json:"size,omitempty"`
+		Size          int64                  `json:"size,omitempty"`
 		MimeType      string                 `json:"mime_type,omitempty"`
 		UploadedOn    *time.Time             `json:"uploaded_on,omitempty"`
-		Filename      string                 `json:"filename,omitempty"`
 		Purpose       string                 `json:"purpose,omitempty"`
 		Links         map[string]common.Link `json:"_links,omitempty"`
 	}

@@ -10,6 +10,7 @@ const (
 	disputes    = "disputes"
 	accept      = "accept"
 	evidence    = "evidence"
+	arbitration = "arbitration"
 	submitted   = "submitted"
 	files       = "files"
 	schemeFiles = "schemefiles"
@@ -18,6 +19,7 @@ const (
 type (
 	Dispute struct {
 		Id                 string                `json:"id,omitempty"`
+		Reference          string                `json:"reference,omitempty"`
 		Category           DisputeCategory       `json:"category,omitempty"`
 		Status             DisputeStatus         `json:"status,omitempty"`
 		Amount             int64                 `json:"amount,omitempty"`
@@ -28,6 +30,8 @@ type (
 		EvidenceRequiredBy *time.Time            `json:"evidence_required_by,omitempty"`
 		ReceivedOn         *time.Time            `json:"received_on,omitempty"`
 		LastUpdate         *time.Time            `json:"last_update,omitempty"`
+		IsCeCandidate      bool                  `json:"is_ce_candidate,omitempty"`
+		SegmentId          string                `json:"segment_id,omitempty"`
 		Payment            *PaymentDispute       `json:"payment,omitempty"`
 
 		// Not available on Previous
@@ -45,7 +49,8 @@ type (
 		ProcessedOn *time.Time      `json:"processed_on,omitempty"`
 
 		// Not available on Previous
-		ActionId                 string                    `json:"actionId,omitempty"`
+		ActionId                 string                    `json:"action_id,omitempty"`
+		Reference                string                    `json:"reference,omitempty"`
 		ProcessingChannelId      string                    `json:"processing_channel_id,omitempty"`
 		Mcc                      string                    `json:"mcc,omitempty"`
 		ThreeDSVersionEnrollment *ThreeDSVersionEnrollment `json:"3ds,omitempty"`

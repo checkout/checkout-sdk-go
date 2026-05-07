@@ -22,7 +22,7 @@ type (
 	QueryFilter struct {
 		PaymentId       string `url:"payment_id,omitempty"`
 		ActionId        string `url:"action_id,omitempty"`
-		Reference       string `json:"reference,omitempty"`
+		Reference       string `url:"reference,omitempty"`
 		Limit           int    `url:"limit,omitempty"`
 		PaginationToken string `url:"pagination_token,omitempty"`
 	}
@@ -38,27 +38,32 @@ type (
 	}
 
 	FinancialAction struct {
-		PaymentId            string              `json:"payment_id,omitempty"`
-		ActionId             string              `json:"action_id,omitempty"`
-		ActionType           string              `json:"action_type,omitempty"`
-		EntityId             string              `json:"entity_id,omitempty"`
-		SubEntityId          string              `json:"sub_entity_id,omitempty"`
-		CurrencyAccountId    string              `json:"currency_account_id,omitempty"`
-		PaymentMethod        string              `json:"payment_method,omitempty"`
-		ProcessingChannelId  string              `json:"processing_channel_id,omitempty"`
-		Reference            string              `json:"reference,omitempty"`
-		Mid                  string              `json:"mid,omitempty"`
-		ResponseCode         string              `json:"response_code,omitempty"`
-		ResponseDescription  string              `json:"response_description,omitempty"`
-		Region               Region              `json:"region,omitempty"`
-		CardType             common.CardType     `json:"card_type,omitempty"`
-		CardCategory         common.CardCategory `json:"card_category,omitempty"`
-		IssuerCountry        common.Country      `json:"issuer_country,omitempty"`
-		MerchantCategoryCode string              `json:"merchant_category_code,omitempty"`
-		FxTradeId            string              `json:"fx_trade_id,omitempty"`
-		ProcessedOn          *time.Time          `json:"processed_on,omitempty"`
-		RequestedOn          *time.Time          `json:"requested_on,omitempty"`
-		Breakdown            []ActionBreakdown   `json:"breakdown,omitempty"`
+		PaymentId                  string              `json:"payment_id,omitempty"`
+		ActionId                   string              `json:"action_id,omitempty"`
+		ActionType                 string              `json:"action_type,omitempty"`
+		EntityId                   string              `json:"entity_id,omitempty"`
+		SubEntityId                string              `json:"sub_entity_id,omitempty"`
+		CurrencyAccountId          string              `json:"currency_account_id,omitempty"`
+		PaymentMethod              string              `json:"payment_method,omitempty"`
+		ProcessingChannelId        string              `json:"processing_channel_id,omitempty"`
+		Reference                  string              `json:"reference,omitempty"`
+		Mid                        string              `json:"mid,omitempty"`
+		ResponseCode               string              `json:"response_code,omitempty"`
+		ResponseDescription        string              `json:"response_description,omitempty"`
+		Region                     Region              `json:"region,omitempty"`
+		CardType                   common.CardType     `json:"card_type,omitempty"`
+		CardCategory               common.CardCategory `json:"card_category,omitempty"`
+		IssuerCountry              common.Country      `json:"issuer_country,omitempty"`
+		MerchantCategoryCode       string              `json:"merchant_category_code,omitempty"`
+		FxTradeId                  string              `json:"fx_trade_id,omitempty"`
+		AcquirerReferenceNumber    string              `json:"acquirer_reference_number,omitempty"`
+		SchemeFxAdjustmentEligible bool                `json:"scheme_fx_adjustment_eligible,omitempty"`
+		Bin                        string              `json:"bin,omitempty"`
+		IssuingBank                string              `json:"issuing_bank,omitempty"`
+		PaymentType                string              `json:"payment_type,omitempty"`
+		ProcessedOn                *time.Time          `json:"processed_on,omitempty"`
+		RequestedOn                *time.Time          `json:"requested_on,omitempty"`
+		Breakdown                  []ActionBreakdown   `json:"breakdown,omitempty"`
 	}
 
 	ActionBreakdown struct {
@@ -77,6 +82,8 @@ type (
 		ReserveReleaseDate                    *time.Time      `json:"reserve_release_date,omitempty"`
 		ReserveDeductedDate                   *time.Time      `json:"reserve_deducted_date,omitempty"`
 		TaxFxRate                             float64         `json:"tax_fx_rate,omitempty"`
+		SchemeFxAdjustmentProcessingCurrency  common.Currency `json:"scheme_fx_adjustment_processing_currency,omitempty"`
+		SchemeFxAdjustmentRateApplied         float64         `json:"scheme_fx_adjustment_rate_applied,omitempty"`
 		EntityCountryTaxCurrency              common.Currency `json:"entity_country_tax_currency,omitempty"`
 		TaxCurrencyAmount                     float64         `json:"tax_currency_amount,omitempty"`
 	}

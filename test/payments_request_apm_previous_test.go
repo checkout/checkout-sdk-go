@@ -807,31 +807,6 @@ func getIdealSourceRequestPrevious() payments.PaymentSource {
 	return source
 }
 
-func getKlarnaSourceRequest() payments.PaymentSource {
-	source := apm.NewRequestKlarnaSource()
-	source.AuthorizationToken = "b4bd3423-24e3"
-	source.PurchaseCountry = string(common.GB)
-	source.Locale = "en-GB"
-	source.TaxAmount = 1
-	source.BillingAddress = Address()
-	source.Customer = map[string]interface{}{
-		"DateOfBirth": "1970-01-01",
-		"Gender":      "male",
-	}
-	source.Products = []map[string]interface{}{
-		{
-			"Name":           "test item",
-			"Quantity":       1,
-			"UnitPrice":      1000,
-			"TaxRate":        0,
-			"TotalAmount":    1000,
-			"TotalTaxAmount": 0,
-		},
-	}
-
-	return source
-}
-
 func getKnetSourceRequest() payments.PaymentSource {
 	paymentMethodDetails := payments.PaymentMethodDetails{
 		DisplayName: "name",
@@ -911,13 +886,6 @@ func getRapiPagoSourceRequest() payments.PaymentSource {
 	source.Description = "RapiPago test payment"
 	source.Country = common.AR
 	source.Payer = &payer
-
-	return source
-}
-
-func getSepaSourceRequest() payments.PaymentSource {
-	source := apm.NewRequestSepaSource()
-	source.Id = "1"
 
 	return source
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -819,6 +820,143 @@ func TestGetPayoutSchedule(t *testing.T) {
 	}
 }
 
+func TestCreateReserveRule(t *testing.T) {
+	t.Skip("API returning 503, with comment 'No healthy upstream'")
+
+	testEntityId := createReserveRuleTestEntity(t)
+
+	cases := []struct {
+		name    string
+		request accounts.ReserveRuleRequest
+		checker func(*common.IdResponse, error)
+	}{
+		{
+			name:    "when request is valid then create reserve rule",
+			request: buildReserveRuleIntegrationRequest(),
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotEmpty(t, response.Id)
+			},
+		},
+	}
+
+	client := buildAccountsClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.CreateReserveRule(testEntityId, tc.request))
+		})
+	}
+}
+
+func TestGetReserveRules(t *testing.T) {
+	t.Skip("API returning 503, with comment 'No healthy upstream'")
+
+	testEntityId := createReserveRuleTestEntity(t)
+	_, _ = buildAccountsClient().Accounts.CreateReserveRule(testEntityId, buildReserveRuleIntegrationRequest())
+
+	cases := []struct {
+		name    string
+		checker func(*accounts.ReserveRulesResponse, error)
+	}{
+		{
+			name: "when entity has reserve rules then return list",
+			checker: func(response *accounts.ReserveRulesResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotEmpty(t, response.Data)
+				assert.NotEmpty(t, response.Data[0].Id)
+				assert.NotEmpty(t, response.Data[0].Type)
+			},
+		},
+	}
+
+	client := buildAccountsClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetReserveRules(testEntityId))
+		})
+	}
+}
+
+func TestGetReserveRuleDetails(t *testing.T) {
+	t.Skip("API returning 503, with comment 'No healthy upstream'")
+
+	testEntityId := createReserveRuleTestEntity(t)
+	reserveRuleRequest := buildReserveRuleIntegrationRequest()
+	createResponse, _ := buildAccountsClient().Accounts.CreateReserveRule(testEntityId, reserveRuleRequest)
+
+	cases := []struct {
+		name    string
+		checker func(*accounts.ReserveRuleResponse, error)
+	}{
+		{
+			name: "when ids are valid then return reserve rule details",
+			checker: func(response *accounts.ReserveRuleResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotEmpty(t, response.Id)
+				assert.Equal(t, reserveRuleRequest.Type, response.Type)
+				assert.NotNil(t, response.Rolling)
+				assert.Equal(t, reserveRuleRequest.Rolling.Percentage, response.Rolling.Percentage)
+				assert.NotNil(t, response.Rolling.HoldingDuration)
+				assert.Equal(t, reserveRuleRequest.Rolling.HoldingDuration.Weeks, response.Rolling.HoldingDuration.Weeks)
+				assert.NotNil(t, response.ValidFrom)
+			},
+		},
+	}
+
+	client := buildAccountsClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetReserveRuleDetails(testEntityId, createResponse.Id))
+		})
+	}
+}
+
+func TestUpdateReserveRule(t *testing.T) {
+	t.Skip("API returning 503, with comment 'No healthy upstream'")
+
+	testEntityId := createReserveRuleTestEntity(t)
+	createResponse, _ := buildAccountsClient().Accounts.CreateReserveRule(testEntityId, buildReserveRuleIntegrationRequest())
+
+	updatePercentage := 15.0
+	updateWeeks := 16
+	updateRequest := buildReserveRuleIntegrationRequest()
+	updateRequest.Rolling.Percentage = &updatePercentage
+	updateRequest.Rolling.HoldingDuration.Weeks = &updateWeeks
+
+	etag := ""
+	if createResponse.HttpMetadata.Headers != nil {
+		etag = createResponse.HttpMetadata.Headers.Header.Get("ETag")
+	}
+
+	cases := []struct {
+		name    string
+		checker func(*common.IdResponse, error)
+	}{
+		{
+			name: "when request is valid then update reserve rule",
+			checker: func(response *common.IdResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, createResponse.Id, response.Id)
+			},
+		},
+	}
+
+	client := buildAccountsClient().Accounts
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.UpdateReserveRule(testEntityId, createResponse.Id, etag, updateRequest))
+		})
+	}
+}
+
 func createEntity(t *testing.T, inputReference *string) string {
 	var reference string
 	if inputReference == nil {
@@ -988,4 +1126,48 @@ func buildAccountsClientVersion(schemaVersion string) *nas.Api {
 		Build()
 
 	return oauthAccountsClientVersion
+}
+
+func buildReserveRuleIntegrationRequest() accounts.ReserveRuleRequest {
+	percentage := 12.5
+	weeks := 8
+	validFrom := time.Now().UTC().AddDate(0, 0, 30)
+	return accounts.ReserveRuleRequest{
+		Type: "rolling",
+		Rolling: &accounts.RollingReserveRule{
+			Percentage:      &percentage,
+			HoldingDuration: &accounts.HoldingDuration{Weeks: &weeks},
+		},
+		ValidFrom: &validFrom,
+	}
+}
+
+func createReserveRuleTestEntity(t *testing.T) string {
+	request := accounts.OnboardEntityRequest{
+		Reference: GenerateRandomReference(),
+		ContactDetails: &accounts.ContactDetails{
+			Phone: &accounts.Phone{Number: "2345678910"},
+		},
+		Profile: &accounts.Profile{
+			Urls: []string{"https://www.superheroexample.com"},
+			Mccs: []string{"0742"},
+		},
+		Company: &accounts.Company{
+			BusinessRegistrationNumber: "01234567",
+			LegalName:                  "Reserve Rules Test Inc.",
+			TradingName:                "Reserve Rules Test",
+			PrincipalAddress:           Address(),
+			RegisteredAddress:          Address(),
+			Representatives: []accounts.Representative{
+				{FirstName: "John", LastName: "Doe", Address: Address()},
+			},
+		},
+	}
+
+	entity, err := buildAccountsClient().Accounts.CreateEntity(request)
+	if err != nil {
+		assert.Fail(t, fmt.Sprintf("error creating reserve rule test entity - %s", err.Error()))
+	}
+
+	return entity.Id
 }

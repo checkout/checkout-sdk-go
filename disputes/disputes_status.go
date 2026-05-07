@@ -13,5 +13,6 @@ const (
 	ArbitrationLost        DisputeStatus = "arbitration_lost"
 	EvidenceRequired       DisputeStatus = "evidence_required"
 	EvidenceUnderReview    DisputeStatus = "evidence_under_review"
+	ArbEvidenceSubmitted   DisputeStatus = "arb_evidence_submitted"
 	ArbitrationUnderReview DisputeStatus = "arbitration_under_review"
 )

@@ -25,7 +25,7 @@ func (c *Client) RequestPaymentSessions(request PaymentSessionsRequest) (*Paymen
 }
 
 func (c *Client) RequestPaymentSessionsWithContext(ctx context.Context, request PaymentSessionsRequest) (*PaymentSessionsResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *Client) RequestPaymentSessionsWithPayment(request PaymentSessionsWithPa
 }
 
 func (c *Client) RequestPaymentSessionsWithPaymentWithContext(ctx context.Context, request PaymentSessionsWithPaymentRequest) (*PaymentSessionPaymentResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *Client) SubmitPaymentSession(sessionId string, request SubmitPaymentSes
 }
 
 func (c *Client) SubmitPaymentSessionWithContext(ctx context.Context, sessionId string, request SubmitPaymentSessionRequest) (*PaymentSessionPaymentResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}

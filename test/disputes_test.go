@@ -27,6 +27,8 @@ var (
 	}
 )
 
+// tests
+
 func TestSetupDefault(t *testing.T) {
 	t.Skip("Due the time to expect the dispute, just run as needed")
 	var (
@@ -479,6 +481,87 @@ func TestGetDisputeSchemeFiles(t *testing.T) {
 		})
 	}
 }
+
+func TestSubmitArbitrationEvidence(t *testing.T) {
+	t.Skip("Due the time to expect the dispute, just run as needed")
+
+	cases := []struct {
+		name      string
+		disputeId string
+		checker   func(*common.MetadataResponse, error)
+	}{
+		{
+			name:      "when dispute has evidence then submit arbitration evidence",
+			disputeId: disputeId,
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusNoContent, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:      "when dispute doesn't exist then return error",
+			disputeId: "disp_invalid",
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().Disputes
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if disputeId != "" {
+				tc.checker(client.SubmitArbitrationEvidence(tc.disputeId))
+			}
+		})
+	}
+}
+
+func TestGetSubmittedArbitrationEvidence(t *testing.T) {
+	t.Skip("Due the time to expect the dispute, just run as needed")
+	dispute := getDisputes(t).Data[0]
+
+	cases := []struct {
+		name      string
+		disputeId string
+		checker   func(*disputes.DisputeCompiledSubmittedEvidenceResponse, error)
+	}{
+		{
+			name:      "when dispute has submitted arbitration evidence then return the file",
+			disputeId: dispute.Id,
+			checker: func(response *disputes.DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.NotEmpty(t, response.FileId)
+			},
+		},
+		{
+			name:      "when dispute does not exist then return error",
+			disputeId: "not_found",
+			checker: func(response *disputes.DisputeCompiledSubmittedEvidenceResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := DefaultApi().Disputes
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetSubmittedArbitrationEvidence(tc.disputeId))
+		})
+	}
+}
+
+// common methods
 
 func getPaymentRequest(t *testing.T, token string) *nas.PaymentResponse {
 	tokenSource := sources.NewRequestTokenSource()

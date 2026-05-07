@@ -16,6 +16,17 @@ const (
 	Visa ShippingIndicator = "visa"
 )
 
+type Experience string
+
+const (
+	ThreeDsExperience Experience = "3ds"
+	GoogleSpaExperience Experience = "google_spa"
+)
+
+type GoogleSpa struct {
+	ContinueUrl string `json:"continue_url,omitempty"`
+}
+
 type (
 	ThreeDsRequestorAuthenticationInfo struct {
 		ThreeDsReqAuthMethod    payments.ThreeDsReqAuthMethodType `json:"three_ds_req_auth_method,omitempty"`
@@ -61,6 +72,8 @@ type (
 		Installment                   *Installment               `json:"installment,omitempty"`
 		Optimization                  *Optimization              `json:"optimization,omitempty"`
 		InitialTransaction            *InitialTransaction        `json:"initial_transaction,omitempty"`
+		GoogleSpa                     *GoogleSpa                 `json:"google_spa,omitempty"`
+		PreferredExperiences          []Experience               `json:"preferred_experiences,omitempty"`
 	}
 
 	ThreeDsMethodCompletionRequest struct {

@@ -46,12 +46,12 @@ var (
 func TestCreate(t *testing.T) {
 	var (
 		token = CreateTokenInstrumentResponse{
-			Type:             common.Card,
-			Id:               "src_wmlfc3zyhqzehihu7giusaaawu",
-			CustomerResponse: &customerResponse,
-			ExpiryMonth:      6,
-			ExpiryYear:       2025,
-			Last4:            "1234",
+			Type:        common.Card,
+			Id:          "src_wmlfc3zyhqzehihu7giusaaawu",
+			Customer:    &customerResponse,
+			ExpiryMonth: 6,
+			ExpiryYear:  2025,
+			Last4:       "1234",
 		}
 
 		createTokenResponse = CreateInstrumentResponse{

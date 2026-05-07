@@ -10,4 +10,6 @@ const (
 	RefundOrCancellationPolicy         RelevantEvidence = "refund_or_cancellation_policy"
 	RecurringTransactionAgreement      RelevantEvidence = "recurring_transaction_agreement"
 	AdditionalEvidence                 RelevantEvidence = "additional_evidence"
+	ProofOfDeliveryOrServiceDate       RelevantEvidence = "proof_of_delivery_or_service_date"
+	CompellingEvidence                 RelevantEvidence = "compelling_evidence"
 )

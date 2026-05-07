@@ -14,6 +14,8 @@ const (
 	Card      TokenType = "card"
 	ApplePay  TokenType = "applepay"
 	GooglePay TokenType = "googlepay"
+	Cvv       TokenType = "cvv"
+	Pin       TokenType = "pin"
 )
 
 type (
@@ -31,6 +33,24 @@ type (
 	WalletTokenRequest struct {
 		Type      TokenType `json:"type" binding:"required"`
 		TokenData TokenData `json:"token_data" binding:"required"`
+	}
+
+	CvvTokenData struct {
+		Cvv string `json:"cvv,omitempty"`
+	}
+
+	PinTokenData struct {
+		Pin string `json:"pin,omitempty"`
+	}
+
+	CvvTokenRequest struct {
+		Type      TokenType    `json:"type" binding:"required"`
+		TokenData CvvTokenData `json:"token_data" binding:"required"`
+	}
+
+	PinTokenRequest struct {
+		Type      TokenType    `json:"type" binding:"required"`
+		TokenData PinTokenData `json:"token_data" binding:"required"`
 	}
 )
 
@@ -62,6 +82,20 @@ func (t *GooglePayTokenData) GetType() TokenType {
 }
 
 type (
+	CvvTokenResponse struct {
+		HttpMetadata common.HttpMetadata
+		Type         TokenType  `json:"type,omitempty"`
+		Token        string     `json:"token,omitempty"`
+		ExpiresOn    *time.Time `json:"expires_on,omitempty"`
+	}
+
+	PinTokenResponse struct {
+		HttpMetadata common.HttpMetadata
+		Type         TokenType  `json:"type,omitempty"`
+		Token        string     `json:"token,omitempty"`
+		ExpiresOn    *time.Time `json:"expires_on,omitempty"`
+	}
+
 	CardTokenResponse struct {
 		HttpMetadata   common.HttpMetadata
 		Type           TokenType           `json:"type,omitempty"`

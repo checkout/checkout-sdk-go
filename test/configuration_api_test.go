@@ -28,7 +28,7 @@ func TestShouldCreateConfigurationWithSubdomain(t *testing.T) {
 		{"12345678", "https://12345678.api.sandbox.checkout.com", "https://12345678.access.sandbox.checkout.com/connect/token"},
 		{"abcdefgh", "https://abcdefgh.api.sandbox.checkout.com", "https://abcdefgh.access.sandbox.checkout.com/connect/token"},
 		{"1234doma", "https://1234doma.api.sandbox.checkout.com", "https://1234doma.access.sandbox.checkout.com/connect/token"},
-		{"test-123", "https://test-123.api.sandbox.checkout.com", "https://test-123.access.sandbox.checkout.com/connect/token"},
+		{"pl-vkuhvk4v", "https://pl-vkuhvk4v.api.sandbox.checkout.com", "https://pl-vkuhvk4v.access.sandbox.checkout.com/connect/token"},
 		{"pl-abc123", "https://pl-abc123.api.sandbox.checkout.com", "https://pl-abc123.access.sandbox.checkout.com/connect/token"},
 	}
 
@@ -61,6 +61,9 @@ func TestShouldCreateConfigurationWithBadSubdomain(t *testing.T) {
 		{"foo-", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
 		{"-foo", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
 		{"ABC", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
+		{"test-123", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
+		{"foo-bar", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
+		{"pl-", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
 	}
 
 	for _, tc := range testCases {

@@ -36,7 +36,7 @@ func NewEnvironmentSubdomain(environment Environment, subdomain string) *Environ
 func createUrlWithSubdomain(originalUrl string, subdomain string) string {
 	newEnvironment := originalUrl
 
-	regex := regexp.MustCompile("^[a-z0-9]+(-[a-z0-9]+)*$")
+	regex := regexp.MustCompile("^(?:pl-)?[a-z0-9]+$")
 
 	if regex.MatchString(subdomain) {
 		merchantUrl, err := url.Parse(originalUrl)

@@ -87,4 +87,27 @@ func TestShouldCreateConfigurationWithSubdomainForProduction(t *testing.T) {
 	assert.Equal(t, "https://1234prod.api.checkout.com", config.EnvironmentSubdomain.ApiUrl)
 	assert.Equal(t, "https://1234prod.access.checkout.com/connect/token", config.EnvironmentSubdomain.AuthorizationUrl)
 	assert.Equal(t, "https://forward.checkout.com", config.Environment.ForwardUri())
+	assert.Equal(t, "https://identity-verification.checkout.com", config.Environment.IdentityUri())
+}
+
+func TestShouldHaveCorrectSandboxUrls(t *testing.T) {
+	env := configuration.Sandbox()
+
+	assert.Equal(t, "https://api.sandbox.checkout.com", env.BaseUri())
+	assert.Equal(t, "https://files.sandbox.checkout.com", env.FilesUri())
+	assert.Equal(t, "https://transfers.sandbox.checkout.com", env.TransfersUri())
+	assert.Equal(t, "https://balances.sandbox.checkout.com", env.BalancesUri())
+	assert.Equal(t, "https://forward.sandbox.checkout.com", env.ForwardUri())
+	assert.Equal(t, "https://identity-verification.sandbox.checkout.com", env.IdentityUri())
+}
+
+func TestShouldHaveCorrectProductionUrls(t *testing.T) {
+	env := configuration.Production()
+
+	assert.Equal(t, "https://api.checkout.com", env.BaseUri())
+	assert.Equal(t, "https://files.checkout.com/", env.FilesUri())
+	assert.Equal(t, "https://transfers.checkout.com/", env.TransfersUri())
+	assert.Equal(t, "https://balances.checkout.com/", env.BalancesUri())
+	assert.Equal(t, "https://forward.checkout.com", env.ForwardUri())
+	assert.Equal(t, "https://identity-verification.checkout.com", env.IdentityUri())
 }

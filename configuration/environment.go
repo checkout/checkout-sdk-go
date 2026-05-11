@@ -12,6 +12,7 @@ type Environment interface {
 	TransfersUri() string
 	BalancesUri() string
 	ForwardUri() string
+	IdentityUri() string
 	IsSandbox() bool
 }
 
@@ -56,6 +57,7 @@ type CheckoutEnv struct {
 	transfersUri     string
 	balancesUri      string
 	forwardUri       string
+	identityUri      string
 	isSandbox        bool
 }
 
@@ -83,6 +85,10 @@ func (e *CheckoutEnv) ForwardUri() string {
 	return e.forwardUri
 }
 
+func (e *CheckoutEnv) IdentityUri() string {
+	return e.identityUri
+}
+
 func (e *CheckoutEnv) IsSandbox() bool {
 	return e.isSandbox
 }
@@ -94,6 +100,7 @@ func NewEnvironment(
 	transfersUri string,
 	balancesUri string,
 	forwardUri string,
+	identityUri string,
 	isSandbox bool,
 ) *CheckoutEnv {
 	return &CheckoutEnv{
@@ -103,6 +110,7 @@ func NewEnvironment(
 		transfersUri:     transfersUri,
 		balancesUri:      balancesUri,
 		forwardUri:       forwardUri,
+		identityUri:      identityUri,
 		isSandbox:        isSandbox}
 }
 
@@ -114,6 +122,7 @@ func Sandbox() *CheckoutEnv {
 		"https://transfers.sandbox.checkout.com",
 		"https://balances.sandbox.checkout.com",
 		"https://forward.sandbox.checkout.com",
+		"https://identity-verification.sandbox.checkout.com",
 		true)
 }
 
@@ -125,5 +134,6 @@ func Production() *CheckoutEnv {
 		"https://transfers.checkout.com/",
 		"https://balances.checkout.com/",
 		"https://forward.checkout.com",
+		"https://identity-verification.checkout.com",
 		false)
 }

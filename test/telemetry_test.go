@@ -94,6 +94,8 @@ func createMockEnvironment(mockServerURL string) *configuration.CheckoutEnv {
 		mockServerURL, // filesUri
 		mockServerURL, // transfersUri
 		mockServerURL, // balancesUri
+		mockServerURL, // forwardUri
+		mockServerURL, // identityUri
 		true,          // isSandbox
 	)
 }

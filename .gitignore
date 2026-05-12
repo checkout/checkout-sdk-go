@@ -18,3 +18,5 @@
 *.DS_Store*
 .cursor/rules/*.mdc
 .cursor/skills/endpoint-review-auto/*.md
+.claude/
+CLAUDE.md

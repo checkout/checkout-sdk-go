@@ -108,7 +108,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Contexts = contexts.NewClient(configuration, apiClient)
 	api.PaymentSessions = payment_sessions.NewClient(configuration, apiClient)
 	api.PaymentSetups = setups.NewClient(configuration, apiClient)
-	api.Forward = forward.NewClient(configuration, apiClient)
+	api.Forward = forward.NewClient(configuration, buildForwardClient(configuration))
 	api.ApplePay = applepay.NewClient(configuration, apiClient)
 	api.GooglePay = googlepay.NewClient(configuration, apiClient)
 	api.NetworkTokens = networktokens.NewClient(configuration, apiClient)
@@ -116,11 +116,12 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.AgenticCommerce = agenticcommerce.NewClient(configuration, apiClient)
 	api.ComplianceRequests = compliancerequests.NewClient(configuration, apiClient)
 	api.PaymentMethods = paymentmethods.NewClient(configuration, apiClient)
-	api.AmlScreening = amlscreening.NewClient(configuration, apiClient)
-	api.Applicants = applicants.NewClient(configuration, apiClient)
-	api.FaceAuthentication = faceauthentication.NewClient(configuration, apiClient)
-	api.IdDocumentVerification = iddocumentverification.NewClient(configuration, apiClient)
-	api.IdentityVerification = identityverification.NewClient(configuration, apiClient)
+	identityClient := buildIdentityClient(configuration)
+	api.AmlScreening = amlscreening.NewClient(configuration, identityClient)
+	api.Applicants = applicants.NewClient(configuration, identityClient)
+	api.FaceAuthentication = faceauthentication.NewClient(configuration, identityClient)
+	api.IdDocumentVerification = iddocumentverification.NewClient(configuration, identityClient)
+	api.IdentityVerification = identityverification.NewClient(configuration, identityClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)
@@ -145,4 +146,12 @@ func buildBalancesClient(configuration *configuration.Configuration) client.Http
 
 func buildTransfersClient(configuration *configuration.Configuration) client.HttpClient {
 	return client.NewApiClient(configuration, configuration.Environment.TransfersUri())
+}
+
+func buildForwardClient(configuration *configuration.Configuration) client.HttpClient {
+	return client.NewApiClient(configuration, configuration.Environment.ForwardUri())
+}
+
+func buildIdentityClient(configuration *configuration.Configuration) client.HttpClient {
+	return client.NewApiClient(configuration, configuration.Environment.IdentityUri())
 }

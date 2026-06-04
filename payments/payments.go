@@ -646,6 +646,7 @@ type (
 
 	PaymentRetryResponse struct {
 		Enabled       bool       `json:"enabled,omitempty"`
+		AttemptsMade  int        `json:"attempts_made,omitempty"`
 		MaxAttempts   int        `json:"max_attempts,omitempty"`
 		EndsOn        *time.Time `json:"ends_on,omitempty"`
 		NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
@@ -795,12 +796,12 @@ type (
 		Amount    int64 `json:"amount,omitempty"`
 
 		//Common
-		DaysBetweenPayments   int        `json:"days_between_payments,omitempty"`
-		TotalNumberOfPayments int        `json:"total_number_of_payments,omitempty"`
-		CurrentPaymentNumber  int        `json:"current_payment_number,omitempty"`
-		Expiry                *time.Time `json:"expiry,omitempty"`
-		Name                  string     `json:"name,omitempty"`
-		StartDate             string     `json:"start_date,omitempty"`
+		DaysBetweenPayments   int    `json:"days_between_payments,omitempty"`
+		TotalNumberOfPayments int    `json:"total_number_of_payments,omitempty"`
+		CurrentPaymentNumber  int    `json:"current_payment_number,omitempty"`
+		Expiry                string `json:"expiry,omitempty"`
+		Name                  string `json:"name,omitempty"`
+		StartDate             string `json:"start_date,omitempty"`
 	}
 )
 
@@ -889,7 +890,7 @@ type (
 		PartnerOrderId                   string                           `json:"partner_order_id,omitempty"`
 		PartnerStatus                    string                           `json:"partner_status,omitempty"`
 		PartnerTransactionId             string                           `json:"partner_transaction_id,omitempty"`
-		PartnerErrorCodes                string                           `json:"partner_error_codes,omitempty"`
+		PartnerErrorCodes                []string                         `json:"partner_error_codes,omitempty"`
 		PartnerErrorMessage              string                           `json:"partner_error_message,omitempty"`
 		PartnerAuthorizationCode         string                           `json:"partner_authorization_code,omitempty"`
 		PartnerAuthorizationResponseCode string                           `json:"partner_authorization_response_code,omitempty"`
@@ -950,15 +951,15 @@ type (
 	}
 
 	CaptureProcessingSettings struct {
-		OrderId              string         `json:"order_id,omitempty"`
-		OtpValue             string         `json:"otp_value,omitempty"`
-		TaxAmount            int64          `json:"tax_amount,omitempty"`
-		SurchargeAmount      int64          `json:"surcharge_amount,omitempty"`
-		DiscountAmount       int64          `json:"discount_amount,omitempty"`
-		DutyAmount           int64          `json:"duty_amount,omitempty"`
-		ShippingAmount       int64          `json:"shipping_amount,omitempty"`
-		ShippingTaxAmount    int64          `json:"shipping_tax_amount,omitempty"`
-		PurchaseCountry      common.Country `json:"purchase_country,omitempty"`
-		ForeignRetailerAmount int64         `json:"foreign_retailer_amount,omitempty"`
+		OrderId               string         `json:"order_id,omitempty"`
+		OtpValue              string         `json:"otp_value,omitempty"`
+		TaxAmount             int64          `json:"tax_amount,omitempty"`
+		SurchargeAmount       int64          `json:"surcharge_amount,omitempty"`
+		DiscountAmount        int64          `json:"discount_amount,omitempty"`
+		DutyAmount            int64          `json:"duty_amount,omitempty"`
+		ShippingAmount        int64          `json:"shipping_amount,omitempty"`
+		ShippingTaxAmount     int64          `json:"shipping_tax_amount,omitempty"`
+		PurchaseCountry       common.Country `json:"purchase_country,omitempty"`
+		ForeignRetailerAmount int64          `json:"foreign_retailer_amount,omitempty"`
 	}
 )

@@ -35,7 +35,7 @@ func (c *Client) SetRequirementsDueWithContext(
 	entityId string,
 	request SimulatorSetRequirementsDueRequest,
 ) (*SimulatorSetRequirementsDueResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *Client) RunScenarioWithContext(
 	ctx context.Context,
 	entityId, scenarioId string,
 ) (*SimulatorRunScenarioResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (c *Client) SetEntityStatusWithContext(
 	entityId string,
 	request SimulatorSetStatusRequest,
 ) (*SimulatorSetStatusResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (c *Client) ListAvailableRequirements() (*SimulatorAvailableRequirementsRes
 func (c *Client) ListAvailableRequirementsWithContext(
 	ctx context.Context,
 ) (*SimulatorAvailableRequirementsResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c *Client) ListScenarios() (*SimulatorScenariosResponse, error) {
 func (c *Client) ListScenariosWithContext(
 	ctx context.Context,
 ) (*SimulatorScenariosResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
 	}

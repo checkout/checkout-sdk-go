@@ -750,3 +750,97 @@ func TestDelete(t *testing.T) {
 		})
 	}
 }
+
+func TestRevokeInstrument(t *testing.T) {
+	var (
+		metadataResponse = common.MetadataResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+		}
+	)
+
+	cases := []struct {
+		name             string
+		instrumentId     string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPatch         func(*mock.Mock) mock.Call
+		checker          func(*common.MetadataResponse, error)
+	}{
+		{
+			name:         "when instrument id is valid then revoke instrument",
+			instrumentId: "src_abcd1234efgh5678",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*common.MetadataResponse)
+						*respMapping = metadataResponse
+					})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:         "when credentials invalid then return error",
+			instrumentId: "src_abcd1234efgh5678",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:         "when instrument already revoked then return 410",
+			instrumentId: "src_revoked",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPatch: func(m *mock.Mock) mock.Call {
+				return *m.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusGone,
+						Status:     "410 Gone",
+					})
+			},
+			checker: func(response *common.MetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusGone, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPatch(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.RevokeInstrument(tc.instrumentId))
+		})
+	}
+}

@@ -337,3 +337,69 @@ func TestConfirmPaymentSetup(t *testing.T) {
 		})
 	}
 }
+
+func TestCreatePaymentSetup_WithAccountFundingTransactionAndBlik(t *testing.T) {
+	enabled := true
+
+	var (
+		createdResponse = PaymentSetupResponse{
+			HttpMetadata: mocks.HttpMetadataStatusCreated,
+			Id:           "ps_aft_blik_001",
+			Amount:       1000,
+			Currency:     common.GBP,
+			PaymentMethods: &PaymentMethods{
+				Blik: &BlikPaymentMethod{
+					PartnerCode: "999111",
+				},
+			},
+			AccountFundingTransaction: &PaymentSetupAccountFundingTransaction{
+				Enabled: &enabled,
+				Purpose: AFTPurposeDonations,
+			},
+		}
+
+		request = PaymentSetupRequest{
+			Amount:   1000,
+			Currency: common.GBP,
+			AccountFundingTransaction: &PaymentSetupAccountFundingTransaction{
+				Enabled: &enabled,
+				Purpose: AFTPurposeDonations,
+			},
+		}
+	)
+
+	apiClient := new(mocks.ApiClientMock)
+	credentials := new(mocks.CredentialsMock)
+	environment := new(mocks.EnvironmentMock)
+	enableTelemetry := true
+
+	credentials.On("GetAuthorization", mock.Anything).
+		Return(&configuration.SdkAuthorization{}, nil)
+	apiClient.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil).
+		Run(func(args mock.Arguments) {
+			respMapping := args.Get(4).(*PaymentSetupResponse)
+			*respMapping = createdResponse
+		})
+
+	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+	client := NewClient(config, apiClient)
+
+	response, err := client.CreatePaymentSetup(request)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
+	assert.Equal(t, "ps_aft_blik_001", response.Id)
+
+	// AccountFundingTransaction surfaced on the response
+	assert.NotNil(t, response.AccountFundingTransaction)
+	assert.Equal(t, AFTPurposeDonations, response.AccountFundingTransaction.Purpose)
+	assert.NotNil(t, response.AccountFundingTransaction.Enabled)
+	assert.True(t, *response.AccountFundingTransaction.Enabled)
+
+	// Blik payment method surfaced
+	assert.NotNil(t, response.PaymentMethods)
+	assert.NotNil(t, response.PaymentMethods.Blik)
+	assert.Equal(t, "999111", response.PaymentMethods.Blik.PartnerCode)
+}

@@ -22,17 +22,18 @@ const (
 // ===== Main Request/Response Structs =====
 
 type PaymentSetupRequest struct {
-	ProcessingChannelId string                `json:"processing_channel_id"`
-	Amount              int64                 `json:"amount"`
-	Currency            common.Currency       `json:"currency"`
-	PaymentType         payments.PaymentType  `json:"payment_type,omitempty"`
-	Reference           string                `json:"reference,omitempty"`
-	Description         string                `json:"description,omitempty"`
-	PaymentMethods      *PaymentMethods       `json:"payment_methods,omitempty"`
-	Settings            *PaymentSetupSettings `json:"settings,omitempty"`
-	Customer            *PaymentSetupCustomer `json:"customer,omitempty"`
-	Order               *PaymentSetupOrder    `json:"order,omitempty"`
-	Industry            *PaymentSetupIndustry `json:"industry,omitempty"`
+	ProcessingChannelId       string                                 `json:"processing_channel_id"`
+	Amount                    int64                                  `json:"amount"`
+	Currency                  common.Currency                        `json:"currency"`
+	PaymentType               payments.PaymentType                   `json:"payment_type,omitempty"`
+	Reference                 string                                 `json:"reference,omitempty"`
+	Description               string                                 `json:"description,omitempty"`
+	PaymentMethods            *PaymentMethods                        `json:"payment_methods,omitempty"`
+	Settings                  *PaymentSetupSettings                  `json:"settings,omitempty"`
+	Customer                  *PaymentSetupCustomer                  `json:"customer,omitempty"`
+	Order                     *PaymentSetupOrder                     `json:"order,omitempty"`
+	Industry                  *PaymentSetupIndustry                  `json:"industry,omitempty"`
+	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 }
 
 type PaymentSetupResponse struct {

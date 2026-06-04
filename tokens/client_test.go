@@ -223,6 +223,126 @@ func TestRequestCvvToken(t *testing.T) {
 	}
 }
 
+func TestGetTokenMetadata(t *testing.T) {
+	var (
+		tokenMetadataResponse = TokenMetadataResponse{
+			HttpMetadata:  mocks.HttpMetadataStatusOk,
+			Token:         tokenId,
+			Type:          "card",
+			ExpiryMonth:   expiryMonth,
+			ExpiryYear:    expiryYear,
+			Scheme:        "Visa",
+			Last4:         "4242",
+			Bin:           "424242",
+			CardType:      "CREDIT",
+			CardCategory:  "CONSUMER",
+			Issuer:        "JPMORGAN CHASE BANK NA",
+			IssuerCountry: "US",
+			ProductId:     "A",
+			ProductType:   "Visa Traditional",
+			BillingAddress: &TokenMetadataBillingAddress{
+				City:    "London",
+				Country: "GB",
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		tokenId          string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*TokenMetadataResponse, error)
+	}{
+		{
+			name:    "when token id is valid then return token metadata",
+			tokenId: tokenId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*TokenMetadataResponse)
+						*respMapping = tokenMetadataResponse
+					})
+			},
+			checker: func(response *TokenMetadataResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, tokenId, response.Token)
+				assert.Equal(t, "card", response.Type)
+				assert.Equal(t, "CREDIT", response.CardType)
+				assert.Equal(t, "CONSUMER", response.CardCategory)
+				assert.Equal(t, "4242", response.Last4)
+				assert.Equal(t, "424242", response.Bin)
+				assert.NotNil(t, response.BillingAddress)
+				assert.Equal(t, "London", response.BillingAddress.City)
+				assert.Equal(t, "GB", response.BillingAddress.Country)
+			},
+		},
+		{
+			name:    "when credentials invalid then return error",
+			tokenId: tokenId,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *TokenMetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+		{
+			name:    "when token not found then return 404",
+			tokenId: "tok_unknown",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *TokenMetadataResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.GetTokenMetadata(tc.tokenId))
+		})
+	}
+}
+
 func TestRequestPinToken(t *testing.T) {
 	var (
 		pinTokenRequest = PinTokenRequest{

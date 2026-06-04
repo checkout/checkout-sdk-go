@@ -67,13 +67,17 @@ func DefaultApi() *nas.Api {
 
 func OAuthApi() *nas.Api {
 	if oauthApi == nil {
-		oauthApi, _ = checkout.Builder().OAuth().
+		var err error
+		oauthApi, err = checkout.Builder().OAuth().
 			WithClientCredentials(
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes(getOAuthScopes()).
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("failed to build OAuth API client: %v", err))
+		}
 	}
 	return oauthApi
 }
@@ -181,7 +185,7 @@ func getOAuthScopes() []string {
 		configuration.Marketplace, configuration.SessionsApp, configuration.SessionsBrowser,
 		configuration.Vault, configuration.PayoutsBankDetails, configuration.Disputes,
 		configuration.TransfersCreate, configuration.TransfersView, configuration.Balances,
-		configuration.VaultCardMetadata, configuration.FinancialActions, configuration.PaymentsSearch}
+		configuration.VaultCardMetadata, configuration.FinancialActions}
 }
 
 func Bool(v bool) *bool { return &v }

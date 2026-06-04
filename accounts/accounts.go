@@ -9,6 +9,7 @@ const (
 	payoutSchedulesPath    = "payout-schedules"
 	paymentInstrumentsPath = "payment-instruments"
 	reserveRulesPath       = "reserve-rules"
+	requirementsPath       = "requirements"
 )
 
 type AccountHolderType string

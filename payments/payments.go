@@ -605,6 +605,7 @@ type (
 		PartnerCustomerRiskData *PartnerCustomerRiskData  `json:"partner_customer_risk_data,omitempty"`
 		AffiliateId             string                    `json:"affiliate_id,omitempty"`
 		AffiliateUrl            string                    `json:"affiliate_url,omitempty"`
+		PartnerCode             string                    `json:"partner_code,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {
@@ -644,6 +645,7 @@ type (
 	}
 
 	PaymentRetryResponse struct {
+		Enabled       bool       `json:"enabled,omitempty"`
 		MaxAttempts   int        `json:"max_attempts,omitempty"`
 		EndsOn        *time.Time `json:"ends_on,omitempty"`
 		NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
@@ -797,6 +799,8 @@ type (
 		TotalNumberOfPayments int        `json:"total_number_of_payments,omitempty"`
 		CurrentPaymentNumber  int        `json:"current_payment_number,omitempty"`
 		Expiry                *time.Time `json:"expiry,omitempty"`
+		Name                  string     `json:"name,omitempty"`
+		StartDate             string     `json:"start_date,omitempty"`
 	}
 )
 
@@ -869,6 +873,7 @@ type (
 		HttpMetadata common.HttpMetadata
 		ActionId     string                 `json:"action_id,omitempty"`
 		Reference    string                 `json:"reference,omitempty"`
+		ActionType   string                 `json:"action_type,omitempty"`
 		Links        map[string]common.Link `json:"_links"`
 	}
 
@@ -896,6 +901,15 @@ type (
 		SchemeMerchantId                 string                           `json:"scheme_merchant_id,omitempty"`
 		PanTypeProcessed                 PanProcessedType                 `json:"pan_type_processed,omitempty"`
 		CkoNetworkTokenAvailable         bool                             `json:"cko_network_token_available,omitempty"`
+		FallbackSourceUsed               bool                             `json:"fallback_source_used,omitempty"`
+		FailureCode                      string                           `json:"failure_code,omitempty"`
+		PartnerCode                      string                           `json:"partner_code,omitempty"`
+		PartnerResponseCode              string                           `json:"partner_response_code,omitempty"`
+		Scheme                           string                           `json:"scheme,omitempty"`
+		PartnerFraudStatus               string                           `json:"partner_fraud_status,omitempty"`
+		PartnerMerchantAdviceCode        string                           `json:"partner_merchant_advice_code,omitempty"`
+		AccommodationData                []AccommodationData              `json:"accommodation_data,omitempty"`
+		AirlineData                      []AirlineData                    `json:"airline_data,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {

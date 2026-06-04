@@ -21,7 +21,7 @@ func TestRetrieveEntityBalances(t *testing.T) {
 			Data: []AccountBalance{
 				{
 					Descriptor:      "Revenue Account 1",
-					HoldingCurrency: string(common.EUR),
+					HoldingCurrency: common.EUR,
 					Balances: Balances{
 						Pending:    10,
 						Available:  50,

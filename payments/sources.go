@@ -62,6 +62,7 @@ const (
 	TrustlySource         SourceType = "trustly"
 	TwintSource           SourceType = "twint"
 	Wechatpay             SourceType = "wechatpay"
+	BlikSource            SourceType = "blik"
 )
 
 type (

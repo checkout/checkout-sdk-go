@@ -1,10 +1,11 @@
 package test
 
 import (
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
 	"testing"
 	"time"
+
+	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -87,7 +88,24 @@ func TestRefundCardPayment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			Wait(time.Duration(3))
 			tc.checkerRefund(client.RefundPayment(tc.paymentId, &tc.refundRequest, nil))
-			tc.checkerGet(client.GetPaymentDetails(tc.paymentId))
+
+			// Refunds are eventually consistent on the sandbox; balances may
+			// not reflect the refund right after RefundPayment returns. Poll
+			// GetPaymentDetails until TotalRefunded is updated, bounded to
+			// MaxRetryAttemps (10) attempts * 1s wait = ~10s total.
+			process := func() (interface{}, error) {
+				return client.GetPaymentDetails(tc.paymentId)
+			}
+			predicate := func(data interface{}) bool {
+				response := data.(*nas.GetPaymentResponse)
+				return response != nil && response.Balances.TotalRefunded > 0
+			}
+			response, err := retriable(process, predicate, 1)
+			var typed *nas.GetPaymentResponse
+			if response != nil {
+				typed = response.(*nas.GetPaymentResponse)
+			}
+			tc.checkerGet(typed, err)
 		})
 	}
 }

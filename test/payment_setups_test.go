@@ -29,25 +29,13 @@ var (
 		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
 		PaymentMethods: &setups.PaymentMethods{
 			Klarna: &setups.KlarnaPaymentMethod{
+				// status, flags and payment_method_options.action are read-only
+				// response fields; only initialization is writable on the request.
 				PaymentMethodBase: setups.PaymentMethodBase{
-					Status:         "available",
-					Flags:          []string{"supported"},
 					Initialization: setups.PaymentMethodInitializationEnabled,
 				},
 				AccountHolder: &setups.KlarnaAccountHolder{
 					BillingAddress: Address(),
-				},
-				PaymentMethodOptions: &setups.PaymentMethodOptions{
-					Sdk: &setups.PaymentMethodOption{
-						Id:     "sdk_option_test",
-						Status: "active",
-						Flags:  []string{"supported"},
-						Action: &setups.PaymentMethodAction{
-							Type:        "sdk",
-							ClientToken: "test_client_token",
-							SessionId:   "test_session_id",
-						},
-					},
 				},
 			},
 		},

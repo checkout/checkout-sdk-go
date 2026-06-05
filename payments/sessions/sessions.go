@@ -173,6 +173,7 @@ type (
 		Sender                     *nas.Sender                              `json:"sender,omitempty"`
 		Capture                    bool                                     `json:"capture"`
 		CaptureOn                  *time.Time                               `json:"capture_on,omitempty"`
+		Processing                 *payments.ProcessingSettings             `json:"processing,omitempty"`
 	}
 
 	// Response structures for payment session submit/complete endpoints

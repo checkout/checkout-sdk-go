@@ -39,6 +39,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/standaloneaccountupdater"
 	"github.com/checkout/checkout-sdk-go/v2/tokens"
 	"github.com/checkout/checkout-sdk-go/v2/transfers"
+	"github.com/checkout/checkout-sdk-go/v2/onboardingsimulator"
 	"github.com/checkout/checkout-sdk-go/v2/workflows"
 )
 
@@ -81,6 +82,8 @@ type Api struct {
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
 	Sepa   *sepa.Client
+
+	OnboardingSimulator *onboardingsimulator.Client
 }
 
 func CheckoutApi(configuration *configuration.Configuration) *Api {
@@ -125,6 +128,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)
 	api.Sepa = sepa.NewClient(configuration, apiClient)
+	api.OnboardingSimulator = onboardingsimulator.NewClient(configuration, apiClient)
 	return &api
 }
 

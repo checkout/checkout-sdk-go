@@ -118,3 +118,8 @@ type MerchantRiskInfo struct {
 	GiftCardCurrency          string                        `json:"gift_card_currency,omitempty"`
 	GiftCardCount             string                        `json:"gift_card_count,omitempty"`
 }
+
+type DeviceInformation struct {
+	DeviceId        string `json:"device_id,omitempty"`
+	DeviceSessionId string `json:"device_session_id,omitempty"`
+}

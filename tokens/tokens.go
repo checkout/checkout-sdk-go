@@ -117,4 +117,28 @@ type (
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 		Phone          *common.Phone       `json:"phone,omitempty"`
 	}
+
+	TokenMetadataBillingAddress struct {
+		City    string `json:"city,omitempty"`
+		Country string `json:"country,omitempty"`
+	}
+
+	TokenMetadataResponse struct {
+		HttpMetadata  common.HttpMetadata
+		Token         string                       `json:"token,omitempty"`
+		Type          string                       `json:"type,omitempty"`
+		ExpiresOn     *time.Time                   `json:"expires_on,omitempty"`
+		ExpiryMonth   int                          `json:"expiry_month,omitempty"`
+		ExpiryYear    int                          `json:"expiry_year,omitempty"`
+		Scheme        string                       `json:"scheme,omitempty"`
+		Last4         string                       `json:"last4,omitempty"`
+		Bin           string                       `json:"bin,omitempty"`
+		CardType      string                       `json:"card_type,omitempty"`
+		CardCategory  string                       `json:"card_category,omitempty"`
+		Issuer        string                       `json:"issuer,omitempty"`
+		IssuerCountry string                       `json:"issuer_country,omitempty"`
+		ProductId     string                       `json:"product_id,omitempty"`
+		ProductType   string                       `json:"product_type,omitempty"`
+		BillingAddress *TokenMetadataBillingAddress `json:"billing_address,omitempty"`
+	}
 )

@@ -122,3 +122,22 @@ func (c *Client) RequestPinTokenWithContext(ctx context.Context, request PinToke
 
 	return &response, nil
 }
+
+func (c *Client) GetTokenMetadata(tokenId string) (*TokenMetadataResponse, error) {
+	return c.GetTokenMetadataWithContext(context.Background(), tokenId)
+}
+
+func (c *Client) GetTokenMetadataWithContext(ctx context.Context, tokenId string) (*TokenMetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response TokenMetadataResponse
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(tokensPath, tokenId, "metadata"), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

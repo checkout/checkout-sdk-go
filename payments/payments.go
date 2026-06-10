@@ -642,6 +642,7 @@ type (
 		ContinuationPayload              string           `json:"continuation_payload,omitempty"`
 		Pun                              string           `json:"pun,omitempty"`
 		MerchantCategoryCode             string           `json:"merchant_category_code,omitempty"`
+		SchemeTransactionLinkId          string           `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	PaymentRetryResponse struct {
@@ -911,6 +912,7 @@ type (
 		PartnerMerchantAdviceCode        string                           `json:"partner_merchant_advice_code,omitempty"`
 		AccommodationData                []AccommodationData              `json:"accommodation_data,omitempty"`
 		AirlineData                      []AirlineData                    `json:"airline_data,omitempty"`
+		SchemeTransactionLinkId          string                           `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {

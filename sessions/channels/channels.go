@@ -71,8 +71,8 @@ type (
 		ChannelData
 		ThreeDsMethodCompletion common.ThreeDsMethodCompletion `json:"three_ds_method_completion,omitempty" default:"u"`
 		AcceptHeader            string                         `json:"accept_header,omitempty"`
-		JavaEnabled             bool                           `json:"java_enabled,omitempty"`
-		JavascriptEnabled       bool                           `json:"javascript_enabled,omitempty"`
+		JavaEnabled             *bool                          `json:"java_enabled,omitempty"`
+		JavascriptEnabled       *bool                          `json:"javascript_enabled,omitempty"`
 		Language                string                         `json:"language,omitempty"`
 		ColorDepth              string                         `json:"color_depth,omitempty"`
 		ScreenHeight            string                         `json:"screen_height,omitempty"`

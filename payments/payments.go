@@ -510,8 +510,8 @@ type (
 		Incognito         bool      `json:"incognito,omitempty"`
 		Jailbroken        bool      `json:"jailbroken,omitempty"`
 		Rooted            bool      `json:"rooted,omitempty"`
-		JavaEnabled       bool      `json:"java_enabled,omitempty"`
-		JavascriptEnabled bool      `json:"javascript_enabled,omitempty"`
+		JavaEnabled       *bool     `json:"java_enabled,omitempty"`
+		JavascriptEnabled *bool     `json:"javascript_enabled,omitempty"`
 		Language          string    `json:"language,omitempty"`
 		ColorDepth        string    `json:"color_depth,omitempty"`
 		ScreenHeight      string    `json:"screen_height,omitempty"`

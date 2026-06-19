@@ -19,3 +19,4 @@
 .cursor/rules/*.mdc
 .claude/rules/*.md
 .cursor/skills/endpoint-review-auto/*.md
+CLAUDE.md

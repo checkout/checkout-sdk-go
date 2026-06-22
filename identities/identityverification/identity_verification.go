@@ -13,6 +13,7 @@ const (
 	anonymizePath             = "anonymize"
 	attemptsPath              = "attempts"
 	reportPath                = "pdf-report"
+	assetsPath                = "assets"
 )
 
 type CreateIdentityVerificationRequest struct {
@@ -84,4 +85,18 @@ type IdentityVerificationAttemptsResponse struct {
 type IdentityVerificationReportResponse struct {
 	HttpMetadata common.HttpMetadata
 	SignedUrl    string `json:"signed_url,omitempty"`
+}
+
+type IdentityVerificationAttemptAsset struct {
+	Type  identities.IdentityVerificationAttemptAssetType `json:"type,omitempty"`
+	Links identities.AttemptAssetLinks                    `json:"_links,omitempty"`
+}
+
+type IdentityVerificationAttemptAssetsResponse struct {
+	HttpMetadata common.HttpMetadata
+	TotalCount   int                                `json:"total_count,omitempty"`
+	Skip         int                                `json:"skip,omitempty"`
+	Limit        int                                `json:"limit,omitempty"`
+	Data         []IdentityVerificationAttemptAsset `json:"data,omitempty"`
+	Links        map[string]common.Link             `json:"_links,omitempty"`
 }

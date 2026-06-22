@@ -113,3 +113,16 @@ func TestPaymentProcessing_SchemeTransactionLinkIdAbsent(t *testing.T) {
 	assert.Equal(t, "RRN001", processing.RetrievalReferenceNumber)
 	assert.Empty(t, processing.SchemeTransactionLinkId)
 }
+
+// Verifies scheme_transaction_link_id on the request-side ProcessingSettings
+// (PaymentRequestProcessing) serializes to its snake_case wire name and is
+// omitted when unset.
+func TestProcessingSettings_SchemeTransactionLinkId(t *testing.T) {
+	marshalled, err := json.Marshal(ProcessingSettings{SchemeTransactionLinkId: "MTL-001"})
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshalled), `"scheme_transaction_link_id":"MTL-001"`)
+
+	marshalled, err = json.Marshal(ProcessingSettings{})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(marshalled), "scheme_transaction_link_id")
+}

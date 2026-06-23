@@ -606,6 +606,7 @@ type (
 		AffiliateId             string                    `json:"affiliate_id,omitempty"`
 		AffiliateUrl            string                    `json:"affiliate_url,omitempty"`
 		PartnerCode             string                    `json:"partner_code,omitempty"`
+		SchemeTransactionLinkId string                    `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {

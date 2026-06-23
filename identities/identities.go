@@ -169,3 +169,40 @@ type DocumentDetails struct {
 type FaceImage struct {
 	ImageSignedUrl string `json:"image_signed_url,omitempty"`
 }
+
+// FaceAuthenticationAttemptAssetType is the type of asset captured during a face authentication attempt.
+type FaceAuthenticationAttemptAssetType string
+
+const (
+	FaceImageFavAsset FaceAuthenticationAttemptAssetType = "face_image"
+	FaceVideoFavAsset FaceAuthenticationAttemptAssetType = "face_video"
+)
+
+// IdentityVerificationAttemptAssetType is the type of asset captured during an identity verification attempt.
+type IdentityVerificationAttemptAssetType string
+
+const (
+	FaceImageIdvAsset                    IdentityVerificationAttemptAssetType = "face_image"
+	FaceVideoIdvAsset                    IdentityVerificationAttemptAssetType = "face_video"
+	DocumentFrontImageIdvAsset           IdentityVerificationAttemptAssetType = "document_front_image"
+	DocumentBackImageIdvAsset            IdentityVerificationAttemptAssetType = "document_back_image"
+	DocumentFrontVideoIdvAsset           IdentityVerificationAttemptAssetType = "document_front_video"
+	DocumentBackVideoIdvAsset            IdentityVerificationAttemptAssetType = "document_back_video"
+	DocumentSignatureImageIdvAsset       IdentityVerificationAttemptAssetType = "document_signature_image"
+	SecondaryDocumentFrontImageIdvAsset  IdentityVerificationAttemptAssetType = "secondary_document_front_image"
+	SecondaryDocumentBackImageIdvAsset   IdentityVerificationAttemptAssetType = "secondary_document_back_image"
+	SecondaryDocumentFrontVideoIdvAsset  IdentityVerificationAttemptAssetType = "secondary_document_front_video"
+	SecondaryDocumentBackVideoIdvAsset   IdentityVerificationAttemptAssetType = "secondary_document_back_video"
+	SecondaryDocumentSignatureImageAsset IdentityVerificationAttemptAssetType = "secondary_document_signature_image"
+)
+
+// AttemptAssetsQueryFilter holds the pagination query parameters for retrieving attempt assets.
+type AttemptAssetsQueryFilter struct {
+	Skip  int `url:"skip,omitempty"`
+	Limit int `url:"limit,omitempty"`
+}
+
+// AttemptAssetLinks holds the links related to an attempt asset.
+type AttemptAssetLinks struct {
+	AssetUrl common.Link `json:"asset_url,omitempty"`
+}

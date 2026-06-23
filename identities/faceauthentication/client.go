@@ -6,6 +6,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/client"
 	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	"github.com/checkout/checkout-sdk-go/v2/identities"
 )
 
 type Client struct {
@@ -127,6 +128,30 @@ func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, fa
 
 	var response FaceAuthenticationAttemptResponse
 	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath, attemptId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetFaceAuthenticationAttemptAssets(faceAuthenticationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*FaceAuthenticationAttemptAssetsResponse, error) {
+	return c.GetFaceAuthenticationAttemptAssetsWithContext(context.Background(), faceAuthenticationId, attemptId, query)
+}
+
+func (c *Client) GetFaceAuthenticationAttemptAssetsWithContext(ctx context.Context, faceAuthenticationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*FaceAuthenticationAttemptAssetsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath, attemptId, assetsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
+	var response FaceAuthenticationAttemptAssetsResponse
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
 	if err != nil {
 		return nil, err
 	}

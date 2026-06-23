@@ -325,6 +325,49 @@ func TestGetIdentityVerificationReport(t *testing.T) {
 	}
 }
 
+func TestGetIdentityVerificationAttemptAssets(t *testing.T) {
+	t.Skip("Avoid creating identity resources all the time")
+	cases := []struct {
+		name           string
+		verificationId string
+		attemptId      string
+		query          identities.AttemptAssetsQueryFilter
+		checker        func(*identityverification.IdentityVerificationAttemptAssetsResponse, error)
+	}{
+		{
+			name:           "when identity verification and attempt exist then should return 200",
+			verificationId: identityVerificationId,
+			attemptId:      idvAttemptId,
+			query:          identities.AttemptAssetsQueryFilter{Skip: 0, Limit: 10},
+			checker: func(response *identityverification.IdentityVerificationAttemptAssetsResponse, err error) {
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Data)
+			},
+		},
+		{
+			name:           "when identity verification not found then should return error",
+			verificationId: "idv_not_found",
+			attemptId:      "atm_not_found",
+			query:          identities.AttemptAssetsQueryFilter{},
+			checker: func(response *identityverification.IdentityVerificationAttemptAssetsResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIdentitiesApi().IdentityVerification
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetIdentityVerificationAttemptAssets(tc.verificationId, tc.attemptId, tc.query))
+		})
+	}
+}
+
 // # common methods
 
 func createIdentityVerificationAndAttemptRequest() identityverification.CreateIdentityVerificationAndAttemptRequest {

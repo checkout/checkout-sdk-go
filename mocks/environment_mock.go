@@ -26,6 +26,14 @@ func (m *EnvironmentMock) BalancesUri() string {
 	return ""
 }
 
+func (m *EnvironmentMock) ForwardUri() string {
+	return ""
+}
+
+func (m *EnvironmentMock) IdentityUri() string {
+	return ""
+}
+
 func (m *EnvironmentMock) IsSandbox() bool {
 	return true
 }

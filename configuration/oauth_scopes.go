@@ -29,6 +29,7 @@ const (
 	GatewayPaymentDetails       = "gateway:payment-details"
 	GatewayPaymentRefunds       = "gateway:payment-refunds"
 	GatewayPaymentVoids         = "gateway:payment-voids"
+	IdentityVerification        = "identity-verification"
 	IssuingCardMgmt             = "issuing:card-mgmt"
 	IssuingClient               = "issuing:client"
 	IssuingControlsRead         = "issuing:controls-read"

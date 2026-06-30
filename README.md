@@ -194,11 +194,14 @@ import (
 )
 
 environment := configuration.NewEnvironment(
-	"https://the.base.uri/", // the uri for all CKO operations 
-	"https://the.oauth.uri/connect/token", // the uri used for OAUTH authorization, only required for OAuth operations 
-	"https://the.files.uri/", // the uri used for Files operations, only required for Accounts module 
-	"https://the.transfers.uri/", // the uri used for Transfer operations, only required for Transfers module 
-	"https://the.balances.uri/", // the uri used for Balances operations, only required for Balances module false 
+	"https://the.base.uri/", // the uri for all CKO operations
+	"https://the.oauth.uri/connect/token", // the uri used for OAUTH authorization, only required for OAuth operations
+	"https://the.files.uri/", // the uri used for Files operations, only required for Accounts module
+	"https://the.transfers.uri/", // the uri used for Transfer operations, only required for Transfers module
+	"https://the.balances.uri/", // the uri used for Balances operations, only required for Balances module
+	"https://the.forward.uri/", // the uri used for Forward operations, only required for Forward module
+	"https://the.identity.uri/", // the uri used for Identity operations, only required for Identity modules (applicants, identity-verifications, aml-verifications, face-authentications, id-document-verifications)
+	false, // isSandbox
 )
 
 api, err := checkout.Builder().

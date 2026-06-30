@@ -246,6 +246,49 @@ func TestGetFaceAuthenticationAttempt(t *testing.T) {
 	}
 }
 
+func TestGetFaceAuthenticationAttemptAssets(t *testing.T) {
+	t.Skip("Avoid creating identity resources all the time")
+	cases := []struct {
+		name                 string
+		faceAuthenticationId string
+		attemptId            string
+		query                identities.AttemptAssetsQueryFilter
+		checker              func(*faceauthentication.FaceAuthenticationAttemptAssetsResponse, error)
+	}{
+		{
+			name:                 "when face authentication and attempt exist then should return 200",
+			faceAuthenticationId: faceAuthenticationId,
+			attemptId:            faceAuthAttemptId,
+			query:                identities.AttemptAssetsQueryFilter{Skip: 0, Limit: 10},
+			checker: func(response *faceauthentication.FaceAuthenticationAttemptAssetsResponse, err error) {
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.NotNil(t, response.Data)
+			},
+		},
+		{
+			name:                 "when face authentication not found then should return error",
+			faceAuthenticationId: "face_auth_not_found",
+			attemptId:            "atm_not_found",
+			query:                identities.AttemptAssetsQueryFilter{},
+			checker: func(response *faceauthentication.FaceAuthenticationAttemptAssetsResponse, err error) {
+				assert.NotNil(t, err)
+				assert.Nil(t, response)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	client := buildIdentitiesApi().FaceAuthentication
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.checker(client.GetFaceAuthenticationAttemptAssets(tc.faceAuthenticationId, tc.attemptId, tc.query))
+		})
+	}
+}
+
 // # common methods
 
 func createFaceAuthenticationRequest() faceauthentication.CreateFaceAuthenticationRequest {

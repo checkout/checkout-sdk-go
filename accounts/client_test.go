@@ -2159,3 +2159,225 @@ func assertReserveRuleResponse(t *testing.T, response *ReserveRuleResponse) {
 	assert.NotNil(t, response.Rolling.Percentage)
 	assert.NotNil(t, response.Rolling.HoldingDuration)
 }
+
+func TestGetEntityRequirements(t *testing.T) {
+	var (
+		listResponse = EntityRequirementListResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Data: []EntityRequirementListItem{
+				{
+					Id:           "req_5wmacwhrhbzhqkhx5hlqmzje44",
+					Resource:     "ent_wxglze3wwywujg4nna5fb7ldli",
+					ResourceType: "company",
+					Reason:       PeriodicReview,
+					Priority:     CriticalPriority,
+					FieldPath:    "company.legal_name",
+				},
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*EntityRequirementListResponse, error)
+	}{
+		{
+			name:     "when entity id is valid then return requirements list",
+			entityId: "ent_wxglze3wwywujg4nna5fb7ldli",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*EntityRequirementListResponse)
+						*respMapping = listResponse
+					})
+			},
+			checker: func(response *EntityRequirementListResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Len(t, response.Data, 1)
+				assert.Equal(t, "req_5wmacwhrhbzhqkhx5hlqmzje44", response.Data[0].Id)
+				assert.Equal(t, "company", response.Data[0].ResourceType)
+				assert.Equal(t, PeriodicReview, response.Data[0].Reason)
+				assert.Equal(t, CriticalPriority, response.Data[0].Priority)
+			},
+		},
+		{
+			name:     "when credentials invalid then return error",
+			entityId: "ent_xxx",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil)
+			},
+			checker: func(response *EntityRequirementListResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAuthorizationError)
+				assert.Equal(t, "Invalid authorization type", chkErr.Error())
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			filesClient := new(mocks.ApiClientMock)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.GetEntityRequirements(tc.entityId))
+		})
+	}
+}
+
+func TestGetEntityRequirementDetails(t *testing.T) {
+	var (
+		detailsResponse = EntityRequirementDetailsResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			EntityRequirementDetails: EntityRequirementDetails{
+				EntityRequirementListItem: EntityRequirementListItem{
+					Id:           "req_5wmacwhrhbzhqkhx5hlqmzje44",
+					Resource:     "ent_wxglze3wwywujg4nna5fb7ldli",
+					ResourceType: "company",
+					FieldPath:    "company.legal_name",
+				},
+				Message: "Please confirm your legal company name.",
+			},
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		requirementId    string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiGet           func(*mock.Mock) mock.Call
+		checker          func(*EntityRequirementDetailsResponse, error)
+	}{
+		{
+			name:          "when ids are valid then return requirement details",
+			entityId:      "ent_wxglze3wwywujg4nna5fb7ldli",
+			requirementId: "req_5wmacwhrhbzhqkhx5hlqmzje44",
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiGet: func(m *mock.Mock) mock.Call {
+				return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(3).(*EntityRequirementDetailsResponse)
+						*respMapping = detailsResponse
+					})
+			},
+			checker: func(response *EntityRequirementDetailsResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, "req_5wmacwhrhbzhqkhx5hlqmzje44", response.Id)
+				assert.Equal(t, "Please confirm your legal company name.", response.Message)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiGet(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			filesClient := new(mocks.ApiClientMock)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.GetEntityRequirementDetails(tc.entityId, tc.requirementId))
+		})
+	}
+}
+
+func TestResolveEntityRequirement(t *testing.T) {
+	var (
+		updateResponse = EntityRequirementUpdateResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Id:           "req_5wmacwhrhbzhqkhx5hlqmzje44",
+			Status:       ProcessingStatus,
+		}
+	)
+
+	cases := []struct {
+		name             string
+		entityId         string
+		requirementId    string
+		request          EntityRequirementUpdateRequest
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPut           func(*mock.Mock) mock.Call
+		checker          func(*EntityRequirementUpdateResponse, error)
+	}{
+		{
+			name:          "when request is valid then return processing response",
+			entityId:      "ent_wxglze3wwywujg4nna5fb7ldli",
+			requirementId: "req_5wmacwhrhbzhqkhx5hlqmzje44",
+			request:       EntityRequirementUpdateRequest{Value: "Acme Holdings Limited"},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPut: func(m *mock.Mock) mock.Call {
+				return *m.On("PutWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						respMapping := args.Get(4).(*EntityRequirementUpdateResponse)
+						*respMapping = updateResponse
+					})
+			},
+			checker: func(response *EntityRequirementUpdateResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+				assert.Equal(t, "req_5wmacwhrhbzhqkhx5hlqmzje44", response.Id)
+				assert.Equal(t, ProcessingStatus, response.Status)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPut(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			filesClient := new(mocks.ApiClientMock)
+			client := NewClient(config, apiClient, filesClient)
+
+			tc.checker(client.ResolveEntityRequirement(tc.entityId, tc.requirementId, tc.request))
+		})
+	}
+}

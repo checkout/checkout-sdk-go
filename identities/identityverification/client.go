@@ -6,6 +6,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/client"
 	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	"github.com/checkout/checkout-sdk-go/v2/identities"
 )
 
 type Client struct {
@@ -165,6 +166,30 @@ func (c *Client) GetIdentityVerificationReportWithContext(ctx context.Context, v
 
 	var response IdentityVerificationReportResponse
 	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, reportPath), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetIdentityVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdentityVerificationAttemptAssetsResponse, error) {
+	return c.GetIdentityVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
+}
+
+func (c *Client) GetIdentityVerificationAttemptAssetsWithContext(ctx context.Context, verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdentityVerificationAttemptAssetsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(common.BuildPath(identityVerificationsPath, verificationId, attemptsPath, attemptId, assetsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
+	var response IdentityVerificationAttemptAssetsResponse
+	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -576,3 +576,60 @@ func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId s
 
 	return &response, nil
 }
+
+func (c *Client) GetEntityRequirements(entityId string) (*EntityRequirementListResponse, error) {
+	return c.GetEntityRequirementsWithContext(context.Background(), entityId)
+}
+
+func (c *Client) GetEntityRequirementsWithContext(ctx context.Context, entityId string) (*EntityRequirementListResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response EntityRequirementListResponse
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) GetEntityRequirementDetails(entityId, requirementId string) (*EntityRequirementDetailsResponse, error) {
+	return c.GetEntityRequirementDetailsWithContext(context.Background(), entityId, requirementId)
+}
+
+func (c *Client) GetEntityRequirementDetailsWithContext(ctx context.Context, entityId, requirementId string) (*EntityRequirementDetailsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response EntityRequirementDetailsResponse
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath, requirementId), auth, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (c *Client) ResolveEntityRequirement(entityId, requirementId string, request EntityRequirementUpdateRequest) (*EntityRequirementUpdateResponse, error) {
+	return c.ResolveEntityRequirementWithContext(context.Background(), entityId, requirementId, request)
+}
+
+func (c *Client) ResolveEntityRequirementWithContext(ctx context.Context, entityId, requirementId string, request EntityRequirementUpdateRequest) (*EntityRequirementUpdateResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response EntityRequirementUpdateResponse
+	err = c.apiClient.PutWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath, requirementId), auth, request, &response, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

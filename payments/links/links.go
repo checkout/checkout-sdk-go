@@ -71,6 +71,10 @@ type (
 		CaptureOn                  *time.Time                               `json:"capture_on,omitempty"`
 		Instruction                *payments.PaymentInstruction             `json:"instruction,omitempty"`
 		PaymentMethodConfiguration *payments.PaymentMethodConfiguration     `json:"payment_method_configuration,omitempty"`
+		// AuthorizationType is the authorization type. Defaults to Final.
+		AuthorizationType nas.AuthorizationType `json:"authorization_type,omitempty" default:"Final"`
+		// PaymentPlan is the information to process a recurring payment request. To be used when the payment_type is Recurring.
+		PaymentPlan *payments.PaymentPlan `json:"payment_plan,omitempty"`
 	}
 )
 

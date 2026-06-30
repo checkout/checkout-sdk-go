@@ -151,6 +151,7 @@ func makePaymentContextRequest(t *testing.T) *contexts.PaymentContextsRequestRes
 }
 
 func TestGetPaymentContext(t *testing.T) {
+	t.Skip("PayPal APM service unavailable in sandbox - apm_service_unavailable")
 
 	request := makePaymentContextRequest(t)
 

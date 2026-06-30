@@ -510,8 +510,8 @@ type (
 		Incognito         bool      `json:"incognito,omitempty"`
 		Jailbroken        bool      `json:"jailbroken,omitempty"`
 		Rooted            bool      `json:"rooted,omitempty"`
-		JavaEnabled       bool      `json:"java_enabled,omitempty"`
-		JavascriptEnabled bool      `json:"javascript_enabled,omitempty"`
+		JavaEnabled       *bool     `json:"java_enabled,omitempty"`
+		JavascriptEnabled *bool     `json:"javascript_enabled,omitempty"`
 		Language          string    `json:"language,omitempty"`
 		ColorDepth        string    `json:"color_depth,omitempty"`
 		ScreenHeight      string    `json:"screen_height,omitempty"`
@@ -605,6 +605,8 @@ type (
 		PartnerCustomerRiskData *PartnerCustomerRiskData  `json:"partner_customer_risk_data,omitempty"`
 		AffiliateId             string                    `json:"affiliate_id,omitempty"`
 		AffiliateUrl            string                    `json:"affiliate_url,omitempty"`
+		PartnerCode             string                    `json:"partner_code,omitempty"`
+		SchemeTransactionLinkId string                    `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {
@@ -641,9 +643,12 @@ type (
 		ContinuationPayload              string           `json:"continuation_payload,omitempty"`
 		Pun                              string           `json:"pun,omitempty"`
 		MerchantCategoryCode             string           `json:"merchant_category_code,omitempty"`
+		SchemeTransactionLinkId          string           `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	PaymentRetryResponse struct {
+		Enabled       bool       `json:"enabled,omitempty"`
+		AttemptsMade  int        `json:"attempts_made,omitempty"`
 		MaxAttempts   int        `json:"max_attempts,omitempty"`
 		EndsOn        *time.Time `json:"ends_on,omitempty"`
 		NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
@@ -793,10 +798,12 @@ type (
 		Amount    int64 `json:"amount,omitempty"`
 
 		//Common
-		DaysBetweenPayments   int        `json:"days_between_payments,omitempty"`
-		TotalNumberOfPayments int        `json:"total_number_of_payments,omitempty"`
-		CurrentPaymentNumber  int        `json:"current_payment_number,omitempty"`
-		Expiry                *time.Time `json:"expiry,omitempty"`
+		DaysBetweenPayments   int    `json:"days_between_payments,omitempty"`
+		TotalNumberOfPayments int    `json:"total_number_of_payments,omitempty"`
+		CurrentPaymentNumber  int    `json:"current_payment_number,omitempty"`
+		Expiry                string `json:"expiry,omitempty"`
+		Name                  string `json:"name,omitempty"`
+		StartDate             string `json:"start_date,omitempty"`
 	}
 )
 
@@ -869,6 +876,7 @@ type (
 		HttpMetadata common.HttpMetadata
 		ActionId     string                 `json:"action_id,omitempty"`
 		Reference    string                 `json:"reference,omitempty"`
+		ActionType   string                 `json:"action_type,omitempty"`
 		Links        map[string]common.Link `json:"_links"`
 	}
 
@@ -884,7 +892,7 @@ type (
 		PartnerOrderId                   string                           `json:"partner_order_id,omitempty"`
 		PartnerStatus                    string                           `json:"partner_status,omitempty"`
 		PartnerTransactionId             string                           `json:"partner_transaction_id,omitempty"`
-		PartnerErrorCodes                string                           `json:"partner_error_codes,omitempty"`
+		PartnerErrorCodes                []string                         `json:"partner_error_codes,omitempty"`
 		PartnerErrorMessage              string                           `json:"partner_error_message,omitempty"`
 		PartnerAuthorizationCode         string                           `json:"partner_authorization_code,omitempty"`
 		PartnerAuthorizationResponseCode string                           `json:"partner_authorization_response_code,omitempty"`
@@ -896,6 +904,16 @@ type (
 		SchemeMerchantId                 string                           `json:"scheme_merchant_id,omitempty"`
 		PanTypeProcessed                 PanProcessedType                 `json:"pan_type_processed,omitempty"`
 		CkoNetworkTokenAvailable         bool                             `json:"cko_network_token_available,omitempty"`
+		FallbackSourceUsed               bool                             `json:"fallback_source_used,omitempty"`
+		FailureCode                      string                           `json:"failure_code,omitempty"`
+		PartnerCode                      string                           `json:"partner_code,omitempty"`
+		PartnerResponseCode              string                           `json:"partner_response_code,omitempty"`
+		Scheme                           string                           `json:"scheme,omitempty"`
+		PartnerFraudStatus               string                           `json:"partner_fraud_status,omitempty"`
+		PartnerMerchantAdviceCode        string                           `json:"partner_merchant_advice_code,omitempty"`
+		AccommodationData                []AccommodationData              `json:"accommodation_data,omitempty"`
+		AirlineData                      []AirlineData                    `json:"airline_data,omitempty"`
+		SchemeTransactionLinkId          string                           `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {
@@ -936,15 +954,15 @@ type (
 	}
 
 	CaptureProcessingSettings struct {
-		OrderId              string         `json:"order_id,omitempty"`
-		OtpValue             string         `json:"otp_value,omitempty"`
-		TaxAmount            int64          `json:"tax_amount,omitempty"`
-		SurchargeAmount      int64          `json:"surcharge_amount,omitempty"`
-		DiscountAmount       int64          `json:"discount_amount,omitempty"`
-		DutyAmount           int64          `json:"duty_amount,omitempty"`
-		ShippingAmount       int64          `json:"shipping_amount,omitempty"`
-		ShippingTaxAmount    int64          `json:"shipping_tax_amount,omitempty"`
-		PurchaseCountry      common.Country `json:"purchase_country,omitempty"`
-		ForeignRetailerAmount int64         `json:"foreign_retailer_amount,omitempty"`
+		OrderId               string         `json:"order_id,omitempty"`
+		OtpValue              string         `json:"otp_value,omitempty"`
+		TaxAmount             int64          `json:"tax_amount,omitempty"`
+		SurchargeAmount       int64          `json:"surcharge_amount,omitempty"`
+		DiscountAmount        int64          `json:"discount_amount,omitempty"`
+		DutyAmount            int64          `json:"duty_amount,omitempty"`
+		ShippingAmount        int64          `json:"shipping_amount,omitempty"`
+		ShippingTaxAmount     int64          `json:"shipping_tax_amount,omitempty"`
+		PurchaseCountry       common.Country `json:"purchase_country,omitempty"`
+		ForeignRetailerAmount int64          `json:"foreign_retailer_amount,omitempty"`
 	}
 )

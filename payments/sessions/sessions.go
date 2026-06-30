@@ -100,6 +100,10 @@ type (
 		EnabledPaymentMethods      []PaymentMethodsType                     `json:"enabled_payment_methods,omitempty"`
 		DisabledPaymentMethods     []PaymentMethodsType                     `json:"disabled_payment_methods,omitempty"`
 		CustomerRetry              *payments.PaymentRetryRequest            `json:"customer_retry,omitempty"`
+		// AuthorizationType is the authorization type. Defaults to Final.
+		AuthorizationType nas.AuthorizationType `json:"authorization_type,omitempty" default:"Final"`
+		// PaymentPlan is the information to process a recurring payment request. To be used when the payment_type is Recurring.
+		PaymentPlan *payments.PaymentPlan `json:"payment_plan,omitempty"`
 		// Deprecated: IpAddress is deprecated. Use alternative fields for client identification.
 		IpAddress string `json:"ip_address,omitempty"`
 	}
@@ -173,6 +177,7 @@ type (
 		Sender                     *nas.Sender                              `json:"sender,omitempty"`
 		Capture                    bool                                     `json:"capture"`
 		CaptureOn                  *time.Time                               `json:"capture_on,omitempty"`
+		Processing                 *payments.ProcessingSettings             `json:"processing,omitempty"`
 	}
 
 	// Response structures for payment session submit/complete endpoints

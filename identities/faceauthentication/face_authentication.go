@@ -11,6 +11,7 @@ const (
 	faceAuthenticationsPath = "face-authentications"
 	anonymizePath           = "anonymize"
 	attemptsPath            = "attempts"
+	assetsPath              = "assets"
 )
 
 type CreateFaceAuthenticationRequest struct {
@@ -55,4 +56,18 @@ type FaceAuthenticationAttemptsResponse struct {
 	Skip         int                                  `json:"skip,omitempty"`
 	Limit        int                                  `json:"limit,omitempty"`
 	Data         []FaceAuthenticationAttemptResponse  `json:"data,omitempty"`
+}
+
+type FaceAuthenticationAttemptAsset struct {
+	Type  identities.FaceAuthenticationAttemptAssetType `json:"type,omitempty"`
+	Links identities.AttemptAssetLinks                  `json:"_links,omitempty"`
+}
+
+type FaceAuthenticationAttemptAssetsResponse struct {
+	HttpMetadata common.HttpMetadata
+	TotalCount   int                              `json:"total_count,omitempty"`
+	Skip         int                              `json:"skip,omitempty"`
+	Limit        int                              `json:"limit,omitempty"`
+	Data         []FaceAuthenticationAttemptAsset `json:"data,omitempty"`
+	Links        map[string]common.Link           `json:"_links,omitempty"`
 }

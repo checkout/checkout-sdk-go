@@ -65,6 +65,42 @@ func TestRequestSession(t *testing.T) {
 			},
 		},
 		{
+			name: "when request carries device_information then it is sent",
+			request: SessionRequest{
+				Source:                 sources.NewSessionCardSource(),
+				Amount:                 100,
+				Currency:               common.USD,
+				ProcessingChannelId:    "pc_5jp2az55l3cuths25t5p3xhwru",
+				AuthenticationType:     RegularAuthType,
+				AuthenticationCategory: Payment,
+				DeviceInformation: &DeviceInformation{
+					DeviceId:        "device_xyz",
+					DeviceSessionId: "dsid_ipsmclhxwq72phhr32iwfvrflm",
+				},
+			},
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						req := args.Get(3).(SessionRequest)
+						assert.NotNil(t, req.DeviceInformation)
+						assert.Equal(t, "device_xyz", req.DeviceInformation.DeviceId)
+						assert.Equal(t, "dsid_ipsmclhxwq72phhr32iwfvrflm", req.DeviceInformation.DeviceSessionId)
+						respMapping := args.Get(4).(*SessionDetails)
+						*respMapping = sessionDetails
+					})
+			},
+			checker: func(response *SessionResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusCreated, response.Created.HttpMetadata.StatusCode)
+			},
+		},
+		{
 			name: "when credentials invalid then return error",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).

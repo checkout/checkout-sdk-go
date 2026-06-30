@@ -1772,6 +1772,7 @@ func buildPaymentReversalResponse() payments.PaymentReversalResponse {
 		HttpMetadata: mocks.HttpMetadataStatusAccepted,
 		ActionId:     actionId,
 		Reference:    reference,
+		ActionType:   "Refund",
 		Links: map[string]common.Link{
 			"payment": {HRef: &[]string{"https://www.test-link.com"}[0]},
 		},
@@ -1783,6 +1784,7 @@ func assertPaymentReversalResponse(t *testing.T, response *payments.PaymentRever
 	assert.Equal(t, http.StatusAccepted, response.HttpMetadata.StatusCode)
 	assert.Equal(t, actionId, response.ActionId)
 	assert.Equal(t, reference, response.Reference)
+	assert.Equal(t, "Refund", response.ActionType)
 	assert.NotEmpty(t, response.Links)
 	assert.NotEmpty(t, response.Links["payment"])
 }

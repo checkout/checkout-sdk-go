@@ -431,6 +431,10 @@ func assertProcessing(t *testing.T, response *nas.PaymentResponse) {
 	assert.NotEmpty(t, processing)
 	assert.NotEmpty(t, processing.AcquirerTransactionId)
 	assert.NotEmpty(t, processing.RetrievalReferenceNumber)
+	// Mastercard Transaction Link Identifier - optional, only populated for Mastercard
+	// transactions. The test card is not Mastercard, so the field is typically absent.
+	// Referencing it confirms the SDK exposes the field on the payment response.
+	_ = processing.SchemeTransactionLinkId
 }
 
 func assertRisk(t *testing.T, response *nas.PaymentResponse) {

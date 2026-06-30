@@ -433,6 +433,8 @@ type (
 		ProcessingDetails *ProcessingDetails         `json:"processing_details,omitempty"`
 		IsDraft           bool                       `json:"is_draft,omitempty"`
 		AdditionalInfo    *AdditionalInfo            `json:"additional_info,omitempty"`
+		SellerCategory    string                     `json:"seller_category,omitempty"`
+		Submitter         *Submitter                 `json:"submitter,omitempty"`
 	}
 
 	OnboardSubEntityRequest struct {
@@ -493,5 +495,73 @@ type (
 		MaximumSizeInBytes      int64                  `json:"maximum_size_in_bytes,omitempty"`
 		DocumentTypesForPurpose []string               `json:"document_types_for_purpose,omitempty"`
 		Links                   map[string]common.Link `json:"_links,omitempty"`
+	}
+)
+
+type EntityRequirementReason string
+
+const (
+	PeriodicReview EntityRequirementReason = "periodic_review"
+	Attestation    EntityRequirementReason = "attestation"
+)
+
+type EntityRequirementPriority string
+
+const (
+	HighPriority     EntityRequirementPriority = "high"
+	CriticalPriority EntityRequirementPriority = "critical"
+)
+
+type EntityRequirementUpdateStatus string
+
+const (
+	ProcessingStatus EntityRequirementUpdateStatus = "processing"
+)
+
+type (
+	Submitter struct {
+		IpAddress string `json:"ip_address,omitempty"`
+	}
+
+	EntityRequirementListItem struct {
+		Id           string                    `json:"id,omitempty"`
+		Resource     string                    `json:"resource,omitempty"`
+		ResourceType string                    `json:"resource_type,omitempty"`
+		Reason       EntityRequirementReason   `json:"reason,omitempty"`
+		Priority     EntityRequirementPriority `json:"priority,omitempty"`
+		Deadline     *time.Time                `json:"deadline,omitempty"`
+		Urn          string                    `json:"urn,omitempty"`
+		FieldPath    string                    `json:"field_path,omitempty"`
+		FieldUrn     string                    `json:"field_urn,omitempty"`
+		Metadata     map[string]interface{}    `json:"metadata,omitempty"`
+		Links        map[string]common.Link    `json:"_links,omitempty"`
+	}
+
+	EntityRequirementDetails struct {
+		EntityRequirementListItem
+		Message string                 `json:"message,omitempty"`
+		Schema  map[string]interface{} `json:"_schema,omitempty"`
+	}
+
+	EntityRequirementListResponse struct {
+		HttpMetadata common.HttpMetadata        `json:"http_metadata,omitempty"`
+		Data         []EntityRequirementListItem `json:"data,omitempty"`
+	}
+
+	EntityRequirementDetailsResponse struct {
+		HttpMetadata common.HttpMetadata
+		EntityRequirementDetails
+	}
+
+	EntityRequirementUpdateRequest struct {
+		Value interface{} `json:"value"`
+	}
+
+	EntityRequirementUpdateResponse struct {
+		HttpMetadata common.HttpMetadata
+		Id          string                        `json:"id,omitempty"`
+		Status      EntityRequirementUpdateStatus `json:"status,omitempty"`
+		SubmittedAt *time.Time                    `json:"submitted_at,omitempty"`
+		Links       map[string]common.Link        `json:"_links,omitempty"`
 	}
 )

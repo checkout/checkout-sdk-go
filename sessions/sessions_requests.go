@@ -74,6 +74,7 @@ type (
 		InitialTransaction            *InitialTransaction        `json:"initial_transaction,omitempty"`
 		GoogleSpa                     *GoogleSpa                 `json:"google_spa,omitempty"`
 		PreferredExperiences          []Experience               `json:"preferred_experiences,omitempty"`
+		DeviceInformation             *DeviceInformation         `json:"device_information,omitempty"`
 	}
 
 	ThreeDsMethodCompletionRequest struct {

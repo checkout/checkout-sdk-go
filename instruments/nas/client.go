@@ -136,3 +136,22 @@ func (c *Client) DeleteWithContext(ctx context.Context, instrumentId string) (*c
 
 	return &response, nil
 }
+
+func (c *Client) RevokeInstrument(instrumentId string) (*common.MetadataResponse, error) {
+	return c.RevokeInstrumentWithContext(context.Background(), instrumentId)
+}
+
+func (c *Client) RevokeInstrumentWithContext(ctx context.Context, instrumentId string) (*common.MetadataResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	var response common.MetadataResponse
+	err = c.apiClient.PatchWithContext(ctx, common.BuildPath(instruments.Path, instrumentId, "revoke"), auth, nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}

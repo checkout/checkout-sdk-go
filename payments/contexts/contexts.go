@@ -155,6 +155,7 @@ type (
 
 	PaymentContextDetailsResponse struct {
 		HttpMetadata    common.HttpMetadata
+		Id              string                          `json:"id,omitempty"`
 		Status          PaymentContextDetailsStatusType `json:"status,omitempty"`
 		PaymentRequest  *PaymentContextsResponse        `json:"payment_request,omitempty"`
 		PartnerMetadata *PaymentContextsPartnerMetadata `json:"partner_metadata,omitempty"`

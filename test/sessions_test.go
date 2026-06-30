@@ -343,8 +343,8 @@ func TestCompleteSession(t *testing.T) {
 func getBrowserChannel() channels.Channel {
 	c := channels.NewBrowserSession()
 	c.AcceptHeader = "Accept:  *.*, q=0.1"
-	c.JavaEnabled = true
-	c.JavascriptEnabled = true
+	c.JavaEnabled = Bool(true)
+	c.JavascriptEnabled = Bool(true)
 	c.Language = "FR-fr"
 	c.ColorDepth = "16"
 	c.ScreenWidth = "1920"

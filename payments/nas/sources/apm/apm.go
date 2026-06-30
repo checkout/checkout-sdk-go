@@ -263,6 +263,16 @@ type (
 		Type           payments.SourceType `json:"type,omitempty"`
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 	}
+
+	RequestBlikSource struct {
+		Type               payments.SourceType `json:"type,omitempty"`
+		PartnerAgreementId string              `json:"partner_agreement_id,omitempty"`
+	}
+
+	PaymentGetResponseBlikSource struct {
+		Type payments.SourceType `json:"type,omitempty"`
+		Id   string              `json:"id,omitempty"`
+	}
 )
 
 func NewRequestAchSource() *requestAchSource {
@@ -650,5 +660,15 @@ func NewRequestWeChatPaySource() *requestWeChatPaySource {
 }
 
 func (s *requestWeChatPaySource) GetType() payments.SourceType {
+	return s.Type
+}
+
+//
+
+func NewRequestBlikSource() *RequestBlikSource {
+	return &RequestBlikSource{Type: payments.BlikSource}
+}
+
+func (s *RequestBlikSource) GetType() payments.SourceType {
 	return s.Type
 }

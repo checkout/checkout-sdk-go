@@ -67,6 +67,11 @@ func DefaultApi() *nas.Api {
 
 func OAuthApi() *nas.Api {
 	if oauthApi == nil {
+		// Intentionally ignore the build error here. Build() reaches the OAuth
+		// token endpoint synchronously; in CI the endpoint occasionally returns
+		// HTML (e.g. proxy challenge / 5xx page), and a panic would abort every
+		// other test in this package's process. Tests that actually need
+		// OAuthApi() will surface the failure clearly when they nil-deref.
 		oauthApi, _ = checkout.Builder().OAuth().
 			WithClientCredentials(
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),

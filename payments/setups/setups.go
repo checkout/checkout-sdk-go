@@ -22,34 +22,36 @@ const (
 // ===== Main Request/Response Structs =====
 
 type PaymentSetupRequest struct {
-	ProcessingChannelId string                `json:"processing_channel_id"`
-	Amount              int64                 `json:"amount"`
-	Currency            common.Currency       `json:"currency"`
-	PaymentType         payments.PaymentType  `json:"payment_type,omitempty"`
-	Reference           string                `json:"reference,omitempty"`
-	Description         string                `json:"description,omitempty"`
-	PaymentMethods      *PaymentMethods       `json:"payment_methods,omitempty"`
-	Settings            *PaymentSetupSettings `json:"settings,omitempty"`
-	Customer            *PaymentSetupCustomer `json:"customer,omitempty"`
-	Order               *PaymentSetupOrder    `json:"order,omitempty"`
-	Industry            *PaymentSetupIndustry `json:"industry,omitempty"`
+	ProcessingChannelId       string                                 `json:"processing_channel_id"`
+	Amount                    int64                                  `json:"amount"`
+	Currency                  common.Currency                        `json:"currency"`
+	PaymentType               payments.PaymentType                   `json:"payment_type,omitempty"`
+	Reference                 string                                 `json:"reference,omitempty"`
+	Description               string                                 `json:"description,omitempty"`
+	PaymentMethods            *PaymentMethods                        `json:"payment_methods,omitempty"`
+	Settings                  *PaymentSetupSettings                  `json:"settings,omitempty"`
+	Customer                  *PaymentSetupCustomer                  `json:"customer,omitempty"`
+	Order                     *PaymentSetupOrder                     `json:"order,omitempty"`
+	Industry                  *PaymentSetupIndustry                  `json:"industry,omitempty"`
+	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 }
 
 type PaymentSetupResponse struct {
 	HttpMetadata            common.HttpMetadata
-	Id                      string                `json:"id,omitempty"`
-	ProcessingChannelId     string                `json:"processing_channel_id"`
-	Amount                  int64                 `json:"amount"`
-	Currency                common.Currency       `json:"currency"`
-	PaymentType             payments.PaymentType  `json:"payment_type,omitempty"`
-	Reference               string                `json:"reference,omitempty"`
-	Description             string                `json:"description,omitempty"`
-	PaymentMethods          *PaymentMethods       `json:"payment_methods,omitempty"`
-	AvailablePaymentMethods []string              `json:"available_payment_methods,omitempty"`
-	Settings                *PaymentSetupSettings `json:"settings,omitempty"`
-	Customer                *PaymentSetupCustomer `json:"customer,omitempty"`
-	Order                   *PaymentSetupOrder    `json:"order,omitempty"`
-	Industry                *PaymentSetupIndustry `json:"industry,omitempty"`
+	Id                      string                            `json:"id,omitempty"`
+	ProcessingChannelId     string                            `json:"processing_channel_id"`
+	Amount                  int64                             `json:"amount"`
+	Currency                common.Currency                   `json:"currency"`
+	PaymentType             payments.PaymentType              `json:"payment_type,omitempty"`
+	Reference               string                            `json:"reference,omitempty"`
+	Description             string                            `json:"description,omitempty"`
+	PaymentMethods          *PaymentMethods                   `json:"payment_methods,omitempty"`
+	AvailablePaymentMethods []string                          `json:"available_payment_methods,omitempty"`
+	Settings                *PaymentSetupSettings             `json:"settings,omitempty"`
+	Customer                *PaymentSetupCustomer             `json:"customer,omitempty"`
+	Order                   *PaymentSetupOrder                `json:"order,omitempty"`
+	Industry                *PaymentSetupIndustry             `json:"industry,omitempty"`
+	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 }
 
 type PaymentSetupConfirmResponse struct {
@@ -153,6 +155,7 @@ type PaymentMethods struct {
 	Googlepay  *SimplePaymentMethod     `json:"googlepay,omitempty"`
 	Applepay   *SimplePaymentMethod     `json:"applepay,omitempty"`
 	Card       *SimplePaymentMethod     `json:"card,omitempty"`
+	Blik       *BlikPaymentMethod       `json:"blik,omitempty"`
 }
 
 type PaymentMethodBase struct {
@@ -353,4 +356,69 @@ type PaymentSetupRetry struct {
 	MaxAttempts   int        `json:"max_attempts,omitempty"`
 	EndsOn        *time.Time `json:"ends_on,omitempty"`
 	NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
+}
+
+type AccountFundingTransactionPurpose string
+
+const (
+	AFTPurposeDonations        AccountFundingTransactionPurpose = "donations"
+	AFTPurposeEducation        AccountFundingTransactionPurpose = "education"
+	AFTPurposeEmergencyNeed    AccountFundingTransactionPurpose = "emergency_need"
+	AFTPurposeExpatriation     AccountFundingTransactionPurpose = "expatriation"
+	AFTPurposeFamilySupport    AccountFundingTransactionPurpose = "family_support"
+	AFTPurposeFinancialServices AccountFundingTransactionPurpose = "financial_services"
+	AFTPurposeGifts            AccountFundingTransactionPurpose = "gifts"
+	AFTPurposeIncome           AccountFundingTransactionPurpose = "income"
+	AFTPurposeInsurance        AccountFundingTransactionPurpose = "insurance"
+	AFTPurposeInvestment       AccountFundingTransactionPurpose = "investment"
+	AFTPurposeItServices       AccountFundingTransactionPurpose = "it_services"
+	AFTPurposeLeisure          AccountFundingTransactionPurpose = "leisure"
+	AFTPurposeLoanPayment       AccountFundingTransactionPurpose = "loan_payment"
+	AFTPurposeMedicalTreatment  AccountFundingTransactionPurpose = "medical_treatment"
+	AFTPurposeOther            AccountFundingTransactionPurpose = "other"
+	AFTPurposePension          AccountFundingTransactionPurpose = "pension"
+	AFTPurposeRoyalties        AccountFundingTransactionPurpose = "royalties"
+	AFTPurposeSavings          AccountFundingTransactionPurpose = "savings"
+	AFTPurposeTravelAndTourism AccountFundingTransactionPurpose = "travel_and_tourism"
+)
+
+type AccountFundingTransactionIdentificationType string
+
+const (
+	AFTIdentificationPassport       AccountFundingTransactionIdentificationType = "passport"
+	AFTIdentificationDrivingLicense AccountFundingTransactionIdentificationType = "driving_license"
+	AFTIdentificationNationalId     AccountFundingTransactionIdentificationType = "national_id"
+)
+
+type AccountFundingTransactionIdentification struct {
+	Type          AccountFundingTransactionIdentificationType `json:"type,omitempty"`
+	Number        string                                      `json:"number,omitempty"`
+	IssuingCountry string                                     `json:"issuing_country,omitempty"`
+}
+
+type AccountFundingTransactionSender struct {
+	DateOfBirth    *time.Time                               `json:"date_of_birth,omitempty"`
+	Reference      string                                   `json:"reference,omitempty"`
+	Identification *AccountFundingTransactionIdentification `json:"identification,omitempty"`
+}
+
+type AccountFundingTransactionRecipient struct {
+	DateOfBirth   *time.Time      `json:"date_of_birth,omitempty"`
+	AccountNumber string          `json:"account_number,omitempty"`
+	FirstName     string          `json:"first_name,omitempty"`
+	LastName      string          `json:"last_name,omitempty"`
+	Address       *common.Address `json:"address,omitempty"`
+}
+
+type PaymentSetupAccountFundingTransaction struct {
+	Enabled   *bool                                `json:"enabled,omitempty"`
+	Purpose   AccountFundingTransactionPurpose     `json:"purpose,omitempty"`
+	Sender    *AccountFundingTransactionSender     `json:"sender,omitempty"`
+	Recipient *AccountFundingTransactionRecipient  `json:"recipient,omitempty"`
+}
+
+type BlikPaymentMethod struct {
+	PaymentMethodBase
+	PartnerCode          string                `json:"partner_code,omitempty"`
+	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }

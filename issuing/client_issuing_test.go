@@ -34,11 +34,6 @@ var (
 		Zip:          "W1T 4TJ",
 		Country:      "GB",
 	}
-	document = &cardholders.CardholderDocument{
-		Type:            "national_identity_card",
-		FrontDocumentId: "file_6lbss42ezvoufcb2beo76rvwly",
-		BackDocumentId:  "file_aaz5pemp6326zbuvevp6qroqu4",
-	}
 	links = map[string]common.Link{
 		"self": {
 			HRef: &[]string{"https://api.checkout.com/issuing/cardholders/crh_d3ozhf43pcq2xbldn2g45qnb44"}[0],
@@ -84,7 +79,6 @@ func TestCreateCardholder(t *testing.T) {
 				DateOfBirth:      "1985-05-15",
 				BillingAddress:   address,
 				ResidencyAddress: address,
-				Document:         document,
 			},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).

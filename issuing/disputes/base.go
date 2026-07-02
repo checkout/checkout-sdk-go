@@ -20,27 +20,58 @@ const (
 type IssuingDisputeStatusReason string
 
 const (
-	DisputeExpired                           IssuingDisputeStatusReason = "expired"
-	DisputeChargebackPending                 IssuingDisputeStatusReason = "chargeback_pending"
+	DisputeExpired                                 IssuingDisputeStatusReason = "expired"
+	DisputeChargebackPending                       IssuingDisputeStatusReason = "chargeback_pending"
 	DisputeChargebackEvidenceInvalidOrInsufficient IssuingDisputeStatusReason = "chargeback_evidence_invalid_or_insufficient"
-	DisputeChargebackProcessed              IssuingDisputeStatusReason = "chargeback_processed"
-	DisputeChargebackRejected               IssuingDisputeStatusReason = "chargeback_rejected"
-	DisputeChargebackReversalPending        IssuingDisputeStatusReason = "chargeback_reversal_pending"
-	DisputeChargebackReversed               IssuingDisputeStatusReason = "chargeback_reversed"
-	DisputeChargebackResponseAccepted       IssuingDisputeStatusReason = "chargeback_response_accepted"
-	DisputePrearbitrationPending            IssuingDisputeStatusReason = "prearbitration_pending"
-	DisputePrearbitrationEvidenceInvalid    IssuingDisputeStatusReason = "prearbitration_evidence_invalid_or_insufficient"
-	DisputePrearbitrationProcessed         IssuingDisputeStatusReason = "prearbitration_processed"
-	DisputePrearbitrationRejected          IssuingDisputeStatusReason = "prearbitration_rejected"
-	DisputePrearbitrationReversalPending   IssuingDisputeStatusReason = "prearbitration_reversal_pending"
-	DisputePrearbitrationReversed          IssuingDisputeStatusReason = "prearbitration_reversed"
-	DisputePrearbitrationResponseAccepted  IssuingDisputeStatusReason = "prearbitration_response_accepted"
-	DisputeArbitrationPending              IssuingDisputeStatusReason = "arbitration_pending"
-	DisputeArbitrationProcessed            IssuingDisputeStatusReason = "arbitration_processed"
-	DisputePresentmentReversed             IssuingDisputeStatusReason = "presentment_reversed"
+	DisputeChargebackProcessed                     IssuingDisputeStatusReason = "chargeback_processed"
+	DisputeChargebackRejected                      IssuingDisputeStatusReason = "chargeback_rejected"
+	DisputeChargebackReversalPending               IssuingDisputeStatusReason = "chargeback_reversal_pending"
+	DisputeChargebackReversed                      IssuingDisputeStatusReason = "chargeback_reversed"
+	DisputeChargebackResponseAccepted              IssuingDisputeStatusReason = "chargeback_response_accepted"
+	DisputePrearbitrationPending                   IssuingDisputeStatusReason = "prearbitration_pending"
+	DisputePrearbitrationEvidenceInvalid           IssuingDisputeStatusReason = "prearbitration_evidence_invalid_or_insufficient"
+	DisputePrearbitrationProcessed                 IssuingDisputeStatusReason = "prearbitration_processed"
+	DisputePrearbitrationRejected                  IssuingDisputeStatusReason = "prearbitration_rejected"
+	DisputePrearbitrationReversalPending           IssuingDisputeStatusReason = "prearbitration_reversal_pending"
+	DisputePrearbitrationReversed                  IssuingDisputeStatusReason = "prearbitration_reversed"
+	DisputePrearbitrationResponseAccepted          IssuingDisputeStatusReason = "prearbitration_response_accepted"
+	DisputeArbitrationPending                      IssuingDisputeStatusReason = "arbitration_pending"
+	DisputeArbitrationProcessed                    IssuingDisputeStatusReason = "arbitration_processed"
+	DisputePresentmentReversed                     IssuingDisputeStatusReason = "presentment_reversed"
+)
+
+// IssuingDisputeFraudType is the type of fraud the cardholder is asserting.
+type IssuingDisputeFraudType string
+
+const (
+	FraudTypeCardLost                  IssuingDisputeFraudType = "card_lost"
+	FraudTypeCardStolen                IssuingDisputeFraudType = "card_stolen"
+	FraudTypeCardNeverReceived         IssuingDisputeFraudType = "card_never_received"
+	FraudTypeFraudulentAccount         IssuingDisputeFraudType = "fraudulent_account"
+	FraudTypeCounterfeitCard           IssuingDisputeFraudType = "counterfeit_card"
+	FraudTypeAccountTakeover           IssuingDisputeFraudType = "account_takeover"
+	FraudTypeCardNotPresentFraud       IssuingDisputeFraudType = "card_not_present_fraud"
+	FraudTypeMerchantMisrepresentation IssuingDisputeFraudType = "merchant_misrepresentation"
+	FraudTypeCardholderManipulation    IssuingDisputeFraudType = "cardholder_manipulation"
+	FraudTypeIncorrectProcessing       IssuingDisputeFraudType = "incorrect_processing"
+	FraudTypeOther                     IssuingDisputeFraudType = "other"
 )
 
 type (
+	// IssuingDisputeFraudDetails contains fraud-related information required when the dispute reason
+	// code is fraud-related.
+	IssuingDisputeFraudDetails struct {
+		FraudType   IssuingDisputeFraudType `json:"fraud_type,omitempty"`
+		Description string                  `json:"description,omitempty"`
+	}
+
+	// IssuingDisputeActionDetails provides instructions on the amendments required before the dispute
+	// can proceed, if the dispute status is action_required.
+	IssuingDisputeActionDetails struct {
+		Instructions       string `json:"instructions,omitempty"`
+		LastActionResponse string `json:"last_action_response,omitempty"`
+	}
+
 	DisputeEvidence struct {
 		Name        string `json:"name,omitempty"`
 		Content     string `json:"content,omitempty"`
@@ -58,13 +89,13 @@ type (
 	}
 
 	DisputeMerchant struct {
-		Id           string              `json:"id,omitempty"`
-		Name         string              `json:"name,omitempty"`
-		City         string              `json:"city,omitempty"`
-		State        string              `json:"state,omitempty"`
-		CountryCode  common.Country      `json:"country_code,omitempty"`
-		CategoryCode string              `json:"category_code,omitempty"`
-		Evidence     []string            `json:"evidence,omitempty"`
+		Id           string         `json:"id,omitempty"`
+		Name         string         `json:"name,omitempty"`
+		City         string         `json:"city,omitempty"`
+		State        string         `json:"state,omitempty"`
+		CountryCode  common.Country `json:"country_code,omitempty"`
+		CategoryCode string         `json:"category_code,omitempty"`
+		Evidence     []string       `json:"evidence,omitempty"`
 	}
 
 	DisputeReasonChange struct {
@@ -73,11 +104,11 @@ type (
 	}
 
 	DisputeChargeback struct {
-		SubmittedOn   *time.Time           `json:"submitted_on,omitempty"`
-		Reason        string               `json:"reason,omitempty"`
-		Amount        *DisputeAmount       `json:"amount,omitempty"`
+		SubmittedOn   *time.Time            `json:"submitted_on,omitempty"`
+		Reason        string                `json:"reason,omitempty"`
+		Amount        *DisputeAmount        `json:"amount,omitempty"`
 		Evidence      []DisputeFileEvidence `json:"evidence,omitempty"`
-		Justification string               `json:"justification,omitempty"`
+		Justification string                `json:"justification,omitempty"`
 	}
 
 	DisputeRepresentment struct {

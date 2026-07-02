@@ -35,7 +35,7 @@ var (
 					Initialization: setups.PaymentMethodInitializationEnabled,
 				},
 				AccountHolder: &setups.KlarnaAccountHolder{
-					BillingAddress: Address(),
+					Name: "John Smith",
 				},
 			},
 		},

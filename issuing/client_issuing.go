@@ -18,33 +18,33 @@ import (
 )
 
 const (
-	issuingPath            = "issuing"
-	cardholdersPath        = "cardholders"
-	cardsPath              = "cards"
-	threeDSEnrollmentPath  = "3ds-enrollment"
-	activatePath           = "activate"
-	credentialsPath        = "credentials"
-	revokePath             = "revoke"
-	renewPath              = "renew"
-	scheduleRevocationPath = "schedule-revocation"
-	suspendPath            = "suspend"
-	controlsPath           = "controls"
-	controlGroupsPath      = "control-groups"
-	controlProfilesPath    = "control-profiles"
-	addPath                = "add"
-	removePath             = "remove"
-	digitalCardsPath       = "digital-cards"
-	disputesPath           = "disputes"
-	cancelPath             = "cancel"
-	escalatePath           = "escalate"
-	simulatePath           = "simulate"
-	authorizationsPath     = "authorizations"
-	presentmentsPath       = "presentments"
-	refundsPath            = "refunds"
-	reversalsPath          = "reversals"
-	oobPath                = "oob"
-	authenticationPath     = "authentication"
-	transactionsPath       = "transactions"
+	issuingPath           = "issuing"
+	cardholdersPath       = "cardholders"
+	cardsPath             = "cards"
+	threeDSEnrollmentPath = "3ds-enrollment"
+	activatePath          = "activate"
+	credentialsPath       = "credentials"
+	revokePath            = "revoke"
+	renewPath             = "renew"
+	suspendPath           = "suspend"
+	controlsPath          = "controls"
+	controlGroupsPath     = "control-groups"
+	controlProfilesPath   = "control-profiles"
+	addPath               = "add"
+	removePath            = "remove"
+	digitalCardsPath      = "digital-cards"
+	disputesPath          = "disputes"
+	cancelPath            = "cancel"
+	escalatePath          = "escalate"
+	amendPath             = "amend"
+	simulatePath          = "simulate"
+	authorizationsPath    = "authorizations"
+	presentmentsPath      = "presentments"
+	refundsPath           = "refunds"
+	reversalsPath         = "reversals"
+	oobPath               = "oob"
+	authenticationPath    = "authentication"
+	transactionsPath      = "transactions"
 )
 
 type Client struct {
@@ -730,62 +730,6 @@ func (c *Client) RenewCardWithContext(
 	return &response, nil
 }
 
-func (c *Client) ScheduleCardRevocation(
-	cardId string,
-	request cards.ScheduleRevocationRequest,
-) (*cards.ScheduleRevocationResponse, error) {
-	return c.ScheduleCardRevocationWithContext(context.Background(), cardId, request)
-}
-
-func (c *Client) ScheduleCardRevocationWithContext(
-	ctx context.Context,
-	cardId string,
-	request cards.ScheduleRevocationRequest,
-) (*cards.ScheduleRevocationResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-	var response cards.ScheduleRevocationResponse
-	err = c.apiClient.PostWithContext(
-		ctx,
-		common.BuildPath(issuingPath, cardsPath, cardId, scheduleRevocationPath),
-		auth,
-		request,
-		&response,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &response, nil
-}
-
-func (c *Client) DeleteScheduledRevocation(cardId string) (*cards.ScheduleRevocationResponse, error) {
-	return c.DeleteScheduledRevocationWithContext(context.Background(), cardId)
-}
-
-func (c *Client) DeleteScheduledRevocationWithContext(
-	ctx context.Context,
-	cardId string,
-) (*cards.ScheduleRevocationResponse, error) {
-	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
-	if err != nil {
-		return nil, err
-	}
-	var response cards.ScheduleRevocationResponse
-	err = c.apiClient.DeleteWithContext(
-		ctx,
-		common.BuildPath(issuingPath, cardsPath, cardId, scheduleRevocationPath),
-		auth,
-		&response,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return &response, nil
-}
-
 func (c *Client) GetControlGroups(
 	query controlgroups.ControlGroupsQuery,
 ) (*controlgroups.ControlGroupsResponse, error) {
@@ -1217,6 +1161,41 @@ func (c *Client) EscalateDisputeWithContext(
 	err = c.apiClient.PostWithContext(
 		ctx,
 		common.BuildPath(issuingPath, disputesPath, disputeId, escalatePath),
+		auth,
+		request,
+		&response,
+		idempotencyKey,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+// AmendDispute submits an amendment to a dispute that is currently blocked from proceeding.
+// It handles both chargeback-stage and escalation-stage amendments.
+func (c *Client) AmendDispute(
+	disputeId string,
+	request disputes.AmendDisputeRequest,
+	idempotencyKey *string,
+) (*disputes.IssuingDisputeResponse, error) {
+	return c.AmendDisputeWithContext(context.Background(), disputeId, request, idempotencyKey)
+}
+
+func (c *Client) AmendDisputeWithContext(
+	ctx context.Context,
+	disputeId string,
+	request disputes.AmendDisputeRequest,
+	idempotencyKey *string,
+) (*disputes.IssuingDisputeResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+	var response disputes.IssuingDisputeResponse
+	err = c.apiClient.PostWithContext(
+		ctx,
+		common.BuildPath(issuingPath, disputesPath, disputeId, amendPath),
 		auth,
 		request,
 		&response,

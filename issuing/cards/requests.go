@@ -73,15 +73,16 @@ type (
 	}
 
 	CardDetailsRequest struct {
-		Type           CardType     `json:"type,omitempty"`
-		CardholderId   string       `json:"cardholder_id,omitempty"`
-		Lifetime       CardLifetime `json:"lifetime"`
-		Reference      string       `json:"reference,omitempty"`
-		CardProductId  string       `json:"card_product_id,omitempty"`
-		DisplayName    string       `json:"display_name,omitempty"`
-		ActivateCard   bool         `json:"activate_card,omitempty"`
+		Type           CardType      `json:"type,omitempty"`
+		CardholderId   string        `json:"cardholder_id,omitempty"`
+		Lifetime       CardLifetime  `json:"lifetime"`
+		Reference      string        `json:"reference,omitempty"`
+		CardProductId  string        `json:"card_product_id,omitempty"`
+		DisplayName    string        `json:"display_name,omitempty"`
+		ActivateCard   bool          `json:"activate_card,omitempty"`
 		Metadata       *CardMetadata `json:"metadata,omitempty"`
 		RevocationDate string        `json:"revocation_date,omitempty"`
+		ActivationDate string        `json:"activation_date,omitempty"`
 	}
 
 	physicalCardRequest struct {
@@ -91,7 +92,7 @@ type (
 
 	virtualCardRequest struct {
 		CardDetailsRequest
-		IsSingleUse      bool     `json:"is_single_use,omitempty"`
+		IsSingleUse       bool     `json:"is_single_use,omitempty"`
 		ReturnCredentials []string `json:"return_credentials,omitempty"`
 		ControlProfiles   []string `json:"control_profiles,omitempty"`
 	}
@@ -157,13 +158,11 @@ func (c *virtualCardRenewRequest) GetRenewType() CardType {
 }
 
 type (
-	ScheduleRevocationRequest struct {
-		RevocationDate string `json:"revocation_date,omitempty"`
-	}
-
 	CardUpdateRequest struct {
-		Reference   string `json:"reference,omitempty"`
-		ExpiryMonth int    `json:"expiry_month,omitempty"`
-		ExpiryYear  int    `json:"expiry_year,omitempty"`
+		Reference      string `json:"reference,omitempty"`
+		ExpiryMonth    int    `json:"expiry_month,omitempty"`
+		ExpiryYear     int    `json:"expiry_year,omitempty"`
+		ActivationDate string `json:"activation_date,omitempty"`
+		RevocationDate string `json:"revocation_date,omitempty"`
 	}
 )

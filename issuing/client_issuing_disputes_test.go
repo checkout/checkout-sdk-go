@@ -421,9 +421,10 @@ func TestAmendDispute(t *testing.T) {
 					Return(&configuration.SdkAuthorization{}, nil)
 			},
 			apiPost: func(m *mock.Mock) mock.Call {
-				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				return *m.On("PostWithContext", mock.Anything, "/issuing/disputes/idsp_test_12345abcdefghijklmnop/amend", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
+						assert.Equal(t, "/issuing/disputes/idsp_test_12345abcdefghijklmnop/amend", args.Get(1))
 						respMapping := args.Get(4).(*disputes.IssuingDisputeResponse)
 						*respMapping = response
 					})

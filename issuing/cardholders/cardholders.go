@@ -27,25 +27,18 @@ const (
 )
 
 type (
-	CardholderDocument struct {
-		Type            common.DocumentType `json:"type,omitempty"`
-		FrontDocumentId string              `json:"front_document_id,omitempty"`
-		BackDocumentId  string              `json:"back_document_id,omitempty"`
-	}
-
 	CardholderRequest struct {
-		Type             CardholderType      `json:"type,omitempty"`
-		Reference        string              `json:"reference,omitempty"`
-		EntityId         string              `json:"entity_id,omitempty"`
-		FirstName        string              `json:"first_name,omitempty"`
-		MiddleName       string              `json:"middle_name,omitempty"`
-		LastName         string              `json:"last_name,omitempty"`
-		Email            string              `json:"email,omitempty"`
-		PhoneNumber      *common.Phone       `json:"phone_number,omitempty"`
-		DateOfBirth      string              `json:"date_of_birth,omitempty"`
-		BillingAddress   *common.Address     `json:"billing_address,omitempty"`
-		ResidencyAddress *common.Address     `json:"residency_address,omitempty"`
-		Document         *CardholderDocument `json:"document,omitempty"`
+		Type             CardholderType  `json:"type,omitempty"`
+		Reference        string          `json:"reference,omitempty"`
+		EntityId         string          `json:"entity_id,omitempty"`
+		FirstName        string          `json:"first_name,omitempty"`
+		MiddleName       string          `json:"middle_name,omitempty"`
+		LastName         string          `json:"last_name,omitempty"`
+		Email            string          `json:"email,omitempty"`
+		PhoneNumber      *common.Phone   `json:"phone_number,omitempty"`
+		DateOfBirth      string          `json:"date_of_birth,omitempty"`
+		BillingAddress   *common.Address `json:"billing_address,omitempty"`
+		ResidencyAddress *common.Address `json:"residency_address,omitempty"`
 	}
 )
 

@@ -392,6 +392,92 @@ func TestEscalateDispute(t *testing.T) {
 	}
 }
 
+func TestAmendDispute(t *testing.T) {
+	idempotencyKey := "test-idempotency-key-amend"
+
+	var (
+		response = disputes.IssuingDisputeResponse{
+			HttpMetadata: mocks.HttpMetadataStatusOk,
+			Id:           "idsp_test_12345abcdefghijklmnop",
+		}
+	)
+
+	cases := []struct {
+		name             string
+		disputeId        string
+		request          disputes.AmendDisputeRequest
+		idempotencyKey   *string
+		getAuthorization func(*mock.Mock) mock.Call
+		apiPost          func(*mock.Mock) mock.Call
+		checker          func(*disputes.IssuingDisputeResponse, error)
+	}{
+		{
+			name:           "when request is correct then should return 200",
+			disputeId:      "idsp_test_12345abcdefghijklmnop",
+			request:        buildAmendDisputeRequest(),
+			idempotencyKey: &idempotencyKey,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, "/issuing/disputes/idsp_test_12345abcdefghijklmnop/amend", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(nil).
+					Run(func(args mock.Arguments) {
+						assert.Equal(t, "/issuing/disputes/idsp_test_12345abcdefghijklmnop/amend", args.Get(1))
+						respMapping := args.Get(4).(*disputes.IssuingDisputeResponse)
+						*respMapping = response
+					})
+			},
+			checker: func(response *disputes.IssuingDisputeResponse, err error) {
+				assert.Nil(t, err)
+				assert.NotNil(t, response)
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+			},
+		},
+		{
+			name:           "when dispute not found then return 404",
+			disputeId:      "idsp_not_found",
+			request:        buildAmendDisputeRequest(),
+			idempotencyKey: nil,
+			getAuthorization: func(m *mock.Mock) mock.Call {
+				return *m.On("GetAuthorization", mock.Anything).
+					Return(&configuration.SdkAuthorization{}, nil)
+			},
+			apiPost: func(m *mock.Mock) mock.Call {
+				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return(errors.CheckoutAPIError{
+						StatusCode: http.StatusNotFound,
+						Status:     "404 Not Found",
+					})
+			},
+			checker: func(response *disputes.IssuingDisputeResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				chkErr := err.(errors.CheckoutAPIError)
+				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			apiClient := new(mocks.ApiClientMock)
+			credentials := new(mocks.CredentialsMock)
+			environment := new(mocks.EnvironmentMock)
+			enableTelemetry := true
+
+			tc.getAuthorization(&credentials.Mock)
+			tc.apiPost(&apiClient.Mock)
+
+			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+			client := NewClient(config, apiClient)
+
+			tc.checker(client.AmendDispute(tc.disputeId, tc.request, tc.idempotencyKey))
+		})
+	}
+}
+
 // # common methods
 
 func buildCreateDisputeRequest() disputes.CreateDisputeRequest {
@@ -424,6 +510,30 @@ func buildEscalateDisputeRequest() disputes.EscalateDisputeRequest {
 				Description: "Additional supporting documentation",
 			},
 		},
+		FraudDetails: &disputes.IssuingDisputeFraudDetails{
+			FraudType: disputes.FraudTypeAccountTakeover,
+		},
+	}
+}
+
+func buildAmendDisputeRequest() disputes.AmendDisputeRequest {
+	amount := int64(1500)
+	return disputes.AmendDisputeRequest{
+		Reason: "4807",
+		Amount: &amount,
+		Evidence: []disputes.DisputeEvidence{
+			{
+				Name:        "amended_evidence.pdf",
+				Content:     "QW1lbmRlZCBFdmlkZW5jZQ==",
+				Description: "Amended evidence file",
+			},
+		},
+		FraudDetails: &disputes.IssuingDisputeFraudDetails{
+			FraudType:   disputes.FraudTypeCardNotPresentFraud,
+			Description: "No online purchases on this date.",
+		},
+		ReasonChangeJustification: "New evidence confirms an unauthorized transaction.",
+		ActionResponse:            "Updated the reason code as requested.",
 	}
 }
 

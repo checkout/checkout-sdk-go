@@ -34,24 +34,51 @@ type PaymentSetupRequest struct {
 	Order                     *PaymentSetupOrder                     `json:"order,omitempty"`
 	Industry                  *PaymentSetupIndustry                  `json:"industry,omitempty"`
 	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
+	BillingDescriptor         *PaymentSetupBillingDescriptor         `json:"billing_descriptor,omitempty"`
+	PresentmentDetails        *PaymentSetupPresentmentDetails        `json:"presentment_details,omitempty"`
+	Terminal                  *PaymentSetupTerminal                  `json:"terminal,omitempty"`
 }
 
 type PaymentSetupResponse struct {
-	HttpMetadata            common.HttpMetadata
-	Id                      string                            `json:"id,omitempty"`
-	ProcessingChannelId     string                            `json:"processing_channel_id"`
-	Amount                  int64                             `json:"amount"`
-	Currency                common.Currency                   `json:"currency"`
-	PaymentType             payments.PaymentType              `json:"payment_type,omitempty"`
-	Reference               string                            `json:"reference,omitempty"`
-	Description             string                            `json:"description,omitempty"`
-	PaymentMethods          *PaymentMethods                   `json:"payment_methods,omitempty"`
-	AvailablePaymentMethods []string                          `json:"available_payment_methods,omitempty"`
-	Settings                *PaymentSetupSettings             `json:"settings,omitempty"`
-	Customer                *PaymentSetupCustomer             `json:"customer,omitempty"`
-	Order                   *PaymentSetupOrder                `json:"order,omitempty"`
-	Industry                *PaymentSetupIndustry             `json:"industry,omitempty"`
+	HttpMetadata              common.HttpMetadata
+	Id                        string                                 `json:"id,omitempty"`
+	ProcessingChannelId       string                                 `json:"processing_channel_id"`
+	Amount                    int64                                  `json:"amount"`
+	Currency                  common.Currency                        `json:"currency"`
+	PaymentType               payments.PaymentType                   `json:"payment_type,omitempty"`
+	Reference                 string                                 `json:"reference,omitempty"`
+	Description               string                                 `json:"description,omitempty"`
+	PaymentMethods            *PaymentMethods                        `json:"payment_methods,omitempty"`
+	AvailablePaymentMethods   []string                               `json:"available_payment_methods,omitempty"`
+	Settings                  *PaymentSetupSettings                  `json:"settings,omitempty"`
+	Customer                  *PaymentSetupCustomer                  `json:"customer,omitempty"`
+	Order                     *PaymentSetupOrder                     `json:"order,omitempty"`
+	Industry                  *PaymentSetupIndustry                  `json:"industry,omitempty"`
 	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
+	BillingDescriptor         *PaymentSetupBillingDescriptor         `json:"billing_descriptor,omitempty"`
+	PresentmentDetails        *PaymentSetupPresentmentDetails        `json:"presentment_details,omitempty"`
+	Terminal                  *PaymentSetupTerminal                  `json:"terminal,omitempty"`
+	LatestPayment             map[string]interface{}                 `json:"latest_payment,omitempty"`
+}
+
+// PaymentSetupBillingDescriptor is the billing descriptor for the payment.
+type PaymentSetupBillingDescriptor struct {
+	Name      string `json:"name,omitempty"`
+	City      string `json:"city,omitempty"`
+	Reference string `json:"reference,omitempty"`
+}
+
+// PaymentSetupPresentmentDetails is the amount and currency to present to the customer, when the
+// settlement currency differs from the customer-facing currency.
+type PaymentSetupPresentmentDetails struct {
+	Amount   int64           `json:"amount,omitempty"`
+	Currency common.Currency `json:"currency,omitempty"`
+}
+
+// PaymentSetupTerminal holds terminal details.
+type PaymentSetupTerminal struct {
+	Id            string     `json:"id,omitempty"`
+	LocalDateTime *time.Time `json:"local_date_time,omitempty"`
 }
 
 type PaymentSetupConfirmResponse struct {
@@ -118,44 +145,48 @@ type CustomerMerchantAccount struct {
 // ===== Payment Methods Structs =====
 
 type PaymentMethods struct {
-	Instrument *InstrumentPaymentMethod `json:"instrument,omitempty"`
-	Klarna     *KlarnaPaymentMethod     `json:"klarna,omitempty"`
-	Stcpay     *StcpayPaymentMethod     `json:"stcpay,omitempty"`
-	Tabby      *TabbyPaymentMethod      `json:"tabby,omitempty"`
-	Bizum      *BizumPaymentMethod      `json:"bizum,omitempty"`
-	Paynow     *SimplePaymentMethod     `json:"paynow,omitempty"`
-	Qpay       *SimplePaymentMethod     `json:"qpay,omitempty"`
-	Eps        *SimplePaymentMethod     `json:"eps,omitempty"`
-	Ideal      *SimplePaymentMethod     `json:"ideal,omitempty"`
-	Knet       *SimplePaymentMethod     `json:"knet,omitempty"`
-	Bancontact *SimplePaymentMethod     `json:"bancontact,omitempty"`
-	Benefit    *SimplePaymentMethod     `json:"benefit,omitempty"`
-	Vipps      *SimplePaymentMethod     `json:"vipps,omitempty"`
-	Twint      *SimplePaymentMethod     `json:"twint,omitempty"`
-	AlipayCn   *SimplePaymentMethod     `json:"alipay_cn,omitempty"`
-	AlipayHk   *SimplePaymentMethod     `json:"alipay_hk,omitempty"`
-	Gcash      *SimplePaymentMethod     `json:"gcash,omitempty"`
-	Tng        *SimplePaymentMethod     `json:"tng,omitempty"`
-	Dana       *SimplePaymentMethod     `json:"dana,omitempty"`
-	Mobilepay  *SimplePaymentMethod     `json:"mobilepay,omitempty"`
-	Tamara     *SimplePaymentMethod     `json:"tamara,omitempty"`
-	Mbway      *SimplePaymentMethod     `json:"mbway,omitempty"`
-	Multibanco *MultibancoPaymentMethod `json:"multibanco,omitempty"`
-	Wechatpay  *SimplePaymentMethod     `json:"wechatpay,omitempty"`
-	Kakaopay   *SimplePaymentMethod     `json:"kakaopay,omitempty"`
-	Truemoney  *SimplePaymentMethod     `json:"truemoney,omitempty"`
-	Octopus    *SimplePaymentMethod     `json:"octopus,omitempty"`
-	P24        *P24PaymentMethod        `json:"p24,omitempty"`
-	Alma       *SimplePaymentMethod     `json:"alma,omitempty"`
-	Swish      *SwishPaymentMethod      `json:"swish,omitempty"`
-	Sequra     *SimplePaymentMethod     `json:"sequra,omitempty"`
-	Ach        *AchPaymentMethod        `json:"ach,omitempty"`
-	Sepa       *SepaPaymentMethod       `json:"sepa,omitempty"`
-	Paypal     *PaypalPaymentMethod     `json:"paypal,omitempty"`
-	Googlepay  *SimplePaymentMethod     `json:"googlepay,omitempty"`
-	Applepay   *SimplePaymentMethod     `json:"applepay,omitempty"`
-	Card       *SimplePaymentMethod     `json:"card,omitempty"`
-	Blik       *BlikPaymentMethod       `json:"blik,omitempty"`
+	Instrument  *InstrumentPaymentMethod  `json:"instrument,omitempty"`
+	Klarna      *KlarnaPaymentMethod      `json:"klarna,omitempty"`
+	Stcpay      *StcpayPaymentMethod      `json:"stcpay,omitempty"`
+	Tabby       *TabbyPaymentMethod       `json:"tabby,omitempty"`
+	Bizum       *BizumPaymentMethod       `json:"bizum,omitempty"`
+	Paynow      *SimplePaymentMethod      `json:"paynow,omitempty"`
+	Qpay        *SimplePaymentMethod      `json:"qpay,omitempty"`
+	Eps         *SimplePaymentMethod      `json:"eps,omitempty"`
+	Ideal       *SimplePaymentMethod      `json:"ideal,omitempty"`
+	Knet        *SimplePaymentMethod      `json:"knet,omitempty"`
+	Bancontact  *SimplePaymentMethod      `json:"bancontact,omitempty"`
+	Benefit     *SimplePaymentMethod      `json:"benefit,omitempty"`
+	Vipps       *SimplePaymentMethod      `json:"vipps,omitempty"`
+	Twint       *SimplePaymentMethod      `json:"twint,omitempty"`
+	AlipayCn    *SimplePaymentMethod      `json:"alipay_cn,omitempty"`
+	AlipayHk    *SimplePaymentMethod      `json:"alipay_hk,omitempty"`
+	Gcash       *SimplePaymentMethod      `json:"gcash,omitempty"`
+	Tng         *SimplePaymentMethod      `json:"tng,omitempty"`
+	Dana        *SimplePaymentMethod      `json:"dana,omitempty"`
+	Mobilepay   *SimplePaymentMethod      `json:"mobilepay,omitempty"`
+	Tamara      *SimplePaymentMethod      `json:"tamara,omitempty"`
+	Mbway       *SimplePaymentMethod      `json:"mbway,omitempty"`
+	Multibanco  *MultibancoPaymentMethod  `json:"multibanco,omitempty"`
+	Wechatpay   *SimplePaymentMethod      `json:"wechatpay,omitempty"`
+	Kakaopay    *SimplePaymentMethod      `json:"kakaopay,omitempty"`
+	Truemoney   *SimplePaymentMethod      `json:"truemoney,omitempty"`
+	Octopus     *SimplePaymentMethod      `json:"octopus,omitempty"`
+	P24         *P24PaymentMethod         `json:"p24,omitempty"`
+	Alma        *SimplePaymentMethod      `json:"alma,omitempty"`
+	Swish       *SwishPaymentMethod       `json:"swish,omitempty"`
+	Sequra      *SimplePaymentMethod      `json:"sequra,omitempty"`
+	Ach         *AchPaymentMethod         `json:"ach,omitempty"`
+	Sepa        *SepaPaymentMethod        `json:"sepa,omitempty"`
+	Paypal      *PaypalPaymentMethod      `json:"paypal,omitempty"`
+	Googlepay   *SimplePaymentMethod      `json:"googlepay,omitempty"`
+	Applepay    *SimplePaymentMethod      `json:"applepay,omitempty"`
+	Card        *SimplePaymentMethod      `json:"card,omitempty"`
+	Blik        *BlikPaymentMethod        `json:"blik,omitempty"`
+	Bacs        *BacsPaymentMethod        `json:"bacs,omitempty"`
+	CardPresent *CardPresentPaymentMethod `json:"card_present,omitempty"`
+	PayByBank   *PayByBankPaymentMethod   `json:"pay_by_bank,omitempty"`
+	Stablecoin  *StablecoinPaymentMethod  `json:"stablecoin,omitempty"`
 }
 
 type PaymentMethodBase struct {
@@ -191,7 +222,7 @@ type KlarnaPaymentMethod struct {
 }
 
 type KlarnaAccountHolder struct {
-	BillingAddress *common.Address `json:"billing_address,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type StcpayPaymentMethod struct {
@@ -282,23 +313,110 @@ type PaypalPaymentMethod struct {
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
+// BacsAccountHolderType is the type of Bacs account holder.
+type BacsAccountHolderType string
+
+const (
+	BacsAccountHolderIndividual BacsAccountHolderType = "individual"
+	BacsAccountHolderCorporate  BacsAccountHolderType = "corporate"
+)
+
+type BacsAccountHolder struct {
+	Type        BacsAccountHolderType `json:"type,omitempty"`
+	FirstName   string                `json:"first_name,omitempty"`
+	LastName    string                `json:"last_name,omitempty"`
+	CompanyName string                `json:"company_name,omitempty"`
+	Email       string                `json:"email,omitempty"`
+}
+
+// BacsPaymentMethod is the Bacs payment method's details and configuration.
+type BacsPaymentMethod struct {
+	PaymentMethodBase
+	InstrumentId         string                `json:"instrument_id,omitempty"`
+	AccountHolder        *BacsAccountHolder    `json:"account_holder,omitempty"`
+	AccountNumber        string                `json:"account_number,omitempty"`
+	BankCode             string                `json:"bank_code,omitempty"`
+	Country              common.Country        `json:"country,omitempty"`
+	Currency             string                `json:"currency,omitempty"`
+	AllowPartialMatch    bool                  `json:"allow_partial_match,omitempty"`
+	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
+}
+
+type CardPresentPin struct {
+	KeySetId    string `json:"key_set_id,omitempty"`
+	Block       string `json:"block,omitempty"`
+	BlockFormat string `json:"block_format,omitempty"`
+}
+
+// CardPresentPaymentMethod is the Card Present payment method's details and configuration.
+type CardPresentPaymentMethod struct {
+	PaymentMethodBase
+	Track2            string          `json:"track2,omitempty"`
+	Emv               string          `json:"emv,omitempty"`
+	EntryMode         string          `json:"entry_mode,omitempty"`
+	Pin               *CardPresentPin `json:"pin,omitempty"`
+	StoreForFutureUse bool            `json:"store_for_future_use,omitempty"`
+	Name              string          `json:"name,omitempty"`
+}
+
+type PayByBankBank struct {
+	BankId      string `json:"bank_id,omitempty"`
+	DisplayName string `json:"display_name,omitempty"`
+	LogoUrl     string `json:"logo_url,omitempty"`
+	Available   bool   `json:"available,omitempty"`
+}
+
+type PayByBankAction struct {
+	Type  string          `json:"type,omitempty"`
+	Banks []PayByBankBank `json:"banks,omitempty"`
+}
+
+// PayByBankPaymentMethod is the Pay by Bank (Open Banking) payment method's details and configuration.
+type PayByBankPaymentMethod struct {
+	PaymentMethodBase
+	BankId string           `json:"bank_id,omitempty"`
+	Action *PayByBankAction `json:"action,omitempty"`
+}
+
+// StablecoinPaymentMethod is the Stablecoin payment method's details and configuration.
+type StablecoinPaymentMethod struct {
+	PaymentMethodBase
+}
+
 // ===== Support Structs =====
 
 type PaymentSetupSettings struct {
-	SuccessUrl               string   `json:"success_url,omitempty"`
-	FailureUrl               string   `json:"failure_url,omitempty"`
-	Capture                  bool     `json:"capture,omitempty"`
-	ExcludedPaymentMethods   []string `json:"excluded_payment_methods,omitempty"`
+	SuccessUrl             string   `json:"success_url,omitempty"`
+	FailureUrl             string   `json:"failure_url,omitempty"`
+	Capture                bool     `json:"capture,omitempty"`
+	ExcludedPaymentMethods []string `json:"excluded_payment_methods,omitempty"`
 }
 
 type PaymentSetupOrder struct {
-	Items          []payments.Product        `json:"items,omitempty"`
-	Shipping       *payments.ShippingDetails `json:"shipping,omitempty"`
-	SubMerchants   []OrderSubMerchant        `json:"sub_merchants,omitempty"`
-	InvoiceId      string                    `json:"invoice_id,omitempty"`
-	ShippingAmount int                       `json:"shipping_amount,omitempty"`
-	DiscountAmount int                       `json:"discount_amount,omitempty"`
-	TaxAmount      int                       `json:"tax_amount,omitempty"`
+	Items             []payments.Product             `json:"items,omitempty"`
+	Shipping          *payments.ShippingDetails      `json:"shipping,omitempty"`
+	SubMerchants      []OrderSubMerchant             `json:"sub_merchants,omitempty"`
+	InvoiceId         string                         `json:"invoice_id,omitempty"`
+	ShippingAmount    int                            `json:"shipping_amount,omitempty"`
+	DiscountAmount    int                            `json:"discount_amount,omitempty"`
+	SurchargeAmount   int                            `json:"surcharge_amount,omitempty"`
+	TaxAmount         int                            `json:"tax_amount,omitempty"`
+	TippingAmount     int                            `json:"tipping_amount,omitempty"`
+	AmountAllocations []PaymentSetupAmountAllocation `json:"amount_allocations,omitempty"`
+}
+
+// AmountAllocationCommission is the commission to collect from an amount allocation split.
+type AmountAllocationCommission struct {
+	Amount     int64   `json:"amount,omitempty"`
+	Percentage float64 `json:"percentage,omitempty"`
+}
+
+// PaymentSetupAmountAllocation represents a sub-entity on whose behalf the payment is processed.
+type PaymentSetupAmountAllocation struct {
+	Id         string                      `json:"id,omitempty"`
+	Amount     int64                       `json:"amount,omitempty"`
+	Reference  string                      `json:"reference,omitempty"`
+	Commission *AmountAllocationCommission `json:"commission,omitempty"`
 }
 
 type OrderSubMerchant struct {
@@ -361,25 +479,25 @@ type PaymentSetupRetry struct {
 type AccountFundingTransactionPurpose string
 
 const (
-	AFTPurposeDonations        AccountFundingTransactionPurpose = "donations"
-	AFTPurposeEducation        AccountFundingTransactionPurpose = "education"
-	AFTPurposeEmergencyNeed    AccountFundingTransactionPurpose = "emergency_need"
-	AFTPurposeExpatriation     AccountFundingTransactionPurpose = "expatriation"
-	AFTPurposeFamilySupport    AccountFundingTransactionPurpose = "family_support"
+	AFTPurposeDonations         AccountFundingTransactionPurpose = "donations"
+	AFTPurposeEducation         AccountFundingTransactionPurpose = "education"
+	AFTPurposeEmergencyNeed     AccountFundingTransactionPurpose = "emergency_need"
+	AFTPurposeExpatriation      AccountFundingTransactionPurpose = "expatriation"
+	AFTPurposeFamilySupport     AccountFundingTransactionPurpose = "family_support"
 	AFTPurposeFinancialServices AccountFundingTransactionPurpose = "financial_services"
-	AFTPurposeGifts            AccountFundingTransactionPurpose = "gifts"
-	AFTPurposeIncome           AccountFundingTransactionPurpose = "income"
-	AFTPurposeInsurance        AccountFundingTransactionPurpose = "insurance"
-	AFTPurposeInvestment       AccountFundingTransactionPurpose = "investment"
-	AFTPurposeItServices       AccountFundingTransactionPurpose = "it_services"
-	AFTPurposeLeisure          AccountFundingTransactionPurpose = "leisure"
+	AFTPurposeGifts             AccountFundingTransactionPurpose = "gifts"
+	AFTPurposeIncome            AccountFundingTransactionPurpose = "income"
+	AFTPurposeInsurance         AccountFundingTransactionPurpose = "insurance"
+	AFTPurposeInvestment        AccountFundingTransactionPurpose = "investment"
+	AFTPurposeItServices        AccountFundingTransactionPurpose = "it_services"
+	AFTPurposeLeisure           AccountFundingTransactionPurpose = "leisure"
 	AFTPurposeLoanPayment       AccountFundingTransactionPurpose = "loan_payment"
 	AFTPurposeMedicalTreatment  AccountFundingTransactionPurpose = "medical_treatment"
-	AFTPurposeOther            AccountFundingTransactionPurpose = "other"
-	AFTPurposePension          AccountFundingTransactionPurpose = "pension"
-	AFTPurposeRoyalties        AccountFundingTransactionPurpose = "royalties"
-	AFTPurposeSavings          AccountFundingTransactionPurpose = "savings"
-	AFTPurposeTravelAndTourism AccountFundingTransactionPurpose = "travel_and_tourism"
+	AFTPurposeOther             AccountFundingTransactionPurpose = "other"
+	AFTPurposePension           AccountFundingTransactionPurpose = "pension"
+	AFTPurposeRoyalties         AccountFundingTransactionPurpose = "royalties"
+	AFTPurposeSavings           AccountFundingTransactionPurpose = "savings"
+	AFTPurposeTravelAndTourism  AccountFundingTransactionPurpose = "travel_and_tourism"
 )
 
 type AccountFundingTransactionIdentificationType string
@@ -391,9 +509,9 @@ const (
 )
 
 type AccountFundingTransactionIdentification struct {
-	Type          AccountFundingTransactionIdentificationType `json:"type,omitempty"`
-	Number        string                                      `json:"number,omitempty"`
-	IssuingCountry string                                     `json:"issuing_country,omitempty"`
+	Type           AccountFundingTransactionIdentificationType `json:"type,omitempty"`
+	Number         string                                      `json:"number,omitempty"`
+	IssuingCountry string                                      `json:"issuing_country,omitempty"`
 }
 
 type AccountFundingTransactionSender struct {
@@ -411,10 +529,10 @@ type AccountFundingTransactionRecipient struct {
 }
 
 type PaymentSetupAccountFundingTransaction struct {
-	Enabled   *bool                                `json:"enabled,omitempty"`
-	Purpose   AccountFundingTransactionPurpose     `json:"purpose,omitempty"`
-	Sender    *AccountFundingTransactionSender     `json:"sender,omitempty"`
-	Recipient *AccountFundingTransactionRecipient  `json:"recipient,omitempty"`
+	Enabled   *bool                               `json:"enabled,omitempty"`
+	Purpose   AccountFundingTransactionPurpose    `json:"purpose,omitempty"`
+	Sender    *AccountFundingTransactionSender    `json:"sender,omitempty"`
+	Recipient *AccountFundingTransactionRecipient `json:"recipient,omitempty"`
 }
 
 type BlikPaymentMethod struct {

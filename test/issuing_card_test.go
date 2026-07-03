@@ -379,83 +379,6 @@ func TestRenewCard(t *testing.T) {
 	}
 }
 
-func TestScheduleCardRevocation(t *testing.T) {
-	t.Skip("Avoid creating cards all the time")
-	cases := []struct {
-		name    string
-		cardId  string
-		request cards.ScheduleRevocationRequest
-		checker func(*cards.ScheduleRevocationResponse, error)
-	}{
-		{
-			name:    "when request is correct then should return 201",
-			cardId:  virtualCardId,
-			request: scheduleRevocationRequest(),
-			checker: func(response *cards.ScheduleRevocationResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
-			},
-		},
-		{
-			name:    "when card not found then return error",
-			cardId:  "crd_not_found",
-			request: scheduleRevocationRequest(),
-			checker: func(response *cards.ScheduleRevocationResponse, err error) {
-				assert.Nil(t, response)
-				assert.NotNil(t, err)
-				chkErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
-			},
-		},
-	}
-
-	client := buildIssuingClientApi().Issuing
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.ScheduleCardRevocation(tc.cardId, tc.request))
-		})
-	}
-}
-
-func TestDeleteScheduledRevocation(t *testing.T) {
-	t.Skip("Avoid creating cards all the time")
-	cases := []struct {
-		name    string
-		cardId  string
-		checker func(*cards.ScheduleRevocationResponse, error)
-	}{
-		{
-			name:   "when request is correct then should return 200",
-			cardId: virtualCardId,
-			checker: func(response *cards.ScheduleRevocationResponse, err error) {
-				assert.Nil(t, err)
-				assert.NotNil(t, response)
-				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
-			},
-		},
-		{
-			name:   "when card not found then return error",
-			cardId: "crd_not_found",
-			checker: func(response *cards.ScheduleRevocationResponse, err error) {
-				assert.Nil(t, response)
-				assert.NotNil(t, err)
-				chkErr := err.(errors.CheckoutAPIError)
-				assert.Equal(t, http.StatusNotFound, chkErr.StatusCode)
-			},
-		},
-	}
-
-	client := buildIssuingClientApi().Issuing
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.DeleteScheduledRevocation(tc.cardId))
-		})
-	}
-}
-
 // # common methods
 
 func virtualRenewCardRequest() cards.RenewCardRequest {
@@ -463,10 +386,4 @@ func virtualRenewCardRequest() cards.RenewCardRequest {
 	req.DisplayName = "John Kennedy"
 	req.Reference = "X-123456-N11"
 	return req
-}
-
-func scheduleRevocationRequest() cards.ScheduleRevocationRequest {
-	return cards.ScheduleRevocationRequest{
-		RevocationDate: "2026-12-31",
-	}
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
-
 type (
 	CardResponse struct {
 		HttpMetadata    common.HttpMetadata
@@ -33,6 +32,7 @@ type (
 		CardProductId    string                 `json:"card_product_id,omitempty"`
 		ClientId         string                 `json:"client_id,omitempty"`
 		EntityId         string                 `json:"entity_id,omitempty"`
+		UserId           string                 `json:"user_id,omitempty"`
 		LastFour         string                 `json:"last_four,omitempty"`
 		ExpiryMonth      int                    `json:"expiry_month,omitempty"`
 		ExpiryYear       int                    `json:"expiry_year,omitempty"`
@@ -42,6 +42,11 @@ type (
 		IssuingCountry   common.Country         `json:"issuing_country,omitempty"`
 		Scheme           CardScheme             `json:"scheme,omitempty"`
 		Reference        string                 `json:"reference,omitempty"`
+		Metadata         *CardMetadata          `json:"metadata,omitempty"`
+		RevocationDate   string                 `json:"revocation_date,omitempty"`
+		ActivationDate   string                 `json:"activation_date,omitempty"`
+		RootCardId       string                 `json:"root_card_id,omitempty"`
+		ParentCardId     string                 `json:"parent_card_id,omitempty"`
 		CreatedDate      *time.Time             `json:"created_date,omitempty"`
 		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
 		Links            map[string]common.Link `json:"_links,omitempty"`
@@ -113,28 +118,23 @@ type (
 
 type (
 	RenewCardResponse struct {
-		HttpMetadata   common.HttpMetadata
-		Id             string          `json:"id,omitempty"`
-		ParentCardId   string          `json:"parent_card_id,omitempty"`
-		CardholderId   string          `json:"cardholder_id,omitempty"`
-		Status         CardStatus      `json:"status,omitempty"`
-		Type           CardType        `json:"type,omitempty"`
-		ClientId       string          `json:"client_id,omitempty"`
-		EntityId       string          `json:"entity_id,omitempty"`
-		LastFour       string          `json:"last_four,omitempty"`
-		ExpiryYear     int             `json:"expiry_year,omitempty"`
-		ExpiryMonth    int             `json:"expiry_month,omitempty"`
-		DisplayName    string          `json:"display_name,omitempty"`
-		Reference      string          `json:"reference,omitempty"`
-		CreatedDate    *time.Time      `json:"created_date,omitempty"`
-		BillingCurrency common.Currency `json:"billing_currency,omitempty"`
-		IssuingCountry common.Country  `json:"issuing_country,omitempty"`
-		Links          map[string]common.Link `json:"_links,omitempty"`
-	}
-
-	ScheduleRevocationResponse struct {
-		HttpMetadata common.HttpMetadata
-		Links        map[string]common.Link `json:"_links,omitempty"`
+		HttpMetadata    common.HttpMetadata
+		Id              string                 `json:"id,omitempty"`
+		ParentCardId    string                 `json:"parent_card_id,omitempty"`
+		CardholderId    string                 `json:"cardholder_id,omitempty"`
+		Status          CardStatus             `json:"status,omitempty"`
+		Type            CardType               `json:"type,omitempty"`
+		ClientId        string                 `json:"client_id,omitempty"`
+		EntityId        string                 `json:"entity_id,omitempty"`
+		LastFour        string                 `json:"last_four,omitempty"`
+		ExpiryYear      int                    `json:"expiry_year,omitempty"`
+		ExpiryMonth     int                    `json:"expiry_month,omitempty"`
+		DisplayName     string                 `json:"display_name,omitempty"`
+		Reference       string                 `json:"reference,omitempty"`
+		CreatedDate     *time.Time             `json:"created_date,omitempty"`
+		BillingCurrency common.Currency        `json:"billing_currency,omitempty"`
+		IssuingCountry  common.Country         `json:"issuing_country,omitempty"`
+		Links           map[string]common.Link `json:"_links,omitempty"`
 	}
 
 	CardUpdateResponse struct {

@@ -24,6 +24,20 @@ type (
 	InstrumentDetailsCardToken struct {
 		Token string `json:"token,omitempty"`
 	}
+
+	InstrumentDetailsAch struct {
+		AccountNumber string                `json:"account_number,omitempty"`
+		RoutingNumber string                `json:"routing_number,omitempty"`
+		AccountType   InstrumentAccountType `json:"account_type,omitempty"`
+	}
+)
+
+// InstrumentAccountType is the type of bank account.
+type InstrumentAccountType string
+
+const (
+	InstrumentAccountSavings  InstrumentAccountType = "savings"
+	InstrumentAccountChecking InstrumentAccountType = "checking"
 )
 
 type (
@@ -84,4 +98,8 @@ func (s *InstrumentDetailsSepa) GetType() string {
 
 func (s *InstrumentDetailsCardToken) GetType() string {
 	return string(common.CardToken)
+}
+
+func (s *InstrumentDetailsAch) GetType() string {
+	return "Ach"
 }

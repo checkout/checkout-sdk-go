@@ -30,7 +30,7 @@ var (
 	virtualCardResponse *cards.CardResponse
 	cardControlResponse *controls.CardControlResponse
 
-	controlGroupResponse  *controlgroups.ControlGroupResponse
+	controlGroupResponse   *controlgroups.ControlGroupResponse
 	controlProfileResponse *controlprofiles.ControlProfileResponse
 	disputeResponse        *disputes.IssuingDisputeResponse
 	transactionResponse    *transactions.TransactionResponse
@@ -80,11 +80,6 @@ func cardholderRequest(t *testing.T) *cardholders.CardholderResponse {
 		DateOfBirth:      "1985-05-15",
 		BillingAddress:   Address(),
 		ResidencyAddress: Address(),
-		Document: &cardholders.CardholderDocument{
-			Type:            common.NationalIdentityCard,
-			FrontDocumentId: "file_6lbss42ezvoufcb2beo76rvwly",
-			BackDocumentId:  "file_aaz5pemp6326zbuvevp6qroqu4",
-		},
 	}
 
 	response, err := buildIssuingClientApi().Issuing.CreateCardholder(request)

@@ -889,6 +889,7 @@ type (
 		PurchaseCountry                  common.Country                   `json:"purchase_country,omitempty"`
 		Locale                           string                           `json:"locale,omitempty"`
 		RetrievalReferenceNumber         string                           `json:"retrieval_reference_number,omitempty"`
+		RecommendationCode               string                           `json:"recommendation_code,omitempty"`
 		PartnerOrderId                   string                           `json:"partner_order_id,omitempty"`
 		PartnerStatus                    string                           `json:"partner_status,omitempty"`
 		PartnerTransactionId             string                           `json:"partner_transaction_id,omitempty"`

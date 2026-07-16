@@ -81,34 +81,6 @@ type PaymentSetupTerminal struct {
 	LocalDateTime *time.Time `json:"local_date_time,omitempty"`
 }
 
-type PaymentSetupConfirmResponse struct {
-	HttpMetadata    common.HttpMetadata
-	Id              string                      `json:"id"`
-	ActionId        string                      `json:"action_id"`
-	Amount          int64                       `json:"amount"`
-	Currency        common.Currency             `json:"currency"`
-	Approved        bool                        `json:"approved"`
-	Status          payments.PaymentStatus      `json:"status"`
-	ResponseCode    string                      `json:"response_code"`
-	ProcessedOn     *time.Time                  `json:"processed_on"`
-	Links           map[string]common.Link      `json:"_links"`
-	AmountRequested int                         `json:"amount_requested,omitempty"`
-	AuthCode        string                      `json:"auth_code,omitempty"`
-	ResponseSummary string                      `json:"response_summary,omitempty"`
-	ExpiresOn       *time.Time                  `json:"expires_on,omitempty"`
-	ThreeDs         *payments.ThreeDsEnrollment `json:"3ds,omitempty"`
-	Risk            *payments.RiskAssessment    `json:"risk,omitempty"`
-	Source          *PaymentSetupSource         `json:"source,omitempty"`
-	Customer        *common.CustomerResponse    `json:"customer,omitempty"`
-	Balances        *PaymentSetupBalances       `json:"balances,omitempty"`
-	Reference       string                      `json:"reference,omitempty"`
-	Subscription    *PaymentSetupSubscription   `json:"subscription,omitempty"`
-	Processing      *payments.PaymentProcessing `json:"processing,omitempty"`
-	Eci             string                      `json:"eci,omitempty"`
-	SchemeId        string                      `json:"scheme_id,omitempty"`
-	Retry           *PaymentSetupRetry          `json:"retry,omitempty"`
-}
-
 // ===== Customer Structs =====
 
 type PaymentSetupCustomer struct {
@@ -435,45 +407,6 @@ type AirlineData struct {
 	Ticket           *payments.Ticket            `json:"ticket,omitempty"`
 	Passengers       []payments.Passenger        `json:"passengers,omitempty"`
 	FlightLegDetails []payments.FlightLegDetails `json:"flight_leg_details,omitempty"`
-}
-
-type PaymentSetupSource struct {
-	Type                    string              `json:"type,omitempty"`
-	Id                      string              `json:"id,omitempty"`
-	BillingAddress          *common.Address     `json:"billing_address,omitempty"`
-	Phone                   *common.Phone       `json:"phone,omitempty"`
-	Scheme                  string              `json:"scheme,omitempty"`
-	Last4                   string              `json:"last4,omitempty"`
-	Fingerprint             string              `json:"fingerprint,omitempty"`
-	Bin                     string              `json:"bin,omitempty"`
-	CardType                common.CardType     `json:"card_type,omitempty"`
-	CardCategory            common.CardCategory `json:"card_category,omitempty"`
-	Issuer                  string              `json:"issuer,omitempty"`
-	IssuerCountry           common.Country      `json:"issuer_country,omitempty"`
-	ProductType             string              `json:"product_type,omitempty"`
-	AvsCheck                string              `json:"avs_check,omitempty"`
-	CvvCheck                string              `json:"cvv_check,omitempty"`
-	PaymentAccountReference string              `json:"payment_account_reference,omitempty"`
-}
-
-type PaymentSetupBalances struct {
-	TotalAuthorized    int `json:"total_authorized,omitempty"`
-	TotalVoided        int `json:"total_voided,omitempty"`
-	AvailableToVoid    int `json:"available_to_void,omitempty"`
-	TotalCaptured      int `json:"total_captured,omitempty"`
-	AvailableToCapture int `json:"available_to_capture,omitempty"`
-	TotalRefunded      int `json:"total_refunded,omitempty"`
-	AvailableToRefund  int `json:"available_to_refund,omitempty"`
-}
-
-type PaymentSetupSubscription struct {
-	Id string `json:"id,omitempty"`
-}
-
-type PaymentSetupRetry struct {
-	MaxAttempts   int        `json:"max_attempts,omitempty"`
-	EndsOn        *time.Time `json:"ends_on,omitempty"`
-	NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
 }
 
 type AccountFundingTransactionPurpose string

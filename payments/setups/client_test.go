@@ -11,7 +11,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 	"github.com/checkout/checkout-sdk-go/v2/mocks"
-	"github.com/checkout/checkout-sdk-go/v2/payments"
 )
 
 func TestCreatePaymentSetup(t *testing.T) {
@@ -261,26 +260,26 @@ func TestGetPaymentSetup(t *testing.T) {
 
 func TestConfirmPaymentSetup(t *testing.T) {
 	var (
-		setupId               = "ps_123456789"
-		paymentMethodOptionId = "pmo_123456789"
-		confirmResponse       = PaymentSetupConfirmResponse{
-			Id:     setupId,
-			Status: payments.Authorized,
+		setupId           = "ps_123456789"
+		paymentMethodName = "card"
+		confirmResponse   = PaymentSetupResponse{
+			Id:        setupId,
+			Reference: "REF-0987-475",
 		}
 	)
 
 	cases := []struct {
-		name                  string
-		setupId               string
-		paymentMethodOptionId string
-		getAuthorization      func(*mock.Mock) mock.Call
-		apiPost               func(*mock.Mock) mock.Call
-		checker               func(*PaymentSetupConfirmResponse, error)
+		name              string
+		setupId           string
+		paymentMethodName string
+		getAuthorization  func(*mock.Mock) mock.Call
+		apiPost           func(*mock.Mock) mock.Call
+		checker           func(*PaymentSetupResponse, error)
 	}{
 		{
-			name:                  "when path parameters are correct then confirm payment setup",
-			setupId:               setupId,
-			paymentMethodOptionId: paymentMethodOptionId,
+			name:              "when path parameters are correct then confirm payment setup",
+			setupId:           setupId,
+			paymentMethodName: paymentMethodName,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -289,21 +288,21 @@ func TestConfirmPaymentSetup(t *testing.T) {
 				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil).
 					Run(func(args mock.Arguments) {
-						respMapping := args.Get(4).(*PaymentSetupConfirmResponse)
+						respMapping := args.Get(4).(*PaymentSetupResponse)
 						*respMapping = confirmResponse
 					})
 			},
-			checker: func(response *PaymentSetupConfirmResponse, err error) {
+			checker: func(response *PaymentSetupResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, confirmResponse.Id, response.Id)
-				assert.Equal(t, confirmResponse.Status, response.Status)
+				assert.Equal(t, confirmResponse.Reference, response.Reference)
 			},
 		},
 		{
-			name:                  "when credentials invalid then return error",
-			setupId:               setupId,
-			paymentMethodOptionId: paymentMethodOptionId,
+			name:              "when credentials invalid then return error",
+			setupId:           setupId,
+			paymentMethodName: paymentMethodName,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization"))
@@ -312,7 +311,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 				return *m.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 					Return(nil)
 			},
-			checker: func(response *PaymentSetupConfirmResponse, err error) {
+			checker: func(response *PaymentSetupResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAuthorizationError)
@@ -333,7 +332,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 			enableTelemetry := true
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient)
-			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodOptionId))
+			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodName))
 		})
 	}
 }

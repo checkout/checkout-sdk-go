@@ -32,6 +32,7 @@ type PaymentSetupRequest struct {
 	Settings                  *PaymentSetupSettings                  `json:"settings,omitempty"`
 	Customer                  *PaymentSetupCustomer                  `json:"customer,omitempty"`
 	Order                     *PaymentSetupOrder                     `json:"order,omitempty"`
+	Billing                   *PaymentSetupBilling                   `json:"billing,omitempty"`
 	Industry                  *PaymentSetupIndustry                  `json:"industry,omitempty"`
 	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 	BillingDescriptor         *PaymentSetupBillingDescriptor         `json:"billing_descriptor,omitempty"`
@@ -53,12 +54,18 @@ type PaymentSetupResponse struct {
 	Settings                  *PaymentSetupSettings                  `json:"settings,omitempty"`
 	Customer                  *PaymentSetupCustomer                  `json:"customer,omitempty"`
 	Order                     *PaymentSetupOrder                     `json:"order,omitempty"`
+	Billing                   *PaymentSetupBilling                   `json:"billing,omitempty"`
 	Industry                  *PaymentSetupIndustry                  `json:"industry,omitempty"`
 	AccountFundingTransaction *PaymentSetupAccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 	BillingDescriptor         *PaymentSetupBillingDescriptor         `json:"billing_descriptor,omitempty"`
 	PresentmentDetails        *PaymentSetupPresentmentDetails        `json:"presentment_details,omitempty"`
 	Terminal                  *PaymentSetupTerminal                  `json:"terminal,omitempty"`
 	LatestPayment             map[string]interface{}                 `json:"latest_payment,omitempty"`
+}
+
+// PaymentSetupBilling is the billing details for the payment.
+type PaymentSetupBilling struct {
+	Address *common.Address `json:"address,omitempty"`
 }
 
 // PaymentSetupBillingDescriptor is the billing descriptor for the payment.

@@ -69,7 +69,7 @@ func (c *Client) CreateSecretWithContext(ctx context.Context, request CreateSecr
 	}
 
 	var response SingleSecretResponse
-	err = c.apiClient.PostWithContext(ctx, common.BuildPath(forward, secrets), auth, request, &response, nil)
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(secrets), auth, request, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) ListSecretsWithContext(ctx context.Context) (*ListSecretsRespon
 	}
 
 	var response ListSecretsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(forward, secrets), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(secrets), auth, &response)
 	if err != nil {
 		return nil, err
 	}

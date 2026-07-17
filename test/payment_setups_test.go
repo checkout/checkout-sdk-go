@@ -186,7 +186,7 @@ func TestGetPaymentSetup(t *testing.T) {
 }
 
 func TestConfirmPaymentSetup(t *testing.T) {
-	t.Skip("Confirmation requires a valid payment method option ID from a real setup")
+	t.Skip("Confirmation requires a valid payment method name from a real setup")
 
 	// First create a payment setup
 	createResponse, err := DefaultApi().PaymentSetups.CreatePaymentSetup(paymentSetupRequest)
@@ -194,27 +194,24 @@ func TestConfirmPaymentSetup(t *testing.T) {
 	assert.NotNil(t, createResponse)
 	setupId := createResponse.Id
 
-	// Get a valid payment method option ID from the setup (would need real API response)
-	paymentMethodOptionId := "pmo_real_option_id"
+	// The name of the payment method to process the payment with (for example, tabby, klarna, card)
+	paymentMethodName := "card"
 
 	cases := []struct {
-		name                  string
-		setupId               string
-		paymentMethodOptionId string
-		checker               func(response *setups.PaymentSetupConfirmResponse, err error)
+		name              string
+		setupId           string
+		paymentMethodName string
+		checker           func(response *setups.PaymentSetupResponse, err error)
 	}{
 		{
-			name:                  "when setup id and option id are valid then confirm payment setup",
-			setupId:               setupId,
-			paymentMethodOptionId: paymentMethodOptionId,
-			checker: func(response *setups.PaymentSetupConfirmResponse, err error) {
+			name:              "when setup id and payment method name are valid then confirm payment setup",
+			setupId:           setupId,
+			paymentMethodName: paymentMethodName,
+			checker: func(response *setups.PaymentSetupResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, 200, response.HttpMetadata.StatusCode)
 				assert.Equal(t, setupId, response.Id)
-				assert.NotEmpty(t, response.ActionId)
-				assert.NotNil(t, response.Status)
-				assert.NotNil(t, response.Source)
 			},
 		},
 	}
@@ -223,7 +220,7 @@ func TestConfirmPaymentSetup(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodOptionId))
+			tc.checker(client.ConfirmPaymentSetup(tc.setupId, tc.paymentMethodName))
 		})
 	}
 }
@@ -251,9 +248,9 @@ func TestPaymentSetupFullWorkflow(t *testing.T) {
 	assert.NotNil(t, updateResponse)
 	assert.Equal(t, updatePaymentSetupRequest.Amount, updateResponse.Amount)
 
-	// 4. Confirm payment setup (requires real payment method option)
-	paymentMethodOptionId := "pmo_real_option_from_previous_steps"
-	confirmResponse, err := client.ConfirmPaymentSetup(setupId, paymentMethodOptionId)
+	// 4. Confirm payment setup (requires a real payment method name)
+	paymentMethodName := "card"
+	confirmResponse, err := client.ConfirmPaymentSetup(setupId, paymentMethodName)
 	assert.Nil(t, err)
 	assert.NotNil(t, confirmResponse)
 }

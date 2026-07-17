@@ -99,23 +99,24 @@ func (c *Client) GetPaymentSetupWithContext(ctx context.Context, setupId string)
 }
 
 // ConfirmPaymentSetup confirms a Payment Setup to begin processing the
-// payment request with your chosen payment method option.
+// payment request with your chosen payment method.
 // Beta
 //
 // Confirm a Payment Setup to begin processing the payment request with your
-// chosen payment method option.
-func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodOptionId string) (*PaymentSetupConfirmResponse, error) {
-	return c.ConfirmPaymentSetupWithContext(context.Background(), setupId, paymentMethodOptionId)
+// chosen payment method. paymentMethodName is the name of the payment method
+// to process the payment with (for example, tabby, klarna, card).
+func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodName string) (*PaymentSetupResponse, error) {
+	return c.ConfirmPaymentSetupWithContext(context.Background(), setupId, paymentMethodName)
 }
 
-func (c *Client) ConfirmPaymentSetupWithContext(ctx context.Context, setupId string, paymentMethodOptionId string) (*PaymentSetupConfirmResponse, error) {
+func (c *Client) ConfirmPaymentSetupWithContext(ctx context.Context, setupId string, paymentMethodName string) (*PaymentSetupResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
-	var response PaymentSetupConfirmResponse
-	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSetupsPath, setupId, ConfirmPath, paymentMethodOptionId), auth, nil, &response, nil)
+	var response PaymentSetupResponse
+	err = c.apiClient.PostWithContext(ctx, common.BuildPath(PaymentSetupsPath, setupId, ConfirmPath, paymentMethodName), auth, nil, &response, nil)
 	if err != nil {
 		return nil, err
 	}

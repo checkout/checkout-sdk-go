@@ -19,6 +19,7 @@ import (
 //   - partner_response_code
 //   - fallback_source_used
 //   - scheme_transaction_link_id (Mastercard Transaction Link Identifier)
+//   - recommendation_code (Mastercard/Visa recommendation code)
 func TestProcessingData_UnmarshalAllNewFields(t *testing.T) {
 	payload := `{
 		"scheme":"ACCEL",
@@ -29,6 +30,7 @@ func TestProcessingData_UnmarshalAllNewFields(t *testing.T) {
 		"partner_response_code":"DECLINED",
 		"fallback_source_used":true,
 		"scheme_transaction_link_id":"MTL-XYZ-789",
+		"recommendation_code":"02",
 		"accommodation_data":[{"name":"Grand Hotel"}],
 		"airline_data":[{"ticket":{"number":"045-21351455613"}}]
 	}`
@@ -45,6 +47,7 @@ func TestProcessingData_UnmarshalAllNewFields(t *testing.T) {
 	assert.Equal(t, "DECLINED", data.PartnerResponseCode)
 	assert.True(t, data.FallbackSourceUsed)
 	assert.Equal(t, "MTL-XYZ-789", data.SchemeTransactionLinkId)
+	assert.Equal(t, "02", data.RecommendationCode)
 
 	assert.Len(t, data.AccommodationData, 1)
 	assert.Equal(t, "Grand Hotel", data.AccommodationData[0].Name)
@@ -72,6 +75,7 @@ func TestProcessingData_LeavesNewFieldsZeroWhenAbsent(t *testing.T) {
 	assert.Empty(t, data.PartnerResponseCode)
 	assert.False(t, data.FallbackSourceUsed)
 	assert.Empty(t, data.SchemeTransactionLinkId)
+	assert.Empty(t, data.RecommendationCode)
 	assert.Nil(t, data.AccommodationData)
 	assert.Nil(t, data.AirlineData)
 }

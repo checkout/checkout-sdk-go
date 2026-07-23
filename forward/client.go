@@ -107,7 +107,7 @@ func (c *Client) UpdateSecretWithContext(ctx context.Context, name string, reque
 	}
 
 	var response SingleSecretResponse
-	err = c.apiClient.PatchWithContext(ctx, common.BuildPath(forward, secrets, name), auth, request, &response)
+	err = c.apiClient.PatchWithContext(ctx, common.BuildPath(secrets, name), auth, request, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *Client) DeleteSecretWithContext(ctx context.Context, name string) (*com
 	}
 
 	var response common.MetadataResponse
-	err = c.apiClient.DeleteWithContext(ctx, common.BuildPath(forward, secrets, name), auth, &response)
+	err = c.apiClient.DeleteWithContext(ctx, common.BuildPath(secrets, name), auth, &response)
 	if err != nil {
 		return nil, err
 	}

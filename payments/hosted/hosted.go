@@ -48,7 +48,7 @@ type (
 		FailureUrl  string                       `json:"failure_url,omitempty"`
 		Amount      int                          `json:"amount,omitempty"`
 		PaymentType payments.PaymentType         `json:"payment_type,omitempty,omitempty"`
-		// Deprecated: Use customer.email instead.
+		// Deprecated: Use risk.device.network.ipv4 or risk.device.network.ipv6 instead.
 		PaymentIp                  string                                   `json:"payment_ip,omitempty"`
 		BillingDescriptor          *payments.BillingDescriptor              `json:"billing_descriptor,omitempty"`
 		Reference                  string                                   `json:"reference,omitempty"`

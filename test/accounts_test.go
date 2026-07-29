@@ -258,11 +258,10 @@ func TestCreateEntityV2(t *testing.T) {
 }
 
 func TestCreateEntityV3(t *testing.T) {
-	// Skipped: a live v3.0 onboarding returns a bare 500 unless the OAuth client's merchant is
-	// provisioned for schema 3.0 (accounts-scoped client + platform currency-scope). Test-wiring/
-	// environment prerequisite
-	t.Skip("Schema 3.0 onboarding pending sandbox account currency-scope confirmation")
-
+	// v3.0 onboards a sub-entity as a company whose single representative carries a nested individual
+	// + roles. Runs through the accounts-scoped OAuth client (buildAccountsClient) — the one provisioned
+	// for v3.0 onboarding (the general client returns a bare 500). Profile currencies use the platform
+	// scope (USD) while processing_details reflects the sub-entity region (GBP).
 	cases := []struct {
 		name    string
 		request accounts.OnboardEntityRequest
@@ -272,76 +271,61 @@ func TestCreateEntityV3(t *testing.T) {
 			name: "when request is valid then create entity V3",
 			request: accounts.OnboardEntityRequest{
 				Reference: GenerateRandomReference(),
+				ContactDetails: &accounts.ContactDetails{
+					Phone: &accounts.Phone{CountryCode: common.GB, Number: "2345678910"},
+					EntityEmailAddresses: &accounts.EntityEmailAddresses{
+						Primary: GenerateRandomEmail(),
+					},
+				},
+				Profile: &accounts.Profile{
+					Urls:                   []string{"https://www.superheroexample.com"},
+					Mccs:                   []string{"0742"},
+					DefaultHoldingCurrency: common.USD,
+					HoldingCurrencies:      []common.Currency{common.USD},
+				},
 				Company: &accounts.Company{
-					LegalName:                  "Company " + GenerateRandomString(3),
-					TradingName:                "Trading " + GenerateRandomString(3),
-					BusinessRegistrationNumber: GenerateRandomBusinessRegistrationNumber(),
-					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 1, Year: 2001},
+					BusinessRegistrationNumber: "01234567",
+					BusinessType:               accounts.LimitedCompany,
+					LegalName:                  "Super Hero Masks Inc.",
+					TradingName:                "Super Hero Masks",
+					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 6, Year: 2010},
 					PrincipalAddress:           Address(),
 					RegisteredAddress:          Address(),
 					Representatives: []accounts.Representative{
 						{
-							Company: &accounts.Company{
-								LegalName:         "Company " + GenerateRandomString(3),
-								TradingName:       "Trading " + GenerateRandomString(3),
-								RegisteredAddress: Address(),
-							},
-							OwnershipPercentage: 100,
-						},
-						{
 							Individual: &accounts.Individual{
-								FirstName:    "FirstName " + GenerateRandomString(3),
-								LastName:     "LastName " + GenerateRandomString(3),
-								DateOfBirth:  &accounts.DateOfBirth{Day: 1, Month: 1, Year: 1980},
+								FirstName:    "John",
+								LastName:     "Doe",
+								DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
 								PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
 								Address:      Address(),
-								EmailAddress: GenerateRandomEmail(),
 							},
-							Roles: []accounts.EntityRoles{accounts.AuthorisedSignatoryERStringType, accounts.DirectorERStringType},
-							Documents: &accounts.OnboardSubEntityDocuments{
-								IdentityVerification: &accounts.IdentityVerification{
-									Type:  accounts.PassportIVStringType,
-									Front: "file_bonwzndueqrlwvv3kfcokug5iu",
-								},
+							Roles: []accounts.EntityRoles{
+								accounts.UboERStringType,
+								accounts.AuthorisedSignatoryERStringType,
+								accounts.DirectorERStringType,
+								accounts.ControlPersonERStringType,
 							},
 						},
-					},
-					BusinessType: accounts.PublicLimitedCompany,
-				},
-				Profile: &accounts.Profile{
-					Urls:                   []string{"http://example.com"},
-					Mccs:                   []string{"4814"},
-					DefaultHoldingCurrency: common.GBP,
-					HoldingCurrencies:      []common.Currency{common.GBP},
-				},
-				ContactDetails: &accounts.ContactDetails{
-					Phone: &accounts.Phone{CountryCode: common.GB, Number: GenerateRandomDigits(9)},
-					EntityEmailAddresses: &accounts.EntityEmailAddresses{
-						Primary: GenerateRandomEmail(),
-					},
-					Invitee: &accounts.Invitee{
-						Email: GenerateRandomEmail(),
-					},
-				},
-				Documents: &accounts.OnboardSubEntityDocuments{
-					ArticlesOfAssociation: &accounts.ArticlesOfAssociation{
-						Type:  accounts.ArticlesOfAssociationAOSStringType,
-						Front: "file_aacb27em7gmj6e7dhxabazucqi",
-					},
-					ShareholderStructure: &accounts.ShareholderStructure{
-						Type:  accounts.CertifiedShareholderStructureSHSStringType,
-						Front: "file_bpme2tii3lsgshx4ghj3i4672q",
 					},
 				},
 				ProcessingDetails: &accounts.ProcessingDetails{
-					SettlementCountry:       "GB",
-					TargetCountries:         []string{"GB"},
-					AnnualProcessingVolume:  0,
-					AverageTransactionValue: 0,
-					HighestTransactionValue: 0,
-					Currency:                common.GBP,
+					AnnualProcessingVolume:      1000000,
+					AverageTransactionValue:     5000,
+					AverageOrderFulfillmentTime: 3,
+					HighestTransactionValue:     25000,
+					Currency:                    common.GBP,
+					SettlementCountry:           "GB",
+					TargetCountries:             []string{"GB"},
+					Payments: &accounts.ProcessingDetailsPayments{
+						Ach: &accounts.ProcessingDetailsAch{
+							AnnualAchVolume:              1000000,
+							AverageAchTransactionSize:    5000,
+							EstimatedMonthlyCreditVolume: 100000,
+							AverageCreditAmount:          5000,
+						},
+					},
 				},
-				IsDraft: false,
 			},
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
@@ -352,7 +336,7 @@ func TestCreateEntityV3(t *testing.T) {
 		},
 	}
 
-	client := buildAccountsClientVersion("3.0").Accounts
+	client := buildAccountsClient().Accounts
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

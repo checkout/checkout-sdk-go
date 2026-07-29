@@ -256,7 +256,6 @@ func TestCreateEntityV2(t *testing.T) {
 }
 
 func TestCreateEntityV3(t *testing.T) {
-	t.Skip("Temporarily disabled")
 	cases := []struct {
 		name    string
 		request accounts.OnboardEntityRequest

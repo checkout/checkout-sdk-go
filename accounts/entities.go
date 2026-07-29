@@ -263,8 +263,11 @@ type (
 		Representatives            []Representative        `json:"representatives,omitempty"`
 		FinancialDetails           *EntityFinancialDetails `json:"financial_details,omitempty"`
 		DateOfIncorporation        *DateOfIncorporation    `json:"date_of_incorporation,omitempty"`
-		RegulatoryLicenseNumber    string                  `json:"regulatory_license_number,omitempty"`
-		RegulatoryLicenceNumber    string                  `json:"regulatory_licence_number,omitempty"`
+
+		// Deprecated: not part of the Accounts API schema (US spelling serializes to the non-existent
+		// "regulatory_license_number" key). Use RegulatoryLicenceNumber ("regulatory_licence_number").
+		RegulatoryLicenseNumber string `json:"regulatory_license_number,omitempty"`
+		RegulatoryLicenceNumber string `json:"regulatory_licence_number,omitempty"`
 	}
 
 	EntityDocument struct {

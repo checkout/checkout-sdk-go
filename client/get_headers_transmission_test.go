@@ -2,7 +2,7 @@ package client
 
 import (
 	"context"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,7 +26,7 @@ func TestGetWithContext_TransmitsHeadersWithoutBody(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotMethod = r.Method
 		gotAccept = r.Header.Get("Accept")
-		body, _ := io.ReadAll(r.Body)
+		body, _ := ioutil.ReadAll(r.Body)
 		gotBodyLen = len(body)
 		jsonOK(w)
 	}))
@@ -52,7 +52,7 @@ func TestGetWithContext_NilRequestKeepsDefaultAcceptAndNoBody(t *testing.T) {
 	var gotBodyLen int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotAccept = r.Header.Get("Accept")
-		body, _ := io.ReadAll(r.Body)
+		body, _ := ioutil.ReadAll(r.Body)
 		gotBodyLen = len(body)
 		jsonOK(w)
 	}))

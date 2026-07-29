@@ -62,6 +62,29 @@ const (
 	IddvAttemptTerminated              IdDocumentVerificationAttemptStatus = "terminated"
 )
 
+type AddressDocumentVerificationStatus string
+
+const (
+	AdvCreated                 AddressDocumentVerificationStatus = "created"
+	AdvQualityChecksInProgress AddressDocumentVerificationStatus = "quality_checks_in_progress"
+	AdvChecksInProgress        AddressDocumentVerificationStatus = "checks_in_progress"
+	AdvApproved                AddressDocumentVerificationStatus = "approved"
+	AdvDeclined                AddressDocumentVerificationStatus = "declined"
+	AdvRetryRequired           AddressDocumentVerificationStatus = "retry_required"
+	AdvInconclusive            AddressDocumentVerificationStatus = "inconclusive"
+)
+
+type AddressDocumentVerificationAttemptStatus string
+
+const (
+	AdvAttemptChecksInProgress        AddressDocumentVerificationAttemptStatus = "checks_in_progress"
+	AdvAttemptChecksInconclusive      AddressDocumentVerificationAttemptStatus = "checks_inconclusive"
+	AdvAttemptCompleted               AddressDocumentVerificationAttemptStatus = "completed"
+	AdvAttemptQualityChecksAborted    AddressDocumentVerificationAttemptStatus = "quality_checks_aborted"
+	AdvAttemptQualityChecksInProgress AddressDocumentVerificationAttemptStatus = "quality_checks_in_progress"
+	AdvAttemptTerminated              AddressDocumentVerificationAttemptStatus = "terminated"
+)
+
 type IdentityVerificationStatus string
 
 const (

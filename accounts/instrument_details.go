@@ -86,6 +86,7 @@ type (
 
 type Headers struct {
 	IfMatch string `json:"if-match,omitempty"`
+	Accept  string `json:"Accept,omitempty"`
 }
 
 func (s *InstrumentDetailsFasterPayments) GetType() string {

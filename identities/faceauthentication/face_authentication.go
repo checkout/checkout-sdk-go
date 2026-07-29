@@ -15,12 +15,12 @@ const (
 )
 
 type CreateFaceAuthenticationRequest struct {
-	ApplicantId  string `json:"applicant_id"`
+	ApplicantId   string `json:"applicant_id"`
 	UserJourneyId string `json:"user_journey_id"`
 }
 
 type CreateFaceAuthenticationAttemptRequest struct {
-	RedirectUrl       string                      `json:"redirect_url"`
+	RedirectUrl       string                        `json:"redirect_url"`
 	ClientInformation *identities.ClientInformation `json:"client_information,omitempty"`
 }
 
@@ -52,10 +52,10 @@ type FaceAuthenticationAttemptResponse struct {
 
 type FaceAuthenticationAttemptsResponse struct {
 	HttpMetadata common.HttpMetadata
-	TotalCount   int                                  `json:"total_count,omitempty"`
-	Skip         int                                  `json:"skip,omitempty"`
-	Limit        int                                  `json:"limit,omitempty"`
-	Data         []FaceAuthenticationAttemptResponse  `json:"data,omitempty"`
+	TotalCount   int                                 `json:"total_count,omitempty"`
+	Skip         int                                 `json:"skip,omitempty"`
+	Limit        int                                 `json:"limit,omitempty"`
+	Data         []FaceAuthenticationAttemptResponse `json:"data,omitempty"`
 }
 
 type FaceAuthenticationAttemptAsset struct {

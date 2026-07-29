@@ -55,7 +55,7 @@ func TestContextCancellation(t *testing.T) {
 	cancel() // cancel before performing the request
 
 	var resp common.IdResponse
-	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+	err := client.GetWithContext(ctx, "/test", testAuth(), nil, &resp)
 
 	assert.NotNil(t, err)
 	assert.True(t, errors.Is(err, context.Canceled),
@@ -77,7 +77,7 @@ func TestContextTimeout(t *testing.T) {
 
 	start := time.Now()
 	var resp common.IdResponse
-	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+	err := client.GetWithContext(ctx, "/test", testAuth(), nil, &resp)
 	elapsed := time.Since(start)
 
 	assert.NotNil(t, err)
@@ -101,7 +101,7 @@ func TestContextTimeoutSuccess(t *testing.T) {
 	defer cancel()
 
 	var resp common.IdResponse
-	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+	err := client.GetWithContext(ctx, "/test", testAuth(), nil, &resp)
 
 	assert.Nil(t, err)
 	assert.Equal(t, http.StatusOK, resp.HttpMetadata.StatusCode)
@@ -126,7 +126,7 @@ func TestContextPropagation(t *testing.T) {
 	ctx := context.WithValue(context.Background(), key, "abc-123")
 
 	var resp common.IdResponse
-	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+	err := client.GetWithContext(ctx, "/test", testAuth(), nil, &resp)
 
 	assert.Nil(t, err)
 	assert.True(t, contextReachedServer,
@@ -147,7 +147,7 @@ func TestDefaultMethodUsesBackgroundContext(t *testing.T) {
 	client := newTestClient(server.URL)
 
 	var resp common.IdResponse
-	err := client.Get("/test", testAuth(), &resp)
+	err := client.Get("/test", testAuth(), nil, &resp)
 
 	assert.Nil(t, err)
 	assert.True(t, requestReceived, "Request should succeed with implicit context.Background()")
@@ -182,7 +182,7 @@ func TestConcurrentRequestsWithDifferentContexts(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
 		defer cancel()
 		var r common.IdResponse
-		err := client.GetWithContext(ctx, "/test?delay=long", testAuth(), &r)
+		err := client.GetWithContext(ctx, "/test?delay=long", testAuth(), nil, &r)
 		done <- result{err: err, resp: r}
 	}()
 
@@ -191,7 +191,7 @@ func TestConcurrentRequestsWithDifferentContexts(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 		var r common.IdResponse
-		err := client.GetWithContext(ctx, "/test?delay=short", testAuth(), &r)
+		err := client.GetWithContext(ctx, "/test?delay=short", testAuth(), nil, &r)
 		done <- result{err: err, resp: r}
 	}()
 
@@ -290,7 +290,7 @@ func TestContextDeadline(t *testing.T) {
 	defer cancel()
 
 	var resp common.IdResponse
-	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+	err := client.GetWithContext(ctx, "/test", testAuth(), nil, &resp)
 
 	assert.NotNil(t, err)
 	assert.True(t, errors.Is(err, context.DeadlineExceeded),
@@ -428,7 +428,7 @@ func TestFullRequestContextFlow(t *testing.T) {
 	defer cancel()
 
 	var resp common.MetadataResponse
-	err := client.GetWithContext(ctx, "/test", testAuth(), &resp)
+	err := client.GetWithContext(ctx, "/test", testAuth(), nil, &resp)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, callCount)

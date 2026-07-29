@@ -135,8 +135,9 @@ func (c *Client) ListAvailableRequirementsWithContext(
 		ctx,
 		common.BuildPath(simulatePath, requirementsDuePath),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -161,8 +162,9 @@ func (c *Client) ListScenariosWithContext(
 		ctx,
 		common.BuildPath(simulatePath, scenariosPath),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

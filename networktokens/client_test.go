@@ -213,8 +213,8 @@ func TestGetNetworkToken(t *testing.T) {
 
 func TestRequestCryptogram(t *testing.T) {
 	var (
-		networkTokenId      = "nt_xgu3isllqfyu7ktpk5z2yxbwna"
-		cryptogramResponse  = RequestCryptogramResponse{
+		networkTokenId     = "nt_xgu3isllqfyu7ktpk5z2yxbwna"
+		cryptogramResponse = RequestCryptogramResponse{
 			Cryptogram: "AhJ3hnYAoAbVz5zg1e17MAACAAA=",
 			Eci:        "7",
 		}

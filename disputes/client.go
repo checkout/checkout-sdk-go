@@ -35,7 +35,7 @@ func (c *Client) QueryWithContext(ctx context.Context, queryFilter QueryFilter) 
 	}
 
 	var response QueryResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Client) GetDisputeDetailsWithContext(ctx context.Context, disputeId str
 	}
 
 	var response DisputeResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (c *Client) GetEvidenceWithContext(ctx context.Context, disputeId string) (
 	}
 
 	var response EvidenceResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +170,7 @@ func (c *Client) GetCompiledSubmittedEvidenceWithContext(ctx context.Context, di
 	}
 
 	var response DisputeCompiledSubmittedEvidenceResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence, submitted), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence, submitted), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (c *Client) GetFileDetailsWithContext(ctx context.Context, fileId string) (
 	}
 
 	var response common.FileResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(files, fileId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(files, fileId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +258,7 @@ func (c *Client) GetSubmittedArbitrationEvidenceWithContext(ctx context.Context,
 	}
 
 	var response DisputeCompiledSubmittedEvidenceResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence, arbitration, submitted), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, evidence, arbitration, submitted), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +277,7 @@ func (c *Client) GetDisputeSchemeFilesWithContext(ctx context.Context, disputeId
 	}
 
 	var response SchemeFilesResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, schemeFiles), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(disputes, disputeId, schemeFiles), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

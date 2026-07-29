@@ -110,11 +110,11 @@ type (
 	}
 
 	TransactionAmounts struct {
-		TotalHeld      *TransactionAmountDetail `json:"total_held,omitempty"`
+		TotalHeld       *TransactionAmountDetail `json:"total_held,omitempty"`
 		TotalAuthorized *TransactionAmountDetail `json:"total_authorized,omitempty"`
-		TotalReversed  *TransactionAmountDetail `json:"total_reversed,omitempty"`
-		TotalCleared   *TransactionAmountDetail `json:"total_cleared,omitempty"`
-		TotalRefunded  *TransactionAmountDetail `json:"total_refunded,omitempty"`
+		TotalReversed   *TransactionAmountDetail `json:"total_reversed,omitempty"`
+		TotalCleared    *TransactionAmountDetail `json:"total_cleared,omitempty"`
+		TotalRefunded   *TransactionAmountDetail `json:"total_refunded,omitempty"`
 	}
 
 	TransactionReferenceTransaction struct {
@@ -123,35 +123,35 @@ type (
 	}
 
 	TransactionMessage struct {
-		Id             string          `json:"id,omitempty"`
-		Initiator      string          `json:"initiator,omitempty"`
-		Type           string          `json:"type,omitempty"`
-		Result         string          `json:"result,omitempty"`
-		IsRelayed      *bool           `json:"is_relayed,omitempty"`
-		Indicator      string          `json:"indicator,omitempty"`
+		Id                string          `json:"id,omitempty"`
+		Initiator         string          `json:"initiator,omitempty"`
+		Type              string          `json:"type,omitempty"`
+		Result            string          `json:"result,omitempty"`
+		IsRelayed         *bool           `json:"is_relayed,omitempty"`
+		Indicator         string          `json:"indicator,omitempty"`
 		DeclineReason     string          `json:"decline_reason,omitempty"`
 		AuthorizationCode string          `json:"authorization_code,omitempty"`
 		BillingAmount     *int64          `json:"billing_amount,omitempty"`
-		BillingCurrency common.Currency `json:"billing_currency,omitempty"`
-		CreatedOn      *time.Time      `json:"created_on,omitempty"`
+		BillingCurrency   common.Currency `json:"billing_currency,omitempty"`
+		CreatedOn         *time.Time      `json:"created_on,omitempty"`
 	}
 
 	TransactionResponse struct {
 		HttpMetadata         common.HttpMetadata
-		Id                   string                            `json:"id,omitempty"`
-		CreatedOn            *time.Time                        `json:"created_on,omitempty"`
-		Status               TransactionStatusType             `json:"status,omitempty"`
-		TransactionType      TransactionType                   `json:"transaction_type,omitempty"`
-		Client               *TransactionClient                `json:"client,omitempty"`
-		Entity               *TransactionEntity                `json:"entity,omitempty"`
-		Card                 *TransactionCard                  `json:"card,omitempty"`
-		DigitalCard          *TransactionDigitalCard           `json:"digital_card,omitempty"`
-		Cardholder           *TransactionCardholder            `json:"cardholder,omitempty"`
-		Amounts              *TransactionAmounts               `json:"amounts,omitempty"`
-		Merchant             *TransactionMerchant              `json:"merchant,omitempty"`
-		ReferenceTransaction *TransactionReferenceTransaction  `json:"reference_transaction,omitempty"`
-		Messages             []TransactionMessage              `json:"messages,omitempty"`
-		Links                map[string]common.Link            `json:"_links,omitempty"`
+		Id                   string                           `json:"id,omitempty"`
+		CreatedOn            *time.Time                       `json:"created_on,omitempty"`
+		Status               TransactionStatusType            `json:"status,omitempty"`
+		TransactionType      TransactionType                  `json:"transaction_type,omitempty"`
+		Client               *TransactionClient               `json:"client,omitempty"`
+		Entity               *TransactionEntity               `json:"entity,omitempty"`
+		Card                 *TransactionCard                 `json:"card,omitempty"`
+		DigitalCard          *TransactionDigitalCard          `json:"digital_card,omitempty"`
+		Cardholder           *TransactionCardholder           `json:"cardholder,omitempty"`
+		Amounts              *TransactionAmounts              `json:"amounts,omitempty"`
+		Merchant             *TransactionMerchant             `json:"merchant,omitempty"`
+		ReferenceTransaction *TransactionReferenceTransaction `json:"reference_transaction,omitempty"`
+		Messages             []TransactionMessage             `json:"messages,omitempty"`
+		Links                map[string]common.Link           `json:"_links,omitempty"`
 	}
 
 	TransactionsListResponse struct {

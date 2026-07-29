@@ -76,10 +76,10 @@ type IdentityVerificationAttemptResponse struct {
 
 type IdentityVerificationAttemptsResponse struct {
 	HttpMetadata common.HttpMetadata
-	TotalCount   int                                    `json:"total_count,omitempty"`
-	Skip         int                                    `json:"skip,omitempty"`
-	Limit        int                                    `json:"limit,omitempty"`
-	Data         []IdentityVerificationAttemptResponse  `json:"data,omitempty"`
+	TotalCount   int                                   `json:"total_count,omitempty"`
+	Skip         int                                   `json:"skip,omitempty"`
+	Limit        int                                   `json:"limit,omitempty"`
+	Data         []IdentityVerificationAttemptResponse `json:"data,omitempty"`
 }
 
 type IdentityVerificationReportResponse struct {

@@ -2,6 +2,7 @@ package balances
 
 import (
 	"context"
+
 	"github.com/checkout/checkout-sdk-go/v2/client"
 	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
@@ -43,8 +44,9 @@ func (c *Client) RetrieveEntityBalancesWithContext(
 		ctx,
 		url,
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

@@ -41,8 +41,9 @@ func (c *Client) GetWorkflowsWithContext(
 		ctx,
 		common.BuildPath(WorkflowsPath),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +98,9 @@ func (c *Client) GetWorkflowWithContext(
 		ctx,
 		common.BuildPath(WorkflowsPath, workflowId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -391,8 +393,9 @@ func (c *Client) GetEventTypesWithContext(ctx context.Context) (*events.EventTyp
 		ctx,
 		common.BuildPath(WorkflowsPath, EventTypesPath),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -416,8 +419,9 @@ func (c *Client) GetEventWithContext(
 		ctx,
 		common.BuildPath(WorkflowsPath, EventsPath, eventId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -442,8 +446,9 @@ func (c *Client) GetActionInvocationsWithContext(
 		ctx,
 		common.BuildPath(WorkflowsPath, EventsPath, eventId, ActionsPath, actionId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -549,8 +554,9 @@ func (c *Client) GetSubjectEventsWithContext(
 		ctx,
 		common.BuildPath(WorkflowsPath, EventsPath, SubjectPath, subjectId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

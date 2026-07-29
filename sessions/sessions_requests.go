@@ -19,7 +19,7 @@ const (
 type Experience string
 
 const (
-	ThreeDsExperience Experience = "3ds"
+	ThreeDsExperience   Experience = "3ds"
 	GoogleSpaExperience Experience = "google_spa"
 )
 

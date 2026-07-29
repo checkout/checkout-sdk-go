@@ -49,7 +49,7 @@ func (c *Client) GetHostedPaymentsPageDetailsWithContext(ctx context.Context, ho
 	}
 
 	var response PaymentHostedDetails
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(HostedPaymentsPath, hostedPaymentId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(HostedPaymentsPath, hostedPaymentId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

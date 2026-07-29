@@ -51,7 +51,7 @@ func (c *Client) GetFaceAuthenticationWithContext(ctx context.Context, faceAuthe
 	}
 
 	var response FaceAuthenticationResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, f
 	}
 
 	var response FaceAuthenticationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, fa
 	}
 
 	var response FaceAuthenticationAttemptResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath, attemptId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath, attemptId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +151,7 @@ func (c *Client) GetFaceAuthenticationAttemptAssetsWithContext(ctx context.Conte
 	}
 
 	var response FaceAuthenticationAttemptAssetsResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

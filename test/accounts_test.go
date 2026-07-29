@@ -185,7 +185,8 @@ func TestCreateEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.CreateEntity(tc.request))
+			// v2.0 payload (top-level individual) — pin to 2.0 (SDK now defaults to 3.0)
+			tc.checker(client.CreateEntity(tc.request, "2.0"))
 		})
 	}
 }
@@ -249,7 +250,7 @@ func TestCreateEntityV2(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.CreateEntity(tc.request))
+			tc.checker(client.CreateEntity(tc.request, "2.0"))
 		})
 	}
 }
@@ -349,7 +350,7 @@ func TestCreateEntityV3(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.CreateEntity(tc.request))
+			tc.checker(client.CreateEntity(tc.request, "3.0"))
 		})
 	}
 }
@@ -385,7 +386,7 @@ func TestGetEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetEntity(tc.entityId))
+			tc.checker(client.GetEntity(tc.entityId, "2.0"))
 		})
 	}
 }
@@ -456,7 +457,7 @@ func TestUpdateEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.UpdateEntity(tc.entityId, tc.request))
+			tc.checker(client.UpdateEntity(tc.entityId, tc.request, "2.0"))
 		})
 	}
 }
@@ -983,7 +984,7 @@ func createEntity(t *testing.T, inputReference *string) string {
 		},
 	}
 
-	entity, err := buildAccountsClient().Accounts.CreateEntity(r)
+	entity, err := buildAccountsClient().Accounts.CreateEntity(r, "2.0")
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error creating entity - %s", err.Error()))
 	}
@@ -1024,7 +1025,7 @@ func createEntityCompany(t *testing.T) string {
 		},
 	}
 
-	entity, err := buildAccountsClient().Accounts.CreateEntity(r)
+	entity, err := buildAccountsClient().Accounts.CreateEntity(r, "2.0")
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error creating entity company - %s", err.Error()))
 	}
@@ -1164,7 +1165,7 @@ func createReserveRuleTestEntity(t *testing.T) string {
 		},
 	}
 
-	entity, err := buildAccountsClient().Accounts.CreateEntity(request)
+	entity, err := buildAccountsClient().Accounts.CreateEntity(request, "2.0")
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error creating reserve rule test entity - %s", err.Error()))
 	}

@@ -20,8 +20,8 @@ import (
 )
 
 type HttpClient interface {
-	Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
-	GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
+	Get(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error
+	GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error
 	Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
 	PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
 	Put(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
@@ -60,12 +60,12 @@ func NewApiClient(configuration *configuration.Configuration, baseUri string) *A
 	}
 }
 
-func (a *ApiClient) Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return a.GetWithContext(context.Background(), path, authorization, responseMapping)
+func (a *ApiClient) Get(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	return a.GetWithContext(context.Background(), path, authorization, request, responseMapping)
 }
 
-func (a *ApiClient) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return a.invoke(ctx, http.MethodGet, path, authorization, nil, responseMapping, nil)
+func (a *ApiClient) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	return a.invoke(ctx, http.MethodGet, path, authorization, request, responseMapping, nil)
 }
 
 func (a *ApiClient) Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {

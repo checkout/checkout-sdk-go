@@ -56,6 +56,18 @@ const (
 	LegalRepresentativeERStringType EntityRoles = "legal_representative"
 )
 
+type NationalIdType string
+
+const (
+	Ssn             NationalIdType = "ssn"
+	Itin            NationalIdType = "itin"
+	Passport        NationalIdType = "passport"
+	DrivingLicense  NationalIdType = "driving_license"
+	NationalIdCard  NationalIdType = "national_id_card"
+	ResidencePermit NationalIdType = "residence_permit"
+	Other           NationalIdType = "other"
+)
+
 type IdentityVerificationType string
 
 const (
@@ -97,6 +109,12 @@ type FinancialVerificationType string
 
 const (
 	FinancialStatementFVStringType FinancialVerificationType = "financial_statement"
+)
+
+type FinancialStatementsType string
+
+const (
+	FinancialStatementsFSStringType FinancialStatementsType = "financial_statements"
 )
 
 type ProofOfLegalityType string
@@ -156,6 +174,13 @@ type (
 )
 
 type (
+	Citizenship struct {
+		Type    string         `json:"type,omitempty"`
+		Country common.Country `json:"country,omitempty"`
+	}
+)
+
+type (
 	Profile struct {
 		Urls                   []string          `json:"urls,omitempty"`
 		Mccs                   []string          `json:"mccs,omitempty"`
@@ -186,12 +211,25 @@ type (
 
 type (
 	ProcessingDetails struct {
-		SettlementCountry       string          `json:"settlement_country,omitempty"`
-		TargetCountries         []string        `json:"target_countries,omitempty"`
-		AnnualProcessingVolume  int             `json:"annual_processing_volume,omitempty"`
-		AverageTransactionValue int             `json:"average_transaction_value,omitempty"`
-		HighestTransactionValue int             `json:"highest_transaction_value,omitempty"`
-		Currency                common.Currency `json:"currency,omitempty"`
+		SettlementCountry           string                     `json:"settlement_country,omitempty"`
+		TargetCountries             []string                   `json:"target_countries,omitempty"`
+		AnnualProcessingVolume      int                        `json:"annual_processing_volume,omitempty"`
+		AverageTransactionValue     int                        `json:"average_transaction_value,omitempty"`
+		AverageOrderFulfillmentTime int                        `json:"average_order_fulfillment_time,omitempty"`
+		HighestTransactionValue     int                        `json:"highest_transaction_value,omitempty"`
+		Currency                    common.Currency            `json:"currency,omitempty"`
+		Payments                    *ProcessingDetailsPayments `json:"payments,omitempty"`
+	}
+
+	ProcessingDetailsPayments struct {
+		Ach *ProcessingDetailsAch `json:"ach,omitempty"`
+	}
+
+	ProcessingDetailsAch struct {
+		AnnualAchVolume              int `json:"annual_ach_volume,omitempty"`
+		AverageAchTransactionSize    int `json:"average_ach_transaction_size,omitempty"`
+		EstimatedMonthlyCreditVolume int `json:"estimated_monthly_credit_volume,omitempty"`
+		AverageCreditAmount          int `json:"average_credit_amount,omitempty"`
 	}
 )
 
@@ -217,6 +255,8 @@ type (
 		BusinessType               BusinessType            `json:"business_type,omitempty"`
 		LegalName                  string                  `json:"legal_name,omitempty"`
 		TradingName                string                  `json:"trading_name,omitempty"`
+		AdditionalTradingNames     []string                `json:"additional_trading_names,omitempty"`
+		IsRegisteredCompany        *bool                   `json:"is_registered_company,omitempty"`
 		PrincipalAddress           *common.Address         `json:"principal_address,omitempty"`
 		RegisteredAddress          *common.Address         `json:"registered_address,omitempty"`
 		Document                   *EntityDocument         `json:"document,omitempty"`
@@ -271,6 +311,7 @@ type (
 		ProofOfResidentialAddress    *ProofOfResidentialAddress    `json:"proof_of_residential_address,omitempty"`
 		ProofOfRegistration          *ProofOfRegistration          `json:"proof_of_registration,omitempty"`
 		FinancialVerification        *FinancialVerification        `json:"financial_verification,omitempty"`
+		FinancialStatements          *FinancialStatements          `json:"financial_statements,omitempty"`
 	}
 
 	IdentityVerification struct {
@@ -338,6 +379,11 @@ type (
 		Type  FinancialVerificationType `json:"type,omitempty"`
 		Front string                    `json:"front,omitempty"`
 	}
+
+	FinancialStatements struct {
+		Type  FinancialStatementsType `json:"type,omitempty"`
+		Front string                  `json:"front,omitempty"`
+	}
 )
 
 type (
@@ -349,6 +395,8 @@ type (
 		LegalName         string                  `json:"legal_name,omitempty"`
 		NationalTaxId     string                  `json:"national_tax_id,omitempty"`
 		NationalIdNumber  string                  `json:"national_id_number,omitempty"`
+		NationalIdType    NationalIdType          `json:"national_id_type,omitempty"`
+		Citizenships      []Citizenship           `json:"citizenships,omitempty"`
 		EmailAddress      string                  `json:"email_address,omitempty"`
 		Phone             *Phone                  `json:"phone,omitempty"`
 		Address           *common.Address         `json:"address,omitempty"`
@@ -434,7 +482,16 @@ type (
 		IsDraft           bool                       `json:"is_draft,omitempty"`
 		AdditionalInfo    *AdditionalInfo            `json:"additional_info,omitempty"`
 		SellerCategory    string                     `json:"seller_category,omitempty"`
+		AgreedTerms       *AgreedTerms               `json:"agreed_terms,omitempty"`
 		Submitter         *Submitter                 `json:"submitter,omitempty"`
+	}
+
+	AgreedTerms struct {
+		Date      string `json:"date,omitempty"`
+		IpAddress string `json:"ip_address,omitempty"`
+		Name      string `json:"name,omitempty"`
+		Email     string `json:"email,omitempty"`
+		Version   string `json:"version,omitempty"`
 	}
 
 	OnboardSubEntityRequest struct {
@@ -544,7 +601,7 @@ type (
 	}
 
 	EntityRequirementListResponse struct {
-		HttpMetadata common.HttpMetadata        `json:"http_metadata,omitempty"`
+		HttpMetadata common.HttpMetadata         `json:"http_metadata,omitempty"`
 		Data         []EntityRequirementListItem `json:"data,omitempty"`
 	}
 
@@ -559,9 +616,9 @@ type (
 
 	EntityRequirementUpdateResponse struct {
 		HttpMetadata common.HttpMetadata
-		Id          string                        `json:"id,omitempty"`
-		Status      EntityRequirementUpdateStatus `json:"status,omitempty"`
-		SubmittedAt *time.Time                    `json:"submitted_at,omitempty"`
-		Links       map[string]common.Link        `json:"_links,omitempty"`
+		Id           string                        `json:"id,omitempty"`
+		Status       EntityRequirementUpdateStatus `json:"status,omitempty"`
+		SubmittedAt  *time.Time                    `json:"submitted_at,omitempty"`
+		Links        map[string]common.Link        `json:"_links,omitempty"`
 	}
 )

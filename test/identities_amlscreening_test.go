@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/v2/errors"
-	amlscreening "github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
 	"github.com/checkout/checkout-sdk-go/v2/identities"
+	amlscreening "github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
 )
 
 // # tests
@@ -30,7 +30,7 @@ func TestCreateAmlScreening(t *testing.T) {
 			},
 		},
 		{
-			name:    "when applicant not found then should return error",
+			name: "when applicant not found then should return error",
 			request: amlscreening.CreateAmlScreeningRequest{
 				ApplicantId:      "aplt_not_found",
 				SearchParameters: identities.SearchParameters{ConfigurationIdentifier: "config_test_123"},

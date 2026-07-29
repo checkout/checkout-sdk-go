@@ -49,7 +49,7 @@ func (c *Client) GetPaymentLinkWithContext(ctx context.Context, paymentLinkId st
 	}
 
 	var response PaymentLinkDetails
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(PaymentLinksPath, paymentLinkId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(PaymentLinksPath, paymentLinkId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

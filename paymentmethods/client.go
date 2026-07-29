@@ -36,7 +36,7 @@ func (c *Client) GetAvailablePaymentMethodsWithContext(ctx context.Context, quer
 	}
 
 	var response GetPaymentMethodsResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

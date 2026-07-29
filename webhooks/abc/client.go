@@ -2,6 +2,7 @@ package abc
 
 import (
 	"context"
+
 	"github.com/checkout/checkout-sdk-go/v2/client"
 	"github.com/checkout/checkout-sdk-go/v2/common"
 	"github.com/checkout/checkout-sdk-go/v2/configuration"
@@ -34,8 +35,9 @@ func (c *Client) RetrieveWebhooksWithContext(ctx context.Context) (*WebhooksResp
 		ctx,
 		common.BuildPath(webhooks),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +86,9 @@ func (c *Client) RetrieveWebhookWithContext(ctx context.Context, webhookId strin
 		ctx,
 		common.BuildPath(webhooks, webhookId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

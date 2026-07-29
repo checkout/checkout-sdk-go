@@ -17,7 +17,7 @@ import (
 
 func TestGetComplianceRequest(t *testing.T) {
 	var (
-		paymentId = "pay_fun26akvvjjerahhctaq2uzhu4"
+		paymentId       = "pay_fun26akvvjjerahhctaq2uzhu4"
 		detailsResponse = GetComplianceRequestResponse{
 			HttpMetadata:  mocks.HttpMetadataStatusOk,
 			PaymentId:     paymentId,

@@ -30,7 +30,7 @@ func (c *Client) GetInfoWithContext(ctx context.Context) (*IdealInfo, error) {
 	}
 
 	var response IdealInfo
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idealExternalPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idealExternalPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (c *Client) GetIssuersWithContext(ctx context.Context) (*IssuerResponse, er
 	}
 
 	var response IssuerResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idealExternalPath, issuersPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idealExternalPath, issuersPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

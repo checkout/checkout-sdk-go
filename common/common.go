@@ -2,6 +2,7 @@ package common
 
 import (
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -23,22 +24,60 @@ const (
 type CardType string
 
 const (
-	Charge        CardType = "Charge"
-	Credit        CardType = "Credit"
-	Debit         CardType = "Debit"
+	// Card types returned by the API on the current platform.
+	// These fields are response-only; card_type is never sent in a request.
+	CardTypeCharge        CardType = "CHARGE"
+	CardTypeCredit        CardType = "CREDIT"
+	CardTypeDebit         CardType = "DEBIT"
+	CardTypeDeferredDebit CardType = "DEFERRED DEBIT"
+	CardTypePrepaid       CardType = "PREPAID"
+
+	// CardTypeNetworkToken is returned only by the card metadata endpoint.
+	CardTypeNetworkToken CardType = "NETWORK TOKEN"
+
+	// CardTypeUnknown is returned only on card payout destinations.
+	CardTypeUnknown CardType = "UNKNOWN"
+
+	// Deprecated: Previous (ABC) platform casing. Use CardTypeCharge on the current platform.
+	Charge CardType = "Charge"
+	// Deprecated: Previous (ABC) platform casing. Use CardTypeCredit on the current platform.
+	Credit CardType = "Credit"
+	// Deprecated: Previous (ABC) platform casing. Use CardTypeDebit on the current platform.
+	Debit CardType = "Debit"
+	// Deprecated: Previous (ABC) platform casing. Use CardTypeDeferredDebit on the current platform.
 	DeferredDebit CardType = "Deferred Debit"
-	Prepaid       CardType = "Prepaid"
+	// Deprecated: Previous (ABC) platform casing. Use CardTypePrepaid on the current platform.
+	Prepaid CardType = "Prepaid"
 )
+
+// Normalized returns the card type using the current platform's uppercase spelling,
+// so a value from either platform can be compared against the CardType constants.
+func (c CardType) Normalized() CardType {
+	return CardType(strings.ToUpper(string(c)))
+}
 
 type CardCategory string
 
 const (
-	All               CardCategory = "All"
-	Commercial        CardCategory = "Commercial"
-	Consumer          CardCategory = "Consumer"
-	NotSet            CardCategory = "NotSet"
-	OtherCardCategory CardCategory = "Other"
+	// Card categories returned by the API on the current platform.
+	// These fields are response-only; card_category is never sent in a request.
+	CardCategoryConsumer   CardCategory = "CONSUMER"
+	CardCategoryCommercial CardCategory = "COMMERCIAL"
+
+	// CardCategoryUnknown is returned only on card payout destinations.
+	CardCategoryUnknown CardCategory = "UNKNOWN"
+
+	// Deprecated: Previous (ABC) platform casing. Use CardCategoryCommercial on the current platform.
+	Commercial CardCategory = "Commercial"
+	// Deprecated: Previous (ABC) platform casing. Use CardCategoryConsumer on the current platform.
+	Consumer CardCategory = "Consumer"
 )
+
+// Normalized returns the card category using the current platform's uppercase spelling,
+// so a value from either platform can be compared against the CardCategory constants.
+func (c CardCategory) Normalized() CardCategory {
+	return CardCategory(strings.ToUpper(string(c)))
+}
 
 type AccountHolderType string
 

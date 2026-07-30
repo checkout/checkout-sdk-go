@@ -15,6 +15,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/financial"
 	"github.com/checkout/checkout-sdk-go/v2/forex"
 	"github.com/checkout/checkout-sdk-go/v2/forward"
+	"github.com/checkout/checkout-sdk-go/v2/identities/addressdocumentverification"
 	"github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
 	"github.com/checkout/checkout-sdk-go/v2/identities/applicants"
 	"github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
@@ -44,40 +45,41 @@ import (
 )
 
 type Api struct {
-	Accounts                 *accounts.Client
-	Balances                 *balances.Client
-	Customers                *customers.Client
-	Disputes                 *disputes.Client
-	Financial                *financial.Client
-	Forex                    *forex.Client
-	Hosted                   *hosted.Client
-	Instruments              *instruments.Client
-	Links                    *links.Client
-	Metadata                 *metadata.Client
-	Payments                 *payments.Client
-	Sessions                 *sessions.Client
-	Tokens                   *tokens.Client
-	Transfers                *transfers.Client
-	WorkFlows                *workflows.Client
-	Reports                  *reports.Client
-	Issuing                  *issuing.Client
-	CardholderTokens         *cardholdertokens.Client
-	Contexts                 *contexts.Client
-	PaymentSessions          *payment_sessions.Client
-	PaymentSetups            *setups.Client
-	Forward                  *forward.Client
-	ApplePay                 *applepay.Client
-	GooglePay                *googlepay.Client
-	NetworkTokens            *networktokens.Client
-	StandaloneAccountUpdater *standaloneaccountupdater.Client
-	AgenticCommerce          *agenticcommerce.Client
-	ComplianceRequests       *compliancerequests.Client
-	PaymentMethods           *paymentmethods.Client
-	AmlScreening             *amlscreening.Client
-	Applicants               *applicants.Client
-	FaceAuthentication       *faceauthentication.Client
-	IdDocumentVerification   *iddocumentverification.Client
-	IdentityVerification     *identityverification.Client
+	Accounts                    *accounts.Client
+	Balances                    *balances.Client
+	Customers                   *customers.Client
+	Disputes                    *disputes.Client
+	Financial                   *financial.Client
+	Forex                       *forex.Client
+	Hosted                      *hosted.Client
+	Instruments                 *instruments.Client
+	Links                       *links.Client
+	Metadata                    *metadata.Client
+	Payments                    *payments.Client
+	Sessions                    *sessions.Client
+	Tokens                      *tokens.Client
+	Transfers                   *transfers.Client
+	WorkFlows                   *workflows.Client
+	Reports                     *reports.Client
+	Issuing                     *issuing.Client
+	CardholderTokens            *cardholdertokens.Client
+	Contexts                    *contexts.Client
+	PaymentSessions             *payment_sessions.Client
+	PaymentSetups               *setups.Client
+	Forward                     *forward.Client
+	ApplePay                    *applepay.Client
+	GooglePay                   *googlepay.Client
+	NetworkTokens               *networktokens.Client
+	StandaloneAccountUpdater    *standaloneaccountupdater.Client
+	AgenticCommerce             *agenticcommerce.Client
+	ComplianceRequests          *compliancerequests.Client
+	PaymentMethods              *paymentmethods.Client
+	AmlScreening                *amlscreening.Client
+	Applicants                  *applicants.Client
+	FaceAuthentication          *faceauthentication.Client
+	IdDocumentVerification      *iddocumentverification.Client
+	AddressDocumentVerification *addressdocumentverification.Client
+	IdentityVerification        *identityverification.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -124,6 +126,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Applicants = applicants.NewClient(configuration, identityClient)
 	api.FaceAuthentication = faceauthentication.NewClient(configuration, identityClient)
 	api.IdDocumentVerification = iddocumentverification.NewClient(configuration, identityClient)
+	api.AddressDocumentVerification = addressdocumentverification.NewClient(configuration, identityClient)
 	api.IdentityVerification = identityverification.NewClient(configuration, identityClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)

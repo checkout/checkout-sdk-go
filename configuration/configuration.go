@@ -13,6 +13,11 @@ type Configuration struct {
 	EnvironmentSubdomain *EnvironmentSubdomain
 	HttpClient           http.Client
 	Logger               StdLogger
+	// Retry is opt-in. When nil (the default) requests are executed once with
+	// no retry behaviour. When set, transient failures are retried with
+	// exponential backoff. Configure it via the builder's WithRetries or
+	// WithRetryConfiguration methods.
+	Retry *RetryConfiguration
 }
 
 func NewConfiguration(

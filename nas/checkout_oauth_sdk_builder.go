@@ -56,6 +56,16 @@ func (b *CheckoutOAuthSdkBuilder) WithLogger(logger configuration.StdLogger) *Ch
 	return b
 }
 
+func (b *CheckoutOAuthSdkBuilder) WithRetries() *CheckoutOAuthSdkBuilder {
+	b.Retry = configuration.DefaultRetryConfiguration()
+	return b
+}
+
+func (b *CheckoutOAuthSdkBuilder) WithRetryConfiguration(retry *configuration.RetryConfiguration) *CheckoutOAuthSdkBuilder {
+	b.Retry = retry
+	return b
+}
+
 func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 	if b.ClientId == "" || b.ClientSecret == "" {
 		return nil, errors.CheckoutArgumentError("Invalid OAuth 'client_id' or 'client_secret'")
@@ -84,6 +94,8 @@ func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 	if b.EnvironmentSubdomain != nil {
 		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)
 	}
+
+	newConfiguration.Retry = b.Retry
 
 	return CheckoutApi(newConfiguration), nil
 }

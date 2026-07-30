@@ -42,6 +42,7 @@ type ApiClient struct {
 	EnableTelemetry     bool
 	RequestMetricsQueue common.TelemetryQueue
 	Log                 configuration.StdLogger
+	Retry               *configuration.RetryConfiguration
 }
 
 const (
@@ -57,6 +58,7 @@ func NewApiClient(configuration *configuration.Configuration, baseUri string) *A
 		EnableTelemetry:     configuration.EnableTelemetry,
 		RequestMetricsQueue: *common.NewTelemetryQueue(),
 		Log:                 configuration.Logger,
+		Retry:               configuration.Retry,
 	}
 }
 
@@ -73,7 +75,7 @@ func (a *ApiClient) Post(path string, authorization *configuration.SdkAuthorizat
 }
 
 func (a *ApiClient) PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
-	return a.invoke(ctx, http.MethodPost, path, authorization, request, responseMapping, idempotencyKey)
+	return a.invoke(ctx, http.MethodPost, path, authorization, request, responseMapping, a.ensureIdempotencyKey(idempotencyKey))
 }
 
 func (a *ApiClient) Put(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
@@ -81,7 +83,20 @@ func (a *ApiClient) Put(path string, authorization *configuration.SdkAuthorizati
 }
 
 func (a *ApiClient) PutWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
-	return a.invoke(ctx, http.MethodPut, path, authorization, request, responseMapping, idempotencyKey)
+	return a.invoke(ctx, http.MethodPut, path, authorization, request, responseMapping, a.ensureIdempotencyKey(idempotencyKey))
+}
+
+// ensureIdempotencyKey generates a Cko-Idempotency-Key for write requests when
+// retries are enabled and the caller did not supply one, so a retried write is
+// deduplicated server-side rather than applied twice. A caller-supplied key is
+// left untouched, and when retries are disabled the historical behaviour (no
+// generated key) is preserved.
+func (a *ApiClient) ensureIdempotencyKey(idempotencyKey *string) *string {
+	if a.Retry == nil || idempotencyKey != nil {
+		return idempotencyKey
+	}
+	generated := uuid.NewString()
+	return &generated
 }
 
 func (a *ApiClient) Patch(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
@@ -332,7 +347,7 @@ func (a *ApiClient) doRequest(ctx context.Context, req *http.Request, responseMa
 			req.Header.Set(CkoTelemetryHeader, string(lastRequestMetricStr))
 		}
 		start := time.Now()
-		resp, err := a.HttpClient.Do(req)
+		resp, err := a.send(ctx, req)
 		elapsed := time.Since(start)
 		if err != nil {
 			return err
@@ -343,11 +358,51 @@ func (a *ApiClient) doRequest(ctx context.Context, req *http.Request, responseMa
 		a.RequestMetricsQueue.Enqueue(lastRequestMetric)
 		return a.handleResponse(ctx, resp, responseMapping)
 	} else {
-		resp, err := a.HttpClient.Do(req)
+		resp, err := a.send(ctx, req)
 		if err != nil {
 			return err
 		}
 
 		return a.handleResponse(ctx, resp, responseMapping)
 	}
+}
+
+// send executes req, retrying transient failures when retries are enabled. When
+// a.Retry is nil it delegates directly to the underlying client, leaving the
+// single-attempt behaviour unchanged regardless of the injected http.Client.
+func (a *ApiClient) send(ctx context.Context, req *http.Request) (*http.Response, error) {
+	if a.Retry == nil {
+		return a.HttpClient.Do(req)
+	}
+
+	for attempt := 0; ; attempt++ {
+		resp, err := a.HttpClient.Do(req)
+		if !shouldRetry(resp, err, attempt, a.Retry) {
+			return resp, err
+		}
+
+		delay := backoff(attempt, a.Retry, retryAfterDelay(resp))
+		drainAndClose(resp)
+		if sleepErr := sleep(ctx, delay); sleepErr != nil {
+			return nil, sleepErr
+		}
+		if err := resetBody(req); err != nil {
+			return resp, err
+		}
+	}
+}
+
+// resetBody restores a replayable request body for the next attempt. The stdlib
+// populates GetBody for the *bytes.Buffer bodies this client constructs, so a
+// fresh reader is available on every retry.
+func resetBody(req *http.Request) error {
+	if req.Body == nil || req.GetBody == nil {
+		return nil
+	}
+	body, err := req.GetBody()
+	if err != nil {
+		return err
+	}
+	req.Body = body
+	return nil
 }

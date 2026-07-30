@@ -50,7 +50,7 @@ func (c *Client) GetIdDocumentVerificationWithContext(ctx context.Context, verif
 	}
 
 	var response IdDocumentVerificationResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Contex
 	}
 
 	var response IdDocumentVerificationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (c *Client) GetIdDocumentVerificationAttemptWithContext(ctx context.Context
 	}
 
 	var response IdDocumentVerificationAttemptResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath, attemptId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath, attemptId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *Client) GetIdDocumentVerificationReportWithContext(ctx context.Context,
 	}
 
 	var response IdDocumentVerificationReportResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, reportPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, reportPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

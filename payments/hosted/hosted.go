@@ -41,13 +41,13 @@ type (
 
 type (
 	PaymentHostedRequest struct {
-		Currency                   common.Currency                          `json:"currency,omitempty"`
-		Billing                    *payments.BillingInformation             `json:"billing,omitempty"`
-		SuccessUrl                 string                                   `json:"success_url,omitempty"`
-		CancelUrl                  string                                   `json:"cancel_url,omitempty"`
-		FailureUrl                 string                                   `json:"failure_url,omitempty"`
-		Amount                     int                                      `json:"amount,omitempty"`
-		PaymentType                payments.PaymentType                     `json:"payment_type,omitempty,omitempty"`
+		Currency    common.Currency              `json:"currency,omitempty"`
+		Billing     *payments.BillingInformation `json:"billing,omitempty"`
+		SuccessUrl  string                       `json:"success_url,omitempty"`
+		CancelUrl   string                       `json:"cancel_url,omitempty"`
+		FailureUrl  string                       `json:"failure_url,omitempty"`
+		Amount      int                          `json:"amount,omitempty"`
+		PaymentType payments.PaymentType         `json:"payment_type,omitempty,omitempty"`
 		// Deprecated: Use customer.email instead.
 		PaymentIp                  string                                   `json:"payment_ip,omitempty"`
 		BillingDescriptor          *payments.BillingDescriptor              `json:"billing_descriptor,omitempty"`

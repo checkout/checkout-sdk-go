@@ -30,7 +30,7 @@ func (c *Client) GetMandateWithContext(ctx context.Context, mandateId string) (*
 	}
 
 	var response MandateResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(sepaMandatesPath, mandateId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(sepaMandatesPath, mandateId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (c *Client) GetMandateViaPproWithContext(ctx context.Context, mandateId str
 	}
 
 	var response MandateResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(apmsPath, pproPath, sepaMandatesPath, mandateId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

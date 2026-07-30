@@ -91,8 +91,9 @@ func (c *Client) RetrieveTransferWithContext(
 		ctx,
 		common.BuildPath(transfers, transferId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

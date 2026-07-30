@@ -50,7 +50,7 @@ func (c *Client) GetForwardRequestWithContext(ctx context.Context, forwardId str
 	}
 
 	var response GetForwardResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(forward, forwardId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(forward, forwardId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) ListSecretsWithContext(ctx context.Context) (*ListSecretsRespon
 	}
 
 	var response ListSecretsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(secrets), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(secrets), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

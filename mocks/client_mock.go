@@ -11,14 +11,21 @@ import (
 )
 
 type (
-	ApiClientMock struct{ mock.Mock }
+	ApiClientMock struct {
+		mock.Mock
+		// CapturedGetRequest records the request argument (per-request headers source) passed to the
+		// last Get/GetWithContext call. The request is intentionally not forwarded to m.Called so
+		// existing GET expectations keep their original argument shape.
+		CapturedGetRequest interface{}
+	}
 )
 
-func (m *ApiClientMock) Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return m.GetWithContext(context.Background(), path, authorization, responseMapping)
+func (m *ApiClientMock) Get(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	return m.GetWithContext(context.Background(), path, authorization, request, responseMapping)
 }
 
-func (m *ApiClientMock) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
+func (m *ApiClientMock) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	m.CapturedGetRequest = request
 	args := m.Called(ctx, path, authorization, responseMapping)
 
 	if args.Get(0) != nil {

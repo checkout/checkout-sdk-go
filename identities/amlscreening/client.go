@@ -50,7 +50,7 @@ func (c *Client) GetAmlScreeningWithContext(ctx context.Context, screeningId str
 	}
 
 	var response AmlScreeningResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(amlScreeningPath, screeningId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(amlScreeningPath, screeningId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

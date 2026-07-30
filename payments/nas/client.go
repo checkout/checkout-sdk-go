@@ -63,7 +63,7 @@ func (c *Client) RequestPaymentListWithContext(ctx context.Context, request paym
 	}
 
 	var response GetPaymentListResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Client) GetPaymentDetailsWithContext(ctx context.Context, paymentId str
 	}
 
 	var response GetPaymentResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(payments.PathPayments, paymentId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(payments.PathPayments, paymentId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +131,9 @@ func (c *Client) GetPaymentActionsWithContext(ctx context.Context, paymentId str
 		ctx,
 		common.BuildPath(payments.PathPayments, paymentId, "actions"),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

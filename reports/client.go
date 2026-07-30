@@ -36,7 +36,7 @@ func (c *Client) GetAllReportsWithContext(ctx context.Context, query QueryFilter
 	}
 
 	var response QueryResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *Client) GetReportDetailsWithContext(ctx context.Context, reportId strin
 	}
 
 	var response ReportResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (c *Client) GetReportFileWithContext(ctx context.Context, reportId, fileId 
 	}
 
 	var response common.ContentResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId, files, fileId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId, files, fileId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -74,8 +74,9 @@ func (c *Client) GetSessionDetailsWithContext(
 		ctx,
 		common.BuildPath(SessionsPath, sessionId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

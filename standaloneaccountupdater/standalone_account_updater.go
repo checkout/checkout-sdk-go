@@ -52,7 +52,7 @@ type AccountUpdaterCardDetails struct {
 
 type GetUpdatedCardCredentialsResponse struct {
 	HttpMetadata             common.HttpMetadata
-	AccountUpdateStatus      AccountUpdateStatus      `json:"account_update_status,omitempty"`
-	AccountUpdateFailureCode AccountUpdateFailureCode `json:"account_update_failure_code,omitempty"`
+	AccountUpdateStatus      AccountUpdateStatus        `json:"account_update_status,omitempty"`
+	AccountUpdateFailureCode AccountUpdateFailureCode   `json:"account_update_failure_code,omitempty"`
 	Card                     *AccountUpdaterCardDetails `json:"card,omitempty"`
 }

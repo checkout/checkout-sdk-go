@@ -134,7 +134,7 @@ func TestCreateEntity(t *testing.T) {
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient, filesClient)
 
-			tc.checker(client.CreateEntity(tc.request))
+			tc.checker(client.CreateEntity(tc.request, DefaultSchemaVersion))
 		})
 	}
 }
@@ -463,7 +463,7 @@ func TestGetEntity(t *testing.T) {
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient, filesClient)
 
-			tc.checker(client.GetEntity(tc.entityId))
+			tc.checker(client.GetEntity(tc.entityId, DefaultSchemaVersion))
 		})
 	}
 }
@@ -584,7 +584,7 @@ func TestUpdateEntity(t *testing.T) {
 			config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 			client := NewClient(config, apiClient, filesClient)
 
-			tc.checker(client.UpdateEntity(tc.entityId, tc.request))
+			tc.checker(client.UpdateEntity(tc.entityId, tc.request, DefaultSchemaVersion))
 		})
 	}
 }
@@ -2244,7 +2244,7 @@ func TestGetEntityRequirements(t *testing.T) {
 			filesClient := new(mocks.ApiClientMock)
 			client := NewClient(config, apiClient, filesClient)
 
-			tc.checker(client.GetEntityRequirements(tc.entityId))
+			tc.checker(client.GetEntityRequirements(tc.entityId, DefaultSchemaVersion))
 		})
 	}
 }

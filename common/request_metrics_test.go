@@ -12,8 +12,8 @@ func TestTelemetryQueue_Concurrency(t *testing.T) {
 	tq := NewTelemetryQueue()
 
 	var wg sync.WaitGroup
-	numWorkers := 20 
-	numEnqueues := 5 
+	numWorkers := 20
+	numEnqueues := 5
 
 	enqueueWorker := func(id int) {
 		defer wg.Done()

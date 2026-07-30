@@ -35,7 +35,7 @@ func (c *Client) QueryPaymentsReportWithContext(ctx context.Context, query Payme
 	}
 
 	var response PaymentReportsResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (c *Client) GetSinglePaymentReportWithContext(ctx context.Context, paymentI
 	}
 
 	var response PaymentReportsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reporting, payments, paymentId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reporting, payments, paymentId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (c *Client) QueryStatementsReportWithContext(ctx context.Context, query com
 	}
 
 	var response StatementReportsResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func (c *Client) RetrieveCVSPaymentsReportWithContext(ctx context.Context, query
 	}
 
 	var response common.ContentResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +121,7 @@ func (c *Client) RetrieveCVSSingleStatementReportWithContext(ctx context.Context
 	}
 
 	var response common.ContentResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reporting, statements, statementId, payments, download), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reporting, statements, statementId, payments, download), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *Client) RetrieveCVSStatementsReportWithContext(ctx context.Context, que
 	}
 
 	var response common.ContentResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

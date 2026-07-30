@@ -40,8 +40,9 @@ func (c *Client) GetFinancialActionsWithContext(ctx context.Context, query Query
 		ctx,
 		url,
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

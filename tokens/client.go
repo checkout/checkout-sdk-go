@@ -134,7 +134,7 @@ func (c *Client) GetTokenMetadataWithContext(ctx context.Context, tokenId string
 	}
 
 	var response TokenMetadataResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(tokensPath, tokenId, "metadata"), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(tokensPath, tokenId, "metadata"), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

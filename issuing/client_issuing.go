@@ -106,8 +106,9 @@ func (c *Client) GetCardholderWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardholdersPath, cardholderId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +132,9 @@ func (c *Client) GetCardholderCardsWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardholdersPath, cardholderId, cardsPath),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +179,7 @@ func (c *Client) GetCardDetailsWithContext(ctx context.Context, cardId string) (
 	}
 
 	var response cards.CardDetailsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(issuingPath, cardsPath, cardId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(issuingPath, cardsPath, cardId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -263,8 +265,9 @@ func (c *Client) GetCardThreeDSDetailsWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardsPath, cardId, threeDSEnrollmentPath),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +325,7 @@ func (c *Client) GetCardCredentialsWithContext(
 	if err != nil {
 		return nil, err
 	}
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -462,7 +465,7 @@ func (c *Client) GetCardControlsWithContext(
 	}
 	var response controls.CardControlsQueryResponse
 	url, _ := common.BuildQueryPath(common.BuildPath(issuingPath, controlsPath), query)
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -486,8 +489,9 @@ func (c *Client) GetCardControlDetailsWithContext(
 		ctx,
 		common.BuildPath(issuingPath, controlsPath, controlId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -749,7 +753,7 @@ func (c *Client) GetControlGroupsWithContext(
 	if err != nil {
 		return nil, err
 	}
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -802,8 +806,9 @@ func (c *Client) GetControlGroupDetailsWithContext(
 		ctx,
 		common.BuildPath(issuingPath, controlsPath, controlGroupsPath, controlGroupId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -854,7 +859,7 @@ func (c *Client) GetAllControlProfilesWithContext(
 	if err != nil {
 		return nil, err
 	}
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -909,8 +914,9 @@ func (c *Client) GetControlProfileDetailsWithContext(
 		ctx,
 		common.BuildPath(issuingPath, controlsPath, controlProfilesPath, controlProfileId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -1047,8 +1053,9 @@ func (c *Client) GetDigitalCardWithContext(
 		ctx,
 		common.BuildPath(issuingPath, digitalCardsPath, digitalCardId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -1103,8 +1110,9 @@ func (c *Client) GetDisputeWithContext(
 		ctx,
 		common.BuildPath(issuingPath, disputesPath, disputeId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -1286,7 +1294,7 @@ func (c *Client) GetListTransactionsWithContext(
 	if err != nil {
 		return nil, err
 	}
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -1310,8 +1318,9 @@ func (c *Client) GetSingleTransactionWithContext(
 		ctx,
 		common.BuildPath(issuingPath, transactionsPath, transactionId),
 		auth,
-		&response,
-	)
+		nil,
+		&response)
+
 	if err != nil {
 		return nil, err
 	}

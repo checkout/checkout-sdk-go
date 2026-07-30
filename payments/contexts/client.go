@@ -50,7 +50,7 @@ func (c *Client) GetPaymentContextDetailsWithContext(ctx context.Context, paymen
 	}
 
 	var response PaymentContextDetailsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(PaymentContextsPath, paymentContextId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(PaymentContextsPath, paymentContextId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

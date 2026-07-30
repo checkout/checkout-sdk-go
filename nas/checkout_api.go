@@ -3,11 +3,6 @@ package nas
 import (
 	"github.com/checkout/checkout-sdk-go/v2/accounts"
 	"github.com/checkout/checkout-sdk-go/v2/agenticcommerce"
-	"github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
-	"github.com/checkout/checkout-sdk-go/v2/identities/applicants"
-	"github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
-	"github.com/checkout/checkout-sdk-go/v2/identities/iddocumentverification"
-	"github.com/checkout/checkout-sdk-go/v2/identities/identityverification"
 	"github.com/checkout/checkout-sdk-go/v2/apm/ideal"
 	"github.com/checkout/checkout-sdk-go/v2/apm/klarna"
 	"github.com/checkout/checkout-sdk-go/v2/apm/sepa"
@@ -20,11 +15,17 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/financial"
 	"github.com/checkout/checkout-sdk-go/v2/forex"
 	"github.com/checkout/checkout-sdk-go/v2/forward"
+	"github.com/checkout/checkout-sdk-go/v2/identities/amlscreening"
+	"github.com/checkout/checkout-sdk-go/v2/identities/applicants"
+	"github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
+	"github.com/checkout/checkout-sdk-go/v2/identities/iddocumentverification"
+	"github.com/checkout/checkout-sdk-go/v2/identities/identityverification"
 	instruments "github.com/checkout/checkout-sdk-go/v2/instruments/nas"
 	"github.com/checkout/checkout-sdk-go/v2/issuing"
 	"github.com/checkout/checkout-sdk-go/v2/issuing/cardholdertokens"
 	"github.com/checkout/checkout-sdk-go/v2/metadata"
 	"github.com/checkout/checkout-sdk-go/v2/networktokens"
+	"github.com/checkout/checkout-sdk-go/v2/onboardingsimulator"
 	"github.com/checkout/checkout-sdk-go/v2/paymentmethods"
 	"github.com/checkout/checkout-sdk-go/v2/payments/applepay"
 	"github.com/checkout/checkout-sdk-go/v2/payments/contexts"
@@ -39,33 +40,32 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/standaloneaccountupdater"
 	"github.com/checkout/checkout-sdk-go/v2/tokens"
 	"github.com/checkout/checkout-sdk-go/v2/transfers"
-	"github.com/checkout/checkout-sdk-go/v2/onboardingsimulator"
 	"github.com/checkout/checkout-sdk-go/v2/workflows"
 )
 
 type Api struct {
-	Accounts        *accounts.Client
-	Balances        *balances.Client
-	Customers       *customers.Client
-	Disputes        *disputes.Client
-	Financial       *financial.Client
-	Forex           *forex.Client
-	Hosted          *hosted.Client
-	Instruments     *instruments.Client
-	Links           *links.Client
-	Metadata        *metadata.Client
-	Payments        *payments.Client
-	Sessions        *sessions.Client
-	Tokens          *tokens.Client
-	Transfers       *transfers.Client
-	WorkFlows       *workflows.Client
-	Reports         *reports.Client
-	Issuing            *issuing.Client
-	CardholderTokens   *cardholdertokens.Client
-	Contexts        *contexts.Client
-	PaymentSessions *payment_sessions.Client
-	PaymentSetups   *setups.Client
-	Forward         *forward.Client
+	Accounts                 *accounts.Client
+	Balances                 *balances.Client
+	Customers                *customers.Client
+	Disputes                 *disputes.Client
+	Financial                *financial.Client
+	Forex                    *forex.Client
+	Hosted                   *hosted.Client
+	Instruments              *instruments.Client
+	Links                    *links.Client
+	Metadata                 *metadata.Client
+	Payments                 *payments.Client
+	Sessions                 *sessions.Client
+	Tokens                   *tokens.Client
+	Transfers                *transfers.Client
+	WorkFlows                *workflows.Client
+	Reports                  *reports.Client
+	Issuing                  *issuing.Client
+	CardholderTokens         *cardholdertokens.Client
+	Contexts                 *contexts.Client
+	PaymentSessions          *payment_sessions.Client
+	PaymentSetups            *setups.Client
+	Forward                  *forward.Client
 	ApplePay                 *applepay.Client
 	GooglePay                *googlepay.Client
 	NetworkTokens            *networktokens.Client

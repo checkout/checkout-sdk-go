@@ -20,8 +20,8 @@ import (
 )
 
 type HttpClient interface {
-	Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
-	GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error
+	Get(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error
+	GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error
 	Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
 	PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
 	Put(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error
@@ -60,12 +60,25 @@ func NewApiClient(configuration *configuration.Configuration, baseUri string) *A
 	}
 }
 
-func (a *ApiClient) Get(path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return a.GetWithContext(context.Background(), path, authorization, responseMapping)
+func (a *ApiClient) Get(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	return a.GetWithContext(context.Background(), path, authorization, request, responseMapping)
 }
 
-func (a *ApiClient) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
-	return a.invoke(ctx, http.MethodGet, path, authorization, nil, responseMapping, nil)
+func (a *ApiClient) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
+	if request != nil {
+		// request carries headers only (e.g. the Accept schema-version header); a GET must not send a body,
+		// so build it with an empty body while still resolving headers from request.
+		req, err := a.buildRequest(ctx, http.MethodGet, path, authorization, "application/json", new(bytes.Buffer), nil, request)
+		if err != nil {
+			return err
+		}
+
+		a.Log.Printf("%s: %s", http.MethodGet, path)
+		return a.doRequest(ctx, req, responseMapping)
+	}
+
+	// No per-request headers: behave exactly as before, request = nil, no body, no headers to resolve.
+	return a.invoke(ctx, http.MethodGet, path, authorization, request, responseMapping, nil)
 }
 
 func (a *ApiClient) Post(path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
@@ -136,9 +149,7 @@ func (a *ApiClient) invoke(
 	}
 
 	a.Log.Printf("%s: %s", method, path)
-
 	return a.doRequest(ctx, req, responseMapping)
-
 }
 
 func applyRequestHeaders(request interface{}, headers http.Header) {

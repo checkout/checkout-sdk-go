@@ -27,11 +27,11 @@ type (
 	}
 
 	TransactionSimulation struct {
-		Type              TransactionType   `json:"type,omitempty"`
-		Amount            int               `json:"amount,omitempty"`
-		Currency          common.Currency   `json:"currency,omitempty"`
+		Type              TransactionType     `json:"type,omitempty"`
+		Amount            int                 `json:"amount,omitempty"`
+		Currency          common.Currency     `json:"currency,omitempty"`
 		Merchant          *SimulationMerchant `json:"merchant,omitempty"`
-		AuthorizationType AuthorizationType `json:"authorization_type,omitempty"`
+		AuthorizationType AuthorizationType   `json:"authorization_type,omitempty"`
 	}
 
 	CardAuthorizationRequest struct {

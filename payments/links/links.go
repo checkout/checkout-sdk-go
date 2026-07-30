@@ -20,14 +20,14 @@ const (
 
 type (
 	PaymentInterfacesCustomerSummary struct {
-		RegistrationDate    string  `json:"registration_date,omitempty"`
-		FirstTransactionDate string `json:"first_transaction_date,omitempty"`
-		LastPaymentDate     string  `json:"last_payment_date,omitempty"`
-		TotalOrderCount     int     `json:"total_order_count,omitempty"`
-		LastPaymentAmount   float64 `json:"last_payment_amount,omitempty"`
-		IsPremiumCustomer   bool    `json:"is_premium_customer,omitempty"`
-		IsReturningCustomer bool    `json:"is_returning_customer,omitempty"`
-		LifetimeValue       float64 `json:"lifetime_value,omitempty"`
+		RegistrationDate     string  `json:"registration_date,omitempty"`
+		FirstTransactionDate string  `json:"first_transaction_date,omitempty"`
+		LastPaymentDate      string  `json:"last_payment_date,omitempty"`
+		TotalOrderCount      int     `json:"total_order_count,omitempty"`
+		LastPaymentAmount    float64 `json:"last_payment_amount,omitempty"`
+		IsPremiumCustomer    bool    `json:"is_premium_customer,omitempty"`
+		IsReturningCustomer  bool    `json:"is_returning_customer,omitempty"`
+		LifetimeValue        float64 `json:"lifetime_value,omitempty"`
 	}
 
 	PaymentLinkCustomer struct {
@@ -40,10 +40,10 @@ type (
 
 type (
 	PaymentLinkRequest struct {
-		Amount                     int                                      `json:"amount,omitempty"`
-		Currency                   common.Currency                          `json:"currency,omitempty"`
-		Billing                    *payments.BillingInformation             `json:"billing,omitempty"`
-		PaymentType                payments.PaymentType                     `json:"payment_type,omitempty,omitempty"`
+		Amount      int                          `json:"amount,omitempty"`
+		Currency    common.Currency              `json:"currency,omitempty"`
+		Billing     *payments.BillingInformation `json:"billing,omitempty"`
+		PaymentType payments.PaymentType         `json:"payment_type,omitempty,omitempty"`
 		// Deprecated: Use customer.email instead.
 		PaymentIp                  string                                   `json:"payment_ip,omitempty"`
 		BillingDescriptor          *payments.BillingDescriptor              `json:"billing_descriptor,omitempty"`

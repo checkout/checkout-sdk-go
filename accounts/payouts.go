@@ -82,10 +82,10 @@ func (s scheduleFrequencyMonthly) GetSchedule() Frequency {
 
 type (
 	CurrencySchedule struct {
-		Enabled              bool       `json:"enabled,omitempty"`
-		Threshold            int        `json:"threshold,omitempty"`
-		PaymentInstrumentId  string     `json:"payment_instrument_id,omitempty"`
-		Recurrence           Recurrence `json:"recurrence,omitempty"`
+		Enabled             bool       `json:"enabled,omitempty"`
+		Threshold           int        `json:"threshold,omitempty"`
+		PaymentInstrumentId string     `json:"payment_instrument_id,omitempty"`
+		Recurrence          Recurrence `json:"recurrence,omitempty"`
 	}
 
 	PayoutSchedule struct {

@@ -17,11 +17,11 @@ const (
 type DigitalCardType string
 
 const (
-	SecureElement    DigitalCardType = "secure_element"
+	SecureElement     DigitalCardType = "secure_element"
 	HostCardEmulation DigitalCardType = "host_card_emulation"
-	CardOnFile       DigitalCardType = "card_on_file"
-	ECommerce        DigitalCardType = "e_commerce"
-	QrCode           DigitalCardType = "qr_code"
+	CardOnFile        DigitalCardType = "card_on_file"
+	ECommerce         DigitalCardType = "e_commerce"
+	QrCode            DigitalCardType = "qr_code"
 )
 
 type DigitalCardDeviceType string
@@ -68,24 +68,24 @@ type (
 	}
 
 	DigitalCardDevice struct {
-		Id               string                           `json:"id,omitempty"`
-		Type             DigitalCardDeviceType            `json:"type,omitempty"`
-		Manufacturer     string                           `json:"manufacturer,omitempty"`
-		Brand            string                           `json:"brand,omitempty"`
-		Model            string                           `json:"model,omitempty"`
-		OsVersion        string                           `json:"os_version,omitempty"`
-		FirmwareVersion  string                           `json:"firmware_version,omitempty"`
-		PhoneNumber      string                           `json:"phone_number,omitempty"`
-		DeviceName       string                           `json:"device_name,omitempty"`
-		DeviceParentId   string                           `json:"device_parent_id,omitempty"`
-		Language         string                           `json:"language,omitempty"`
-		SerialNumber     string                           `json:"serial_number,omitempty"`
-		TimeZone         string                           `json:"time_zone,omitempty"`
-		TimeZoneSetting  DigitalCardDeviceTimeZoneSetting `json:"time_zone_setting,omitempty"`
-		SimSerialNumber  string                           `json:"sim_serial_number,omitempty"`
-		Imei             string                           `json:"imei,omitempty"`
-		NetworkOperator  string                           `json:"network_operator,omitempty"`
-		NetworkType      DigitalCardDeviceNetworkType     `json:"network_type,omitempty"`
+		Id              string                           `json:"id,omitempty"`
+		Type            DigitalCardDeviceType            `json:"type,omitempty"`
+		Manufacturer    string                           `json:"manufacturer,omitempty"`
+		Brand           string                           `json:"brand,omitempty"`
+		Model           string                           `json:"model,omitempty"`
+		OsVersion       string                           `json:"os_version,omitempty"`
+		FirmwareVersion string                           `json:"firmware_version,omitempty"`
+		PhoneNumber     string                           `json:"phone_number,omitempty"`
+		DeviceName      string                           `json:"device_name,omitempty"`
+		DeviceParentId  string                           `json:"device_parent_id,omitempty"`
+		Language        string                           `json:"language,omitempty"`
+		SerialNumber    string                           `json:"serial_number,omitempty"`
+		TimeZone        string                           `json:"time_zone,omitempty"`
+		TimeZoneSetting DigitalCardDeviceTimeZoneSetting `json:"time_zone_setting,omitempty"`
+		SimSerialNumber string                           `json:"sim_serial_number,omitempty"`
+		Imei            string                           `json:"imei,omitempty"`
+		NetworkOperator string                           `json:"network_operator,omitempty"`
+		NetworkType     DigitalCardDeviceNetworkType     `json:"network_type,omitempty"`
 	}
 
 	GetDigitalCardResponse struct {

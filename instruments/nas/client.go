@@ -54,7 +54,7 @@ func (c *Client) GetWithContext(ctx context.Context, instrumentId string) (*GetI
 	}
 
 	var response GetInstrumentResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(instruments.Path, instrumentId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(instruments.Path, instrumentId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *Client) GetBankAccountFieldFormattingWithContext(
 	}
 
 	var response GetBankAccountFieldFormattingResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

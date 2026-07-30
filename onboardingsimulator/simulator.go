@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	simulatePath       = "simulate"
-	entitiesPath       = "entities"
+	simulatePath        = "simulate"
+	entitiesPath        = "entities"
 	requirementsDuePath = "requirements-due"
-	scenariosPath      = "scenarios"
-	statusPath         = "status"
+	scenariosPath       = "scenarios"
+	statusPath          = "status"
 )
 
 type SimulatorEntityStatus string

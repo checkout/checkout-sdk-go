@@ -50,7 +50,7 @@ func (c *Client) GetApplicantWithContext(ctx context.Context, applicantId string
 	}
 
 	var response ApplicantResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(applicantsPath, applicantId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(applicantsPath, applicantId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

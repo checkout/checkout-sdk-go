@@ -36,7 +36,7 @@ func (c *Client) GetComplianceRequestWithContext(ctx context.Context, paymentId 
 	}
 
 	var response GetComplianceRequestResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(complianceRequestsPath, paymentId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(complianceRequestsPath, paymentId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

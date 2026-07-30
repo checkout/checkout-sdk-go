@@ -69,7 +69,7 @@ func (c *Client) GetRegisteredDomainsWithContext(ctx context.Context, entityId s
 	}
 
 	var response DomainListResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(GooglePayEnrollmentsPath, entityId, domainsPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(GooglePayEnrollmentsPath, entityId, domainsPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (c *Client) GetEnrollmentStateWithContext(ctx context.Context, entityId str
 	}
 
 	var response EnrollmentStateResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(GooglePayEnrollmentsPath, entityId, statePath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(GooglePayEnrollmentsPath, entityId, statePath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

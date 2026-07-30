@@ -125,7 +125,7 @@ func TestApplyRequestHeaders_DashTag(t *testing.T) {
 // TestApplyRequestHeaders_NoJsonTag verifies fields with no json tag are skipped.
 func TestApplyRequestHeaders_NoJsonTag(t *testing.T) {
 	type headersNoTag struct {
-		NoTag string
+		NoTag  string
 		Tagged string `json:"x-tagged"`
 	}
 	type req struct{ Headers headersNoTag }

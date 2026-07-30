@@ -19,12 +19,12 @@ var (
 
 	applicantResponse *applicants.ApplicantResponse
 
-	identityVerificationId      string
-	idvAttemptId                string
-	faceAuthenticationId        string
-	faceAuthAttemptId           string
-	idDocumentVerificationId    string
-	idDocVerificationAttemptId  string
+	identityVerificationId     string
+	idvAttemptId               string
+	faceAuthenticationId       string
+	faceAuthAttemptId          string
+	idDocumentVerificationId   string
+	idDocVerificationAttemptId string
 )
 
 func TestSetupIdentities(t *testing.T) {

@@ -62,7 +62,7 @@ func (c *Client) GetRatesWithContext(ctx context.Context, queryFilter RatesQuery
 	}
 
 	var response RatesResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

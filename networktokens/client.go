@@ -58,7 +58,7 @@ func (c *Client) GetNetworkTokenWithContext(ctx context.Context, networkTokenId 
 	}
 
 	var response NetworkTokenResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(networkTokensPath, networkTokenId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(networkTokensPath, networkTokenId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -26,25 +26,42 @@ func NewClient(
 	}
 }
 
-func (c *Client) CreateEntity(request OnboardEntityRequest) (*OnboardEntityResponse, error) {
-	return c.CreateEntityWithContext(context.Background(), request)
+// DefaultSchemaVersion is 3.0, the latest Accounts API schema version. Pass it as the schemaVersion
+// argument (or "") to negotiate 3.0 via the Accept header.
+const DefaultSchemaVersion = "3.0"
+
+func buildSchemaVersionHeaders(schemaVersion string) *Headers {
+	if schemaVersion == "" {
+		schemaVersion = DefaultSchemaVersion
+	}
+	return &Headers{Accept: "application/json;schema_version=" + schemaVersion}
+}
+
+func (c *Client) CreateEntity(request OnboardEntityRequest, schemaVersion string) (*OnboardEntityResponse, error) {
+	return c.CreateEntityWithContext(context.Background(), request, schemaVersion)
 }
 
 func (c *Client) CreateEntityWithContext(
 	ctx context.Context,
 	request OnboardEntityRequest,
+	schemaVersion string,
 ) (*OnboardEntityResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	payload := struct {
+		OnboardEntityRequest
+		Headers *Headers `json:"-"`
+	}{request, buildSchemaVersionHeaders(schemaVersion)}
+
 	var response OnboardEntityResponse
 	err = c.apiClient.PostWithContext(
 		ctx,
 		common.BuildPath(accountsPath, entitiesPath),
 		auth,
-		request,
+		payload,
 		&response,
 		nil,
 	)
@@ -69,7 +86,7 @@ func (c *Client) GetSubEntityMembersWithContext(
 	}
 
 	var response OnboardSubEntityDetailsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, membersPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, membersPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -111,18 +128,22 @@ func (c *Client) ReinviteSubEntityMemberWithContext(
 	return &response, nil
 }
 
-func (c *Client) GetEntity(entityId string) (*OnboardEntityDetails, error) {
-	return c.GetEntityWithContext(context.Background(), entityId)
+func (c *Client) GetEntity(entityId string, schemaVersion string) (*OnboardEntityDetails, error) {
+	return c.GetEntityWithContext(context.Background(), entityId, schemaVersion)
 }
 
-func (c *Client) GetEntityWithContext(ctx context.Context, entityId string) (*OnboardEntityDetails, error) {
+func (c *Client) GetEntityWithContext(ctx context.Context, entityId string, schemaVersion string) (*OnboardEntityDetails, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	payload := struct {
+		Headers *Headers `json:"-"`
+	}{buildSchemaVersionHeaders(schemaVersion)}
+
 	var response OnboardEntityDetails
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId), auth, payload, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -130,22 +151,28 @@ func (c *Client) GetEntityWithContext(ctx context.Context, entityId string) (*On
 	return &response, nil
 }
 
-func (c *Client) UpdateEntity(entityId string, request OnboardEntityRequest) (*OnboardEntityResponse, error) {
-	return c.UpdateEntityWithContext(context.Background(), entityId, request)
+func (c *Client) UpdateEntity(entityId string, request OnboardEntityRequest, schemaVersion string) (*OnboardEntityResponse, error) {
+	return c.UpdateEntityWithContext(context.Background(), entityId, request, schemaVersion)
 }
 
 func (c *Client) UpdateEntityWithContext(
 	ctx context.Context,
 	entityId string,
 	request OnboardEntityRequest,
+	schemaVersion string,
 ) (*OnboardEntityResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	payload := struct {
+		OnboardEntityRequest
+		Headers *Headers `json:"-"`
+	}{request, buildSchemaVersionHeaders(schemaVersion)}
+
 	var response OnboardEntityResponse
-	err = c.apiClient.PutWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId), auth, request, &response, nil)
+	err = c.apiClient.PutWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId), auth, payload, &response, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -242,9 +269,10 @@ func (c *Client) RetrievePaymentInstrumentDetailsWithContext(
 	err = c.apiClient.GetWithContext(
 		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, paymentInstrumentsPath, paymentInstrumentId),
-		auth,
-		&response,
-	)
+		auth, nil,
+
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +338,7 @@ func (c *Client) QueryPaymentInstrumentsWithContext(
 	}
 
 	var response PaymentInstrumentQueryResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -335,9 +363,10 @@ func (c *Client) RetrievePayoutScheduleWithContext(
 	err = c.apiClient.GetWithContext(
 		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, payoutSchedulesPath),
-		auth,
-		&response,
-	)
+		auth, nil,
+
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -428,9 +457,10 @@ func (c *Client) GetReserveRulesWithContext(ctx context.Context, entityId string
 	err = c.apiClient.GetWithContext(
 		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, reserveRulesPath),
-		auth,
-		&response,
-	)
+		auth, nil,
+
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -455,9 +485,10 @@ func (c *Client) GetReserveRuleDetailsWithContext(
 	err = c.apiClient.GetWithContext(
 		ctx,
 		common.BuildPath(accountsPath, entitiesPath, entityId, reserveRulesPath, reserveRuleId),
-		auth,
-		&response,
-	)
+		auth, nil,
+
+		&response)
+
 	if err != nil {
 		return nil, err
 	}
@@ -569,7 +600,7 @@ func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId s
 	}
 
 	var response FileDetailsResponse
-	err = c.filesClient.GetWithContext(ctx, common.BuildPath(entitiesPath, entityId, filesPath, fileId), auth, &response)
+	err = c.filesClient.GetWithContext(ctx, common.BuildPath(entitiesPath, entityId, filesPath, fileId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -577,18 +608,22 @@ func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId s
 	return &response, nil
 }
 
-func (c *Client) GetEntityRequirements(entityId string) (*EntityRequirementListResponse, error) {
-	return c.GetEntityRequirementsWithContext(context.Background(), entityId)
+func (c *Client) GetEntityRequirements(entityId string, schemaVersion string) (*EntityRequirementListResponse, error) {
+	return c.GetEntityRequirementsWithContext(context.Background(), entityId, schemaVersion)
 }
 
-func (c *Client) GetEntityRequirementsWithContext(ctx context.Context, entityId string) (*EntityRequirementListResponse, error) {
+func (c *Client) GetEntityRequirementsWithContext(ctx context.Context, entityId string, schemaVersion string) (*EntityRequirementListResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	payload := struct {
+		Headers *Headers `json:"-"`
+	}{buildSchemaVersionHeaders(schemaVersion)}
+
 	var response EntityRequirementListResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath), auth, payload, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -607,7 +642,7 @@ func (c *Client) GetEntityRequirementDetailsWithContext(ctx context.Context, ent
 	}
 
 	var response EntityRequirementDetailsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath, requirementId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(accountsPath, entitiesPath, entityId, requirementsPath, requirementId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

@@ -70,7 +70,7 @@ func (c *Client) GetIdentityVerificationWithContext(ctx context.Context, verific
 	}
 
 	var response IdentityVerificationResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context,
 	}
 
 	var response IdentityVerificationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, attemptsPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, attemptsPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *Client) GetIdentityVerificationAttemptWithContext(ctx context.Context, 
 	}
 
 	var response IdentityVerificationAttemptResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, attemptsPath, attemptId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, attemptsPath, attemptId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (c *Client) GetIdentityVerificationReportWithContext(ctx context.Context, v
 	}
 
 	var response IdentityVerificationReportResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, reportPath), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, reportPath), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (c *Client) GetIdentityVerificationAttemptAssetsWithContext(ctx context.Con
 	}
 
 	var response IdentityVerificationAttemptAssetsResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

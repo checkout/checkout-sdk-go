@@ -15,8 +15,8 @@ const (
 )
 
 type CreateIdDocumentVerificationRequest struct {
-	ApplicantId   string                 `json:"applicant_id"`
-	UserJourneyId string                 `json:"user_journey_id"`
+	ApplicantId   string                   `json:"applicant_id"`
+	UserJourneyId string                   `json:"user_journey_id"`
 	DeclaredData  *identities.DeclaredData `json:"declared_data,omitempty"`
 }
 
@@ -50,10 +50,10 @@ type IdDocumentVerificationAttemptResponse struct {
 
 type IdDocumentVerificationAttemptsResponse struct {
 	HttpMetadata common.HttpMetadata
-	TotalCount   int                                      `json:"total_count,omitempty"`
-	Skip         int                                      `json:"skip,omitempty"`
-	Limit        int                                      `json:"limit,omitempty"`
-	Data         []IdDocumentVerificationAttemptResponse  `json:"data,omitempty"`
+	TotalCount   int                                     `json:"total_count,omitempty"`
+	Skip         int                                     `json:"skip,omitempty"`
+	Limit        int                                     `json:"limit,omitempty"`
+	Data         []IdDocumentVerificationAttemptResponse `json:"data,omitempty"`
 }
 
 type IdDocumentVerificationReportResponse struct {

@@ -17,11 +17,11 @@ func TestReverseCardPayment(t *testing.T) {
 	paymentResponse := makeCardPayment(t, false, 10)
 
 	cases := []struct {
-		name        string
-		paymentId   string
-		request     payments.PaymentReversalRequest
-		checkerOne  func(interface{}, error)
-		checkerTwo  func(interface{}, error)
+		name       string
+		paymentId  string
+		request    payments.PaymentReversalRequest
+		checkerOne func(interface{}, error)
+		checkerTwo func(interface{}, error)
 	}{
 		{
 			name:      "when request is valid then return a reversal response",
@@ -123,4 +123,3 @@ func buildReversalIntegrationRequest() payments.PaymentReversalRequest {
 		},
 	}
 }
-

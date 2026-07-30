@@ -30,7 +30,7 @@ func (c *Client) RetrieveAllEventTypesWithContext(ctx context.Context) (*EventTy
 	}
 
 	var response EventTypesResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(eventTypes), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(eventTypes), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *Client) RetrieveAllEventTypesQueryWithContext(
 	}
 
 	var response EventTypesResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *Client) RetrieveEventsWithContext(ctx context.Context) (*EventsPageResp
 	}
 
 	var response EventsPageResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(events), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(events), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (c *Client) RetrieveEventsQueryWithContext(ctx context.Context, query Query
 	}
 
 	var response EventsPageResponse
-	err = c.apiClient.GetWithContext(ctx, url, auth, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (c *Client) RetrieveEventWithContext(ctx context.Context, eventId string) (
 	}
 
 	var response EventResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(events, eventId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(events, eventId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (c *Client) RetrieveEventNotificationWithContext(
 	}
 
 	var response EventNotificationResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(events, eventId, notifications, notificationId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(events, eventId, notifications, notificationId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

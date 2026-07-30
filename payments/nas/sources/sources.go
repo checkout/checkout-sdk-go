@@ -38,7 +38,7 @@ type (
 		BillingAddress    *common.Address       `json:"billing_address,omitempty"`
 		Phone             *common.Phone         `json:"phone,omitempty"`
 		Stored            *bool                 `json:"stored,omitempty"`
-		StoreForFutureUse *bool                  `json:"store_for_future_use,omitempty"`
+		StoreForFutureUse *bool                 `json:"store_for_future_use,omitempty"`
 		AccountHolder     *common.AccountHolder `json:"account_holder,omitempty"`
 	}
 

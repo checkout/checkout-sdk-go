@@ -92,24 +92,24 @@ type (
 		Bin          string              `json:"bin,omitempty"`
 		Scheme       string              `json:"scheme,omitempty"`
 		// Deprecated: This property will be removed in the future, and should not be used. Use LocalSchemes instead.
-		SchemeLocal               SchemeLocalType            `json:"scheme_local,omitempty"`
-		LocalSchemes              []SchemeLocalType          `json:"local_schemes,omitempty"`
-		CardType                  common.CardType            `json:"card_type,omitempty"`
-		CardCategory              common.CardCategory        `json:"card_category,omitempty"`
-		Currency                  common.Currency            `json:"currency,omitempty"`
-		Issuer                    string                     `json:"issuer,omitempty"`
-		IssuerCountry             common.Country             `json:"issuer_country,omitempty"`
-		IssuerCountryName         string                     `json:"issuer_country_name,omitempty"`
-		ProductId                 string                     `json:"product_id,omitempty"`
-		ProductType               string                     `json:"product_type,omitempty"`
-		SubproductId              string                     `json:"subproduct_id,omitempty"`
-		RegulatedIndicator           bool                       `json:"regulated_indicator,omitempty"`
-		RegulatedType                string                     `json:"regulated_type,omitempty"`
-		IsComboCard                  bool                       `json:"is_combo_card,omitempty"`
-		IsReloadablePrepaid          bool                       `json:"is_reloadable_prepaid,omitempty"`
-		AnonymousPrepaidDescription  string                     `json:"anonymous_prepaid_description,omitempty"`
-		CardPayouts                  *CardMetadataPayouts       `json:"card_payouts,omitempty"`
-		SchemeMetadata               *SchemeMetadata            `json:"scheme_metadata,omitempty"`
-		AccountFundingTransaction    *AccountFundingTransaction `json:"account_funding_transaction,omitempty"`
+		SchemeLocal                 SchemeLocalType            `json:"scheme_local,omitempty"`
+		LocalSchemes                []SchemeLocalType          `json:"local_schemes,omitempty"`
+		CardType                    common.CardType            `json:"card_type,omitempty"`
+		CardCategory                common.CardCategory        `json:"card_category,omitempty"`
+		Currency                    common.Currency            `json:"currency,omitempty"`
+		Issuer                      string                     `json:"issuer,omitempty"`
+		IssuerCountry               common.Country             `json:"issuer_country,omitempty"`
+		IssuerCountryName           string                     `json:"issuer_country_name,omitempty"`
+		ProductId                   string                     `json:"product_id,omitempty"`
+		ProductType                 string                     `json:"product_type,omitempty"`
+		SubproductId                string                     `json:"subproduct_id,omitempty"`
+		RegulatedIndicator          bool                       `json:"regulated_indicator,omitempty"`
+		RegulatedType               string                     `json:"regulated_type,omitempty"`
+		IsComboCard                 bool                       `json:"is_combo_card,omitempty"`
+		IsReloadablePrepaid         bool                       `json:"is_reloadable_prepaid,omitempty"`
+		AnonymousPrepaidDescription string                     `json:"anonymous_prepaid_description,omitempty"`
+		CardPayouts                 *CardMetadataPayouts       `json:"card_payouts,omitempty"`
+		SchemeMetadata              *SchemeMetadata            `json:"scheme_metadata,omitempty"`
+		AccountFundingTransaction   *AccountFundingTransaction `json:"account_funding_transaction,omitempty"`
 	}
 )

@@ -276,7 +276,7 @@ func TestGetRegisteredDomains(t *testing.T) {
 
 func TestGetEnrollmentState(t *testing.T) {
 	var (
-		entityId              = "ent_uzm3uxtssvmuxnyrfdffcyjxeu"
+		entityId                = "ent_uzm3uxtssvmuxnyrfdffcyjxeu"
 		enrollmentStateResponse = EnrollmentStateResponse{
 			State: Active,
 		}

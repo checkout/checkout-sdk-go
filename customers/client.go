@@ -49,7 +49,7 @@ func (c *Client) GetWithContext(ctx context.Context, customerId string) (*GetCus
 	}
 
 	var response GetCustomerResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(Path, customerId), auth, &response)
+	err = c.apiClient.GetWithContext(ctx, common.BuildPath(Path, customerId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

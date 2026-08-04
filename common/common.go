@@ -145,9 +145,9 @@ const (
 type ThreeDsMethodCompletion string
 
 const (
-	Y ThreeDsMethodCompletion = "y"
-	N ThreeDsMethodCompletion = "n"
-	U ThreeDsMethodCompletion = "u"
+	Y ThreeDsMethodCompletion = "Y"
+	N ThreeDsMethodCompletion = "N"
+	U ThreeDsMethodCompletion = "U"
 )
 
 type AccountNameInquiryType string

@@ -13,6 +13,38 @@ const (
 	IssuerFingerprintPath = "issuer-fingerprint"
 )
 
+// SessionChallengeIndicator indicates whether a challenge is requested for this session.
+//
+// Used by SessionRequest.ChallengeIndicator for POST /sessions. This is the only field in the API
+// that accepts the exemption values below; the 3ds.challenge_indicator field on payments, hosted
+// payments, payment links and payment sessions accepts only the first four values and is modelled by
+// common.ChallengeIndicator.
+//
+// The following are requests for exemption: SessionChallengeLowValue,
+// SessionChallengeTrustedListing, SessionChallengeTrustedListingPrompt and
+// SessionChallengeTransactionRiskAssessment. If an exemption cannot be applied, then the value
+// SessionChallengeNoChallengeRequested will be used instead.
+//
+// [Optional]
+// Default: SessionChallengeNoPreference
+// max 50 characters
+//
+// The constants are prefixed because package common already declares LowValue, TrustedListing,
+// TrustedListingPrompt and TransactionRiskAssessment as Exemption values.
+type SessionChallengeIndicator string
+
+const (
+	SessionChallengeNoPreference              SessionChallengeIndicator = "no_preference"
+	SessionChallengeNoChallengeRequested      SessionChallengeIndicator = "no_challenge_requested"
+	SessionChallengeRequested                 SessionChallengeIndicator = "challenge_requested"
+	SessionChallengeRequestedMandate          SessionChallengeIndicator = "challenge_requested_mandate"
+	SessionChallengeLowValue                  SessionChallengeIndicator = "low_value"
+	SessionChallengeTrustedListing            SessionChallengeIndicator = "trusted_listing"
+	SessionChallengeTrustedListingPrompt      SessionChallengeIndicator = "trusted_listing_prompt"
+	SessionChallengeTransactionRiskAssessment SessionChallengeIndicator = "transaction_risk_assessment"
+	SessionChallengeDataShare                 SessionChallengeIndicator = "data_share"
+)
+
 type AuthenticationType string
 
 const (
@@ -27,7 +59,7 @@ type Category string
 
 const (
 	Payment    Category = "payment"
-	NonPayment Category = "nonPayment"
+	NonPayment Category = "non_payment"
 )
 
 type TransactionType string
@@ -37,7 +69,7 @@ const (
 	CheckAcceptance          TransactionType = "check_acceptance"
 	GoodsService             TransactionType = "goods_service"
 	PrepaidActivationAndLoad TransactionType = "prepaid_activation_and_load"
-	QuashiCardTransaction    TransactionType = "quashi_card_transaction"
+	QuasiCardTransaction     TransactionType = "quasi_card_transaction"
 )
 
 type SessionStatus string

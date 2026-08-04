@@ -100,7 +100,7 @@ type (
 		Installment            *Installment               `json:"installment,omitempty"`
 		InitialTransaction     *InitialTransaction        `json:"initial_transaction,omitempty"`
 		AuthenticationDate     *time.Time                 `json:"authentication_date,omitempty"`
-		ChallengeIndicator     *common.ChallengeIndicator `json:"challenge_indicator,omitempty"`
+		ChallengeIndicator     *SessionChallengeIndicator `json:"challenge_indicator,omitempty"`
 		Optimization           *Optimization              `json:"optimization,omitempty"`
 		Certificates           *DsPublicKeys              `json:"certificates,omitempty"`
 		Approved               bool                       `json:"approved,omitempty"`

@@ -699,7 +699,7 @@ func TestTestWorkflow(t *testing.T) {
 	workflow := getWorkflow(t, createWorkflow(t).Id)
 
 	var request = events.EventTypesRequest{
-		[]string{"payment_approved",
+		EventTypes: []string{"payment_approved",
 			"payment_declined",
 			"card_verification_declined",
 			"card_verified",

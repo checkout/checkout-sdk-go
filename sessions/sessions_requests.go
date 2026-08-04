@@ -10,10 +10,25 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/sessions/sources"
 )
 
+// ShippingIndicator indicates the shipping method chosen for the transaction.
+//
+// Used by MerchantRiskInfo.ShippingIndicator. Choose the option that accurately describes the
+// cardholder's specific transaction.
+//
+// [Optional]
+//
+// The constants are prefixed to avoid clashing with the scheme and payment-method constants of the
+// same name elsewhere in the SDK.
 type ShippingIndicator string
 
 const (
-	Visa ShippingIndicator = "visa"
+	ShippingBillingAddress           ShippingIndicator = "billing_address"
+	ShippingAnotherAddressOnFile     ShippingIndicator = "another_address_on_file"
+	ShippingNotOnFile                ShippingIndicator = "not_on_file"
+	ShippingStorePickUp              ShippingIndicator = "store_pick_up"
+	ShippingDigitalGoods             ShippingIndicator = "digital_goods"
+	ShippingTravelAndEventNoShipping ShippingIndicator = "travel_and_event_no_shipping"
+	ShippingOther                    ShippingIndicator = "other"
 )
 
 type Experience string
@@ -58,7 +73,7 @@ type (
 		AuthenticationType            AuthenticationType         `json:"authentication_type,omitempty"`
 		AuthenticationCategory        Category                   `json:"authentication_category,omitempty"`
 		AccountInfo                   *CardholderAccountInfo     `json:"account_info,omitempty"`
-		ChallengeIndicator            common.ChallengeIndicator  `json:"challenge_indicator,omitempty"`
+		ChallengeIndicator            SessionChallengeIndicator  `json:"challenge_indicator,omitempty"`
 		BillingDescriptor             *SessionsBillingDescriptor `json:"billing_descriptor,omitempty"`
 		Reference                     string                     `json:"reference,omitempty"`
 		MerchantRiskInfo              *MerchantRiskInfo          `json:"merchant_risk_info,omitempty"`
@@ -87,7 +102,7 @@ func NewSessionRequest() *SessionRequest {
 		Source:                 sources.NewSessionCardSource(),
 		AuthenticationType:     RegularAuthType,
 		AuthenticationCategory: Payment,
-		ChallengeIndicator:     common.NoPreference,
+		ChallengeIndicator:     SessionChallengeNoPreference,
 		TransactionType:        GoodsService,
 	}
 }

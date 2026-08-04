@@ -39,6 +39,17 @@ const (
 	Y ResponseCode = "Y"
 )
 
+// ExperienceStatus is the status of a preferred experience on the session response.
+// The constants are prefixed because Unavailable is already declared as a SessionStatus.
+type ExperienceStatus string
+
+const (
+	ExperienceAvailable   ExperienceStatus = "available"
+	ExperienceUnprocessed ExperienceStatus = "unprocessed"
+	ExperienceProcessed   ExperienceStatus = "processed"
+	ExperienceUnavailable ExperienceStatus = "unavailable"
+)
+
 type TrustedBeneficiaryStatusType string
 
 const (
@@ -118,7 +129,73 @@ type (
 		Exemption              *ThreeDsExemption          `json:"exemption,omitempty"`
 		FlowType               common.ThreeDsFlowType     `json:"flow_type,omitempty"`
 		SchemeInfo             *SchemeInfo                `json:"scheme_info,omitempty"`
+		ThreeDs                *ThreeDsInfo               `json:"3ds,omitempty"`
+		PreferredExperiences   *PreferredExperiences      `json:"preferred_experiences,omitempty"`
+		Experience             Experience                 `json:"experience,omitempty"`
+		GoogleSpa              *GoogleSpaInfo             `json:"google_spa,omitempty"`
 		Links                  map[string]common.Link     `json:"_links,omitempty"`
+	}
+
+	// ThreeDsInfo provides more information about the 3DS experience.
+	ThreeDsInfo struct {
+		// ChallengeRequest is the CReq message, encoded in Base 64.
+		ChallengeRequest string `json:"challenge_request,omitempty"`
+		// InteractionCounter is the number of authentication attempts performed by the cardholder.
+		// max 2 characters
+		InteractionCounter string `json:"interaction_counter,omitempty"`
+		// ErrorDetails provides additional information about the error returned.
+		ErrorDetails *ThreeDsErrorDetails `json:"error_details,omitempty"`
+	}
+
+	// ThreeDsErrorDetails provides additional information about the error returned.
+	ThreeDsErrorDetails struct {
+		// ErrorCode identifies the type of issue.
+		ErrorCode string `json:"error_code,omitempty"`
+		// ErrorComponent specifies which 3D Secure component identified the error.
+		ErrorComponent string `json:"error_component,omitempty"`
+		// ErrorDetail provides additional details about the issue.
+		// max 2048 characters
+		ErrorDetail string `json:"error_detail,omitempty"`
+		// ErrorDescription describes the issue identified.
+		// max 2048 characters
+		ErrorDescription string `json:"error_description,omitempty"`
+	}
+
+	// PreferredExperiences reports the outcome of each experience requested for the session.
+	PreferredExperiences struct {
+		GoogleSpa *ExperienceOutcome `json:"google_spa,omitempty"`
+		ThreeDs   *ExperienceOutcome `json:"3ds,omitempty"`
+	}
+
+	// ExperienceOutcome is the status of a single preferred experience.
+	ExperienceOutcome struct {
+		Status ExperienceStatus `json:"status,omitempty"`
+		// Reason lists the reason(s) why processing the experience was unsuccessful.
+		Reason []string `json:"reason,omitempty"`
+	}
+
+	// GoogleSpaInfo holds the details of Google SPA (Secure Payment Authentication). The hosted
+	// variant returns only Token; the non-hosted variant returns the challenge details as well.
+	GoogleSpaInfo struct {
+		ChallengeUrl   string           `json:"challenge_url,omitempty"`
+		InitialTimeout string           `json:"initial_timeout,omitempty"`
+		MaxTimeout     string           `json:"max_timeout,omitempty"`
+		Iframe         *GoogleSpaIframe `json:"iframe,omitempty"`
+		Token          *GoogleSpaToken  `json:"token,omitempty"`
+	}
+
+	// GoogleSpaIframe holds the details of the challenge iframe displayed in the cardholder browser
+	// window.
+	GoogleSpaIframe struct {
+		Height string `json:"height,omitempty"`
+		Width  string `json:"width,omitempty"`
+	}
+
+	// GoogleSpaToken is the token for the given PAN provisioned and authenticated.
+	GoogleSpaToken struct {
+		Number      string `json:"number,omitempty"`
+		ExpiryMonth int    `json:"expiry_month,omitempty"`
+		ExpiryYear  int    `json:"expiry_year,omitempty"`
 	}
 
 	GetSessionResponse struct {

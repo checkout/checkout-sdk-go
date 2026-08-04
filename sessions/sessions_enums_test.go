@@ -1,6 +1,7 @@
 package sessions
 
 import (
+	"encoding/json"
 	"regexp"
 	"testing"
 
@@ -81,6 +82,61 @@ func TestSessionScheme_MatchesSpec(t *testing.T) {
 	assert.Len(t, actual, 8)
 }
 
+func TestExperienceStatus_MatchesSpec(t *testing.T) {
+	// Spec: PreferredExperiences status enum is the four values below.
+	expected := []string{"available", "unprocessed", "processed", "unavailable"}
+	actual := []string{
+		string(ExperienceAvailable), string(ExperienceUnprocessed),
+		string(ExperienceProcessed), string(ExperienceUnavailable),
+	}
+
+	assert.Equal(t, expected, actual)
+}
+
+// The 3ds, preferred_experiences, experience and google_spa fields of GetSessionResponse were
+// previously unmodelled, so the Google SPA and preferred-experience data the API returns was dropped.
+func TestSessionDetails_DeserializesTheExperienceFields(t *testing.T) {
+	payload := []byte(`{
+		"3ds":{"challenge_request":"creq","interaction_counter":"03",
+			"error_details":{"error_code":"101","error_component":"D","error_detail":"acctNumber",
+			"error_description":"missing"}},
+		"preferred_experiences":{"google_spa":{"status":"available"},
+			"3ds":{"status":"processed","reason":["Invalid response"]}},
+		"experience":"3ds",
+		"google_spa":{"challenge_url":"https://google.example/challenge","initial_timeout":"5",
+			"max_timeout":"10","iframe":{"height":"400","width":"250"},
+			"token":{"number":"4242","expiry_month":12,"expiry_year":2030}}
+	}`)
+
+	var details SessionDetails
+	assert.Nil(t, json.Unmarshal(payload, &details))
+
+	assert.NotNil(t, details.ThreeDs)
+	assert.Equal(t, "creq", details.ThreeDs.ChallengeRequest)
+	assert.Equal(t, "03", details.ThreeDs.InteractionCounter)
+	assert.NotNil(t, details.ThreeDs.ErrorDetails)
+	assert.Equal(t, "101", details.ThreeDs.ErrorDetails.ErrorCode)
+	assert.Equal(t, "D", details.ThreeDs.ErrorDetails.ErrorComponent)
+
+	assert.NotNil(t, details.PreferredExperiences)
+	assert.NotNil(t, details.PreferredExperiences.GoogleSpa)
+	assert.Equal(t, ExperienceAvailable, details.PreferredExperiences.GoogleSpa.Status)
+	assert.NotNil(t, details.PreferredExperiences.ThreeDs)
+	assert.Equal(t, ExperienceProcessed, details.PreferredExperiences.ThreeDs.Status)
+	assert.Equal(t, []string{"Invalid response"}, details.PreferredExperiences.ThreeDs.Reason)
+
+	assert.Equal(t, ThreeDsExperience, details.Experience)
+
+	assert.NotNil(t, details.GoogleSpa)
+	assert.Equal(t, "https://google.example/challenge", details.GoogleSpa.ChallengeUrl)
+	assert.Equal(t, "5", details.GoogleSpa.InitialTimeout)
+	assert.NotNil(t, details.GoogleSpa.Iframe)
+	assert.Equal(t, "400", details.GoogleSpa.Iframe.Height)
+	assert.NotNil(t, details.GoogleSpa.Token)
+	assert.Equal(t, "4242", details.GoogleSpa.Token.Number)
+	assert.Equal(t, 12, details.GoogleSpa.Token.ExpiryMonth)
+}
+
 // Structural guard: every wire value used by the sessions surface must be snake_case or a single
 // uppercase code. This catches camelCase leaking into a value, which is how "nonPayment" survived.
 func TestEverySessionsWireValueIsWellFormed(t *testing.T) {
@@ -97,9 +153,7 @@ func TestEverySessionsWireValueIsWellFormed(t *testing.T) {
 		string(sources.Upi), string(sources.Visa),
 		string(ThreeDsExperience), string(GoogleSpaExperience),
 	}
-	for _, value := range sessionChallengeIndicatorWireValues {
-		values = append(values, value)
-	}
+	values = append(values, sessionChallengeIndicatorWireValues...)
 
 	assert.Greater(t, len(values), 30)
 	for _, value := range values {

@@ -64,6 +64,11 @@ type (
 )
 
 type (
+	// SessionRequest is the request body for POST /sessions.
+	//
+	// It declares exactly the 24 properties of the SessionRequest schema. prior_transaction_reference
+	// was carried here from a June 2022 sessions update but is absent from the current API Reference,
+	// from the API schema search and from the developer documentation, so it is no longer declared.
 	SessionRequest struct {
 		Source                        sources.SessionSource      `json:"source,omitempty"`
 		Amount                        int64                      `json:"amount,omitempty"`
@@ -77,7 +82,6 @@ type (
 		BillingDescriptor             *SessionsBillingDescriptor `json:"billing_descriptor,omitempty"`
 		Reference                     string                     `json:"reference,omitempty"`
 		MerchantRiskInfo              *MerchantRiskInfo          `json:"merchant_risk_info,omitempty"`
-		PriorTransactionReference     string                     `json:"prior_transaction_reference,omitempty"`
 		TransactionType               TransactionType            `json:"transaction_type,omitempty"`
 		ShippingAddress               *sources.SessionAddress    `json:"shipping_address,omitempty"`
 		ShippingAddressMatchesBilling bool                       `json:"shipping_address_matches_billing,omitempty"`

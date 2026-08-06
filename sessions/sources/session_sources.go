@@ -19,8 +19,10 @@ const (
 	Amex            SessionScheme = "amex"
 	CartesBancaires SessionScheme = "cartes_bancaires"
 	Diners          SessionScheme = "diners"
+	Discover        SessionScheme = "discover"
 	Jcb             SessionScheme = "jcb"
 	Mastercard      SessionScheme = "mastercard"
+	Upi             SessionScheme = "upi"
 	Visa            SessionScheme = "visa"
 )
 

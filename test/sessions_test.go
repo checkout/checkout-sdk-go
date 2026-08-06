@@ -26,7 +26,7 @@ func TestRequestSession(t *testing.T) {
 			request: getNonHostedSession(
 				getBrowserChannel(),
 				sessions.Payment,
-				common.NoPreference,
+				sessions.SessionChallengeNoPreference,
 				sessions.GoodsService,
 			),
 			checker: func(response *sessions.SessionResponse, err error) {
@@ -44,7 +44,7 @@ func TestRequestSession(t *testing.T) {
 			request: getNonHostedSession(
 				getAppChannel(),
 				sessions.Payment,
-				common.NoPreference,
+				sessions.SessionChallengeNoPreference,
 				sessions.GoodsService,
 			),
 			checker: func(response *sessions.SessionResponse, err error) {
@@ -71,7 +71,7 @@ func TestRequestSession(t *testing.T) {
 func TestGetSessionDetailsBrowser(t *testing.T) {
 	session := createSession(t, getNonHostedSession(getBrowserChannel(),
 		sessions.Payment,
-		common.NoPreference,
+		sessions.SessionChallengeNoPreference,
 		sessions.GoodsService))
 
 	cases := []struct {
@@ -127,7 +127,7 @@ func TestGetSessionDetailsMerchantInitiated(t *testing.T) {
 	t.Skip("unavailable")
 	session := createSession(t, getNonHostedSession(getMerchantInitiated(),
 		sessions.Payment,
-		common.NoPreference,
+		sessions.SessionChallengeNoPreference,
 		sessions.GoodsService))
 
 	cases := []struct {
@@ -386,7 +386,7 @@ func getAppChannel() channels.Channel {
 func getNonHostedSession(
 	channel channels.Channel,
 	category sessions.Category,
-	indicator common.ChallengeIndicator,
+	indicator sessions.SessionChallengeIndicator,
 	transaction sessions.TransactionType,
 ) sessions.SessionRequest {
 	sessionAddress := &sources.SessionAddress{
@@ -483,7 +483,7 @@ func getHostedSession() sessions.SessionRequest {
 	sessionRequest.ProcessingChannelId = "pc_5jp2az55l3cuths25t5p3xhwru"
 	sessionRequest.AuthenticationType = sessions.RegularAuthType
 	sessionRequest.AuthenticationCategory = sessions.Payment
-	sessionRequest.ChallengeIndicator = common.NoPreference
+	sessionRequest.ChallengeIndicator = sessions.SessionChallengeNoPreference
 	sessionRequest.Reference = "ORD-5023-4E89"
 	sessionRequest.TransactionType = sessions.GoodsService
 	sessionRequest.ShippingAddress = sessionAddress

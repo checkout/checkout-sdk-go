@@ -21,7 +21,19 @@ func (b *CheckoutPreviousSdkBuilder) WithEnvironment(environment configuration.E
 }
 
 func (b *CheckoutPreviousSdkBuilder) WithEnvironmentSubdomain(subdomain string) *CheckoutPreviousSdkBuilder {
-	b.EnvironmentSubdomain = configuration.NewEnvironmentSubdomain(b.Environment, subdomain)
+	b.Subdomain = subdomain
+	return b
+}
+
+// WithLegacyDomain opts out of the merchant-specific subdomain, sending every request to the
+// shared hosts instead (api.checkout.com and access.checkout.com, or their sandbox equivalents).
+//
+// Deprecated: this is an emergency fallback for the rare case where the merchant-specific
+// subdomain cannot be used, and will be removed in a future release. Call
+// WithEnvironmentSubdomain instead.
+// See https://api-reference.checkout.com/#section/Base-URLs
+func (b *CheckoutPreviousSdkBuilder) WithLegacyDomain() *CheckoutPreviousSdkBuilder {
+	b.UseLegacyDomain = true
 	return b
 }
 
@@ -46,7 +58,18 @@ func (b *CheckoutPreviousSdkBuilder) WithSecretKey(secretKey string) *CheckoutPr
 }
 
 func (b *CheckoutPreviousSdkBuilder) Build() (*Api, error) {
-	err := b.ValidateSecretKey(configuration.PreviousSecretKeyPattern)
+	// The Previous (ABC) platform predates merchant-specific subdomains, so it is exempt from
+	// the mandatory WithEnvironmentSubdomain/WithLegacyDomain configuration.
+	if err := b.ValidateEnvironmentSettings(false); err != nil {
+		return nil, err
+	}
+
+	environmentSubdomain, err := b.GetEnvironmentSubdomain()
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.ValidateSecretKey(configuration.PreviousSecretKeyPattern)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +83,8 @@ func (b *CheckoutPreviousSdkBuilder) Build() (*Api, error) {
 
 	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.EnableTelemetry, b.Environment, b.HttpClient, b.Logger)
 
-	if b.EnvironmentSubdomain != nil {
-		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)
+	if environmentSubdomain != nil {
+		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, environmentSubdomain, b.HttpClient, b.Logger)
 	}
 
 	return CheckoutApi(newConfiguration), nil

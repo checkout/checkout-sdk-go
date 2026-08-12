@@ -17,6 +17,10 @@ func TestDefaultCheckoutSdks(t *testing.T) {
 		WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
 		WithPublicKey(os.Getenv("CHECKOUT_DEFAULT_PUBLIC_KEY")).
 		WithEnvironment(configuration.Sandbox()).
+		// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,
+		// so the token request would come back invalid_client. Opting out explicitly until
+		// they are.
+		WithLegacyDomain().
 		Build()
 
 	var defaultApiSubdomain, _ = checkout.Builder().
@@ -32,6 +36,7 @@ func TestDefaultCheckoutSdks(t *testing.T) {
 		WithSecretKey("error").
 		WithPublicKey("error").
 		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
 		Build()
 
 	cases := []struct {
@@ -68,4 +73,67 @@ func TestDefaultCheckoutSdks(t *testing.T) {
 		})
 	}
 
+}
+
+func TestShouldFailWithoutSubdomainOrLegacyDomain(t *testing.T) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
+		WithEnvironment(configuration.Sandbox()).
+		Build()
+
+	assert.Nil(t, api)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "environment subdomain is required")
+}
+
+func TestShouldFailWithBothSubdomainAndLegacyDomain(t *testing.T) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
+		WithEnvironment(configuration.Sandbox()).
+		WithEnvironmentSubdomain("1234doma").
+		WithLegacyDomain().
+		Build()
+
+	assert.Nil(t, api)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "cannot both be set")
+}
+
+func TestShouldFailWithInvalidSubdomain(t *testing.T) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
+		WithEnvironment(configuration.Sandbox()).
+		WithEnvironmentSubdomain("not a subdomain").
+		Build()
+
+	assert.Nil(t, api)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "invalid environment subdomain")
+}
+
+func TestShouldCreateSdkWithLegacyDomain(t *testing.T) {
+	api, err := checkout.Builder().
+		StaticKeys().
+		WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
+		WithPublicKey(os.Getenv("CHECKOUT_DEFAULT_PUBLIC_KEY")).
+		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
+		Build()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, api)
+}
+
+func TestShouldCreatePreviousSdkWithoutSubdomain(t *testing.T) {
+	api, err := checkout.Builder().Previous().
+		WithSecretKey(os.Getenv("CHECKOUT_PREVIOUS_SECRET_KEY")).
+		WithPublicKey(os.Getenv("CHECKOUT_PREVIOUS_PUBLIC_KEY")).
+		WithEnvironment(configuration.Sandbox()).
+		Build()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, api)
 }

@@ -21,7 +21,19 @@ func (b *CheckoutDefaultSdkBuilder) WithEnvironment(environment configuration.En
 }
 
 func (b *CheckoutDefaultSdkBuilder) WithEnvironmentSubdomain(subdomain string) *CheckoutDefaultSdkBuilder {
-	b.EnvironmentSubdomain = configuration.NewEnvironmentSubdomain(b.Environment, subdomain)
+	b.Subdomain = subdomain
+	return b
+}
+
+// WithLegacyDomain opts out of the merchant-specific subdomain, sending every request to the
+// shared hosts instead (api.checkout.com and access.checkout.com, or their sandbox equivalents).
+//
+// Deprecated: this is an emergency fallback for the rare case where the merchant-specific
+// subdomain cannot be used, and will be removed in a future release. Call
+// WithEnvironmentSubdomain instead.
+// See https://api-reference.checkout.com/#section/Base-URLs
+func (b *CheckoutDefaultSdkBuilder) WithLegacyDomain() *CheckoutDefaultSdkBuilder {
+	b.UseLegacyDomain = true
 	return b
 }
 
@@ -46,7 +58,16 @@ func (b *CheckoutDefaultSdkBuilder) WithSecretKey(secretKey string) *CheckoutDef
 }
 
 func (b *CheckoutDefaultSdkBuilder) Build() (*Api, error) {
-	err := b.ValidateSecretKey(configuration.DefaultSecretKeyPattern)
+	if err := b.ValidateEnvironmentSettings(true); err != nil {
+		return nil, err
+	}
+
+	environmentSubdomain, err := b.GetEnvironmentSubdomain()
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.ValidateSecretKey(configuration.DefaultSecretKeyPattern)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +81,8 @@ func (b *CheckoutDefaultSdkBuilder) Build() (*Api, error) {
 
 	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.EnableTelemetry, b.Environment, b.HttpClient, b.Logger)
 
-	if b.EnvironmentSubdomain != nil {
-		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)
+	if environmentSubdomain != nil {
+		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, environmentSubdomain, b.HttpClient, b.Logger)
 	}
 
 	return CheckoutApi(newConfiguration), nil

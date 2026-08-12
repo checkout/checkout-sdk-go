@@ -18,17 +18,11 @@ func TestOauthCheckoutSdks(t *testing.T) {
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
 		WithEnvironment(configuration.Sandbox()).
+		// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,
+		// so the token request would come back invalid_client. Opting out explicitly until
+		// they are.
+		WithLegacyDomain().
 		Build()
-
-	// Not ready yet to tests with subdomains
-	// var oauthApiSubdomain, _ = checkout.Builder().
-	// 	OAuth().
-	// 	WithClientCredentials(
-	// 		os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
-	// 		os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
-	// 	WithEnvironment(configuration.Sandbox()).
-	// 	WithEnvironmentSubdomain("123dmain").
-	// 	Build()
 
 	var oauthApiBad, _ = checkout.Builder().
 		OAuth().
@@ -36,6 +30,7 @@ func TestOauthCheckoutSdks(t *testing.T) {
 			"error",
 			"error").
 		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
 		Build()
 
 	cases := []struct {

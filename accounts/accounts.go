@@ -30,6 +30,8 @@ const (
 
 type (
 	InstrumentDocument struct {
+		// Type accepts only bank_statement. Use common.BankStatement rather than a literal.
+		// Left as a string so existing callers keep compiling.
 		Type   string `json:"type,omitempty"`
 		FileId string `json:"file_id,omitempty"`
 	}

@@ -107,6 +107,19 @@ const (
 	ElectoralId          DocumentType = "electoral_id"
 )
 
+// InstrumentDocumentType is the type of the legal document that verifies a bank account when
+// creating a payment instrument.
+//
+// Deliberately separate from DocumentType, which lists identity documents (passport, national
+// identity card, driving license). The API models the bank account document type as its own
+// enum whose only accepted value is bank_statement, so offering it alongside the identity
+// documents would suggest it is valid where the API rejects it, and vice versa.
+type InstrumentDocumentType string
+
+const (
+	BankStatement InstrumentDocumentType = "bank_statement"
+)
+
 type AccountHolderIdentificationType string
 
 const (

@@ -924,6 +924,8 @@ type (
 	}
 
 	VoidRequest struct {
+		// Amount to void (min 0, max 9999999999). If not specified, the full payment amount is voided.
+		Amount    int64                  `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}

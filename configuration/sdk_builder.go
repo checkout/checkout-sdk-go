@@ -8,6 +8,7 @@ type SdkBuilder struct {
 	EnvironmentSubdomain *EnvironmentSubdomain
 	HttpClient           *http.Client
 	Logger               StdLogger
+	Retry                *RetryConfiguration
 }
 
 func (s *SdkBuilder) GetConfiguration(string, string) *Configuration {

@@ -161,6 +161,42 @@ api, err := checkout.Builder().
                      Build()
 ```
 
+## Retries
+
+By default the SDK executes each request exactly once. You can opt in to automatic retries of transient failures — connection errors and `409`, `429` and `5xx` responses — with exponential backoff and jitter, independently of the `http.Client` you provide. This behaviour mirrors the resilience offered by other Checkout SDKs.
+
+```go
+import (
+    "github.com/checkout/checkout-sdk-go/v2"
+    "github.com/checkout/checkout-sdk-go/v2/configuration"
+)
+
+// Enable retries with sensible defaults (2 retries, 500ms–5s backoff).
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithSecretKey("secret_key").
+                     WithRetries().
+                     Build()
+```
+
+To customise the behaviour, pass your own `RetryConfiguration`:
+
+```go
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithSecretKey("secret_key").
+                     WithRetryConfiguration(&configuration.RetryConfiguration{
+                         MaxRetries: 3,
+                         MinBackoff: 200 * time.Millisecond,
+                         MaxBackoff: 10 * time.Second,
+                     }).
+                     Build()
+```
+
+When retries are enabled, the SDK automatically generates a `Cko-Idempotency-Key` for `POST` and `PUT` requests that do not already supply one, so a retried write is deduplicated by the Checkout API rather than applied twice. A server-provided `Retry-After` header is respected (capped at `MaxBackoff`), and backoff always stops early if the request `context` is cancelled or its deadline is exceeded.
+
 ## Logging
 
 The SDK supports custom Log provider. You can provide your log configuration via SDK initialization. By default, the SDK uses the `log` package from the standard library.

@@ -35,6 +35,16 @@ func (b *CheckoutPreviousSdkBuilder) WithLogger(logger configuration.StdLogger) 
 	return b
 }
 
+func (b *CheckoutPreviousSdkBuilder) WithRetries() *CheckoutPreviousSdkBuilder {
+	b.Retry = configuration.DefaultRetryConfiguration()
+	return b
+}
+
+func (b *CheckoutPreviousSdkBuilder) WithRetryConfiguration(retry *configuration.RetryConfiguration) *CheckoutPreviousSdkBuilder {
+	b.Retry = retry
+	return b
+}
+
 func (b *CheckoutPreviousSdkBuilder) WithPublicKey(publicKey string) *CheckoutPreviousSdkBuilder {
 	b.PublicKey = publicKey
 	return b
@@ -63,6 +73,8 @@ func (b *CheckoutPreviousSdkBuilder) Build() (*Api, error) {
 	if b.EnvironmentSubdomain != nil {
 		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, b.EnvironmentSubdomain, b.HttpClient, b.Logger)
 	}
+
+	newConfiguration.Retry = b.Retry
 
 	return CheckoutApi(newConfiguration), nil
 }

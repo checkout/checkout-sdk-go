@@ -110,8 +110,11 @@ type (
 	}
 
 	PaymentInstructionResponse struct {
-		ValueDate *time.Time             `json:"value_date,omitempty"`
-		Links     map[string]common.Link `json:"_links"`
+		ValueDate *time.Time `json:"value_date,omitempty"`
+		// FundsTransferType is the scheme's categorisation of the client,
+		// for example FD, MT or AA.
+		FundsTransferType string                 `json:"funds_transfer_type,omitempty"`
+		Links             map[string]common.Link `json:"_links"`
 	}
 
 	Identification struct {

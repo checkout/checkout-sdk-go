@@ -8,11 +8,22 @@ import (
 	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
+// Frequency indicates how often funds should be paid out to a sub-entity.
 type Frequency string
 
 const (
-	Weekly  Frequency = "weekly"
-	Daily   Frequency = "daily"
+	// Weekly pays out on the configured days of the week. SaaS seller (ISV)
+	// sub-entities accept working days only, Monday to Friday: a schedule set
+	// to a Saturday or Sunday is rejected. Standard sub-entities accept any day.
+	Weekly Frequency = "weekly"
+	// Daily pays out every day for standard sub-entities. For SaaS seller (ISV)
+	// sub-entities it runs on working days only, Monday to Friday, with no
+	// payout at weekends, based on the available balance as of 00:00 in the
+	// sub-entity's time zone.
+	Daily Frequency = "daily"
+	// Monthly pays out on the configured days of the month. Standard
+	// sub-entities accept any day from 1 to 28. SaaS seller (ISV) sub-entities
+	// accept only these combinations, in any order: [1], [15], [1, 15] or [1, 16].
 	Monthly Frequency = "monthly"
 )
 
@@ -82,9 +93,23 @@ func (s scheduleFrequencyMonthly) GetSchedule() Frequency {
 
 type (
 	CurrencySchedule struct {
-		Enabled             bool       `json:"enabled,omitempty"`
-		Threshold           int        `json:"threshold,omitempty"`
-		PaymentInstrumentId string     `json:"payment_instrument_id,omitempty"`
+		Enabled   bool `json:"enabled,omitempty"`
+		Threshold int  `json:"threshold,omitempty"`
+		// PaymentInstrumentId is the ID of the platforms payment instrument used
+		// as the payout destination for this schedule. Optional for SaaS seller
+		// (ISV) schedules; if included, it must reference a verified payment
+		// instrument, otherwise the request fails.
+		PaymentInstrumentId string `json:"payment_instrument_id,omitempty"`
+		// BalanceMinimum is the amount, in the minor units of the schedule's
+		// currency, to retain in the sub-entity's available balance. Only the
+		// funds above this are paid out, and no payout is generated if there are
+		// none. Defaults to 0 if not set. SaaS seller (ISV) schedules only.
+		BalanceMinimum *int64 `json:"balance_minimum,omitempty"`
+		// CarryForwardEnabled indicates whether to carry forward any balance
+		// below the configured minimum to the next payout. Always returned for
+		// SaaS sellers, and defaults to false if not set. SaaS seller (ISV)
+		// schedules only.
+		CarryForwardEnabled *bool      `json:"carry_forward_enabled,omitempty"`
 		Recurrence          Recurrence `json:"recurrence,omitempty"`
 	}
 
@@ -131,6 +156,9 @@ func (p *PayoutSchedule) UnmarshalJSON(data []byte) error {
 
 			currency.Enabled = currencyMap[k].Enabled
 			currency.Threshold = currencyMap[k].Threshold
+			currency.PaymentInstrumentId = currencyMap[k].PaymentInstrumentId
+			currency.BalanceMinimum = currencyMap[k].BalanceMinimum
+			currency.CarryForwardEnabled = currencyMap[k].CarryForwardEnabled
 			p.Currency[k] = currency
 		}
 	}
@@ -146,9 +174,12 @@ func (p *PayoutSchedule) UnmarshalJSON(data []byte) error {
 
 type (
 	currencyUnmarshaler struct {
-		Enabled    bool `json:"enabled,omitempty"`
-		Threshold  int  `json:"threshold,omitempty"`
-		Recurrence struct {
+		Enabled             bool   `json:"enabled,omitempty"`
+		Threshold           int    `json:"threshold,omitempty"`
+		PaymentInstrumentId string `json:"payment_instrument_id,omitempty"`
+		BalanceMinimum      *int64 `json:"balance_minimum,omitempty"`
+		CarryForwardEnabled *bool  `json:"carry_forward_enabled,omitempty"`
+		Recurrence          struct {
 			Frequency
 		}
 	}

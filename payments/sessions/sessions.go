@@ -94,7 +94,7 @@ type (
 		Locale                     payments.LocalType                       `json:"locale,omitempty"`
 		ThreeDsRequest             *payments.ThreeDsRequestFlowHostedLinks  `json:"3ds,omitempty"`
 		Sender                     *nas.Sender                              `json:"sender,omitempty"`
-		Capture                    bool                                     `json:"capture"`
+		Capture                    *bool                                    `json:"capture,omitempty"`
 		CaptureOn                  *time.Time                               `json:"capture_on,omitempty"`
 		ExpiresOn                  *time.Time                               `json:"expires_on,omitempty"`
 		EnabledPaymentMethods      []PaymentMethodsType                     `json:"enabled_payment_methods,omitempty"`
@@ -149,8 +149,10 @@ type (
 		Locale                     payments.LocalType                       `json:"locale,omitempty"`
 		ThreeDsRequest             *payments.ThreeDsRequestFlowHostedLinks  `json:"3ds,omitempty"`
 		Sender                     *nas.Sender                              `json:"sender,omitempty"`
-		Capture                    bool                                     `json:"capture"`
+		Capture                    *bool                                    `json:"capture,omitempty"`
 		CaptureOn                  *time.Time                               `json:"capture_on,omitempty"`
+		AuthorizationType          nas.AuthorizationType                    `json:"authorization_type,omitempty"`
+		PaymentPlan                *payments.PaymentPlan                    `json:"payment_plan,omitempty"`
 	}
 
 	SubmitPaymentSessionRequest struct {
@@ -175,9 +177,10 @@ type (
 		ProcessingChannelId        string                               `json:"processing_channel_id,omitempty"`
 		Metadata                   map[string]interface{}               `json:"metadata,omitempty"`
 		Sender                     *nas.Sender                          `json:"sender,omitempty"`
-		Capture                    bool                                 `json:"capture"`
+		Capture                    *bool                                `json:"capture,omitempty"`
 		CaptureOn                  *time.Time                           `json:"capture_on,omitempty"`
 		Processing                 *payments.ProcessingSettings         `json:"processing,omitempty"`
+		AmountAllocations          []common.AmountAllocations           `json:"amount_allocations,omitempty"`
 	}
 
 	// Response structures for payment session submit/complete endpoints

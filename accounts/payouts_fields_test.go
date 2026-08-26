@@ -103,3 +103,38 @@ func TestPayoutSchedule_UnmarshalNewFieldsAbsent(t *testing.T) {
 	assert.Nil(t, usd.BalanceMinimum)
 	assert.Nil(t, usd.CarryForwardEnabled)
 }
+
+// The OpenAPI spec (GetScheduleResponse / GetScheduleResponseIsv) describes a
+// different nesting: the currency object holds a "recurrence" wrapper that
+// contains enabled, threshold, balance_minimum, carry_forward_enabled and
+// payment_instrument_id, with the frequency under an inner "schedule" object.
+// Every typed SDK (this one, Java, .NET) models the flat shape asserted by the
+// tests above, and their integration suites pass against the live API, so the
+// flat shape is treated as the real contract and the spec wording as a spec
+// bug (reported). This test documents that a spec-shaped payload does NOT map:
+// if it ever starts mapping, the API moved and the models must follow.
+func TestPayoutSchedule_SpecShapedPayloadDoesNotMap(t *testing.T) {
+	payload := `{
+		"GBP": {
+			"recurrence": {
+				"enabled": true,
+				"threshold": 100,
+				"balance_minimum": 500,
+				"carry_forward_enabled": true,
+				"payment_instrument_id": "ppi_w4jelhppmfiufdnatam37wrfc4",
+				"schedule": {
+					"frequency": "weekly",
+					"by_day": ["monday"]
+				}
+			}
+		},
+		"_links": {}
+	}`
+
+	var schedule PayoutSchedule
+	err := json.Unmarshal([]byte(payload), &schedule)
+
+	// The spec-shaped recurrence object has no frequency at its top level, so
+	// the unmarshaler cannot dispatch and reports the currency as unsupported.
+	assert.Error(t, err)
+}

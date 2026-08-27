@@ -924,6 +924,10 @@ type (
 	}
 
 	VoidRequest struct {
+		// Amount to void (min 0, max 9999999999). If not specified, the full payment
+		// amount is voided. A pointer so an explicit 0, which the spec allows, is
+		// distinguishable from the field not being set.
+		Amount    *int64                 `json:"amount,omitempty"`
 		Reference string                 `json:"reference,omitempty"`
 		Metadata  map[string]interface{} `json:"metadata,omitempty"`
 	}

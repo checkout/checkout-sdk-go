@@ -18,6 +18,10 @@ type Environment interface {
 	IsSandbox() bool
 }
 
+// subdomainRegex matches a merchant-specific subdomain, optionally carrying the pl- prefix used
+// by Private Link merchants.
+var subdomainRegex = regexp.MustCompile("^(?:pl-)?[a-z0-9]+$")
+
 type EnvironmentSubdomain struct {
 	ApiUrl           string
 	AuthorizationUrl string
@@ -42,12 +46,10 @@ func NewEnvironmentSubdomain(environment Environment, subdomain string) (*Enviro
 // subdomain to the host. It returns an error when the subdomain is not a valid merchant-specific
 // subdomain, rather than quietly falling back to the shared host.
 func createUrlWithSubdomain(originalUrl, subdomain string) (string, error) {
-	regex := regexp.MustCompile("^(?:pl-)?[a-z0-9]+$")
-
-	if !regex.MatchString(subdomain) {
+	if !subdomainRegex.MatchString(subdomain) {
 		return "", errors.CheckoutArgumentError(
-			"invalid environment subdomain - provide your merchant-specific subdomain, the first " +
-				"8 characters of your client ID (see " +
+			"invalid environment subdomain - provide your merchant-specific subdomain, typically " +
+				"your client ID excluding the cli_ prefix (see " +
 				"https://api-reference.checkout.com/#section/Base-URLs)")
 	}
 

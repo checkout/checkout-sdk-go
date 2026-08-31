@@ -60,10 +60,7 @@ func DefaultApi() *nas.Api {
 			WithEnvironment(configuration.Sandbox()).
 			WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
 			WithPublicKey(os.Getenv("CHECKOUT_DEFAULT_PUBLIC_KEY")).
-			// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,
-			// so the token request would come back invalid_client. Opting out explicitly until
-			// they are.
-			WithLegacyDomain().
+			WithEnvironmentSubdomain(os.Getenv("CHECKOUT_MERCHANT_SUBDOMAIN")).
 			Build()
 	}
 	return defaultApi
@@ -82,6 +79,8 @@ func OAuthApi() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes(getOAuthScopes()).
+			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().
 			Build()
 	}

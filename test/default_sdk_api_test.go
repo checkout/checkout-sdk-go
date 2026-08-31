@@ -17,10 +17,7 @@ func TestDefaultCheckoutSdks(t *testing.T) {
 		WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
 		WithPublicKey(os.Getenv("CHECKOUT_DEFAULT_PUBLIC_KEY")).
 		WithEnvironment(configuration.Sandbox()).
-		// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,
-		// so the token request would come back invalid_client. Opting out explicitly until
-		// they are.
-		WithLegacyDomain().
+		WithEnvironmentSubdomain(os.Getenv("CHECKOUT_MERCHANT_SUBDOMAIN")).
 		Build()
 
 	var defaultApiSubdomain, _ = checkout.Builder().

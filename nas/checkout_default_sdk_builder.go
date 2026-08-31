@@ -82,7 +82,7 @@ func (b *CheckoutDefaultSdkBuilder) Build() (*Api, error) {
 	newConfiguration := configuration.NewConfiguration(sdkCredentials, b.EnableTelemetry, b.Environment, b.HttpClient, b.Logger)
 
 	if environmentSubdomain != nil {
-		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.Environment, environmentSubdomain, b.HttpClient, b.Logger)
+		newConfiguration = configuration.NewConfigurationWithSubdomain(sdkCredentials, b.EnableTelemetry, b.Environment, environmentSubdomain, b.HttpClient, b.Logger)
 	}
 
 	return CheckoutApi(newConfiguration), nil

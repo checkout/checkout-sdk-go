@@ -18,9 +18,8 @@ func TestOauthCheckoutSdks(t *testing.T) {
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
 		WithEnvironment(configuration.Sandbox()).
-		// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,
-		// so the token request would come back invalid_client. Opting out explicitly until
-		// they are.
+		// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+		// come back invalid_client. Opting out explicitly until they are provisioned.
 		WithLegacyDomain().
 		Build()
 

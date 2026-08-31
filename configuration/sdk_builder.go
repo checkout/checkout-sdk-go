@@ -43,8 +43,8 @@ func (s *SdkBuilder) ValidateEnvironmentSettings(requiresSubdomain bool) error {
 	}
 	if s.Subdomain == "" && !s.UseLegacyDomain && requiresSubdomain {
 		return errors.CheckoutArgumentError(
-			"environment subdomain is required - provide your merchant-specific subdomain (the " +
-				"first 8 characters of your client ID, see " +
+			"environment subdomain is required - provide your merchant-specific subdomain (typically " +
+				"your client ID excluding the cli_ prefix, see " +
 				"https://api-reference.checkout.com/#section/Base-URLs), or call WithLegacyDomain " +
 				"to opt out only if merchant specific sub domains are causing issues")
 	}

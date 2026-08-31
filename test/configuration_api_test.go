@@ -36,7 +36,7 @@ func TestShouldCreateConfigurationWithSubdomain(t *testing.T) {
 		t.Run("Should create configuration with subdomain "+tc.subdomain, func(t *testing.T) {
 			subdomain, err := configuration.NewEnvironmentSubdomain(environment, tc.subdomain)
 			assert.Nil(t, err)
-			config := configuration.NewConfigurationWithSubdomain(credentials, environment, subdomain, &http.Client{}, nil)
+			config := configuration.NewConfigurationWithSubdomain(credentials, nil, environment, subdomain, &http.Client{}, nil)
 
 			assert.NotNil(t, config)
 			assert.Equal(t, tc.expectedApiUrl, config.EnvironmentSubdomain.ApiUrl)
@@ -68,7 +68,7 @@ func TestShouldCreateConfigurationWithSubdomainForProduction(t *testing.T) {
 
 	subdomain_env, err := configuration.NewEnvironmentSubdomain(environment, subdomain)
 	assert.Nil(t, err)
-	config := configuration.NewConfigurationWithSubdomain(credentials, environment, subdomain_env, &http.Client{}, nil)
+	config := configuration.NewConfigurationWithSubdomain(credentials, nil, environment, subdomain_env, &http.Client{}, nil)
 
 	assert.NotNil(t, config)
 	assert.Equal(t, "https://1234prod.api.checkout.com", config.EnvironmentSubdomain.ApiUrl)

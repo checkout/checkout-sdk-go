@@ -77,6 +77,13 @@ func (b *CheckoutOAuthSdkBuilder) Build() (*Api, error) {
 		return nil, err
 	}
 
+	if b.AuthorizationUri != "" && b.Subdomain != "" {
+		return nil, errors.CheckoutArgumentError(
+			"authorization URI and environment subdomain cannot both be set - the token endpoint " +
+				"is derived from your subdomain; combine the authorization URI with " +
+				"WithLegacyDomain() if you need a custom token host")
+	}
+
 	environmentSubdomain, subdomainErr := b.GetEnvironmentSubdomain()
 	if subdomainErr != nil {
 		return nil, subdomainErr

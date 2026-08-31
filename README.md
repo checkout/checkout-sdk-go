@@ -100,7 +100,6 @@ import (
 
 api, err := checkout.Builder().
                      OAuth().
-                     WithAuthorizationUri("https://access.sandbox.checkout.com/connect/token"). // optional, custom authorization URI
                      WithClientCredentials("client_id", "client_secret").
                      WithEnvironment(configuration.Sandbox()).
                      WithEnvironmentSubdomain("subdomain"). // required, the first 8 characters of your client ID

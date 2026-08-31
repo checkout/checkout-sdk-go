@@ -1,6 +1,8 @@
 package test
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -83,4 +85,37 @@ func TestOauthCheckoutSdkWithSubdomain(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "invalid_client")
+}
+
+func TestOauthShouldFailWithAuthorizationUriAndSubdomain(t *testing.T) {
+	api, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithAuthorizationUri("https://access.sandbox.checkout.com/connect/token").
+		WithEnvironment(configuration.Sandbox()).
+		WithEnvironmentSubdomain("1234doma").
+		Build()
+
+	assert.Nil(t, api)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "authorization URI and environment subdomain cannot both be set")
+}
+
+func TestOauthShouldBuildWithAuthorizationUriAndLegacyDomain(t *testing.T) {
+	tokenServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"token","expires_in":3600,"token_type":"Bearer"}`))
+	}))
+	defer tokenServer.Close()
+
+	api, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithAuthorizationUri(tokenServer.URL).
+		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
+		Build()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, api)
 }

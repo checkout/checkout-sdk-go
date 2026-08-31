@@ -3,11 +3,11 @@ package contexts
 import (
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/payments"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
 
-	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
-	"github.com/checkout/checkout-sdk-go/v2/payments/nas/sources/apm"
+	"github.com/checkout/checkout-sdk-go/v3/payments/nas"
+	"github.com/checkout/checkout-sdk-go/v3/payments/nas/sources/apm"
 )
 
 type PaymentContextDetailsStatusType string

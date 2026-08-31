@@ -1,6 +1,6 @@
 package cardholdertokens
 
-import "github.com/checkout/checkout-sdk-go/v2/common"
+import "github.com/checkout/checkout-sdk-go/v3/common"
 
 const cardholderTokenPath = "issuing/access/connect/token"
 

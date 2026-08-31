@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/forward"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/forward"
 	"github.com/stretchr/testify/assert"
 )
 

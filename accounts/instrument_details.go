@@ -1,7 +1,7 @@
 package accounts
 
 import (
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 type InstrumentDetail string

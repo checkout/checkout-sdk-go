@@ -7,14 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
-	"github.com/checkout/checkout-sdk-go/v2/mocks"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/actions"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/conditions"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/events"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/reflows"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/mocks"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/actions"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/conditions"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/events"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/reflows"
 )
 
 func TestCreateWorkflow(t *testing.T) {

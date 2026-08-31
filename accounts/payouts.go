@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
 
 // Frequency indicates how often funds should be paid out to a sub-entity.

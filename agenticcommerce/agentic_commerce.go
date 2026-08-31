@@ -3,7 +3,7 @@ package agenticcommerce
 import (
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 const delegatePaymentPath = "agentic_commerce/delegate_payment"

@@ -7,19 +7,19 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2"
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	issuingTesting "github.com/checkout/checkout-sdk-go/v2/issuing/testing"
-	"github.com/checkout/checkout-sdk-go/v2/nas"
+	"github.com/checkout/checkout-sdk-go/v3"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	issuingTesting "github.com/checkout/checkout-sdk-go/v3/issuing/testing"
+	"github.com/checkout/checkout-sdk-go/v3/nas"
 
-	cardholders "github.com/checkout/checkout-sdk-go/v2/issuing/cardholders"
-	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
-	controlgroups "github.com/checkout/checkout-sdk-go/v2/issuing/controlgroups"
-	controlprofiles "github.com/checkout/checkout-sdk-go/v2/issuing/controlprofiles"
-	controls "github.com/checkout/checkout-sdk-go/v2/issuing/controls"
-	disputes "github.com/checkout/checkout-sdk-go/v2/issuing/disputes"
-	transactions "github.com/checkout/checkout-sdk-go/v2/issuing/transactions"
+	cardholders "github.com/checkout/checkout-sdk-go/v3/issuing/cardholders"
+	cards "github.com/checkout/checkout-sdk-go/v3/issuing/cards"
+	controlgroups "github.com/checkout/checkout-sdk-go/v3/issuing/controlgroups"
+	controlprofiles "github.com/checkout/checkout-sdk-go/v3/issuing/controlprofiles"
+	controls "github.com/checkout/checkout-sdk-go/v3/issuing/controls"
+	disputes "github.com/checkout/checkout-sdk-go/v3/issuing/disputes"
+	transactions "github.com/checkout/checkout-sdk-go/v3/issuing/transactions"
 )
 
 var (

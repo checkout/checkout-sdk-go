@@ -1,9 +1,9 @@
 package customers
 
 import (
-	instruments "github.com/checkout/checkout-sdk-go/v2/instruments/nas"
+	instruments "github.com/checkout/checkout-sdk-go/v3/instruments/nas"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 const Path = "customers"

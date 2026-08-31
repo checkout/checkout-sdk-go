@@ -5,7 +5,7 @@
 
 [![build-status](https://github.com/checkout/checkout-sdk-go/workflows/build-release/badge.svg)](https://github.com/checkout/checkout-sdk-go/actions/workflows/build-release.yml)
 [![GitHub release](https://img.shields.io/github/release/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/releases/)
-[![Go Reference](https://pkg.go.dev/badge/github.com/checkout/checkout-sdk-go/v2.svg)](https://pkg.go.dev/github.com/checkout/checkout-sdk-go/v2)
+[![Go Reference](https://pkg.go.dev/badge/github.com/checkout/checkout-sdk-go/v3.svg)](https://pkg.go.dev/github.com/checkout/checkout-sdk-go/v3)
 
 [![GitHub license](https://img.shields.io/github/license/checkout/checkout-sdk-go.svg)](https://github.com/checkout/checkout-sdk-go/blob/master/LICENSE.md)
 
@@ -21,7 +21,7 @@
 Make sure your project is using Go Modules:
 ```sh
 # For v2.x (current)
-go get github.com/checkout/checkout-sdk-go/v2
+go get github.com/checkout/checkout-sdk-go/v3
 
 # For v1.x (legacy)
 go get github.com/checkout/checkout-sdk-go@v1.9.0
@@ -29,7 +29,7 @@ go get github.com/checkout/checkout-sdk-go@v1.9.0
 Then import the library into your code:
 ```sh
 # For v2.x
-import "github.com/checkout/checkout-sdk-go/v2"
+import "github.com/checkout/checkout-sdk-go/v3"
 
 # For v1.x
 import "github.com/checkout/checkout-sdk-go"
@@ -75,8 +75,8 @@ Default keys client instantiation can be done as follows:
 
 ```go
 import (
-    "github.com/checkout/checkout-sdk-go/v2"
-    "github.com/checkout/checkout-sdk-go/v2/configuration"
+    "github.com/checkout/checkout-sdk-go/v3"
+    "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 api, err := checkout.Builder().
@@ -94,8 +94,8 @@ The SDK supports client credentials OAuth, when initialized as follows:
 
 ```go
 import (
-    "github.com/checkout/checkout-sdk-go/v2"
-    "github.com/checkout/checkout-sdk-go/v2/configuration"
+    "github.com/checkout/checkout-sdk-go/v3"
+    "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 api, err := checkout.Builder().
@@ -113,8 +113,8 @@ If your pair of keys matches the previous system type, this is how the SDK shoul
 
 ```go
 import (
-    "github.com/checkout/checkout-sdk-go/v2"
-    "github.com/checkout/checkout-sdk-go/v2/configuration"
+    "github.com/checkout/checkout-sdk-go/v3"
+    "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 api, err := checkout.Builder().
@@ -130,8 +130,8 @@ Then just get any client, and start making requests:
 
 ```go
 import (
-    "github.com/checkout/checkout-sdk-go/v2/payments"
-    "github.com/checkout/checkout-sdk-go/v2/payments/nas"
+    "github.com/checkout/checkout-sdk-go/v3/payments"
+    "github.com/checkout/checkout-sdk-go/v3/payments/nas"
 )
 
 request := nas.PaymentRequest{}
@@ -150,8 +150,8 @@ Go SDK supports your own configuration for `http client` using `http.Client` fro
 import (
     "net/http"
     
-    "github.com/checkout/checkout-sdk-go/v2"
-    "github.com/checkout/checkout-sdk-go/v2/configuration"
+    "github.com/checkout/checkout-sdk-go/v3"
+    "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 httpClient := http.Client{
@@ -175,8 +175,8 @@ The SDK supports custom Log provider. You can provide your log configuration via
 import (
     "log"	
 	
-    "github.com/checkout/checkout-sdk-go/v2"
-    "github.com/checkout/checkout-sdk-go/v2/configuration"
+    "github.com/checkout/checkout-sdk-go/v3"
+    "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 logger := log.New(os.Stderr, "checkout-sdk-go - ", log.LstdFlags)
@@ -195,8 +195,8 @@ In case that you want to use an integrator or mock server, you can specify your 
 
 ```go
 import (
-    "github.com/checkout/checkout-sdk-go/v2"
-    "github.com/checkout/checkout-sdk-go/v2/configuration"
+    "github.com/checkout/checkout-sdk-go/v3"
+    "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 environment := configuration.NewEnvironment(

@@ -3,8 +3,8 @@ package issuing
 import (
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	cards "github.com/checkout/checkout-sdk-go/v3/issuing/cards"
 )
 
 type CardholderType string

@@ -2,14 +2,14 @@ package test
 
 import (
 	"fmt"
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	webhooks "github.com/checkout/checkout-sdk-go/v2/webhooks/abc"
+	webhooks "github.com/checkout/checkout-sdk-go/v3/webhooks/abc"
 )
 
 func TestRetrieveWebhook(t *testing.T) {

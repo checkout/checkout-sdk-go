@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/payments"
-	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
+	"github.com/checkout/checkout-sdk-go/v3/payments/nas"
 )
 
 // Verifies that capture is omitted from every payment session request unless the caller sets it.

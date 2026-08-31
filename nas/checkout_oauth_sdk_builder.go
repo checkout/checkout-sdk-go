@@ -3,8 +3,8 @@ package nas
 import (
 	"net/http"
 
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
 
 type CheckoutOAuthSdkBuilder struct {

@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2"
-	"github.com/checkout/checkout-sdk-go/v2/abc"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	"github.com/checkout/checkout-sdk-go/v3"
+	"github.com/checkout/checkout-sdk-go/v3/abc"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 func TestPreviousCheckoutSdks(t *testing.T) {

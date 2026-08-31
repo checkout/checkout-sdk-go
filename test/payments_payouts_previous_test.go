@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/payments"
-	"github.com/checkout/checkout-sdk-go/v2/payments/abc"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
+	"github.com/checkout/checkout-sdk-go/v3/payments/abc"
 )
 
 func TestRequestPayoutPrevious(t *testing.T) {

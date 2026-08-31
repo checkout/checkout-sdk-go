@@ -1,9 +1,9 @@
 package workflows
 
 import (
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/actions"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/conditions"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/actions"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/conditions"
 )
 
 const (

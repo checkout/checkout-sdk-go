@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 // Verifies the Payment Setups schemas aligned with the 2026-06-29 Checkout.com swagger delta:

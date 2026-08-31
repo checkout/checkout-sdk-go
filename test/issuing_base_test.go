@@ -52,8 +52,8 @@ func buildIssuingClientApi() *nas.Api {
 	if issuingClientApi == nil {
 		issuingClientApi, _ = checkout.Builder().OAuth().
 			WithClientCredentials(
-				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
-				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_ID"),
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes([]string{
 				configuration.Vault,

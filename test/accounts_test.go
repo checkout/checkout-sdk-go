@@ -1065,8 +1065,8 @@ func buildFilesClient() *nas.Api {
 	if oauthFilesApi == nil {
 		oauthFilesApi, _ = checkout.Builder().OAuth().
 			WithClientCredentials(
-				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
-				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes([]string{configuration.Marketplace, configuration.Files}).
 			// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,
@@ -1083,8 +1083,8 @@ func buildPayoutsScheduleClient() *nas.Api {
 	if oauthPayoutsScheduleApi == nil {
 		oauthPayoutsScheduleApi, _ = checkout.Builder().OAuth().
 			WithClientCredentials(
-				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
-				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes([]string{configuration.Accounts}).
 			// The sandbox OAuth clients are not provisioned for the merchant-specific subdomain,

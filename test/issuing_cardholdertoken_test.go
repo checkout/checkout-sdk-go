@@ -27,8 +27,8 @@ func TestRequestCardholderTokenWithContext(t *testing.T) {
 			name: "when request is correct then return cardholder token",
 			request: cardholdertokens.CardholderTokenRequest{
 				GrantType:    "client_credentials",
-				ClientId:     os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_ID"),
-				ClientSecret: os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_SECRET"),
+				ClientId:     os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
+				ClientSecret: os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET"),
 				CardholderId: created.Id,
 			},
 			checker: func(response *cardholdertokens.CardholderTokenResponse, err error) {
@@ -44,8 +44,8 @@ func TestRequestCardholderTokenWithContext(t *testing.T) {
 			name: "when single_use is true then return single-use cardholder token",
 			request: cardholdertokens.CardholderTokenRequest{
 				GrantType:    "client_credentials",
-				ClientId:     os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_ID"),
-				ClientSecret: os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_SECRET"),
+				ClientId:     os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
+				ClientSecret: os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET"),
 				CardholderId: created.Id,
 				SingleUse:    true,
 			},

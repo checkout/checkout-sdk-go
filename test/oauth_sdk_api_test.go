@@ -1,6 +1,8 @@
 package test
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -18,17 +20,10 @@ func TestOauthCheckoutSdks(t *testing.T) {
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
 		WithEnvironment(configuration.Sandbox()).
+		// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+		// come back invalid_client. Opting out explicitly until they are provisioned.
+		WithLegacyDomain().
 		Build()
-
-	// Not ready yet to tests with subdomains
-	// var oauthApiSubdomain, _ = checkout.Builder().
-	// 	OAuth().
-	// 	WithClientCredentials(
-	// 		os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
-	// 		os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
-	// 	WithEnvironment(configuration.Sandbox()).
-	// 	WithEnvironmentSubdomain("123dmain").
-	// 	Build()
 
 	var oauthApiBad, _ = checkout.Builder().
 		OAuth().
@@ -36,6 +31,7 @@ func TestOauthCheckoutSdks(t *testing.T) {
 			"error",
 			"error").
 		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
 		Build()
 
 	cases := []struct {
@@ -89,4 +85,37 @@ func TestOauthCheckoutSdkWithSubdomain(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "invalid_client")
+}
+
+func TestOauthShouldFailWithAuthorizationUriAndSubdomain(t *testing.T) {
+	api, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithAuthorizationUri("https://access.sandbox.checkout.com/connect/token").
+		WithEnvironment(configuration.Sandbox()).
+		WithEnvironmentSubdomain("1234doma").
+		Build()
+
+	assert.Nil(t, api)
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "authorization URI and environment subdomain cannot both be set")
+}
+
+func TestOauthShouldBuildWithAuthorizationUriAndLegacyDomain(t *testing.T) {
+	tokenServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"token","expires_in":3600,"token_type":"Bearer"}`))
+	}))
+	defer tokenServer.Close()
+
+	api, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithAuthorizationUri(tokenServer.URL).
+		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
+		Build()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, api)
 }

@@ -3,6 +3,8 @@ package configuration
 import (
 	"net/url"
 	"regexp"
+
+	"github.com/checkout/checkout-sdk-go/v2/errors"
 )
 
 type Environment interface {
@@ -16,38 +18,47 @@ type Environment interface {
 	IsSandbox() bool
 }
 
+// subdomainRegex matches a merchant-specific subdomain, optionally carrying the pl- prefix used
+// by Private Link merchants.
+var subdomainRegex = regexp.MustCompile("^(?:pl-)?[a-z0-9]+$")
+
 type EnvironmentSubdomain struct {
 	ApiUrl           string
 	AuthorizationUrl string
 }
 
-func NewEnvironmentSubdomain(environment Environment, subdomain string) *EnvironmentSubdomain {
-	apiUrl := createUrlWithSubdomain(environment.BaseUri(), subdomain)
-	authorizationUrl := createUrlWithSubdomain(environment.AuthorizationUri(), subdomain)
+func NewEnvironmentSubdomain(environment Environment, subdomain string) (*EnvironmentSubdomain, error) {
+	apiUrl, err := createUrlWithSubdomain(environment.BaseUri(), subdomain)
+	if err != nil {
+		return nil, err
+	}
+	authorizationUrl, err := createUrlWithSubdomain(environment.AuthorizationUri(), subdomain)
+	if err != nil {
+		return nil, err
+	}
 	return &EnvironmentSubdomain{
 		ApiUrl:           apiUrl,
 		AuthorizationUrl: authorizationUrl,
-	}
+	}, nil
 }
 
-// createUrlWithSubdomain applies subdomain transformation to any given URI.
-// If the subdomain is valid (alphanumeric pattern), prepends it to the host.
-// Otherwise, returns the original URI unchanged.
-func createUrlWithSubdomain(originalUrl string, subdomain string) string {
-	newEnvironment := originalUrl
-
-	regex := regexp.MustCompile("^(?:pl-)?[a-z0-9]+$")
-
-	if regex.MatchString(subdomain) {
-		merchantUrl, err := url.Parse(originalUrl)
-		if err != nil {
-			return newEnvironment
-		}
-		merchantUrl.Host = subdomain + "." + merchantUrl.Host
-		newEnvironment = merchantUrl.String()
+// createUrlWithSubdomain applies subdomain transformation to any given URI, prepending the
+// subdomain to the host. It returns an error when the subdomain is not a valid merchant-specific
+// subdomain, rather than quietly falling back to the shared host.
+func createUrlWithSubdomain(originalUrl, subdomain string) (string, error) {
+	if !subdomainRegex.MatchString(subdomain) {
+		return "", errors.CheckoutArgumentError(
+			"invalid environment subdomain - provide your merchant-specific subdomain, typically " +
+				"your client ID excluding the cli_ prefix (see " +
+				"https://api-reference.checkout.com/#section/Base-URLs)")
 	}
 
-	return newEnvironment
+	merchantUrl, err := url.Parse(originalUrl)
+	if err != nil {
+		return "", err
+	}
+	merchantUrl.Host = subdomain + "." + merchantUrl.Host
+	return merchantUrl.String(), nil
 }
 
 type CheckoutEnv struct {

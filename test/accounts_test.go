@@ -1069,6 +1069,9 @@ func buildFilesClient() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes([]string{configuration.Marketplace, configuration.Files}).
+			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+			// come back invalid_client. Opting out explicitly until they are provisioned.
+			WithLegacyDomain().
 			Build()
 	}
 
@@ -1083,6 +1086,9 @@ func buildPayoutsScheduleClient() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes([]string{configuration.Accounts}).
+			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+			// come back invalid_client. Opting out explicitly until they are provisioned.
+			WithLegacyDomain().
 			Build()
 	}
 
@@ -1097,6 +1103,9 @@ func buildAccountsClient() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			WithScopes([]string{configuration.Accounts}).
+			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+			// come back invalid_client. Opting out explicitly until they are provisioned.
+			WithLegacyDomain().
 			Build()
 	}
 
@@ -1114,6 +1123,9 @@ func buildAccountsClientVersion(schemaVersion string) *nas.Api {
 		WithScopes([]string{configuration.Accounts}).
 		WithEnvironment(configuration.Sandbox()).
 		WithHttpClient(httpClient).
+		// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+		// come back invalid_client. Opting out explicitly until they are provisioned.
+		WithLegacyDomain().
 		Build()
 
 	return oauthAccountsClientVersion

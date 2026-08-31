@@ -34,8 +34,9 @@ func TestShouldCreateConfigurationWithSubdomain(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("Should create configuration with subdomain "+tc.subdomain, func(t *testing.T) {
-			subdomain := configuration.NewEnvironmentSubdomain(environment, tc.subdomain)
-			config := configuration.NewConfigurationWithSubdomain(credentials, environment, subdomain, &http.Client{}, nil)
+			subdomain, err := configuration.NewEnvironmentSubdomain(environment, tc.subdomain)
+			assert.Nil(t, err)
+			config := configuration.NewConfigurationWithSubdomain(credentials, nil, environment, subdomain, &http.Client{}, nil)
 
 			assert.NotNil(t, config)
 			assert.Equal(t, tc.expectedApiUrl, config.EnvironmentSubdomain.ApiUrl)
@@ -44,36 +45,18 @@ func TestShouldCreateConfigurationWithSubdomain(t *testing.T) {
 	}
 }
 
-func TestShouldCreateConfigurationWithBadSubdomain(t *testing.T) {
-	credentials := new(mocks.CredentialsMock)
+func TestShouldFailWithBadSubdomain(t *testing.T) {
 	environment := configuration.Sandbox()
 
-	testCases := []struct {
-		subdomain       string
-		expectedApiUrl  string
-		expectedAuthUrl string
-	}{
-		{"", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"  ", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{" - ", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"a b", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"ab c1", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"foo-", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"-foo", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"ABC", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"test-123", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"foo-bar", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-		{"pl-", "https://api.sandbox.checkout.com", "https://access.sandbox.checkout.com/connect/token"},
-	}
+	badSubdomains := []string{"", "  ", " - ", "a b", "ab c1", "foo-", "-foo", "ABC", "test-123", "foo-bar", "pl-"}
 
-	for _, tc := range testCases {
-		t.Run("Should create configuration with bad subdomain "+tc.subdomain, func(t *testing.T) {
-			subdomain := configuration.NewEnvironmentSubdomain(environment, tc.subdomain)
-			config := configuration.NewConfigurationWithSubdomain(credentials, environment, subdomain, &http.Client{}, nil)
+	for _, badSubdomain := range badSubdomains {
+		t.Run("Should fail with bad subdomain "+badSubdomain, func(t *testing.T) {
+			subdomain, err := configuration.NewEnvironmentSubdomain(environment, badSubdomain)
 
-			assert.NotNil(t, config)
-			assert.Equal(t, tc.expectedApiUrl, config.EnvironmentSubdomain.ApiUrl)
-			assert.Equal(t, tc.expectedAuthUrl, config.EnvironmentSubdomain.AuthorizationUrl)
+			assert.Nil(t, subdomain)
+			assert.NotNil(t, err)
+			assert.Contains(t, err.Error(), "invalid environment subdomain")
 		})
 	}
 }
@@ -83,8 +66,9 @@ func TestShouldCreateConfigurationWithSubdomainForProduction(t *testing.T) {
 	environment := configuration.Production()
 	subdomain := "1234prod"
 
-	subdomain_env := configuration.NewEnvironmentSubdomain(environment, subdomain)
-	config := configuration.NewConfigurationWithSubdomain(credentials, environment, subdomain_env, &http.Client{}, nil)
+	subdomain_env, err := configuration.NewEnvironmentSubdomain(environment, subdomain)
+	assert.Nil(t, err)
+	config := configuration.NewConfigurationWithSubdomain(credentials, nil, environment, subdomain_env, &http.Client{}, nil)
 
 	assert.NotNil(t, config)
 	assert.Equal(t, "https://1234prod.api.checkout.com", config.EnvironmentSubdomain.ApiUrl)

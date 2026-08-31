@@ -21,7 +21,7 @@
 Make sure your project is using Go Modules:
 ```sh
 # For v2.x (current)
-go get github.com/checkout/checkout-sdk-go/v2@v2.0.0
+go get github.com/checkout/checkout-sdk-go/v2
 
 # For v1.x (legacy)
 go get github.com/checkout/checkout-sdk-go@v1.9.0
@@ -65,6 +65,10 @@ account [here](https://www.checkout.com/get-test-account).
 
 **PLEASE NEVER SHARE OR PUBLISH YOUR CHECKOUT CREDENTIALS.**
 
+### Subdomain value
+
+Requests must be made through your merchant-specific subdomain (MSSD): the first 8 characters of your client ID (excluding `cli_`). For example, if your client ID is `cli_vkuhvk4vjn2edkps7dfsq6emqm`, your subdomain is `vkuhvk4v`. When `WithEnvironmentSubdomain` is set the SDK sends requests to `https://vkuhvk4v.api.checkout.com`. See [Base URLs](https://api-reference.checkout.com/#section/Base-URLs) and [API endpoints](https://www.checkout.com/docs/developer-resources/api/api-endpoints) for further details, and for where to find your unique client ID. Private Link merchants use their pl- prefixed subdomain (for example pl-vkuhvk4v), which the SDK also accepts.
+
 ### Default
 
 Default keys client instantiation can be done as follows:
@@ -78,6 +82,7 @@ import (
 api, err := checkout.Builder().
                      StaticKeys().
                      WithEnvironment(configuration.Sandbox()).
+                     WithEnvironmentSubdomain("subdomain"). // required, the first 8 characters of your client ID
                      WithSecretKey("secret_key").
                      WithPublicKey("public_key"). // optional, only required for operations related with tokens
                      Build()
@@ -95,9 +100,9 @@ import (
 
 api, err := checkout.Builder().
                      OAuth().
-                     WithAuthorizationUri("https://access.sandbox.checkout.com/connect/token"). // optional, custom authorization URI
                      WithClientCredentials("client_id", "client_secret").
                      WithEnvironment(configuration.Sandbox()).
+                     WithEnvironmentSubdomain("subdomain"). // required, the first 8 characters of your client ID
                      WithScopes(getOAuthScopes()).
                      Build()
 ```
@@ -115,6 +120,7 @@ import (
 api, err := checkout.Builder().
                      Previous().
                      WithEnvironment(configuration.Sandbox()).
+                     WithEnvironmentSubdomain("subdomain"). // optional for the Previous platform
                      WithSecretKey("secret_key").
                      WithPublicKey("public_key"). // optional, only required for operations related with tokens
                      Build()
@@ -241,6 +247,23 @@ api := checkout.Builder().
     WithEnableTelemetry(false).
     Build()
 ```
+
+## Legacy domain (emergency use only)
+
+> :warning: **Only use if merchant specific sub domains are causing issues.** Connecting through your merchant-specific subdomain (see [Subdomain value](#subdomain-value)) is the supported way of using the Checkout.com API, and non-subdomain usage will be deprecated.
+
+If, in exceptional circumstances, you cannot use your merchant-specific subdomain, you can explicitly opt out by calling `WithLegacyDomain()` instead of `WithEnvironmentSubdomain(...)`:
+
+```go
+api, err := checkout.Builder().
+                     StaticKeys().
+                     WithEnvironment(configuration.Sandbox()).
+                     WithSecretKey("secret_key").
+                     WithLegacyDomain(). // deprecated, emergency fallback only
+                     Build()
+```
+
+This routes requests to `api.checkout.com` (or `api.sandbox.checkout.com`) and `access.checkout.com` (or `access.sandbox.checkout.com`). The method carries a `Deprecated:` doc comment, so `staticcheck` (SA1019) and editors will flag it. Exactly one of `WithEnvironmentSubdomain(...)` or `WithLegacyDomain()` must be set: `Build()` returns a `CheckoutArgumentError` if both, or neither, are. The Previous (ABC) platform predates merchant-specific subdomains and is exempt from this requirement.
 
 ## Code of Conduct
 

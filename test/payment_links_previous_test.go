@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
-	"github.com/checkout/checkout-sdk-go/v2/payments/links"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/payments/links"
 )
 
 func TestCreatePaymentLinkPrevious(t *testing.T) {

@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
-	"github.com/checkout/checkout-sdk-go/v2/forex"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/forex"
 )
 
 func TestRequestQuote(t *testing.T) {

@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/v2"
-	"github.com/checkout/checkout-sdk-go/v2/abc"
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	"github.com/checkout/checkout-sdk-go/v2/nas"
+	"github.com/checkout/checkout-sdk-go/v3"
+	"github.com/checkout/checkout-sdk-go/v3/abc"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/nas"
 )
 
 const MaxRetryAttemps = 10

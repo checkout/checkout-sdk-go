@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/identities"
+	"github.com/checkout/checkout-sdk-go/v3/identities"
 )
 
 // Verifies the face authentication attempt assets response (FavAttemptAssets)

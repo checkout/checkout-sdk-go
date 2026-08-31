@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
-	"github.com/checkout/checkout-sdk-go/v2/reports"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/reports"
 )
 
 func setupReportTest(t *testing.T) *reports.ReportResponse {

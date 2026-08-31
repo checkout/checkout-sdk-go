@@ -3,9 +3,9 @@ package paymentmethods
 import (
 	"context"
 
-	"github.com/checkout/checkout-sdk-go/v2/client"
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/client"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
 )
 
 type Client struct {

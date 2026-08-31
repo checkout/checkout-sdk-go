@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 
-	controls "github.com/checkout/checkout-sdk-go/v2/issuing/controls"
+	controls "github.com/checkout/checkout-sdk-go/v3/issuing/controls"
 )
 
 func TestCreateControl(t *testing.T) {

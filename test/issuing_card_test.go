@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 
-	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
+	cards "github.com/checkout/checkout-sdk-go/v3/issuing/cards"
 )
 
 // # tests

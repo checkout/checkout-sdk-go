@@ -1,7 +1,7 @@
 package channels
 
 import (
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 type ChannelType string

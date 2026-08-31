@@ -3,18 +3,18 @@ package issuing
 import (
 	"context"
 
-	"github.com/checkout/checkout-sdk-go/v2/client"
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	cardholders "github.com/checkout/checkout-sdk-go/v2/issuing/cardholders"
-	cards "github.com/checkout/checkout-sdk-go/v2/issuing/cards"
-	controlgroups "github.com/checkout/checkout-sdk-go/v2/issuing/controlgroups"
-	controlprofiles "github.com/checkout/checkout-sdk-go/v2/issuing/controlprofiles"
-	controls "github.com/checkout/checkout-sdk-go/v2/issuing/controls"
-	digitalcards "github.com/checkout/checkout-sdk-go/v2/issuing/digitalcards"
-	disputes "github.com/checkout/checkout-sdk-go/v2/issuing/disputes"
-	testing "github.com/checkout/checkout-sdk-go/v2/issuing/testing"
-	transactions "github.com/checkout/checkout-sdk-go/v2/issuing/transactions"
+	"github.com/checkout/checkout-sdk-go/v3/client"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	cardholders "github.com/checkout/checkout-sdk-go/v3/issuing/cardholders"
+	cards "github.com/checkout/checkout-sdk-go/v3/issuing/cards"
+	controlgroups "github.com/checkout/checkout-sdk-go/v3/issuing/controlgroups"
+	controlprofiles "github.com/checkout/checkout-sdk-go/v3/issuing/controlprofiles"
+	controls "github.com/checkout/checkout-sdk-go/v3/issuing/controls"
+	digitalcards "github.com/checkout/checkout-sdk-go/v3/issuing/digitalcards"
+	disputes "github.com/checkout/checkout-sdk-go/v3/issuing/disputes"
+	testing "github.com/checkout/checkout-sdk-go/v3/issuing/testing"
+	transactions "github.com/checkout/checkout-sdk-go/v3/issuing/transactions"
 )
 
 const (

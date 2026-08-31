@@ -1,4 +1,4 @@
-module github.com/checkout/checkout-sdk-go/v2
+module github.com/checkout/checkout-sdk-go/v3
 
 go 1.14
 

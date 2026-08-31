@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"regexp"
 
-	"github.com/checkout/checkout-sdk-go/v2/errors"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
 
 type Environment interface {

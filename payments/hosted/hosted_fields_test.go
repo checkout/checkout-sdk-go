@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/payments"
-	"github.com/checkout/checkout-sdk-go/v2/payments/nas"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
+	"github.com/checkout/checkout-sdk-go/v3/payments/nas"
 )
 
 // Verifies the fields recently aligned with the Checkout.com swagger spec

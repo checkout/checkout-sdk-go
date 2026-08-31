@@ -3,7 +3,7 @@ package accounts
 import (
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 // ReserveRuleType identifies the reserve calculation model applied to an entity.

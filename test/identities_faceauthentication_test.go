@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/errors"
-	"github.com/checkout/checkout-sdk-go/v2/identities"
-	faceauthentication "github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/identities"
+	faceauthentication "github.com/checkout/checkout-sdk-go/v3/identities/faceauthentication"
 )
 
 // # tests

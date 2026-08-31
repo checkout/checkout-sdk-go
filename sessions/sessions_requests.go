@@ -3,11 +3,11 @@ package sessions
 import (
 	"time"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/payments"
-	"github.com/checkout/checkout-sdk-go/v2/sessions/channels"
-	"github.com/checkout/checkout-sdk-go/v2/sessions/completion"
-	"github.com/checkout/checkout-sdk-go/v2/sessions/sources"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
+	"github.com/checkout/checkout-sdk-go/v3/sessions/channels"
+	"github.com/checkout/checkout-sdk-go/v3/sessions/completion"
+	"github.com/checkout/checkout-sdk-go/v3/sessions/sources"
 )
 
 // ShippingIndicator indicates the shipping method chosen for the transaction.

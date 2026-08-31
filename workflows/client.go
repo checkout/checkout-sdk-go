@@ -3,13 +3,13 @@ package workflows
 import (
 	"context"
 
-	"github.com/checkout/checkout-sdk-go/v2/client"
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/actions"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/conditions"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/events"
-	"github.com/checkout/checkout-sdk-go/v2/workflows/reflows"
+	"github.com/checkout/checkout-sdk-go/v3/client"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/actions"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/conditions"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/events"
+	"github.com/checkout/checkout-sdk-go/v3/workflows/reflows"
 )
 
 type Client struct {

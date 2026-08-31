@@ -3,8 +3,8 @@ package abc
 import (
 	"encoding/json"
 
-	"github.com/checkout/checkout-sdk-go/v2/common"
-	"github.com/checkout/checkout-sdk-go/v2/payments"
+	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
 )
 
 type (

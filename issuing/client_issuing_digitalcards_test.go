@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/checkout/checkout-sdk-go/v2/configuration"
-	"github.com/checkout/checkout-sdk-go/v2/errors"
-	"github.com/checkout/checkout-sdk-go/v2/mocks"
+	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/mocks"
 
-	digitalcards "github.com/checkout/checkout-sdk-go/v2/issuing/digitalcards"
+	digitalcards "github.com/checkout/checkout-sdk-go/v3/issuing/digitalcards"
 )
 
 // # tests

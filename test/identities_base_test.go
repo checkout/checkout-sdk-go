@@ -6,12 +6,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/checkout/checkout-sdk-go/v2/nas"
+	"github.com/checkout/checkout-sdk-go/v3/nas"
 
-	applicants "github.com/checkout/checkout-sdk-go/v2/identities/applicants"
-	faceauthentication "github.com/checkout/checkout-sdk-go/v2/identities/faceauthentication"
-	iddocumentverification "github.com/checkout/checkout-sdk-go/v2/identities/iddocumentverification"
-	identityverification "github.com/checkout/checkout-sdk-go/v2/identities/identityverification"
+	applicants "github.com/checkout/checkout-sdk-go/v3/identities/applicants"
+	faceauthentication "github.com/checkout/checkout-sdk-go/v3/identities/faceauthentication"
+	iddocumentverification "github.com/checkout/checkout-sdk-go/v3/identities/iddocumentverification"
+	identityverification "github.com/checkout/checkout-sdk-go/v3/identities/identityverification"
 )
 
 var (

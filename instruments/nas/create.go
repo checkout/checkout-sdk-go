@@ -48,14 +48,22 @@ type (
 	createSepaInstrumentRequest struct {
 		Type           common.InstrumentType            `json:"type" binding:"required"`
 		InstrumentData *InstrumentData                  `json:"instrument_data,omitempty"`
-		AccountHolder  *common.AccountHolder            `json:"account_holder" binding:"required"`
+		AccountHolder  *SepaAccountHolder               `json:"account_holder" binding:"required"`
 		Customer       *CreateCustomerInstrumentRequest `json:"customer,omitempty"`
 	}
 
 	createAchInstrumentRequest struct {
 		Type           common.InstrumentType            `json:"type" binding:"required"`
 		InstrumentData *AchInstrumentData               `json:"instrument_data,omitempty"`
-		AccountHolder  *common.AccountHolder            `json:"account_holder" binding:"required"`
+		AccountHolder  *AchAccountHolder                `json:"account_holder" binding:"required"`
+		Customer       *CreateCustomerInstrumentRequest `json:"customer,omitempty"`
+	}
+
+	createBacsInstrumentRequest struct {
+		Type           common.InstrumentType            `json:"type" binding:"required"`
+		Account        *BacsInstrumentAccount           `json:"account" binding:"required"`
+		InstrumentData *BacsInstrumentData              `json:"instrument_data" binding:"required"`
+		AccountHolder  *CreateBacsAccountHolder         `json:"account_holder" binding:"required"`
 		Customer       *CreateCustomerInstrumentRequest `json:"customer,omitempty"`
 	}
 )
@@ -90,6 +98,12 @@ func NewCreateAchInstrumentRequest() *createAchInstrumentRequest {
 	}
 }
 
+func NewCreateBacsInstrumentRequest() *createBacsInstrumentRequest {
+	return &createBacsInstrumentRequest{
+		Type: common.Bacs,
+	}
+}
+
 type (
 	CreateInstrumentResponse struct {
 		HttpMetadata                        common.HttpMetadata
@@ -98,6 +112,7 @@ type (
 		CreateTokenInstrumentResponse       *CreateTokenInstrumentResponse
 		CreateSepaInstrumentResponse        *CreateSepaInstrumentResponse
 		CreateAchInstrumentResponse         *CreateAchInstrumentResponse
+		CreateBacsInstrumentResponse        *CreateBacsInstrumentResponse
 		AlternativeResponse                 *common.AlternativeResponse
 	}
 
@@ -168,6 +183,14 @@ type (
 		Id          string                `json:"id,omitempty"`
 		Fingerprint string                `json:"fingerprint,omitempty"`
 	}
+
+	// CreateBacsInstrumentResponse is the response returned after storing a Bacs Direct Debit
+	// instrument. StoreBacsInstrumentResponse declares type, id and fingerprint.
+	CreateBacsInstrumentResponse struct {
+		Type        common.InstrumentType `json:"type" binding:"required"`
+		Id          string                `json:"id,omitempty"`
+		Fingerprint string                `json:"fingerprint,omitempty"`
+	}
 )
 
 func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
@@ -207,6 +230,12 @@ func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.CreateAchInstrumentResponse = &response
+	case string(common.Bacs):
+		var response CreateBacsInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.CreateBacsInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

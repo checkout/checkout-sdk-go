@@ -41,6 +41,18 @@ type (
 )
 
 // Requests
+// SepaMandateType is the type of SEPA mandate on a SEPA payment source.
+//
+// This deliberately does not reuse instruments/nas.SepaMandateType. The two carry the same two
+// values today, but they belong to independent schemas: this one to
+// PaymentRequestSEPAV4Source.mandate_type, the other to the SEPA instrument's instrument_data.type.
+type SepaMandateType string
+
+const (
+	SepaMandateCore SepaMandateType = "Core"
+	SepaMandateB2B  SepaMandateType = "B2B"
+)
+
 type (
 	requestAchSource struct {
 		Type          payments.SourceType   `json:"type,omitempty"`
@@ -222,6 +234,11 @@ type (
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 	}
 
+	// requestSepaSource is the SEPA Direct Debit source.
+	//
+	// BankCode is not declared by PaymentRequestSEPAV4Source. No SEPA schema in the specification
+	// declares a bank code, and the source is identified by IBAN through AccountNumber. Retained
+	// pending confirmation from the API owners that it is a supported but unlisted field.
 	requestSepaSource struct {
 		Type            payments.SourceType   `json:"type,omitempty"`
 		Country         common.Country        `json:"country,omitempty"`
@@ -230,7 +247,16 @@ type (
 		Currency        common.Currency       `json:"currency,omitempty"`
 		AccountHolder   *common.AccountHolder `json:"account_holder,omitempty"`
 		MandateId       string                `json:"mandate_id,omitempty"`
+		MandateType     SepaMandateType       `json:"mandate_type,omitempty"`
 		DateOfSignature string                `json:"date_of_signature,omitempty"`
+	}
+
+	// requestBacsSource is the Bacs Direct Debit source.
+	//
+	// Id is the Bacs Direct Debit instrument ID and matches the pattern ^(src)_(\w{26})$.
+	requestBacsSource struct {
+		Type payments.SourceType `json:"type,omitempty"`
+		Id   string              `json:"id,omitempty"`
 	}
 
 	requestStcPaySource struct {
@@ -590,6 +616,14 @@ func NewRequestSepaSource() *requestSepaSource {
 }
 
 func (s *requestSepaSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func NewRequestBacsSource() *requestBacsSource {
+	return &requestBacsSource{Type: payments.BacsSource}
+}
+
+func (s *requestBacsSource) GetType() payments.SourceType {
 	return s.Type
 }
 

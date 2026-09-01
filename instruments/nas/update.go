@@ -43,13 +43,19 @@ type (
 	updateSepaInstrumentRequest struct {
 		Type           common.InstrumentType `json:"type" binding:"required"`
 		InstrumentData *InstrumentData       `json:"instrument_data,omitempty"`
-		AccountHolder  *common.AccountHolder `json:"account_holder,omitempty"`
+		AccountHolder  *SepaAccountHolder    `json:"account_holder,omitempty"`
 	}
 
 	updateAchInstrumentRequest struct {
 		Type           common.InstrumentType `json:"type" binding:"required"`
 		InstrumentData *AchInstrumentData    `json:"instrument_data,omitempty"`
-		AccountHolder  *common.AccountHolder `json:"account_holder,omitempty"`
+		AccountHolder  *AchAccountHolder     `json:"account_holder,omitempty"`
+	}
+
+	updateBacsInstrumentRequest struct {
+		Type           common.InstrumentType    `json:"type" binding:"required"`
+		InstrumentData *BacsInstrumentData      `json:"instrument_data,omitempty"`
+		AccountHolder  *UpdateBacsAccountHolder `json:"account_holder,omitempty"`
 	}
 )
 
@@ -83,6 +89,12 @@ func NewUpdateAchInstrumentRequest() *updateAchInstrumentRequest {
 	}
 }
 
+func NewUpdateBacsInstrumentRequest() *updateBacsInstrumentRequest {
+	return &updateBacsInstrumentRequest{
+		Type: common.Bacs,
+	}
+}
+
 type (
 	UpdateInstrumentResponse struct {
 		HttpMetadata                        common.HttpMetadata
@@ -90,6 +102,7 @@ type (
 		UpdateBankAccountInstrumentResponse *UpdateBankAccountInstrumentResponse
 		UpdateSepaInstrumentResponse        *UpdateSepaInstrumentResponse
 		UpdateAchInstrumentResponse         *UpdateAchInstrumentResponse
+		UpdateBacsInstrumentResponse        *UpdateBacsInstrumentResponse
 		AlternativeResponse                 *common.AlternativeResponse
 	}
 
@@ -112,6 +125,14 @@ type (
 	}
 
 	UpdateAchInstrumentResponse struct {
+		Type        common.InstrumentType `json:"type" binding:"required"`
+		Id          string                `json:"id,omitempty"`
+		Fingerprint string                `json:"fingerprint,omitempty"`
+	}
+
+	// UpdateBacsInstrumentResponse is the response returned after updating a stored Bacs Direct
+	// Debit instrument. UpdateBacsInstrumentResponse declares type, id and fingerprint.
+	UpdateBacsInstrumentResponse struct {
 		Type        common.InstrumentType `json:"type" binding:"required"`
 		Id          string                `json:"id,omitempty"`
 		Fingerprint string                `json:"fingerprint,omitempty"`
@@ -149,6 +170,12 @@ func (s *UpdateInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.UpdateAchInstrumentResponse = &response
+	case string(common.Bacs):
+		var response UpdateBacsInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.UpdateBacsInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

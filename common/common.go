@@ -308,8 +308,10 @@ const (
 	BankAccount InstrumentType = "bank_account"
 	Token       InstrumentType = "token"
 	Sepa        InstrumentType = "sepa"
-	CardToken   InstrumentType = "card_token"
 	Ach         InstrumentType = "ach"
+	Bacs        InstrumentType = "bacs"
+	// CardToken is Previous API (ABC) only. The current API's instrument type does not declare it.
+	CardToken InstrumentType = "card_token"
 )
 
 type (

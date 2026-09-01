@@ -11,16 +11,16 @@
 
 ## Getting started
 
-> **Version 2.0.0 is here!**
+> **Version 3.0.0 is here!**
 > <br/><br/>
-> We added comprehensive `context.Context` support across all SDK clients. <br/>
-> All client methods now have `*WithContext` variants for better timeout handling, cancellation support, and request lifecycle control. <br/>
-> Backward compatibility is maintained: existing methods continue to work by using `context.Background()` internally. <br/>
+> The module path is now `github.com/checkout/checkout-sdk-go/v3`, so update your imports when you upgrade. <br/>
+> Your merchant-specific subdomain is now required: call `WithEnvironmentSubdomain()`, or the deprecated `WithLegacyDomain()` to keep using the shared hosts. <br/>
+> `context.Context` support from 2.0.0 is unchanged: every client method still has a `*WithContext` variant, and the plain methods keep working. <br/>
 
 ### Module installer
 Make sure your project is using Go Modules:
 ```sh
-# For v2.x (current)
+# For v3.x (current)
 go get github.com/checkout/checkout-sdk-go/v3
 
 # For v1.x (legacy)
@@ -28,7 +28,7 @@ go get github.com/checkout/checkout-sdk-go@v1.9.0
 ```
 Then import the library into your code:
 ```sh
-# For v2.x
+# For v3.x
 import "github.com/checkout/checkout-sdk-go/v3"
 
 # For v1.x

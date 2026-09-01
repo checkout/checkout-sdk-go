@@ -235,14 +235,14 @@ type (
 	}
 
 	// requestSepaSource is the SEPA Direct Debit source.
-	//
-	// BankCode is not declared by PaymentRequestSEPAV4Source. No SEPA schema in the specification
-	// declares a bank code, and the source is identified by IBAN through AccountNumber. Retained
-	// pending confirmation from the API owners that it is a supported but unlisted field.
 	requestSepaSource struct {
-		Type            payments.SourceType   `json:"type,omitempty"`
-		Country         common.Country        `json:"country,omitempty"`
-		AccountNumber   string                `json:"account_number,omitempty"`
+		Type          payments.SourceType `json:"type,omitempty"`
+		Country       common.Country      `json:"country,omitempty"`
+		AccountNumber string              `json:"account_number,omitempty"`
+		// BankCode is not declared by PaymentRequestSEPAV4Source. No SEPA schema in the
+		// specification declares a bank code, and the SEPA source is identified by IBAN through
+		// AccountNumber. Retained for retro-compatibility purposes only. Possibly an obsoleted
+		// field.
 		BankCode        string                `json:"bank_code,omitempty"`
 		Currency        common.Currency       `json:"currency,omitempty"`
 		AccountHolder   *common.AccountHolder `json:"account_holder,omitempty"`

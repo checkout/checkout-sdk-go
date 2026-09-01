@@ -2,7 +2,7 @@ package nas
 
 import (
 	"encoding/json"
-	"os"
+	"io/ioutil"
 	"reflect"
 	"strings"
 	"testing"
@@ -264,7 +264,7 @@ func TestRetrieveResponseUsesAGetSpecificAccountHolder(t *testing.T) {
 // Every exported Bacs response type carries GoDoc, per the Go SDK conventions.
 func TestBacsResponseTypesAreDocumented(t *testing.T) {
 	for _, file := range []string{"create.go", "get.go", "update.go"} {
-		src, err := os.ReadFile(file)
+		src, err := ioutil.ReadFile(file)
 		assert.Nil(t, err)
 		text := string(src)
 		for _, name := range []string{
@@ -284,7 +284,7 @@ func TestBacsResponseTypesAreDocumented(t *testing.T) {
 // The validations slice is untyped because the specification publishes no item schema. The comment
 // recording that must survive, so the next reader does not assume it was an oversight.
 func TestValidationsIsDocumentedAsUntyped(t *testing.T) {
-	src, err := os.ReadFile("get.go")
+	src, err := ioutil.ReadFile("get.go")
 	assert.Nil(t, err)
 	assert.Contains(t, string(src), "no item schema")
 }

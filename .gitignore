@@ -16,7 +16,6 @@
 
 .idea
 *.DS_Store*
-.cursor/rules/*.mdc
-.cursor/skills/endpoint-review-auto/*.md
+.cursor/
 .claude/
 CLAUDE.md

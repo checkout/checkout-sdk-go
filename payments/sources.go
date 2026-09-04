@@ -4,6 +4,7 @@ type SourceType string
 
 const (
 	AchSource             SourceType = "ach"
+	BacsSource            SourceType = "bacs"
 	Afterpay              SourceType = "afterpay"
 	AlipayCn              SourceType = "alipay_cn"
 	AlipayHk              SourceType = "alipay_hk"
@@ -36,6 +37,7 @@ const (
 	KlarnaSource          SourceType = "klarna"
 	KnetSource            SourceType = "knet"
 	Mbway                 SourceType = "mbway"
+	MobilepaySource       SourceType = "mobilepay"
 	MultiBancoSource      SourceType = "multibanco"
 	NetworkTokenSource    SourceType = "network_token"
 	OxxoSource            SourceType = "oxxo"
@@ -53,6 +55,8 @@ const (
 	SepaSource            SourceType = "sepa"
 	SequraSource          SourceType = "sequra"
 	SofortSource          SourceType = "sofort"
+	SwishSource           SourceType = "swish"
+	VippsSource           SourceType = "vipps"
 	Stcpay                SourceType = "stcpay"
 	TamaraSource          SourceType = "tamara"
 	TabbySource           SourceType = "tabby"

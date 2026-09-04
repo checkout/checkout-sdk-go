@@ -3,6 +3,7 @@ package nas
 import (
 	"github.com/checkout/checkout-sdk-go/v3/accounts"
 	"github.com/checkout/checkout-sdk-go/v3/agenticcommerce"
+	"github.com/checkout/checkout-sdk-go/v3/apm/bacs"
 	"github.com/checkout/checkout-sdk-go/v3/apm/ideal"
 	"github.com/checkout/checkout-sdk-go/v3/apm/klarna"
 	"github.com/checkout/checkout-sdk-go/v3/apm/sepa"
@@ -34,7 +35,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/payments/hosted"
 	"github.com/checkout/checkout-sdk-go/v3/payments/links"
 	payments "github.com/checkout/checkout-sdk-go/v3/payments/nas"
-	"github.com/checkout/checkout-sdk-go/v3/payments/sessions"
+	payment_sessions "github.com/checkout/checkout-sdk-go/v3/payments/sessions"
 	"github.com/checkout/checkout-sdk-go/v3/payments/setups"
 	"github.com/checkout/checkout-sdk-go/v3/reports"
 	"github.com/checkout/checkout-sdk-go/v3/sessions"
@@ -84,6 +85,7 @@ type Api struct {
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
 	Sepa   *sepa.Client
+	Bacs   *bacs.Client
 
 	OnboardingSimulator *onboardingsimulator.Client
 }
@@ -132,6 +134,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)
 	api.Sepa = sepa.NewClient(configuration, apiClient)
+	api.Bacs = bacs.NewClient(configuration, apiClient)
 	api.OnboardingSimulator = onboardingsimulator.NewClient(configuration, apiClient)
 	return &api
 }

@@ -20,6 +20,7 @@ type (
 		GetSepaInstrumentResponse        *GetSepaInstrumentResponse
 		GetBankAccountInstrumentResponse *GetBankAccountInstrumentResponse
 		GetAchInstrumentResponse         *GetAchInstrumentResponse
+		GetBacsInstrumentResponse        *GetBacsInstrumentResponse
 		AlternativeResponse              *common.AlternativeResponse
 	}
 
@@ -84,7 +85,60 @@ type (
 		ModifiedOn     *time.Time                              `json:"modified_on,omitempty"`
 		VaultId        string                                  `json:"vault_id,omitempty"`
 		InstrumentData *AchInstrumentData                      `json:"instrument_data,omitempty"`
-		AccountHolder  *common.AccountHolder                   `json:"account_holder,omitempty"`
+		AccountHolder  *AchAccountHolder                       `json:"account_holder,omitempty"`
+		Customer       *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
+	}
+
+	// GetBacsAccountHolder is the account holder details of a stored Bacs Direct Debit instrument.
+	//
+	// Structurally identical to UpdateBacsAccountHolder, but kept separate so a response field is not
+	// typed with a request-named type. RetrieveBacsInstrumentResponse requires FirstName, LastName and
+	// BillingAddress.
+	GetBacsAccountHolder struct {
+		FirstName      string                      `json:"first_name,omitempty"`
+		LastName       string                      `json:"last_name,omitempty"`
+		CompanyName    string                      `json:"company_name,omitempty"`
+		BillingAddress *BacsBillingAddress         `json:"billing_address,omitempty"`
+		Type           InstrumentAccountHolderType `json:"type,omitempty"`
+	}
+
+	// GetBacsInstrumentAccount is the account configuration returned on a stored Bacs instrument.
+	GetBacsInstrumentAccount struct {
+		ClientId            string `json:"client_id,omitempty"`
+		ProcessingChannelId string `json:"processing_channel_id,omitempty"`
+	}
+
+	// GetBacsInstrumentData is the details of a stored Bacs Direct Debit account.
+	//
+	// Status, MatchStatus, Description and MandateId are read-back fields the store and update
+	// shapes do not declare. Status and MatchStatus are free-form strings in the specification.
+	GetBacsInstrumentData struct {
+		AccountNumber     string          `json:"account_number,omitempty"`
+		BankCode          string          `json:"bank_code,omitempty"`
+		Country           common.Country  `json:"country,omitempty"`
+		Currency          common.Currency `json:"currency,omitempty"`
+		PaymentType       BacsPaymentType `json:"payment_type,omitempty"`
+		AllowPartialMatch *bool           `json:"allow_partial_match,omitempty"`
+		Status            string          `json:"status,omitempty"`
+		MatchStatus       string          `json:"match_status,omitempty"`
+		Description       string          `json:"description,omitempty"`
+		MandateId         string          `json:"mandate_id,omitempty"`
+	}
+
+	// GetBacsInstrumentResponse is the details of a stored Bacs Direct Debit instrument.
+	GetBacsInstrumentResponse struct {
+		Type        common.InstrumentType     `json:"type" binding:"required"`
+		Id          string                    `json:"id,omitempty"`
+		Fingerprint string                    `json:"fingerprint,omitempty"`
+		CreatedOn   *time.Time                `json:"created_on,omitempty"`
+		ModifiedOn  *time.Time                `json:"modified_on,omitempty"`
+		VaultId     string                    `json:"vault_id,omitempty"`
+		Account     *GetBacsInstrumentAccount `json:"account,omitempty"`
+		// Validations is untyped because the specification declares the array items as a bare
+		// object with no item schema. Retype it once the item schema is published.
+		Validations    []map[string]interface{}                `json:"validations,omitempty"`
+		InstrumentData *GetBacsInstrumentData                  `json:"instrument_data,omitempty"`
+		AccountHolder  *GetBacsAccountHolder                   `json:"account_holder,omitempty"`
 		Customer       *instruments.InstrumentCustomerResponse `json:"customer,omitempty"`
 	}
 
@@ -154,6 +208,12 @@ func (s *GetInstrumentResponse) UnmarshalJSON(data []byte) error {
 			return nil
 		}
 		s.GetAchInstrumentResponse = &response
+	case string(common.Bacs):
+		var response GetBacsInstrumentResponse
+		if err := json.Unmarshal(data, &response); err != nil {
+			return nil
+		}
+		s.GetBacsInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {

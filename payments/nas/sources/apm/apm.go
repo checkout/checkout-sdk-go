@@ -41,14 +41,105 @@ type (
 )
 
 // Requests
+// SepaMandateType is the type of SEPA mandate on a SEPA payment source.
+//
+// This deliberately does not reuse instruments/nas.SepaMandateType. The two carry the same two
+// values today, but they belong to independent schemas: this one to
+// PaymentRequestSEPAV4Source.mandate_type, the other to the SEPA instrument's instrument_data.type.
+type SepaMandateType string
+
+const (
+	SepaMandateCore SepaMandateType = "Core"
+	SepaMandateB2B  SepaMandateType = "B2B"
+)
+
+// SepaSourceAccountHolderType is the type of account holder on a SEPA payment source.
+//
+// This position declares two values only, unlike common.AccountHolderType which also declares
+// "government". Send them lowercase: the specification declares them capitalized here, but every
+// other account-holder-type position declares them lowercase and every other Checkout.com SDK sends
+// lowercase. Pending confirmation from the API owners.
+type SepaSourceAccountHolderType string
+
+const (
+	SepaSourceIndividual SepaSourceAccountHolderType = "individual"
+	SepaSourceCorporate  SepaSourceAccountHolderType = "corporate"
+)
+
+// AchSourceAccountType is the type of Direct Debit account on an ACH payment source.
+//
+// PaymentRequestAchSource is the only schema declaring this set. common.AccountType is
+// savings / current / cash and serves the bank-account positions, so it cannot express "checking".
+// nas.AchAccountType is savings / checking and serves the stored ACH instrument positions, so it
+// does not declare "cash".
+type AchSourceAccountType string
+
+const (
+	AchSourceSavings  AchSourceAccountType = "savings"
+	AchSourceChecking AchSourceAccountType = "checking"
+	AchSourceCash     AchSourceAccountType = "cash"
+)
+
 type (
+	// SepaSourceBillingAddress is the account holder's billing address on a SEPA payment source.
+	//
+	// Every property is required. Deliberately not common.Address, which also declares a State that
+	// this position does not accept.
+	SepaSourceBillingAddress struct {
+		AddressLine1 string         `json:"address_line1,omitempty"`
+		AddressLine2 string         `json:"address_line2,omitempty"`
+		City         string         `json:"city,omitempty"`
+		Zip          string         `json:"zip,omitempty"`
+		Country      common.Country `json:"country,omitempty"`
+	}
+
+	// SepaSourceAccountHolder is the account holder's personal information on a SEPA payment source.
+	//
+	// Maps the account_holder object of PaymentRequestSEPAV4Source. Deliberately not
+	// common.AccountHolder, which is an 18-property superset. Only BillingAddress is required here,
+	// where the SEPA instrument requires the names too. Send Type lowercase (individual, corporate):
+	// the specification declares it capitalized at this one position, but every other
+	// account-holder-type position declares it lowercase and every other Checkout.com SDK sends
+	// lowercase. Pending confirmation from the API owners.
+	//
+	// FirstName, LastName and CompanyName are each max 50 characters.
+	SepaSourceAccountHolder struct {
+		BillingAddress *SepaSourceBillingAddress   `json:"billing_address,omitempty"`
+		FirstName      string                      `json:"first_name,omitempty"`
+		LastName       string                      `json:"last_name,omitempty"`
+		CompanyName    string                      `json:"company_name,omitempty"`
+		Type           SepaSourceAccountHolderType `json:"type,omitempty"`
+	}
+
+	// AchSourceAccountHolder is the account holder's details on an ACH payment source.
+	//
+	// Maps the AccountHolderAch schema exactly. Deliberately not common.AccountHolder, which is an
+	// 18-property superset, and distinct from the four-property ACH instrument account holder - the
+	// instrument schema declares no billing address, date of birth or identification.
+	//
+	// Type, FirstName and LastName are required. BillingAddress reuses common.Address because that
+	// schema's six properties are exactly what this position references. Identification reuses
+	// common.AccountHolderIdentification, which carries one extra property, DateOfExpiry, that this
+	// position does not declare - do not set it.
+	AchSourceAccountHolder struct {
+		Type           common.AccountHolderType            `json:"type,omitempty"`
+		FirstName      string                              `json:"first_name,omitempty"`
+		LastName       string                              `json:"last_name,omitempty"`
+		CompanyName    string                              `json:"company_name,omitempty"`
+		BillingAddress *common.Address                     `json:"billing_address,omitempty"`
+		DateOfBirth    string                              `json:"date_of_birth,omitempty"`
+		Identification *common.AccountHolderIdentification `json:"identification,omitempty"`
+	}
+
 	requestAchSource struct {
-		Type          payments.SourceType   `json:"type,omitempty"`
-		AccountType   common.AccountType    `json:"account_type,omitempty"`
-		AccountHolder *common.AccountHolder `json:"account_holder,omitempty"`
-		AccountNumber string                `json:"account_number,omitempty"`
-		BankCode      string                `json:"bank_code,omitempty"`
-		Country       common.Country        `json:"country,omitempty"`
+		Type payments.SourceType `json:"type,omitempty"`
+		// AccountType is savings, checking or cash. Deliberately not common.AccountType, which
+		// declares "current" instead of "checking" and is rejected at this position.
+		AccountType   AchSourceAccountType    `json:"account_type,omitempty"`
+		AccountHolder *AchSourceAccountHolder `json:"account_holder,omitempty"`
+		AccountNumber string                  `json:"account_number,omitempty"`
+		BankCode      string                  `json:"bank_code,omitempty"`
+		Country       common.Country          `json:"country,omitempty"`
 	}
 
 	requestAfterPaySource struct {
@@ -222,15 +313,29 @@ type (
 		BillingAddress *common.Address     `json:"billing_address,omitempty"`
 	}
 
+	// requestSepaSource is the SEPA Direct Debit source.
 	requestSepaSource struct {
-		Type            payments.SourceType   `json:"type,omitempty"`
-		Country         common.Country        `json:"country,omitempty"`
-		AccountNumber   string                `json:"account_number,omitempty"`
-		BankCode        string                `json:"bank_code,omitempty"`
-		Currency        common.Currency       `json:"currency,omitempty"`
-		AccountHolder   *common.AccountHolder `json:"account_holder,omitempty"`
-		MandateId       string                `json:"mandate_id,omitempty"`
-		DateOfSignature string                `json:"date_of_signature,omitempty"`
+		Type          payments.SourceType `json:"type,omitempty"`
+		Country       common.Country      `json:"country,omitempty"`
+		AccountNumber string              `json:"account_number,omitempty"`
+		// BankCode is not declared by PaymentRequestSEPAV4Source. No SEPA schema in the
+		// specification declares a bank code, and the SEPA source is identified by IBAN through
+		// AccountNumber. Retained for retro-compatibility purposes only. Possibly an obsoleted
+		// field.
+		BankCode        string                   `json:"bank_code,omitempty"`
+		Currency        common.Currency          `json:"currency,omitempty"`
+		AccountHolder   *SepaSourceAccountHolder `json:"account_holder,omitempty"`
+		MandateId       string                   `json:"mandate_id,omitempty"`
+		MandateType     SepaMandateType          `json:"mandate_type,omitempty"`
+		DateOfSignature string                   `json:"date_of_signature,omitempty"`
+	}
+
+	// requestBacsSource is the Bacs Direct Debit source.
+	//
+	// Id is the Bacs Direct Debit instrument ID and matches the pattern ^(src)_(\w{26})$.
+	requestBacsSource struct {
+		Type payments.SourceType `json:"type,omitempty"`
+		Id   string              `json:"id,omitempty"`
 	}
 
 	requestStcPaySource struct {
@@ -590,6 +695,14 @@ func NewRequestSepaSource() *requestSepaSource {
 }
 
 func (s *requestSepaSource) GetType() payments.SourceType {
+	return s.Type
+}
+
+func NewRequestBacsSource() *requestBacsSource {
+	return &requestBacsSource{Type: payments.BacsSource}
+}
+
+func (s *requestBacsSource) GetType() payments.SourceType {
 	return s.Type
 }
 

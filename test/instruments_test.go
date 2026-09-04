@@ -9,7 +9,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/errors"
 	"github.com/checkout/checkout-sdk-go/v3/instruments/nas"
-	"github.com/checkout/checkout-sdk-go/v3/payments"
 	"github.com/checkout/checkout-sdk-go/v3/tokens"
 )
 
@@ -227,14 +226,19 @@ func createSepaInstrument(t *testing.T) *nas.CreateSepaInstrumentResponse {
 		AccountNumber:   "FR7630006000011234567890189",
 		Country:         common.FR,
 		Currency:        common.EUR,
-		PaymentType:     payments.Recurring,
+		PaymentType:     nas.SepaRecurring,
 		DateOfSignature: dateOfSignature,
 	}
-	request.AccountHolder = &common.AccountHolder{
-		FirstName:      "Ali",
-		LastName:       "Farid",
-		BillingAddress: Address(),
-		Phone:          Phone(),
+	request.AccountHolder = &nas.SepaAccountHolder{
+		FirstName: "Ali",
+		LastName:  "Farid",
+		BillingAddress: &nas.SepaBillingAddress{
+			AddressLine1: "Cloverfield St.",
+			AddressLine2: "23A",
+			City:         "London",
+			Zip:          "SW1A 1AA",
+			Country:      common.GB,
+		},
 	}
 
 	response, err := DefaultApi().Instruments.Create(request)

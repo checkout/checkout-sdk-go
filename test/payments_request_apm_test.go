@@ -646,7 +646,18 @@ func getSepaSource() payments.PaymentSource {
 	source.BankCode = "37040044"
 	source.MandateId = "man_12321233211"
 	source.DateOfSignature = "2023-01-01"
-	source.AccountHolder = AccountHolder()
+	source.AccountHolder = &apm.SepaSourceAccountHolder{
+		FirstName: "John",
+		LastName:  "Smith",
+		Type:      apm.SepaSourceIndividual,
+		BillingAddress: &apm.SepaSourceBillingAddress{
+			AddressLine1: "Cloverfield St.",
+			AddressLine2: "23A",
+			City:         "London",
+			Zip:          "SW1A 1AA",
+			Country:      common.GB,
+		},
+	}
 
 	return source
 }

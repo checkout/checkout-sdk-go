@@ -12,7 +12,6 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/configuration"
 	"github.com/checkout/checkout-sdk-go/v3/errors"
 	"github.com/checkout/checkout-sdk-go/v3/mocks"
-	"github.com/checkout/checkout-sdk-go/v3/payments"
 )
 
 const (
@@ -246,7 +245,7 @@ func getCreateSepaInstrumentRequest() *createSepaInstrumentRequest {
 		AccountNumber:   "FR2810096000509685512959O86",
 		Country:         common.GB,
 		Currency:        common.GBP,
-		PaymentType:     payments.Recurring,
+		PaymentType:     SepaRecurring,
 		MandateId:       "1234567890",
 		DateOfSignature: apiDate,
 	}

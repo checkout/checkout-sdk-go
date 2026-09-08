@@ -51,10 +51,8 @@ type (
 	}
 )
 
-// TopUpInstructionsResponse is the response of
+// Response types for
 // GET /entities/{entityId}/currency-accounts/{currencyAccountId}/top-up-instructions.
-//
-// It carries the bank details and payment reference used to top up a sub-account.
 type (
 	// TopUpFundingDetails holds the bank details for a single funding rail.
 	//
@@ -109,8 +107,10 @@ type (
 		International *TopUpFundingDetails `json:"international,omitempty"`
 	}
 
-	// TopUpInstructionsResponse is the bank details and payment reference used to top up a
-	// sub-account.
+	// TopUpInstructionsResponse is the response of
+	// GET /entities/{entityId}/currency-accounts/{currencyAccountId}/top-up-instructions.
+	//
+	// It carries the bank details and payment reference used to top up a sub-account.
 	TopUpInstructionsResponse struct {
 		HttpMetadata common.HttpMetadata
 		// CurrencyAccountId is the unique identifier of the sub-account that the instructions

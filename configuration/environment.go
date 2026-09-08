@@ -141,9 +141,9 @@ func Production() *CheckoutEnv {
 	return NewEnvironment(
 		"https://api.checkout.com",
 		"https://access.checkout.com/connect/token",
-		"https://files.checkout.com/",
-		"https://transfers.checkout.com/",
-		"https://balances.checkout.com/",
+		"https://files.checkout.com",
+		"https://transfers.checkout.com",
+		"https://balances.checkout.com",
 		"https://forward.checkout.com",
 		"https://identity-verification.checkout.com",
 		false)

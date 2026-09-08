@@ -4,6 +4,7 @@ const (
 	Accounts                    = "accounts"
 	Balances                    = "balances"
 	BalancesView                = "balances:view"
+	BalancesTopUpInstructions   = "balances:top-up-instructions"
 	Disputes                    = "disputes"
 	DisputesAccept              = "disputes:accept"
 	DisputesProvideEvidence     = "disputes:provide-evidence"

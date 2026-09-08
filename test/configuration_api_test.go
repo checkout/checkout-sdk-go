@@ -92,9 +92,10 @@ func TestShouldHaveCorrectProductionUrls(t *testing.T) {
 	env := configuration.Production()
 
 	assert.Equal(t, "https://api.checkout.com", env.BaseUri())
-	assert.Equal(t, "https://files.checkout.com/", env.FilesUri())
-	assert.Equal(t, "https://transfers.checkout.com/", env.TransfersUri())
-	assert.Equal(t, "https://balances.checkout.com/", env.BalancesUri())
+
+	assert.Equal(t, "https://files.checkout.com", env.FilesUri())
+	assert.Equal(t, "https://transfers.checkout.com", env.TransfersUri())
+	assert.Equal(t, "https://balances.checkout.com", env.BalancesUri())
 	assert.Equal(t, "https://forward.checkout.com", env.ForwardUri())
 	assert.Equal(t, "https://identity-verification.checkout.com", env.IdentityUri())
 }

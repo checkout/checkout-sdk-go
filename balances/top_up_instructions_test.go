@@ -63,6 +63,16 @@ func assertFullRail(t *testing.T, rail *TopUpFundingDetails) {
 	assert.Equal(t, "TESTUS00XXX", rail.SwiftCode)
 }
 
+func okAuthorization(m *mock.Mock) mock.Call {
+	return *m.On("GetAuthorization", mock.Anything).
+		Return(&configuration.SdkAuthorization{}, nil)
+}
+
+func okApiGet(m *mock.Mock) mock.Call {
+	return *m.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil)
+}
+
 func TestRetrieveTopUpInstructions(t *testing.T) {
 	var response = TopUpInstructionsResponse{
 		HttpMetadata:      mocks.HttpMetadataStatusOk,
@@ -151,6 +161,56 @@ func TestRetrieveTopUpInstructions(t *testing.T) {
 				assert.NotNil(t, err)
 				chkErr := err.(errors.CheckoutAPIError)
 				assert.Equal(t, http.StatusForbidden, chkErr.StatusCode)
+			},
+		},
+		{
+			name:              "when entity id is empty then return argument error",
+			entityId:          "",
+			currencyAccountId: testCurrencyAccountId,
+			getAuthorization:  okAuthorization,
+			apiGet:            okApiGet,
+			checker: func(response *TopUpInstructionsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				assert.IsType(t, errors.CheckoutArgumentError(""), err)
+				assert.Equal(t, "entityId cannot be blank", err.Error())
+			},
+		},
+		{
+			name:              "when currency account id is empty then return argument error",
+			entityId:          testEntityId,
+			currencyAccountId: "",
+			getAuthorization:  okAuthorization,
+			apiGet:            okApiGet,
+			checker: func(response *TopUpInstructionsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				assert.IsType(t, errors.CheckoutArgumentError(""), err)
+				assert.Equal(t, "currencyAccountId cannot be blank", err.Error())
+			},
+		},
+		{
+			name:              "when entity id is whitespace only then return argument error",
+			entityId:          "   ",
+			currencyAccountId: testCurrencyAccountId,
+			getAuthorization:  okAuthorization,
+			apiGet:            okApiGet,
+			checker: func(response *TopUpInstructionsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				assert.Equal(t, "entityId cannot be blank", err.Error())
+			},
+		},
+		{
+			name:              "when both path parameters are blank then reject on entity id first",
+			entityId:          "",
+			currencyAccountId: "",
+			getAuthorization:  okAuthorization,
+			apiGet:            okApiGet,
+			checker: func(response *TopUpInstructionsResponse, err error) {
+				assert.Nil(t, response)
+				assert.NotNil(t, err)
+				assert.Equal(t, "entityId cannot be blank", err.Error())
 			},
 		},
 	}

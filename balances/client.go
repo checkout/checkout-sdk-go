@@ -2,10 +2,12 @@ package balances
 
 import (
 	"context"
+	"strings"
 
 	"github.com/checkout/checkout-sdk-go/v3/client"
 	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
 
 type Client struct {
@@ -64,6 +66,9 @@ func (c *Client) RetrieveEntityBalancesWithContext(
 // entityId is the ID of the entity that owns the sub-account, or of an entity above it in your
 // hierarchy; a platform can use its own entity ID to reach the sub-accounts of any entity beneath
 // it. currencyAccountId is the ID of the sub-account to retrieve top-up instructions for.
+//
+// Both arguments are required. A blank value for either returns a CheckoutArgumentError without
+// making a request, matching the java and .NET SDKs' validateParams semantics.
 func (c *Client) RetrieveTopUpInstructions(entityId, currencyAccountId string) (*TopUpInstructionsResponse, error) {
 	return c.RetrieveTopUpInstructionsWithContext(context.Background(), entityId, currencyAccountId)
 }
@@ -73,6 +78,13 @@ func (c *Client) RetrieveTopUpInstructionsWithContext(
 	ctx context.Context,
 	entityId, currencyAccountId string,
 ) (*TopUpInstructionsResponse, error) {
+	if strings.TrimSpace(entityId) == "" {
+		return nil, errors.CheckoutArgumentError("entityId cannot be blank")
+	}
+	if strings.TrimSpace(currencyAccountId) == "" {
+		return nil, errors.CheckoutArgumentError("currencyAccountId cannot be blank")
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

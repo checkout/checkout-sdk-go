@@ -12,7 +12,11 @@ import (
 )
 
 func TestCaptureCardPayment(t *testing.T) {
-	paymentResponse := makeCardPayment(t, false, 10)
+	// A partial capture: half of the authorized amount is captured.
+	const authorizedAmount = int64(10)
+	const capturedAmount = int64(5)
+
+	paymentResponse := makeCardPayment(t, false, authorizedAmount)
 
 	metadata := make(map[string]interface{})
 	metadata["TestCaptureCardPayment"] = "metadata"
@@ -20,7 +24,7 @@ func TestCaptureCardPayment(t *testing.T) {
 	captureRequest := nas.CaptureRequest{
 		Reference: uuid.New().String(),
 		Metadata:  metadata,
-		Amount:    5,
+		Amount:    capturedAmount,
 	}
 
 	cases := []struct {
@@ -44,12 +48,15 @@ func TestCaptureCardPayment(t *testing.T) {
 			},
 			checkerTwo: func(response *nas.GetPaymentResponse, err error) {
 				assert.NotEmpty(t, response.Balances)
-				assert.Equal(t, int64(10), response.Balances.TotalAuthorized)
-				assert.Equal(t, int64(5), response.Balances.TotalCaptured)
+				assert.Equal(t, authorizedAmount, response.Balances.TotalAuthorized)
+				assert.Equal(t, capturedAmount, response.Balances.TotalCaptured)
 				assert.Equal(t, int64(0), response.Balances.TotalRefunded)
-				assert.Equal(t, int64(5), response.Balances.TotalVoided)
+				// The uncaptured remainder is released, not voided: it is neither available
+				// to capture nor to void, and total_voided stays 0. Observed stable from
+				// t+2s to t+24s against the sandbox on 2026-09-10.
+				assert.Equal(t, int64(0), response.Balances.TotalVoided)
 				assert.Equal(t, int64(0), response.Balances.AvailableToCapture)
-				assert.Equal(t, int64(5), response.Balances.AvailableToRefund)
+				assert.Equal(t, capturedAmount, response.Balances.AvailableToRefund)
 				assert.Equal(t, int64(0), response.Balances.AvailableToVoid)
 			},
 		},
@@ -61,8 +68,34 @@ func TestCaptureCardPayment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			Wait(time.Duration(3))
 			tc.checkerOne(client.CapturePayment(tc.paymentId, tc.captureRequest, nil))
-			Wait(time.Duration(3))
-			tc.checkerTwo(client.GetPaymentDetails(tc.paymentId))
+
+			// Poll until the capture is reflected, bounded to
+			// MaxRetryAttemps (10) attempts * 1s wait = ~10s total. This mirrors the
+			// .NET suite, which polls this endpoint on TotalCaptured for this scenario.
+			process := func() (interface{}, error) {
+				return client.GetPaymentDetails(tc.paymentId)
+			}
+			predicate := func(data interface{}) bool {
+				response, ok := data.(*nas.GetPaymentResponse)
+				return ok && response != nil && response.Balances != nil &&
+					response.Balances.TotalCaptured == capturedAmount
+			}
+
+			response, err := retriable(process, predicate, 1)
+			if err != nil {
+				t.Fatalf("GetPaymentDetails failed while waiting for the capture to settle: %v", err)
+			}
+			// retriable returns a nil response with a nil error when it exhausts its
+			// attempts. Balances is a pointer, so handing that straight to the checker
+			// would panic instead of reporting why the test failed.
+			typed, ok := response.(*nas.GetPaymentResponse)
+			if !ok || typed == nil || typed.Balances == nil {
+				t.Fatalf(
+					"payment balances did not reflect the capture of %d after %d attempts",
+					capturedAmount, MaxRetryAttemps)
+			}
+
+			tc.checkerTwo(typed, err)
 		})
 	}
 }

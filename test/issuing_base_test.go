@@ -55,10 +55,13 @@ func buildIssuingClientApi() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ISSUING_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
+			// issuing:card-mgmt and issuing:client were retired: neither is declared in the
+			// spec's scope map nor requested by any operation. The card-management pair below
+			// replaces the former; the latter has no documented equivalent.
 			WithScopes([]string{
 				configuration.Vault,
-				configuration.IssuingClient,
-				configuration.IssuingCardMgmt,
+				configuration.IssuingCardManagementRead,
+				configuration.IssuingCardManagementWrite,
 				configuration.IssuingControlsRead,
 				configuration.IssuingControlsWrite}).
 			// The sandbox OAuth clients lack subdomain provisioning, so the token request would

@@ -1068,7 +1068,9 @@ func buildFilesClient() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
-			WithScopes([]string{configuration.Marketplace, configuration.Files}).
+			// The marketplace scope was retired; accounts is what the entity and
+			// payout-schedules operations document as their OAuth requirement.
+			WithScopes([]string{configuration.Accounts, configuration.Files}).
 			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
 			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().

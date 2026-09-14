@@ -1,10 +1,26 @@
 package configuration
 
+// OAuth 2.0 client credentials scopes.
+//
+// Mirrors components.securitySchemes.OAuth.flows.clientCredentials.scopes in the Checkout.com API
+// specification, plus the scopes that appear only in per-operation security requirements and are
+// never declared in that map: compliance-requests, compliance-requests:read,
+// compliance-requests:respond, vault:gpayme-enrollment and vault:tokens-metadata.
+//
+// Constants are ordered alphabetically. Note that PaymentContext and GatewayPaymentContexts are
+// different scopes: the specification requires the former for GET /payment-contexts/{id} and the
+// latter for POST /payment-contexts. "Payment Context" is the only scope whose wire value contains
+// a space and a capital letter, which looks like a specification authoring defect; it is mirrored
+// verbatim regardless, because that is the value the authorization server is documented to accept.
 const (
 	Accounts                    = "accounts"
 	Balances                    = "balances"
-	BalancesView                = "balances:view"
 	BalancesTopUpInstructions   = "balances:top-up-instructions"
+	BalancesView                = "balances:view"
+	CardManagement              = "card-management"
+	ComplianceRequests          = "compliance-requests"
+	ComplianceRequestsRead      = "compliance-requests:read"
+	ComplianceRequestsRespond   = "compliance-requests:respond"
 	Disputes                    = "disputes"
 	DisputesAccept              = "disputes:accept"
 	DisputesProvideEvidence     = "disputes:provide-evidence"
@@ -18,6 +34,7 @@ const (
 	FinancialActionsView        = "financial-actions:view"
 	Flow                        = "flow"
 	FlowEvents                  = "flow:events"
+	FlowReflow                  = "flow:reflow"
 	FlowWorkflows               = "flow:workflows"
 	Forward                     = "forward"
 	ForwardSecrets              = "forward:secrets"
@@ -27,30 +44,32 @@ const (
 	GatewayPaymentAuthorization = "gateway:payment-authorizations"
 	GatewayPaymentCancellations = "gateway:payment-cancellations"
 	GatewayPaymentCaptures      = "gateway:payment-captures"
+	GatewayPaymentContexts      = "gateway:payment-contexts"
 	GatewayPaymentDetails       = "gateway:payment-details"
 	GatewayPaymentRefunds       = "gateway:payment-refunds"
 	GatewayPaymentVoids         = "gateway:payment-voids"
 	IdentityVerification        = "identity-verification"
-	IssuingCardMgmt             = "issuing:card-mgmt"
-	IssuingClient               = "issuing:client"
+	IssuingCardManagementRead   = "issuing:card-management-read"
+	IssuingCardManagementWrite  = "issuing:card-management-write"
 	IssuingControlsRead         = "issuing:controls-read"
 	IssuingControlsWrite        = "issuing:controls-write"
+	IssuingDisputes             = "issuing-disputes"
 	IssuingDisputesRead         = "issuing:disputes-read"
 	IssuingDisputesWrite        = "issuing:disputes-write"
 	IssuingTransactionsRead     = "issuing:transactions-read"
-	Marketplace                 = "marketplace"
+	IssuingTransactionsWrite    = "issuing:transactions-write"
 	Middleware                  = "middleware"
-	MiddlewareGateway           = "middleware:gateway"
 	MiddlewareMerchantsPublic   = "middleware:merchants-public"
 	MiddlewareMerchantsSecret   = "middleware:merchants-secret"
-	MiddlewarePaymentContext    = "middleware:payment-context"
-	PaymentContexts             = "Payment Contexts"
+	PaymentContext              = "Payment Context"
+	PaymentSessions             = "payment-sessions"
 	PaymentsSearch              = "payments:search"
 	PayoutsBankDetails          = "payouts:bank-details"
 	Reports                     = "reports"
 	ReportsView                 = "reports:view"
 	SessionsApp                 = "sessions:app"
 	SessionsBrowser             = "sessions:browser"
+	Transactions                = "transactions"
 	Transfers                   = "transfers"
 	TransfersCreate             = "transfers:create"
 	TransfersView               = "transfers:view"
@@ -58,8 +77,10 @@ const (
 	VaultApmeEnrollment         = "vault:apme-enrollment"
 	VaultCardMetadata           = "vault:card-metadata"
 	VaultCustomers              = "vault:customers"
+	VaultGpaymeEnrollment       = "vault:gpayme-enrollment"
 	VaultInstruments            = "vault:instruments"
 	VaultNetworkTokens          = "vault:network-tokens"
 	VaultRealTimeAccountUpdater = "vault:real-time-account-updater"
 	VaultTokenization           = "vault:tokenization"
+	VaultTokensMetadata         = "vault:tokens-metadata"
 )

@@ -71,6 +71,21 @@ func TestOAuthScopeValuesAddedInSpecSync(t *testing.T) {
 	}
 }
 
+// marketplace is deliberately not part of this package's surface: it appears nowhere in the
+// specification, neither in the clientCredentials scope map nor in any operation's security
+// requirement, so the SDK does not offer it.
+//
+// It is worth a test because the sandbox authorization server does still grant it, while refusing
+// accounts to the client behind CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID. The two
+// integration fixtures that need it therefore request the literal string, and the temptation on the
+// next red build will be to "fix" that by reintroducing a constant here. Reprovision the sandbox
+// clients for accounts instead.
+func TestMarketplaceIsNotExposedAsAScope(t *testing.T) {
+	for name, scope := range allScopes() {
+		assert.NotEqual(t, "marketplace", scope, "%s reintroduces the retired marketplace scope", name)
+	}
+}
+
 // PaymentContext and GatewayPaymentContexts are unrelated scopes despite reading alike, so this
 // pins which is which. It also pins the singular: this constant held "Payment Contexts" (plural)
 // until the spec sync, a value the authorization server defines under no reading of the spec, so

@@ -7,6 +7,13 @@ package configuration
 // never declared in that map: compliance-requests, compliance-requests:read,
 // compliance-requests:respond, vault:gpayme-enrollment and vault:tokens-metadata.
 //
+// Five further constants -- issuing:card-mgmt, issuing:client, marketplace, middleware:gateway
+// and middleware:payment-context -- appear nowhere in the specification at all, but the
+// authorization server still grants them and callers still request them, so they are kept for
+// backward compatibility. Each is marked inline. Do not assume a scope is dead because the
+// specification omits it: the sandbox payouts client is provisioned for marketplace and answers
+// a request for accounts with invalid_scope.
+//
 // Constants are ordered alphabetically. Note that PaymentContext and GatewayPaymentContexts are
 // different scopes: the specification requires the former for GET /payment-contexts/{id} and the
 // latter for POST /payment-contexts. "Payment Context" is the only scope whose wire value contains
@@ -51,6 +58,8 @@ const (
 	IdentityVerification        = "identity-verification"
 	IssuingCardManagementRead   = "issuing:card-management-read"
 	IssuingCardManagementWrite  = "issuing:card-management-write"
+	IssuingCardMgmt             = "issuing:card-mgmt" // not in spec; kept for backward compat
+	IssuingClient               = "issuing:client"    // not in spec; kept for backward compat
 	IssuingControlsRead         = "issuing:controls-read"
 	IssuingControlsWrite        = "issuing:controls-write"
 	IssuingDisputes             = "issuing-disputes"
@@ -58,9 +67,12 @@ const (
 	IssuingDisputesWrite        = "issuing:disputes-write"
 	IssuingTransactionsRead     = "issuing:transactions-read"
 	IssuingTransactionsWrite    = "issuing:transactions-write"
+	Marketplace                 = "marketplace" // not in spec; kept for backward compat
 	Middleware                  = "middleware"
+	MiddlewareGateway           = "middleware:gateway" // not in spec; kept for backward compat
 	MiddlewareMerchantsPublic   = "middleware:merchants-public"
 	MiddlewareMerchantsSecret   = "middleware:merchants-secret"
+	MiddlewarePaymentContext    = "middleware:payment-context" // not in spec; kept for backward compat
 	PaymentContext              = "Payment Context"
 	PaymentSessions             = "payment-sessions"
 	PaymentsSearch              = "payments:search"

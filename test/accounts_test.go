@@ -1068,13 +1068,11 @@ func buildFilesClient() *nas.Api {
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
-			// "marketplace" is a literal, not a configuration constant, because the scope is not
-			// in the specification and so is not part of the SDK's surface. This client is
-			// nonetheless provisioned for it and not for accounts: requesting accounts here made
-			// the token request fail, and because the Build error is discarded below, that
-			// surfaced as a nil dereference in TestSubmitFileAccounts rather than an auth error.
-			// Replace with configuration.Accounts once the sandbox client is reprovisioned.
-			WithScopes([]string{"marketplace", configuration.Files}).
+			// This client is provisioned for marketplace and not for accounts: requesting accounts
+			// here made the token request fail, and because the Build error is discarded below,
+			// that surfaced as a nil dereference in TestSubmitFileAccounts rather than an auth
+			// error. Switch to configuration.Accounts once the sandbox client is reprovisioned.
+			WithScopes([]string{configuration.Marketplace, configuration.Files}).
 			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
 			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().

@@ -71,18 +71,31 @@ func TestOAuthScopeValuesAddedInSpecSync(t *testing.T) {
 	}
 }
 
-// marketplace is deliberately not part of this package's surface: it appears nowhere in the
-// specification, neither in the clientCredentials scope map nor in any operation's security
-// requirement, so the SDK does not offer it.
+// These five scopes appear nowhere in the specification -- not in the clientCredentials scope map
+// and not in any operation's security requirement -- so a sweep driven by the spec alone would
+// delete them. They are kept deliberately: the authorization server still grants them and callers
+// still request them. marketplace is the proof: the sandbox client behind
+// CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID is provisioned for it and answers a request for
+// accounts with invalid_scope, so dropping it broke TestSubmitFileAccounts (PR #254).
 //
-// It is worth a test because the sandbox authorization server does still grant it, while refusing
-// accounts to the client behind CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID. The two
-// integration fixtures that need it therefore request the literal string, and the temptation on the
-// next red build will be to "fix" that by reintroducing a constant here. Reprovision the sandbox
-// clients for accounts instead.
-func TestMarketplaceIsNotExposedAsAScope(t *testing.T) {
-	for name, scope := range allScopes() {
-		assert.NotEqual(t, "marketplace", scope, "%s reintroduces the retired marketplace scope", name)
+// This test exists to stop the next specification-driven tidy-up from removing them again.
+func TestLegacyOAuthScopeValuesAreRetained(t *testing.T) {
+	cases := []struct {
+		name     string
+		scope    string
+		expected string
+	}{
+		{"IssuingCardMgmt", IssuingCardMgmt, "issuing:card-mgmt"},
+		{"IssuingClient", IssuingClient, "issuing:client"},
+		{"Marketplace", Marketplace, "marketplace"},
+		{"MiddlewareGateway", MiddlewareGateway, "middleware:gateway"},
+		{"MiddlewarePaymentContext", MiddlewarePaymentContext, "middleware:payment-context"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, tc.scope)
+		})
 	}
 }
 
@@ -146,6 +159,8 @@ func allScopes() map[string]string {
 		"IdentityVerification":        IdentityVerification,
 		"IssuingCardManagementRead":   IssuingCardManagementRead,
 		"IssuingCardManagementWrite":  IssuingCardManagementWrite,
+		"IssuingCardMgmt":             IssuingCardMgmt,
+		"IssuingClient":               IssuingClient,
 		"IssuingControlsRead":         IssuingControlsRead,
 		"IssuingControlsWrite":        IssuingControlsWrite,
 		"IssuingDisputes":             IssuingDisputes,
@@ -153,9 +168,12 @@ func allScopes() map[string]string {
 		"IssuingDisputesWrite":        IssuingDisputesWrite,
 		"IssuingTransactionsRead":     IssuingTransactionsRead,
 		"IssuingTransactionsWrite":    IssuingTransactionsWrite,
+		"Marketplace":                 Marketplace,
 		"Middleware":                  Middleware,
+		"MiddlewareGateway":           MiddlewareGateway,
 		"MiddlewareMerchantsPublic":   MiddlewareMerchantsPublic,
 		"MiddlewareMerchantsSecret":   MiddlewareMerchantsSecret,
+		"MiddlewarePaymentContext":    MiddlewarePaymentContext,
 		"PaymentContext":              PaymentContext,
 		"PaymentSessions":             PaymentSessions,
 		"PaymentsSearch":              PaymentsSearch,

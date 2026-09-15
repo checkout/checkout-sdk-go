@@ -48,6 +48,7 @@ func TestOAuthScopeValuesAddedInSpecSync(t *testing.T) {
 		scope    string
 		expected string
 	}{
+		{"AgenticInventory", AgenticInventory, "agentic:inventory"},
 		{"CardManagement", CardManagement, "card-management"},
 		{"FlowReflow", FlowReflow, "flow:reflow"},
 		{"GatewayPaymentContexts", GatewayPaymentContexts, "gateway:payment-contexts"},
@@ -122,6 +123,7 @@ func TestPaymentContextOAuthScopeValues(t *testing.T) {
 func allScopes() map[string]string {
 	return map[string]string{
 		"Accounts":                    Accounts,
+		"AgenticInventory":            AgenticInventory,
 		"Balances":                    Balances,
 		"BalancesTopUpInstructions":   BalancesTopUpInstructions,
 		"BalancesView":                BalancesView,

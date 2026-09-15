@@ -21,6 +21,7 @@ package configuration
 // verbatim regardless, because that is the value the authorization server is documented to accept.
 const (
 	Accounts                    = "accounts"
+	AgenticInventory            = "agentic:inventory"
 	Balances                    = "balances"
 	BalancesTopUpInstructions   = "balances:top-up-instructions"
 	BalancesView                = "balances:view"

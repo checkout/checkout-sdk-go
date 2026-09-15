@@ -242,10 +242,14 @@ func TestCreateEntityV2(t *testing.T) {
 					},
 				},
 				Profile: &accounts.Profile{
-					Urls:                   []string{"http://example.com"},
-					Mccs:                   []string{"4814"},
-					DefaultHoldingCurrency: common.GBP,
-					HoldingCurrencies:      []common.Currency{common.GBP},
+					Urls: []string{"http://example.com"},
+					Mccs: []string{"4814"},
+					// No holding currencies. They are validated against the platform account's
+					// own currency scope, so any hard-coded value ties this test to one set of
+					// credentials: GBP is accepted locally but fails CI with
+					// profile_holding_currencies_0_invalid, and USD is the exact reverse
+					// (profile_default_holding_currency_invalid_for_currency_scope locally).
+					// Omitting both fields leaves nothing to validate and is accepted either way.
 				},
 				IsDraft: true,
 			},

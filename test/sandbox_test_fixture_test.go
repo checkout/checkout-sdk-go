@@ -186,8 +186,10 @@ func Wait(seconds time.Duration) {
 }
 
 func getOAuthScopes() []string {
+	// The marketplace scope was retired; accounts is the documented requirement for the sub-entity
+	// operations this fixture's suites exercise.
 	return []string{configuration.Files, configuration.Flow, configuration.Fx, configuration.Gateway,
-		configuration.Marketplace, configuration.SessionsApp, configuration.SessionsBrowser,
+		configuration.Accounts, configuration.SessionsApp, configuration.SessionsBrowser,
 		configuration.Vault, configuration.PayoutsBankDetails, configuration.Disputes,
 		configuration.TransfersCreate, configuration.TransfersView, configuration.Balances,
 		configuration.VaultCardMetadata, configuration.FinancialActions, configuration.PaymentsSearch}

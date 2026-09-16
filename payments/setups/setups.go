@@ -427,15 +427,109 @@ type OrderSubMerchant struct {
 	RegistrationDate *common.APIShortDate `json:"registration_date,omitempty"`
 }
 
+// PaymentSetupIndustry holds industry-specific information for the payment setup.
 type PaymentSetupIndustry struct {
-	AirlineData       *AirlineData                 `json:"airline_data,omitempty"`
-	AccommodationData []payments.AccommodationData `json:"accommodation_data,omitempty"`
+	Airline       []PaymentSetupAirline       `json:"airline,omitempty"`
+	Accommodation []PaymentSetupAccommodation `json:"accommodation,omitempty"`
 }
 
-type AirlineData struct {
-	Ticket           *payments.Ticket            `json:"ticket,omitempty"`
-	Passengers       []payments.Passenger        `json:"passengers,omitempty"`
-	FlightLegDetails []payments.FlightLegDetails `json:"flight_leg_details,omitempty"`
+// PaymentSetupAirline holds details about the airline ticket and flights the customer booked.
+type PaymentSetupAirline struct {
+	Ticket                  *PaymentSetupAirlineTicket     `json:"ticket,omitempty"`
+	Passengers              []PaymentSetupAirlinePassenger `json:"passengers,omitempty"`
+	FlightLegDetails        []PaymentSetupFlightLegDetails `json:"flight_leg_details,omitempty"`
+	TotalNumberOfPassengers int                            `json:"total_number_of_passengers,omitempty"`
+	TravelType              string                         `json:"travel_type,omitempty"`
+	TripType                string                         `json:"trip_type,omitempty"`
+	Refundable              *bool                          `json:"refundable,omitempty"`
+	DeliveryRecipient       string                         `json:"delivery_recipient,omitempty"`
+	Ancillaries             string                         `json:"ancillaries,omitempty"`
+	Insurance               *PaymentSetupAirlineInsurance  `json:"insurance,omitempty"`
+}
+
+// PaymentSetupAirlineTicket holds details about the airline ticket.
+type PaymentSetupAirlineTicket struct {
+	Number                 string     `json:"number,omitempty"`
+	IssueDate              *time.Time `json:"issue_date,omitempty"`
+	IssuingCarrierCode     string     `json:"issuing_carrier_code,omitempty"`
+	TravelPackageIndicator string     `json:"travel_package_indicator,omitempty"`
+	TravelAgencyName       string     `json:"travel_agency_name,omitempty"`
+	TravelAgencyCode       string     `json:"travel_agency_code,omitempty"`
+}
+
+// PaymentSetupAirlinePassenger is a passenger on the flight.
+type PaymentSetupAirlinePassenger struct {
+	FirstName   string                               `json:"first_name,omitempty"`
+	LastName    string                               `json:"last_name,omitempty"`
+	DateOfBirth *time.Time                           `json:"date_of_birth,omitempty"`
+	Address     *PaymentSetupAirlinePassengerAddress `json:"address,omitempty"`
+}
+
+// PaymentSetupAirlinePassengerAddress holds the passenger's country of residence.
+type PaymentSetupAirlinePassengerAddress struct {
+	Country common.Country `json:"country,omitempty"`
+}
+
+// PaymentSetupFlightLegDetails is a flight leg booked by the customer.
+type PaymentSetupFlightLegDetails struct {
+	FlightNumber      string     `json:"flight_number,omitempty"`
+	CarrierCode       string     `json:"carrier_code,omitempty"`
+	ClassOfTravelling string     `json:"class_of_travelling,omitempty"`
+	DepartureAirport  string     `json:"departure_airport,omitempty"`
+	DepartureDate     *time.Time `json:"departure_date,omitempty"`
+	DepartureTime     string     `json:"departure_time,omitempty"`
+	ArrivalAirport    string     `json:"arrival_airport,omitempty"`
+	StopOverCode      string     `json:"stop_over_code,omitempty"`
+	FareBasisCode     string     `json:"fare_basis_code,omitempty"`
+}
+
+// PaymentSetupAirlineInsurance holds details about the travel insurance purchased with the booking.
+type PaymentSetupAirlineInsurance struct {
+	Type    string                             `json:"type,omitempty"`
+	Company string                             `json:"company,omitempty"`
+	Price   *PaymentSetupAirlineInsurancePrice `json:"price,omitempty"`
+}
+
+// PaymentSetupAirlineInsurancePrice is the price of the travel insurance.
+type PaymentSetupAirlineInsurancePrice struct {
+	Amount   float64 `json:"amount,omitempty"`
+	Currency string  `json:"currency,omitempty"`
+}
+
+// PaymentSetupAccommodation holds details about the accommodation or cruise booked by the customer.
+type PaymentSetupAccommodation struct {
+	Name                string                           `json:"name,omitempty"`
+	BookingReference    string                           `json:"booking_reference,omitempty"`
+	CheckInDate         *time.Time                       `json:"check_in_date,omitempty"`
+	CheckOutDate        *time.Time                       `json:"check_out_date,omitempty"`
+	Address             *common.Address                  `json:"address,omitempty"`
+	NumberOfRooms       int                              `json:"number_of_rooms,omitempty"`
+	Guests              []PaymentSetupAccommodationGuest `json:"guests,omitempty"`
+	Room                []PaymentSetupAccommodationRoom  `json:"room,omitempty"`
+	TotalNumberOfGuests int                              `json:"total_number_of_guests,omitempty"`
+	Refundable          *bool                            `json:"refundable,omitempty"`
+	DeliveryRecipient   string                           `json:"delivery_recipient,omitempty"`
+	Host                *PaymentSetupAccommodationHost   `json:"host,omitempty"`
+}
+
+// PaymentSetupAccommodationGuest is a guest staying at the accommodation.
+type PaymentSetupAccommodationGuest struct {
+	FirstName   string     `json:"first_name,omitempty"`
+	LastName    string     `json:"last_name,omitempty"`
+	DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
+}
+
+// PaymentSetupAccommodationRoom is a room booked by the customer.
+type PaymentSetupAccommodationRoom struct {
+	Rate           float64 `json:"rate,omitempty"`
+	NumberOfNights int     `json:"number_of_nights,omitempty"`
+	Type           string  `json:"type,omitempty"`
+}
+
+// PaymentSetupAccommodationHost holds details about the host of the accommodation.
+type PaymentSetupAccommodationHost struct {
+	RegistrationDate      *time.Time `json:"registration_date,omitempty"`
+	TotalReservationCount int        `json:"total_reservation_count,omitempty"`
 }
 
 type AccountFundingTransactionPurpose string

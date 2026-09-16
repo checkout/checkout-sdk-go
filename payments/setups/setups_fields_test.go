@@ -185,6 +185,144 @@ func TestKlarnaAccountHolder_Name(t *testing.T) {
 	assert.Equal(t, "Jane Doe", decoded.Name)
 }
 
+func boolPtr(value bool) *bool {
+	return &value
+}
+
+// Verifies PaymentSetupAirline and PaymentSetupAccommodation aligned with the 2026-09-08 Checkout.com
+// swagger delta: total_number_of_passengers, travel_type, trip_type, refundable, delivery_recipient,
+// ancillaries, insurance (airline) and total_number_of_guests, refundable, delivery_recipient, host
+// (accommodation). Both schemas are nested under PaymentSetup.industry.airline[] / .accommodation[].
+func TestPaymentSetupIndustry_AirlineAllFields(t *testing.T) {
+	industry := PaymentSetupIndustry{
+		Airline: []PaymentSetupAirline{
+			{
+				Ticket: &PaymentSetupAirlineTicket{
+					Number:                 "0742464639523",
+					IssueDate:              timePtr(t, "2025-05-01T00:00:00Z"),
+					IssuingCarrierCode:     "042",
+					TravelPackageIndicator: "A",
+					TravelAgencyName:       "Checkout Travel Agents",
+					TravelAgencyCode:       "91114362",
+				},
+				Passengers: []PaymentSetupAirlinePassenger{
+					{
+						FirstName:   "John",
+						LastName:    "Smith",
+						DateOfBirth: timePtr(t, "1990-10-31T00:00:00Z"),
+						Address:     &PaymentSetupAirlinePassengerAddress{Country: common.GB},
+					},
+				},
+				FlightLegDetails: []PaymentSetupFlightLegDetails{
+					{
+						FlightNumber:      "BA1483",
+						CarrierCode:       "BA",
+						ClassOfTravelling: "W",
+						DepartureAirport:  "LHR",
+						DepartureDate:     timePtr(t, "2025-10-13T00:00:00Z"),
+						DepartureTime:     "18:30",
+						ArrivalAirport:    "JFK",
+						StopOverCode:      "X",
+						FareBasisCode:     "WUP14B",
+					},
+				},
+				TotalNumberOfPassengers: 1,
+				TravelType:              "international",
+				TripType:                "one_way",
+				Refundable:              boolPtr(true),
+				DeliveryRecipient:       "jane.smith@example.com",
+				Ancillaries:             "extra_baggage",
+				Insurance: &PaymentSetupAirlineInsurance{
+					Type:    "travel",
+					Company: "AXA",
+					Price: &PaymentSetupAirlineInsurancePrice{
+						Amount:   500,
+						Currency: "SAR",
+					},
+				},
+			},
+		},
+	}
+
+	marshalled, err := json.Marshal(industry)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"airline":`)
+	assert.Contains(t, body, `"issuing_carrier_code":"042"`)
+	assert.Contains(t, body, `"class_of_travelling":"W"`)
+	assert.Contains(t, body, `"stop_over_code":"X"`)
+	assert.Contains(t, body, `"total_number_of_passengers":1`)
+	assert.Contains(t, body, `"travel_type":"international"`)
+	assert.Contains(t, body, `"trip_type":"one_way"`)
+	assert.Contains(t, body, `"refundable":true`)
+	assert.Contains(t, body, `"delivery_recipient":"jane.smith@example.com"`)
+	assert.Contains(t, body, `"ancillaries":"extra_baggage"`)
+	assert.Contains(t, body, `"insurance":`)
+	assert.Contains(t, body, `"company":"AXA"`)
+	assert.Contains(t, body, `"currency":"SAR"`)
+
+	var decoded PaymentSetupIndustry
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Len(t, decoded.Airline, 1)
+	assert.Equal(t, 1, decoded.Airline[0].TotalNumberOfPassengers)
+	assert.True(t, *decoded.Airline[0].Refundable)
+	assert.Equal(t, "extra_baggage", decoded.Airline[0].Ancillaries)
+	assert.Equal(t, float64(500), decoded.Airline[0].Insurance.Price.Amount)
+	assert.Equal(t, common.GB, decoded.Airline[0].Passengers[0].Address.Country)
+}
+
+func TestPaymentSetupIndustry_AccommodationAllFields(t *testing.T) {
+	industry := PaymentSetupIndustry{
+		Accommodation: []PaymentSetupAccommodation{
+			{
+				Name:             "Checkout Lodge",
+				BookingReference: "REF9083748",
+				CheckInDate:      timePtr(t, "2025-04-11T00:00:00Z"),
+				CheckOutDate:     timePtr(t, "2025-04-18T00:00:00Z"),
+				Address: &common.Address{
+					AddressLine1: "123 High Street",
+					City:         "London",
+					State:        "Greater London",
+					Country:      common.GB,
+					Zip:          "NE1 1CK",
+				},
+				NumberOfRooms: 2,
+				Guests: []PaymentSetupAccommodationGuest{
+					{FirstName: "John", LastName: "Smith", DateOfBirth: timePtr(t, "1970-03-19T00:00:00Z")},
+				},
+				Room: []PaymentSetupAccommodationRoom{
+					{Rate: 42.3, NumberOfNights: 5, Type: "deluxe"},
+				},
+				TotalNumberOfGuests: 2,
+				Refundable:          boolPtr(true),
+				DeliveryRecipient:   "jane.smith@example.com",
+				Host: &PaymentSetupAccommodationHost{
+					RegistrationDate:      timePtr(t, "2020-01-01T00:00:00Z"),
+					TotalReservationCount: 150,
+				},
+			},
+		},
+	}
+
+	marshalled, err := json.Marshal(industry)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"accommodation":`)
+	assert.Contains(t, body, `"total_number_of_guests":2`)
+	assert.Contains(t, body, `"refundable":true`)
+	assert.Contains(t, body, `"delivery_recipient":"jane.smith@example.com"`)
+	assert.Contains(t, body, `"host":`)
+	assert.Contains(t, body, `"total_reservation_count":150`)
+
+	var decoded PaymentSetupIndustry
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Len(t, decoded.Accommodation, 1)
+	assert.Equal(t, 2, decoded.Accommodation[0].TotalNumberOfGuests)
+	assert.True(t, *decoded.Accommodation[0].Refundable)
+	assert.Equal(t, "jane.smith@example.com", decoded.Accommodation[0].DeliveryRecipient)
+	assert.Equal(t, 150, decoded.Accommodation[0].Host.TotalReservationCount)
+}
+
 func timePtr(t *testing.T, value string) *time.Time {
 	parsed, err := time.Parse(time.RFC3339, value)
 	assert.NoError(t, err)

@@ -111,14 +111,32 @@ type PaymentSetupCustomerDevice struct {
 }
 
 type CustomerMerchantAccount struct {
-	Id                   string     `json:"id,omitempty"`
-	RegistrationDate     *time.Time `json:"registration_date,omitempty"`
-	LastModified         *time.Time `json:"last_modified,omitempty"`
-	ReturningCustomer    *bool      `json:"returning_customer,omitempty"`
-	FirstTransactionDate *time.Time `json:"first_transaction_date,omitempty"`
-	LastTransactionDate  *time.Time `json:"last_transaction_date,omitempty"`
-	TotalOrderCount      int        `json:"total_order_count,omitempty"`
-	LastPaymentAmount    int64      `json:"last_payment_amount,omitempty"`
+	Id string `json:"id,omitempty"`
+
+	// RegistrationDate is the date the customer registered their account with the merchant.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	RegistrationDate *common.APIShortDate `json:"registration_date,omitempty"`
+
+	// LastModified is the date the customer's account with the merchant was last modified.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	LastModified *common.APIShortDate `json:"last_modified,omitempty"`
+
+	ReturningCustomer *bool `json:"returning_customer,omitempty"`
+
+	// FirstTransactionDate is the date of the customer's first transaction.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	FirstTransactionDate *common.APIShortDate `json:"first_transaction_date,omitempty"`
+
+	// LastTransactionDate is the date of the customer's most recent transaction.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	LastTransactionDate *common.APIShortDate `json:"last_transaction_date,omitempty"`
+
+	TotalOrderCount   int   `json:"total_order_count,omitempty"`
+	LastPaymentAmount int64 `json:"last_payment_amount,omitempty"`
 }
 
 // ===== Payment Methods Structs =====
@@ -399,10 +417,14 @@ type PaymentSetupAmountAllocation struct {
 }
 
 type OrderSubMerchant struct {
-	Id               string     `json:"id,omitempty"`
-	ProductCategory  string     `json:"product_category,omitempty"`
-	NumberOfSales    int        `json:"number_of_sales,omitempty"`
-	RegistrationDate *time.Time `json:"registration_date,omitempty"`
+	Id              string `json:"id,omitempty"`
+	ProductCategory string `json:"product_category,omitempty"`
+	NumberOfSales   int    `json:"number_of_sales,omitempty"`
+
+	// RegistrationDate is the date the sub-merchant was registered.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	RegistrationDate *common.APIShortDate `json:"registration_date,omitempty"`
 }
 
 type PaymentSetupIndustry struct {
@@ -455,13 +477,21 @@ type AccountFundingTransactionIdentification struct {
 }
 
 type AccountFundingTransactionSender struct {
-	DateOfBirth    *time.Time                               `json:"date_of_birth,omitempty"`
+	// DateOfBirth is the date of birth of the sender.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
+
 	Reference      string                                   `json:"reference,omitempty"`
 	Identification *AccountFundingTransactionIdentification `json:"identification,omitempty"`
 }
 
 type AccountFundingTransactionRecipient struct {
-	DateOfBirth   *time.Time      `json:"date_of_birth,omitempty"`
+	// DateOfBirth is the date of birth of the recipient.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
+
 	AccountNumber string          `json:"account_number,omitempty"`
 	FirstName     string          `json:"first_name,omitempty"`
 	LastName      string          `json:"last_name,omitempty"`

@@ -1,8 +1,6 @@
 package contexts
 
 import (
-	"time"
-
 	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/payments"
 
@@ -21,14 +19,26 @@ const PaymentContextsPath = "payment-contexts"
 
 type (
 	PaymentContextsCustomerSummary struct {
-		RegistrationDate     *time.Time `json:"registration_date,omitempty"`
-		FirstTransactionDate *time.Time `json:"first_transaction_date,omitempty"`
-		LastPaymentDate      *time.Time `json:"last_payment_date,omitempty"`
-		TotalOrderCount      int64      `json:"total_order_count,omitempty"`
-		LastPaymentAmount    float64    `json:"last_payment_amount,omitempty"`
-		IsPremiumCustomer    bool       `json:"is_premium_customer,omitempty"`
-		IsReturningCustomer  bool       `json:"is_returning_customer,omitempty"`
-		LifetimeValue        float64    `json:"lifetime_value,omitempty"`
+		// RegistrationDate is the date the customer registered.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		RegistrationDate *common.APIShortDate `json:"registration_date,omitempty"`
+
+		// FirstTransactionDate is the date of the customer's first transaction.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		FirstTransactionDate *common.APIShortDate `json:"first_transaction_date,omitempty"`
+
+		// LastPaymentDate is the date of the customer's last payment.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		LastPaymentDate *common.APIShortDate `json:"last_payment_date,omitempty"`
+
+		TotalOrderCount     int64   `json:"total_order_count,omitempty"`
+		LastPaymentAmount   float64 `json:"last_payment_amount,omitempty"`
+		IsPremiumCustomer   bool    `json:"is_premium_customer,omitempty"`
+		IsReturningCustomer bool    `json:"is_returning_customer,omitempty"`
+		LifetimeValue       float64 `json:"lifetime_value,omitempty"`
 	}
 
 	PaymentContextCustomerRequest struct {
@@ -73,31 +83,46 @@ type (
 	}
 
 	PaymentContextsTicket struct {
-		Number                 string     `json:"number,omitempty"`
-		IssueDate              *time.Time `json:"issue_date,omitempty"`
-		IssuingCarrierCode     string     `json:"issuing_carrier_code,omitempty"`
-		TravelPackageIndicator string     `json:"travel_package_indicator,omitempty"`
-		TravelAgencyName       string     `json:"travel_agency_name,omitempty"`
-		TravelAgencyCode       string     `json:"travel_agency_code,omitempty"`
+		Number string `json:"number,omitempty"`
+
+		// IssueDate is the date the airline ticket was issued.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		IssueDate *common.APIShortDate `json:"issue_date,omitempty"`
+
+		IssuingCarrierCode     string `json:"issuing_carrier_code,omitempty"`
+		TravelPackageIndicator string `json:"travel_package_indicator,omitempty"`
+		TravelAgencyName       string `json:"travel_agency_name,omitempty"`
+		TravelAgencyCode       string `json:"travel_agency_code,omitempty"`
 	}
 
 	PaymentContextsPassenger struct {
-		FirstName   string          `json:"first_name,omitempty"`
-		LastName    string          `json:"last_name,omitempty"`
-		DateOfBirth *time.Time      `json:"date_of_birth,omitempty"`
-		Address     *common.Address `json:"address,omitempty"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+
+		// DateOfBirth is the passenger's date of birth.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
+
+		Address *common.Address `json:"address,omitempty"`
 	}
 
 	PaymentContextsFlightLegDetails struct {
-		FlightNumber      string     `json:"flight_number,omitempty"`
-		CarrierCode       string     `json:"carrier_code,omitempty"`
-		ClassOfTravelling string     `json:"class_of_travelling,omitempty"`
-		DepartureAirport  string     `json:"departure_airport,omitempty"`
-		DepartureDate     *time.Time `json:"departure_date,omitempty"`
-		DepartureTime     string     `json:"departure_time,omitempty"`
-		ArrivalAirport    string     `json:"arrival_airport,omitempty"`
-		StopOverCode      string     `json:"stop_over_code,omitempty"`
-		FareBasisCode     string     `json:"fare_basis_code,omitempty"`
+		FlightNumber      string `json:"flight_number,omitempty"`
+		CarrierCode       string `json:"carrier_code,omitempty"`
+		ClassOfTravelling string `json:"class_of_travelling,omitempty"`
+		DepartureAirport  string `json:"departure_airport,omitempty"`
+
+		// DepartureDate is the date of the scheduled take off.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		DepartureDate *common.APIShortDate `json:"departure_date,omitempty"`
+
+		DepartureTime  string `json:"departure_time,omitempty"`
+		ArrivalAirport string `json:"arrival_airport,omitempty"`
+		StopOverCode   string `json:"stop_over_code,omitempty"`
+		FareBasisCode  string `json:"fare_basis_code,omitempty"`
 	}
 
 	PaymentContextsAirlineData struct {

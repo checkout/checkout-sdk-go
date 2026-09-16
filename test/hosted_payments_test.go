@@ -171,9 +171,12 @@ func getHostedPaymentRequest() *hosted.PaymentHostedRequest {
 						Number: "123456",
 					},
 					Passenger: &payments.Passenger{
-						FirstName:   "John",
-						LastName:    "Doe",
-						DateOfBirth: func() *time.Time { t, _ := time.Parse("2006-01-02", "1990-01-01"); return &t }(),
+						FirstName: "John",
+						LastName:  "Doe",
+						DateOfBirth: func() *common.APIShortDate {
+							d := common.APIShortDate(time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC))
+							return &d
+						}(),
 						Address: &common.Address{
 							Country: common.FR,
 						},

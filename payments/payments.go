@@ -337,31 +337,46 @@ type (
 	}
 
 	Ticket struct {
-		Number                 string     `json:"number,omitempty"`
-		IssueDate              *time.Time `json:"issue_date,omitempty"`
-		IssuingCarrierCode     string     `json:"issuing_carrier_code,omitempty"`
-		TravelPackageIndicator string     `json:"travel_package_indicator,omitempty"`
-		TravelAgencyName       string     `json:"travel_agency_name,omitempty"`
-		TravelAgencyCode       string     `json:"travel_agency_code,omitempty"`
+		Number string `json:"number,omitempty"`
+
+		// IssueDate is the date the airline ticket was issued.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		IssueDate *common.APIShortDate `json:"issue_date,omitempty"`
+
+		IssuingCarrierCode     string `json:"issuing_carrier_code,omitempty"`
+		TravelPackageIndicator string `json:"travel_package_indicator,omitempty"`
+		TravelAgencyName       string `json:"travel_agency_name,omitempty"`
+		TravelAgencyCode       string `json:"travel_agency_code,omitempty"`
 	}
 
 	Passenger struct {
-		FirstName   string          `json:"first_name,omitempty"`
-		LastName    string          `json:"last_name,omitempty"`
-		DateOfBirth *time.Time      `json:"date_of_birth,omitempty"`
-		Address     *common.Address `json:"address,omitempty"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+
+		// DateOfBirth is the passenger's date of birth.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
+
+		Address *common.Address `json:"address,omitempty"`
 	}
 
 	FlightLegDetails struct {
-		FlightNumber     string     `json:"flight_number,omitempty"`
-		CarrierCode      string     `json:"carrier_code,omitempty"`
-		ClassOfTraveling string     `json:"class_of_traveling,omitempty"`
-		DepartureAirport string     `json:"departure_airport,omitempty"`
-		DepartureDate    *time.Time `json:"departure_date,omitempty"`
-		DepartureTime    string     `json:"departure_time,omitempty"`
-		ArrivalAirport   string     `json:"arrival_airport,omitempty"`
-		StopoverCode     string     `json:"stopover_code,omitempty"`
-		FareBasisCode    string     `json:"fare_basis_code,omitempty"`
+		FlightNumber     string `json:"flight_number,omitempty"`
+		CarrierCode      string `json:"carrier_code,omitempty"`
+		ClassOfTraveling string `json:"class_of_traveling,omitempty"`
+		DepartureAirport string `json:"departure_airport,omitempty"`
+
+		// DepartureDate is the date of the scheduled take off.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		DepartureDate *common.APIShortDate `json:"departure_date,omitempty"`
+
+		DepartureTime  string `json:"departure_time,omitempty"`
+		ArrivalAirport string `json:"arrival_airport,omitempty"`
+		StopoverCode   string `json:"stopover_code,omitempty"`
+		FareBasisCode  string `json:"fare_basis_code,omitempty"`
 	}
 
 	ShippingInfo struct {
@@ -535,9 +550,13 @@ type (
 	}
 
 	Guest struct {
-		FirstName   string     `json:"first_name,omitempty"`
-		LastName    string     `json:"last_name,omitempty"`
-		DateOfBirth *time.Time `json:"date_of_birth,omitempty"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+
+		// DateOfBirth is the date of birth of the guest.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
 	}
 
 	Room struct {
@@ -546,17 +565,28 @@ type (
 	}
 
 	AccommodationData struct {
-		Name             string          `json:"name,omitempty"`
-		BookingReference string          `json:"booking_reference,omitempty"`
-		CheckInDate      *time.Time      `json:"check_in_date,omitempty"`
-		CheckOutDate     *time.Time      `json:"check_out_date,omitempty"`
-		Address          *common.Address `json:"address,omitempty"`
-		State            string          `json:"state,omitempty"`
-		Country          common.Country  `json:"country,omitempty"`
-		City             string          `json:"city,omitempty"`
-		NumberOfRooms    int             `json:"number_of_rooms,omitempty"`
-		Guests           []Guest         `json:"guests,omitempty"`
-		Room             []Room          `json:"room,omitempty"`
+		Name             string `json:"name,omitempty"`
+		BookingReference string `json:"booking_reference,omitempty"`
+
+		// CheckInDate is, for lodging, the actual or scheduled date the guest checked-in. For
+		// cruise, it is the cruise departure date, also known as the sail date.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		CheckInDate *common.APIShortDate `json:"check_in_date,omitempty"`
+
+		// CheckOutDate is, for lodging, the actual or scheduled date the guest checked-out. For
+		// cruise, it is the cruise return date, also known as the sail end date.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		CheckOutDate *common.APIShortDate `json:"check_out_date,omitempty"`
+
+		Address       *common.Address `json:"address,omitempty"`
+		State         string          `json:"state,omitempty"`
+		Country       common.Country  `json:"country,omitempty"`
+		City          string          `json:"city,omitempty"`
+		NumberOfRooms int             `json:"number_of_rooms,omitempty"`
+		Guests        []Guest         `json:"guests,omitempty"`
+		Room          []Room          `json:"room,omitempty"`
 	}
 	PartnerCustomerRiskData struct {
 		Key   string `json:"key,omitempty"`
@@ -826,8 +856,14 @@ type (
 		WxpayGoodsId   string      `json:"wxpay_goods_id,omitempty"`
 		Url            string      `json:"url,omitempty"`
 		ImageUrl       string      `json:"image_url,omitempty"`
-		ServiceEndsOn  *time.Time  `json:"service_ends_on,omitempty"`
-		Sku            string      `json:"sku,omitempty"`
+
+		// ServiceEndsOn is the maximum date for the service to be rendered or ended.
+		// Required if source.type is sequra and type is digital.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		ServiceEndsOn *common.APIShortDate `json:"service_ends_on,omitempty"`
+
+		Sku string `json:"sku,omitempty"`
 	}
 
 	BillingInformation struct {
@@ -836,20 +872,25 @@ type (
 	}
 
 	RefundOrder struct {
-		Name           string     `json:"name,omitempty"`
-		Quantity       int64      `json:"quantity,omitempty"`
-		UnitPrice      int64      `json:"unit_price,omitempty"`
-		Reference      string     `json:"reference,omitempty"`
-		CommodityCode  string     `json:"commodity_code,omitempty"`
-		UnitOfMeasure  string     `json:"unit_of_measure,omitempty"`
-		TotalAmount    int64      `json:"total_amount,omitempty"`
-		TaxAmount      int64      `json:"tax_amount,omitempty"`
-		DiscountAmount int64      `json:"discount_amount,omitempty"`
-		WxpayGoodsId   string     `json:"wxpay_goods_id,omitempty"`
-		ImageUrl       string     `json:"image_url,omitempty"`
-		Url            string     `json:"url,omitempty"`
-		Type           string     `json:"type,omitempty"`
-		ServiceEndsOn  *time.Time `json:"service_ends_on,omitempty"`
+		Name           string `json:"name,omitempty"`
+		Quantity       int64  `json:"quantity,omitempty"`
+		UnitPrice      int64  `json:"unit_price,omitempty"`
+		Reference      string `json:"reference,omitempty"`
+		CommodityCode  string `json:"commodity_code,omitempty"`
+		UnitOfMeasure  string `json:"unit_of_measure,omitempty"`
+		TotalAmount    int64  `json:"total_amount,omitempty"`
+		TaxAmount      int64  `json:"tax_amount,omitempty"`
+		DiscountAmount int64  `json:"discount_amount,omitempty"`
+		WxpayGoodsId   string `json:"wxpay_goods_id,omitempty"`
+		ImageUrl       string `json:"image_url,omitempty"`
+		Url            string `json:"url,omitempty"`
+		Type           string `json:"type,omitempty"`
+
+		// ServiceEndsOn is the maximum date for the service to be rendered or ended.
+		// Required if source.type is sequra and type is digital.
+		// [Optional]
+		// Format: yyyy-MM-dd
+		ServiceEndsOn *common.APIShortDate `json:"service_ends_on,omitempty"`
 	}
 
 	PaymentMethodDetails struct {

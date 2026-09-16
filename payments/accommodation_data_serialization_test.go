@@ -183,3 +183,40 @@ func TestAccommodationDataDateRoundTrip(t *testing.T) {
 	assert.Nil(t, err)
 	assert.JSONEq(t, payload, string(raw))
 }
+
+// A2: common.APIShortDate also accepts the compact yyyyMMdd form, matching the Java SDK's
+// LocalDate deserializer. This confirms the tolerance reaches the migrated fields, not just the
+// type in isolation -- a response using the compact form parses, and re-serializes in the
+// canonical yyyy-MM-dd the specification declares.
+func TestAccommodationDataAcceptsCompactDates(t *testing.T) {
+	payload := `{
+		"check_in_date":"20261001",
+		"check_out_date":"20261005",
+		"guests":[{"first_name":"Jane","date_of_birth":"19850714"}]
+	}`
+
+	var data AccommodationData
+	assert.Nil(t, json.Unmarshal([]byte(payload), &data))
+
+	assert.Equal(t, time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC), time.Time(*data.CheckInDate))
+	assert.Equal(t, time.Date(2026, 10, 5, 0, 0, 0, 0, time.UTC), time.Time(*data.CheckOutDate))
+	assert.Equal(t, time.Date(1985, 7, 14, 0, 0, 0, 0, time.UTC), time.Time(*data.Guests[0].DateOfBirth))
+
+	raw, err := json.Marshal(data)
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+	assert.Equal(t, "2026-10-01", body["check_in_date"])
+	assert.Equal(t, "2026-10-05", body["check_out_date"])
+}
+
+// The rejection still holds on a migrated field: a date-time on a format: date field is a
+// contract break and must surface as an error rather than be silently truncated.
+func TestAccommodationDataRejectsDateTimeValues(t *testing.T) {
+	var data AccommodationData
+	err := json.Unmarshal([]byte(`{"check_in_date":"2026-10-01T00:00:00Z"}`), &data)
+
+	assert.NotNil(t, err)
+	assert.Contains(t, err.Error(), "APIShortDate only accepts")
+}

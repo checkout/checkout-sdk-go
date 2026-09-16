@@ -208,17 +208,27 @@ func TestCreateEntityV2(t *testing.T) {
 					TradingName:       "Trading " + GenerateRandomString(3),
 					PrincipalAddress:  Address(),
 					RegisteredAddress: Address(),
-					Representatives: []accounts.Representative{
-						{
-							FirstName: GenerateRandomString(5),
-							LastName:  GenerateRandomString(5),
-							Address:   Address(),
-							Roles:     []accounts.EntityRoles{accounts.DirectorERStringType},
-							DateOfBirth: &accounts.DateOfBirth{
-								Day: 1, Month: 1, Year: 1980,
-							},
-						},
-					},
+					// No representatives: schema 2.0 company onboarding started rejecting
+					// company.representatives on 2026-09-15 with
+					// 422 invalid_request / company_representatives_0_invalid
+					// (request_id ea0252e8-ed58-90ab-8ab7-a6b3c4e6b376). Every shape the SDK can
+					// express was refused -- flat fields, a nested individual, with and without
+					// roles, place_of_birth and identification -- while this same request minus
+					// the field is accepted. Schema 2.0 is deprecated, so the field was dropped
+					// rather than the test quarantined; TestCreateEntityV3 still covers
+					// representatives on the current schema.
+					//
+					//  Representatives: []accounts.Representative{
+					//	{
+					//		FirstName: GenerateRandomString(5),
+					//		LastName:  GenerateRandomString(5),
+					//		Address:   Address(),
+					//		Roles:     []accounts.EntityRoles{accounts.DirectorERStringType},
+					//		DateOfBirth: &accounts.DateOfBirth{
+					//			Day: 1, Month: 1, Year: 1980,
+					//		},
+					//	},
+					//},
 					BusinessRegistrationNumber: GenerateRandomBusinessRegistrationNumber(),
 					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 1, Year: 2001},
 				},
@@ -232,15 +242,32 @@ func TestCreateEntityV2(t *testing.T) {
 					},
 				},
 				Profile: &accounts.Profile{
-					Urls:                   []string{"http://example.com"},
-					Mccs:                   []string{"4814"},
-					DefaultHoldingCurrency: common.GBP,
-					HoldingCurrencies:      []common.Currency{common.GBP},
+					Urls: []string{"http://example.com"},
+					Mccs: []string{"4814"},
+					// No holding currencies. They are validated against the platform account's
+					// own currency scope, so any hard-coded value ties this test to one set of
+					// credentials: GBP is accepted locally but fails CI with
+					// profile_holding_currencies_0_invalid, and USD is the exact reverse
+					// (profile_default_holding_currency_invalid_for_currency_scope locally).
+					// Omitting both fields leaves nothing to validate and is accepted either way.
 				},
 				IsDraft: true,
 			},
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
-				assert.Nil(t, err)
+				if !assert.NoError(t, err) {
+					// CheckoutAPIError.Error() returns only the status line, and %v prints Data as
+					// a pointer address, so a rejection here used to report nothing but "422".
+					// ErrorCodes is where the sandbox names the field it refused.
+					if apiErr, ok := err.(errors.CheckoutAPIError); ok && apiErr.Data != nil {
+						t.Logf("create entity V2 rejected: status=%d error_type=%q error_codes=%v request_id=%q",
+							apiErr.StatusCode, apiErr.Data.ErrorType, apiErr.Data.ErrorCodes, apiErr.Data.RequestID)
+					}
+					// Returning is what keeps a rejection from becoming a panic: assert (unlike
+					// require) records the failure and carries on, so the dereferences below ran
+					// against a nil response and took the whole test binary down with SIGSEGV,
+					// masking every integration test that runs after this one.
+					return
+				}
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusCreated, response.HttpMetadata.StatusCode)
 				assert.NotNil(t, response.Id)

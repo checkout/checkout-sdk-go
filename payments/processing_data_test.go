@@ -3,6 +3,7 @@ package payments
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -12,7 +13,7 @@ import (
 //   - scheme
 //   - partner_fraud_status
 //   - partner_merchant_advice_code
-//   - accommodation_data
+//   - accommodation_data (incl. its format: date fields)
 //   - airline_data
 //   - failure_code
 //   - partner_code
@@ -31,8 +32,13 @@ func TestProcessingData_UnmarshalAllNewFields(t *testing.T) {
 		"fallback_source_used":true,
 		"scheme_transaction_link_id":"MTL-XYZ-789",
 		"recommendation_code":"02",
-		"accommodation_data":[{"name":"Grand Hotel"}],
-		"airline_data":[{"ticket":{"number":"045-21351455613"}}]
+		"accommodation_data":[{
+			"name":"Grand Hotel",
+			"check_in_date":"2026-10-01",
+			"check_out_date":"2026-10-05",
+			"guests":[{"first_name":"Jane","date_of_birth":"1985-07-14"}]
+		}],
+		"airline_data":[{"ticket":{"number":"045-21351455613","issue_date":"2026-09-20"}}]
 	}`
 
 	var data ProcessingData
@@ -52,9 +58,34 @@ func TestProcessingData_UnmarshalAllNewFields(t *testing.T) {
 	assert.Len(t, data.AccommodationData, 1)
 	assert.Equal(t, "Grand Hotel", data.AccommodationData[0].Name)
 
+	// The spec declares check_in_date, check_out_date and guests[].date_of_birth as
+	// format: date, so the API sends them date-only. Before these fields became
+	// common.APIShortDate they were *time.Time, and encoding/json could not parse
+	// "2026-10-01" into one -- the whole response failed with
+	// `parsing time "2026-10-01" as "2006-01-02T15:04:05Z07:00"`.
+	assert.NotNil(t, data.AccommodationData[0].CheckInDate)
+	assert.Equal(t,
+		time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC),
+		time.Time(*data.AccommodationData[0].CheckInDate))
+	assert.NotNil(t, data.AccommodationData[0].CheckOutDate)
+	assert.Equal(t,
+		time.Date(2026, 10, 5, 0, 0, 0, 0, time.UTC),
+		time.Time(*data.AccommodationData[0].CheckOutDate))
+
+	assert.Len(t, data.AccommodationData[0].Guests, 1)
+	assert.Equal(t, "Jane", data.AccommodationData[0].Guests[0].FirstName)
+	assert.NotNil(t, data.AccommodationData[0].Guests[0].DateOfBirth)
+	assert.Equal(t,
+		time.Date(1985, 7, 14, 0, 0, 0, 0, time.UTC),
+		time.Time(*data.AccommodationData[0].Guests[0].DateOfBirth))
+
 	assert.Len(t, data.AirlineData, 1)
 	assert.NotNil(t, data.AirlineData[0].Ticket)
 	assert.Equal(t, "045-21351455613", data.AirlineData[0].Ticket.Number)
+	assert.NotNil(t, data.AirlineData[0].Ticket.IssueDate)
+	assert.Equal(t,
+		time.Date(2026, 9, 20, 0, 0, 0, 0, time.UTC),
+		time.Time(*data.AirlineData[0].Ticket.IssueDate))
 }
 
 // Verifies the new fields stay zero-valued (no spurious defaults) when absent

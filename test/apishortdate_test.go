@@ -35,6 +35,23 @@ func TestAPIShortDateUnmarshalling(t *testing.T) {
 			jsonInput:    `"2023-01-09"`,
 			expectedDate: time.Date(2023, 1, 9, 0, 0, 0, 0, time.UTC),
 		},
+		// The compact 8-digit form, accepted to match the Java SDK's LocalDate deserializer
+		// (GsonSerializer.getLocalDateJsonDeserializer), which falls back to yyyyMMdd.
+		{
+			name:         "YYYYMMDD compact (day > month)",
+			jsonInput:    `"20230315"`,
+			expectedDate: time.Date(2023, 3, 15, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			name:         "YYYYMMDD compact (day < month)",
+			jsonInput:    `"20231205"`,
+			expectedDate: time.Date(2023, 12, 5, 0, 0, 0, 0, time.UTC),
+		},
+		{
+			name:         "YYYYMMDD compact leap year",
+			jsonInput:    `"20240229"`,
+			expectedDate: time.Date(2024, 2, 29, 0, 0, 0, 0, time.UTC),
+		},
 	}
 
 	for _, tc := range cases {
@@ -123,6 +140,11 @@ func TestAPIShortDateFormatConfusion(t *testing.T) {
 	}
 }
 
+// APIShortDate accepts yyyy-MM-dd and yyyyMMdd and nothing else. The date-time cases below are
+// the load-bearing ones: every field typed APIShortDate is declared "format": "date" in the
+// specification, so a timestamp on one is a server-side contract break, and silently truncating
+// it would hide that. Java's LocalDate deserializer rejects date-times for the same reason, so
+// the two SDKs agree on both what they accept and what they refuse.
 func TestAPIShortDateInvalidFormats(t *testing.T) {
 	cases := []struct {
 		name      string
@@ -178,6 +200,29 @@ func TestAPIShortDateInvalidFormats(t *testing.T) {
 			name:      "Date with extra characters should fail",
 			jsonInput: `"2023-03-15extra"`,
 			errorMsg:  "should reject date with extra characters",
+		},
+		// Near-misses of the compact yyyyMMdd form. Accepting yyyyMMdd must not loosen
+		// anything else: a wrong-length run of digits, an out-of-range compact date and a
+		// compact date with trailing characters all stay rejected.
+		{
+			name:      "Compact date with extra characters should fail",
+			jsonInput: `"20230315extra"`,
+			errorMsg:  "should reject compact date with extra characters",
+		},
+		{
+			name:      "Six-digit compact date should fail",
+			jsonInput: `"202303"`,
+			errorMsg:  "should reject six-digit date",
+		},
+		{
+			name:      "Invalid compact month/day should fail",
+			jsonInput: `"20231345"`,
+			errorMsg:  "should reject invalid compact month/day values",
+		},
+		{
+			name:      "Compact February 29 in a non-leap year should fail",
+			jsonInput: `"20230229"`,
+			errorMsg:  "should reject February 29 outside a leap year",
 		},
 	}
 
@@ -251,6 +296,37 @@ func TestAPIShortDateRoundTrip(t *testing.T) {
 			// Step 6: Verify expected output format
 			expectedOutput := originalTime.Format("2006-01-02")
 			assert.Equal(t, `"`+expectedOutput+`"`, outputJSON, "Output should match yyyy-MM-dd format")
+		})
+	}
+}
+
+// A compact yyyyMMdd input must normalize to the canonical yyyy-MM-dd on the way back out.
+// The SDK accepts two input formats but only ever emits one, so a value read from the API and
+// echoed back in a later request is always spec-shaped.
+func TestAPIShortDateNormalizesCompactInputOnMarshal(t *testing.T) {
+	cases := []struct {
+		name         string
+		inputJSON    string
+		expectedJSON string
+	}{
+		{name: "compact normalizes to dashed", inputJSON: `"20230315"`, expectedJSON: `"2023-03-15"`},
+		{name: "dashed stays dashed", inputJSON: `"2023-03-15"`, expectedJSON: `"2023-03-15"`},
+		{name: "compact leap year", inputJSON: `"20240229"`, expectedJSON: `"2024-02-29"`},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			var apiDate common.APIShortDate
+			assert.Nil(t, json.Unmarshal([]byte(tc.inputJSON), &apiDate))
+
+			out, err := json.Marshal(apiDate)
+			assert.Nil(t, err)
+			assert.Equal(t, tc.expectedJSON, string(out))
+
+			// And the normalized output must itself round-trip.
+			var again common.APIShortDate
+			assert.Nil(t, json.Unmarshal(out, &again))
+			assert.Equal(t, time.Time(apiDate), time.Time(again))
 		})
 	}
 }

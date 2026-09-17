@@ -199,7 +199,7 @@ func TestPaymentSetupIndustry_AirlineAllFields(t *testing.T) {
 			{
 				Ticket: &PaymentSetupAirlineTicket{
 					Number:                 "0742464639523",
-					IssueDate:              timePtr(t, "2025-05-01T00:00:00Z"),
+					IssueDate:              shortDate(t, 2025, time.May, 1, 0, 0),
 					IssuingCarrierCode:     "042",
 					TravelPackageIndicator: "A",
 					TravelAgencyName:       "Checkout Travel Agents",
@@ -209,7 +209,7 @@ func TestPaymentSetupIndustry_AirlineAllFields(t *testing.T) {
 					{
 						FirstName:   "John",
 						LastName:    "Smith",
-						DateOfBirth: timePtr(t, "1990-10-31T00:00:00Z"),
+						DateOfBirth: shortDate(t, 1990, time.October, 31, 0, 0),
 						Address:     &PaymentSetupAirlinePassengerAddress{Country: common.GB},
 					},
 				},
@@ -219,7 +219,7 @@ func TestPaymentSetupIndustry_AirlineAllFields(t *testing.T) {
 						CarrierCode:       "BA",
 						ClassOfTravelling: "W",
 						DepartureAirport:  "LHR",
-						DepartureDate:     timePtr(t, "2025-10-13T00:00:00Z"),
+						DepartureDate:     shortDate(t, 2025, time.October, 13, 0, 0),
 						DepartureTime:     "18:30",
 						ArrivalAirport:    "JFK",
 						StopOverCode:      "X",
@@ -248,6 +248,10 @@ func TestPaymentSetupIndustry_AirlineAllFields(t *testing.T) {
 	assert.NoError(t, err)
 	body := string(marshalled)
 	assert.Contains(t, body, `"airline":`)
+	assert.Contains(t, body, `"issue_date":"2025-05-01"`)
+	assert.Contains(t, body, `"date_of_birth":"1990-10-31"`)
+	assert.Contains(t, body, `"departure_date":"2025-10-13"`)
+	assert.NotContains(t, body, "T00:00:00")
 	assert.Contains(t, body, `"issuing_carrier_code":"042"`)
 	assert.Contains(t, body, `"class_of_travelling":"W"`)
 	assert.Contains(t, body, `"stop_over_code":"X"`)
@@ -277,8 +281,8 @@ func TestPaymentSetupIndustry_AccommodationAllFields(t *testing.T) {
 			{
 				Name:             "Checkout Lodge",
 				BookingReference: "REF9083748",
-				CheckInDate:      timePtr(t, "2025-04-11T00:00:00Z"),
-				CheckOutDate:     timePtr(t, "2025-04-18T00:00:00Z"),
+				CheckInDate:      shortDate(t, 2025, time.April, 11, 0, 0),
+				CheckOutDate:     shortDate(t, 2025, time.April, 18, 0, 0),
 				Address: &common.Address{
 					AddressLine1: "123 High Street",
 					City:         "London",
@@ -288,7 +292,7 @@ func TestPaymentSetupIndustry_AccommodationAllFields(t *testing.T) {
 				},
 				NumberOfRooms: 2,
 				Guests: []PaymentSetupAccommodationGuest{
-					{FirstName: "John", LastName: "Smith", DateOfBirth: timePtr(t, "1970-03-19T00:00:00Z")},
+					{FirstName: "John", LastName: "Smith", DateOfBirth: shortDate(t, 1970, time.March, 19, 0, 0)},
 				},
 				Room: []PaymentSetupAccommodationRoom{
 					{Rate: 42.3, NumberOfNights: 5, Type: "deluxe"},
@@ -297,7 +301,7 @@ func TestPaymentSetupIndustry_AccommodationAllFields(t *testing.T) {
 				Refundable:          boolPtr(true),
 				DeliveryRecipient:   "jane.smith@example.com",
 				Host: &PaymentSetupAccommodationHost{
-					RegistrationDate:      timePtr(t, "2020-01-01T00:00:00Z"),
+					RegistrationDate:      shortDate(t, 2020, time.January, 1, 0, 0),
 					TotalReservationCount: 150,
 				},
 			},
@@ -308,6 +312,11 @@ func TestPaymentSetupIndustry_AccommodationAllFields(t *testing.T) {
 	assert.NoError(t, err)
 	body := string(marshalled)
 	assert.Contains(t, body, `"accommodation":`)
+	assert.Contains(t, body, `"check_in_date":"2025-04-11"`)
+	assert.Contains(t, body, `"check_out_date":"2025-04-18"`)
+	assert.Contains(t, body, `"date_of_birth":"1970-03-19"`)
+	assert.Contains(t, body, `"registration_date":"2020-01-01"`)
+	assert.NotContains(t, body, "T00:00:00")
 	assert.Contains(t, body, `"total_number_of_guests":2`)
 	assert.Contains(t, body, `"refundable":true`)
 	assert.Contains(t, body, `"delivery_recipient":"jane.smith@example.com"`)

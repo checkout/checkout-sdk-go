@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
-	"github.com/checkout/checkout-sdk-go/v3/payments"
 )
 
 // Serialization tests for the Payment Setups format: date fields.
@@ -90,14 +89,15 @@ func TestAccountFundingTransactionSerializesDateOfBirthAsShortDate(t *testing.T)
 	assert.Contains(t, string(recipient), `"date_of_birth":"2000-01-01"`)
 }
 
-// PaymentSetupIndustry reuses payments.AccommodationData, so Payment Setups inherits the
-// accommodation date fix with no separate declaration of its own. This pins that reuse.
+// PaymentSetupIndustry.Accommodation has its own CheckInDate/CheckOutDate declaration
+// (it no longer reuses payments.AccommodationData, see the accommodation/airline field
+// sweep). This pins that it still emits date-only values, not RFC 3339 timestamps.
 func TestPaymentSetupIndustrySerializesAccommodationDatesAsShortDates(t *testing.T) {
 	checkIn := common.APIShortDate(time.Date(2025, 4, 11, 15, 0, 0, 0, time.UTC))
 	checkOut := common.APIShortDate(time.Date(2025, 4, 18, 10, 0, 0, 0, time.UTC))
 
 	raw, err := json.Marshal(PaymentSetupIndustry{
-		AccommodationData: []payments.AccommodationData{{
+		Accommodation: []PaymentSetupAccommodation{{
 			Name:         "Checkout Lodge",
 			CheckInDate:  &checkIn,
 			CheckOutDate: &checkOut,
@@ -108,7 +108,7 @@ func TestPaymentSetupIndustrySerializesAccommodationDatesAsShortDates(t *testing
 	var body map[string]interface{}
 	assert.Nil(t, json.Unmarshal(raw, &body))
 
-	accommodation := body["accommodation_data"].([]interface{})
+	accommodation := body["accommodation"].([]interface{})
 	assert.Len(t, accommodation, 1)
 
 	first := accommodation[0].(map[string]interface{})

@@ -8,6 +8,12 @@ type ErrorDetails struct {
 	ErrorCodes []string               `json:"error_codes,omitempty"`
 	Id         string                 `json:"id,omitempty"`
 	Links      map[string]interface{} `json:"_links,omitempty"`
+	// VariantId is present on Inventory API error responses for the insufficient_stock error
+	// code (404/409/422 on the /inventory/* endpoints). Empty for every other domain's errors.
+	VariantId string `json:"variant_id,omitempty"`
+	// Available is present on Inventory API error responses for the insufficient_stock error
+	// code, alongside VariantId. Empty for every other domain's errors.
+	Available int64 `json:"available,omitempty"`
 }
 
 type (

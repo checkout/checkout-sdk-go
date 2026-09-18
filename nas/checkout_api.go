@@ -23,6 +23,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/identities/iddocumentverification"
 	"github.com/checkout/checkout-sdk-go/v3/identities/identityverification"
 	instruments "github.com/checkout/checkout-sdk-go/v3/instruments/nas"
+	"github.com/checkout/checkout-sdk-go/v3/inventory"
 	"github.com/checkout/checkout-sdk-go/v3/issuing"
 	"github.com/checkout/checkout-sdk-go/v3/issuing/cardholdertokens"
 	"github.com/checkout/checkout-sdk-go/v3/metadata"
@@ -81,6 +82,7 @@ type Api struct {
 	IdDocumentVerification      *iddocumentverification.Client
 	AddressDocumentVerification *addressdocumentverification.Client
 	IdentityVerification        *identityverification.Client
+	Inventory                   *inventory.Client
 
 	Ideal  *ideal.Client
 	Klarna *klarna.Client
@@ -130,6 +132,7 @@ func CheckoutApi(configuration *configuration.Configuration) *Api {
 	api.IdDocumentVerification = iddocumentverification.NewClient(configuration, identityClient)
 	api.AddressDocumentVerification = addressdocumentverification.NewClient(configuration, identityClient)
 	api.IdentityVerification = identityverification.NewClient(configuration, identityClient)
+	api.Inventory = inventory.NewClient(configuration, apiClient)
 
 	api.Ideal = ideal.NewClient(configuration, apiClient)
 	api.Klarna = klarna.NewClient(configuration, apiClient)

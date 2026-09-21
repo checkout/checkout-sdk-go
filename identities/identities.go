@@ -397,26 +397,106 @@ type VerifiedIdentity struct {
 }
 
 type DocumentDetails struct {
-	DocumentType            DocumentType   `json:"document_type,omitempty"`
-	DocumentIssuingCountry  common.Country `json:"document_issuing_country,omitempty"`
-	FrontImageSignedUrl     string         `json:"front_image_signed_url,omitempty"`
-	FullName                string         `json:"full_name,omitempty"`
-	BirthDate               string         `json:"birth_date,omitempty"`
-	FirstNames              string         `json:"first_names,omitempty"`
-	LastName                string         `json:"last_name,omitempty"`
-	LastNameAtBirth         string         `json:"last_name_at_birth,omitempty"`
-	BirthPlace              string         `json:"birth_place,omitempty"`
-	Nationality             common.Country `json:"nationality,omitempty"`
-	Gender                  Gender         `json:"gender,omitempty"`
-	PersonalNumber          string         `json:"personal_number,omitempty"`
-	TaxIdentificationNumber string         `json:"tax_identification_number,omitempty"`
-	DocumentNumber          string         `json:"document_number,omitempty"`
-	DocumentExpiryDate      string         `json:"document_expiry_date,omitempty"`
-	DocumentIssueDate       string         `json:"document_issue_date,omitempty"`
-	DocumentIssuePlace      string         `json:"document_issue_place,omitempty"`
-	DocumentMrz             string         `json:"document_mrz,omitempty"`
-	BackImageSignedUrl      string         `json:"back_image_signed_url,omitempty"`
-	SignatureImageSignedUrl string         `json:"signature_image_signed_url,omitempty"`
+	// DocumentType is the type of identity document.
+	// [Optional]
+	// Enum: "Driving licence" "ID" "Other" "Passport" "Residence Permit" "Travel Document" "Visa"
+	DocumentType DocumentType `json:"document_type,omitempty"`
+
+	// DocumentIssuingCountry is the country that issued the document.
+	// [Optional]
+	// Standard: ISO 3166-1 alpha-2 country code
+	// ^[A-Za-z]{2}$
+	DocumentIssuingCountry common.Country `json:"document_issuing_country,omitempty"`
+
+	// FrontImageSignedUrl is the pre-signed URL to the captured front image of the document.
+	// [Optional]
+	// Format: uri
+	FrontImageSignedUrl string `json:"front_image_signed_url,omitempty"`
+
+	// FullName is the full name extracted from the document.
+	// [Optional]
+	// max 510 characters
+	FullName string `json:"full_name,omitempty"`
+
+	// BirthDate is the birth date extracted from the document.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	BirthDate string `json:"birth_date,omitempty"`
+
+	// FirstNames is the first names extracted from the document.
+	// [Optional]
+	// max 255 characters
+	FirstNames string `json:"first_names,omitempty"`
+
+	// LastName is the last name extracted from the document.
+	// [Optional]
+	// max 255 characters
+	LastName string `json:"last_name,omitempty"`
+
+	// LastNameAtBirth is the last name at birth extracted from the document.
+	// [Optional]
+	// max 255 characters
+	LastNameAtBirth string `json:"last_name_at_birth,omitempty"`
+
+	// BirthPlace is the birth place extracted from the document.
+	// [Optional]
+	// max 255 characters
+	BirthPlace string `json:"birth_place,omitempty"`
+
+	// Nationality is the nationality extracted from the document.
+	// [Optional]
+	// Standard: ISO 3166-1 alpha-2 country code
+	// ^[A-Za-z]{2}$
+	Nationality common.Country `json:"nationality,omitempty"`
+
+	// Gender is the gender extracted from the document.
+	// [Optional]
+	// Enum: "M" "F"
+	Gender Gender `json:"gender,omitempty"`
+
+	// PersonalNumber is the personal number extracted from the document.
+	// [Optional]
+	// max 255 characters
+	PersonalNumber string `json:"personal_number,omitempty"`
+
+	// TaxIdentificationNumber is the tax identification number extracted from the document.
+	// [Optional]
+	// max 255 characters
+	TaxIdentificationNumber string `json:"tax_identification_number,omitempty"`
+
+	// DocumentNumber is the document's number.
+	// [Optional]
+	// max 255 characters
+	DocumentNumber string `json:"document_number,omitempty"`
+
+	// DocumentExpiryDate is the date the document expires.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	DocumentExpiryDate string `json:"document_expiry_date,omitempty"`
+
+	// DocumentIssueDate is the date the document was issued.
+	// [Optional]
+	// Format: yyyy-MM-dd
+	DocumentIssueDate string `json:"document_issue_date,omitempty"`
+
+	// DocumentIssuePlace is the place the document was issued.
+	// [Optional]
+	// max 255 characters
+	DocumentIssuePlace string `json:"document_issue_place,omitempty"`
+
+	// DocumentMrz is the machine readable zone extracted from the document.
+	// [Optional]
+	DocumentMrz string `json:"document_mrz,omitempty"`
+
+	// BackImageSignedUrl is the pre-signed URL to the captured back image of the document.
+	// [Optional]
+	// Format: uri
+	BackImageSignedUrl string `json:"back_image_signed_url,omitempty"`
+
+	// SignatureImageSignedUrl is the pre-signed URL to the captured signature image.
+	// [Optional]
+	// Format: uri
+	SignatureImageSignedUrl string `json:"signature_image_signed_url,omitempty"`
 
 	// Address is the address extracted from the document. A flat string here, unlike the
 	// structured IdvAddress used by the declared data.

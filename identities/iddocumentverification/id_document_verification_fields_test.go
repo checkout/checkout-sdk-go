@@ -129,3 +129,25 @@ func TestCreateIdDocumentVerificationRequest_DeclaredDataBirthDate(t *testing.T)
 	assert.Contains(t, string(marshalled), `"birth_date":"1994-10-15"`)
 	assert.NotContains(t, string(marshalled), "phone_number")
 }
+
+// The three IDDV responses all declare _links, which was absent entirely until the review pass.
+func TestIdDocumentVerificationResponses_CarryTheirLinks(t *testing.T) {
+	var verification IdDocumentVerificationResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"id":"iddv_1","_links":{"self":{"href":"https://idv.checkout.com/iddv_1"},"applicant":{"href":"https://idv.checkout.com/aplt_1"}}}`),
+		&verification))
+	assert.NotNil(t, verification.Links.Self)
+	assert.NotNil(t, verification.Links.Applicant)
+
+	var attempt IdDocumentVerificationAttemptResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"id":"datp_1","_links":{"self":{"href":"https://idv.checkout.com/datp_1"}}}`), &attempt))
+	assert.NotNil(t, attempt.Links.Self)
+
+	var list IdDocumentVerificationAttemptsResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"total_count":25,"skip":0,"limit":10,"data":[],"_links":{"next":{"href":"https://idv.checkout.com/a?skip=10"}}}`),
+		&list))
+	assert.NotNil(t, list.Links.Next)
+	assert.Contains(t, *list.Links.Next.HRef, "skip=10")
+}

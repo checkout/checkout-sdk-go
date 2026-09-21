@@ -126,3 +126,52 @@ func TestCreateAddressDocumentVerificationRequest_DeclaredDataBirthDate(t *testi
 	assert.NotContains(t, string(marshalled), "email")
 	assert.NotContains(t, string(marshalled), `"address"`)
 }
+
+// E1 asked for risk_labels to be added at the ADV site, and the response also echoes declared_data
+// back. Both were absent until the review pass, so neither could be read.
+func TestAddressDocumentVerificationResponse_RiskLabelsAndDeclaredData(t *testing.T) {
+	payload := `{
+		"id":"adv_1",
+		"applicant_id":"aplt_1",
+		"status":"approved",
+		"risk_labels":["risky_document_format","mcc_not_confident"],
+		"declared_data":{"name":"Hannah Bret","birth_date":"1994-10-15"},
+		"_links":{"self":{"href":"https://idv.checkout.com/adv_1"},"applicant":{"href":"https://idv.checkout.com/aplt_1"}}
+	}`
+
+	var response AddressDocumentVerificationResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+
+	assert.Equal(t, []identities.RiskLabel{identities.RiskyDocumentFormat, identities.MccNotConfident},
+		response.RiskLabels)
+	assert.NotNil(t, response.DeclaredData)
+	assert.Equal(t, "Hannah Bret", response.DeclaredData.Name)
+	assert.Equal(t, "1994-10-15", response.DeclaredData.BirthDate)
+	assert.NotNil(t, response.Links.Self)
+	assert.NotNil(t, response.Links.Applicant)
+}
+
+// The attempt list returns next and previous, which the Links union did not model. Adding skip and
+// limit without them leaves a caller able to request a page but unable to walk to the next one.
+func TestAddressDocumentVerificationAttemptsResponse_PaginationLinks(t *testing.T) {
+	payload := `{
+		"total_count":25,
+		"skip":0,
+		"limit":10,
+		"data":[],
+		"_links":{
+			"self":{"href":"https://idv.checkout.com/adv_1/attempts?skip=0&limit=10"},
+			"next":{"href":"https://idv.checkout.com/adv_1/attempts?skip=10&limit=10"},
+			"previous":{"href":"https://idv.checkout.com/adv_1/attempts?skip=0&limit=10"}
+		}
+	}`
+
+	var response AddressDocumentVerificationAttemptsResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+
+	assert.Equal(t, 25, response.TotalCount)
+	assert.NotNil(t, response.Links.Next)
+	assert.Contains(t, *response.Links.Next.HRef, "skip=10")
+	assert.NotNil(t, response.Links.Previous)
+	assert.NotNil(t, response.Links.Self)
+}

@@ -53,10 +53,31 @@ type AddressDocumentResult struct {
 	Address      *Address `json:"address,omitempty"`
 }
 
-// Links holds the HAL links related to the resource (self and, for verifications, applicant).
+// Links holds the HAL links related to the resource.
+//
+// A union of the three shapes the address document verification endpoints return, so any given
+// response leaves the irrelevant members nil:
+//   - the verification returns self and applicant
+//   - the attempt list returns self, next and previous
+//   - a single attempt returns self only
 type Links struct {
-	Self      *common.Link `json:"self,omitempty"`
+	// Self is the link to this resource.
+	// [Optional]
+	Self *common.Link `json:"self,omitempty"`
+
+	// Applicant is the link to the applicant. Returned by the verification only.
+	// [Optional]
 	Applicant *common.Link `json:"applicant,omitempty"`
+
+	// Next is the link to the next page. Returned by the attempt list only, and absent on the
+	// last page.
+	// [Optional]
+	Next *common.Link `json:"next,omitempty"`
+
+	// Previous is the link to the previous page. Returned by the attempt list only, and absent
+	// on the first page.
+	// [Optional]
+	Previous *common.Link `json:"previous,omitempty"`
 }
 
 // addressDocumentVerificationBase holds fields common to all response types.
@@ -71,10 +92,20 @@ type addressDocumentVerificationBase struct {
 
 type AddressDocumentVerificationResponse struct {
 	addressDocumentVerificationBase
-	UserJourneyId   string                                       `json:"user_journey_id,omitempty"`
-	ApplicantId     string                                       `json:"applicant_id,omitempty"`
-	Status          identities.AddressDocumentVerificationStatus `json:"status,omitempty"`
-	AddressDocument *AddressDocumentResult                       `json:"address_document,omitempty"`
+	UserJourneyId string                                       `json:"user_journey_id,omitempty"`
+	ApplicantId   string                                       `json:"applicant_id,omitempty"`
+	Status        identities.AddressDocumentVerificationStatus `json:"status,omitempty"`
+
+	// DeclaredData is the personal details provided by the applicant, echoed back by the API.
+	// [Optional]
+	DeclaredData *identities.DeclaredData `json:"declared_data,omitempty"`
+
+	// RiskLabels is one or more codes that provide more information about risks associated with
+	// the verification.
+	// [Optional]
+	RiskLabels []identities.RiskLabel `json:"risk_labels,omitempty"`
+
+	AddressDocument *AddressDocumentResult `json:"address_document,omitempty"`
 }
 
 type AddressDocumentVerificationAttemptResponse struct {
@@ -84,11 +115,23 @@ type AddressDocumentVerificationAttemptResponse struct {
 
 type AddressDocumentVerificationAttemptsResponse struct {
 	HttpMetadata common.HttpMetadata
-	TotalCount   int                                          `json:"total_count,omitempty"`
-	Skip         int                                          `json:"skip,omitempty"`
-	Limit        int                                          `json:"limit,omitempty"`
-	Data         []AddressDocumentVerificationAttemptResponse `json:"data,omitempty"`
-	Links        *Links                                       `json:"_links,omitempty"`
+
+	// TotalCount is the total number of attempts.
+	// [Required]
+	TotalCount int `json:"total_count,omitempty"`
+
+	// Skip is the number of attempts skipped.
+	// [Required]
+	Skip int `json:"skip,omitempty"`
+
+	// Limit is the maximum number of attempts returned.
+	// [Required]
+	Limit int `json:"limit,omitempty"`
+
+	// Data is the list of attempts for the current page.
+	// [Required]
+	Data  []AddressDocumentVerificationAttemptResponse `json:"data,omitempty"`
+	Links *Links                                       `json:"_links,omitempty"`
 }
 
 // AddressDocumentVerificationReportResponse represents the response body for

@@ -90,3 +90,24 @@ func TestFaceAuthenticationAttemptResponse_PhoneNumber(t *testing.T) {
 	assert.NotNil(t, response.PhoneNumber)
 	assert.Equal(t, "5555550102", response.PhoneNumber.Number)
 }
+
+// The FAV responses all declare _links.
+func TestFaceAuthenticationResponses_CarryTheirLinks(t *testing.T) {
+	var faceAuth FaceAuthenticationResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"id":"fav_1","_links":{"self":{"href":"https://idv.checkout.com/fav_1"},"applicant":{"href":"https://idv.checkout.com/aplt_1"}}}`),
+		&faceAuth))
+	assert.NotNil(t, faceAuth.Links.Self)
+	assert.NotNil(t, faceAuth.Links.Applicant)
+
+	var attempt FaceAuthenticationAttemptResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"id":"att_1","_links":{"verification_url":{"href":"https://verify.checkout.com/att_1"}}}`), &attempt))
+	assert.NotNil(t, attempt.Links.VerificationUrl)
+
+	var list FaceAuthenticationAttemptsResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"total_count":25,"skip":0,"limit":10,"data":[],"_links":{"next":{"href":"https://idv.checkout.com/a?skip=10"}}}`),
+		&list))
+	assert.NotNil(t, list.Links.Next)
+}

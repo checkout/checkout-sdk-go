@@ -162,3 +162,39 @@ func TestIdentityVerificationAttemptResponse_PhoneNumberAndSessionFields(t *test
 	assert.Equal(t, 2, response.ApplicantSessionInformation.NumberOfSessions)
 	assert.Equal(t, identities.Desktop, response.ApplicantSessionInformation.InitialDevice)
 }
+
+// The IDV responses all declare _links. The attempt carries verification_url, which is how a
+// caller sends the applicant to complete the attempt.
+func TestIdentityVerificationResponses_CarryTheirLinks(t *testing.T) {
+	var verification IdentityVerificationResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"id":"idv_1","_links":{"self":{"href":"https://idv.checkout.com/idv_1"},"applicant":{"href":"https://idv.checkout.com/aplt_1"}}}`),
+		&verification))
+	assert.NotNil(t, verification.Links.Self)
+	assert.NotNil(t, verification.Links.Applicant)
+
+	var attempt IdentityVerificationAttemptResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"id":"att_1","_links":{"self":{"href":"https://idv.checkout.com/att_1"},"verification_url":{"href":"https://verify.checkout.com/att_1"}}}`),
+		&attempt))
+	assert.NotNil(t, attempt.Links.Self)
+	assert.NotNil(t, attempt.Links.VerificationUrl)
+	assert.Contains(t, *attempt.Links.VerificationUrl.HRef, "verify.checkout.com")
+
+	var list IdentityVerificationAttemptsResponse
+	assert.NoError(t, json.Unmarshal([]byte(
+		`{"total_count":25,"skip":10,"limit":10,"data":[],"_links":{"next":{"href":"https://idv.checkout.com/a?skip=20"},"previous":{"href":"https://idv.checkout.com/a?skip=0"}}}`),
+		&list))
+	assert.NotNil(t, list.Links.Next)
+	assert.NotNil(t, list.Links.Previous)
+}
+
+// D4: the attempt inherits declared_data from the shared base, but the attempt schema does not
+// declare it, so it never populates. Retained deliberately; this pins the documented behaviour so
+// nobody "fixes" it by wiring it to something.
+func TestIdentityVerificationAttemptResponse_DeclaredDataNeverPopulates(t *testing.T) {
+	var attempt IdentityVerificationAttemptResponse
+	assert.NoError(t, json.Unmarshal([]byte(`{"id":"att_1","status":"completed"}`), &attempt))
+	assert.Nil(t, attempt.DeclaredData,
+		"the attempt schema declares no declared_data, so the inherited field stays nil")
+}

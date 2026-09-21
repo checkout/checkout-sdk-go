@@ -21,7 +21,8 @@ type cardUpdateHeaders struct {
 
 // TestPatchWithContext_TransmitsHeadersAndBody verifies end-to-end, through the real ApiClient and
 // transport, that a PATCH carrying a Headers source emits both headers and still sends the body.
-// PatchWithContext has no headers parameter, so the only route is the reflected Headers field;
+// PatchWithContext has no headers parameter, so the only route is the reflected Headers field.
+// This is what proves part D needs no change to the HttpClient interface.
 func TestPatchWithContext_TransmitsHeadersAndBody(t *testing.T) {
 	var gotMethod, gotCvv, gotKey, gotBody string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

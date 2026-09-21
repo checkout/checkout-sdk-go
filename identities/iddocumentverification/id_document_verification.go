@@ -38,6 +38,29 @@ type idDocumentVerificationBase struct {
 	ResponseCodes []identities.ResponseCode `json:"response_codes,omitempty"`
 }
 
+// Links holds the HAL links related to the resource.
+//
+// A union of the shapes the ID document verification endpoints return, so any given response
+// leaves the irrelevant members nil: the verification returns self and applicant, the attempt list
+// returns self, next and previous, and a single attempt returns self only.
+type Links struct {
+	// Self is the link to this resource.
+	// [Optional]
+	Self *common.Link `json:"self,omitempty"`
+
+	// Applicant is the link to the applicant. Returned by the verification only.
+	// [Optional]
+	Applicant *common.Link `json:"applicant,omitempty"`
+
+	// Next is the link to the next page. Returned by the attempt list only.
+	// [Optional]
+	Next *common.Link `json:"next,omitempty"`
+
+	// Previous is the link to the previous page. Returned by the attempt list only.
+	// [Optional]
+	Previous *common.Link `json:"previous,omitempty"`
+}
+
 type IdDocumentVerificationResponse struct {
 	idDocumentVerificationBase
 	UserJourneyId string                                  `json:"user_journey_id,omitempty"`
@@ -45,19 +68,44 @@ type IdDocumentVerificationResponse struct {
 	Status        identities.IdDocumentVerificationStatus `json:"status,omitempty"`
 	DeclaredData  *identities.DeclaredData                `json:"declared_data,omitempty"`
 	Document      *identities.DocumentDetails             `json:"document,omitempty"`
+
+	// Links holds the self and applicant HAL links.
+	// [Optional]
+	Links *Links `json:"_links,omitempty"`
 }
 
 type IdDocumentVerificationAttemptResponse struct {
 	idDocumentVerificationBase
 	Status identities.IdDocumentVerificationAttemptStatus `json:"status,omitempty"`
+
+	// Links holds the self HAL link.
+	// [Optional]
+	Links *Links `json:"_links,omitempty"`
 }
 
 type IdDocumentVerificationAttemptsResponse struct {
 	HttpMetadata common.HttpMetadata
-	TotalCount   int                                     `json:"total_count,omitempty"`
-	Skip         int                                     `json:"skip,omitempty"`
-	Limit        int                                     `json:"limit,omitempty"`
-	Data         []IdDocumentVerificationAttemptResponse `json:"data,omitempty"`
+
+	// TotalCount is the total number of attempts.
+	// [Required]
+	TotalCount int `json:"total_count,omitempty"`
+
+	// Skip is the number of attempts skipped.
+	// [Required]
+	Skip int `json:"skip,omitempty"`
+
+	// Limit is the maximum number of attempts returned.
+	// [Required]
+	Limit int `json:"limit,omitempty"`
+
+	// Data is the list of attempts for the current page.
+	// [Required]
+	Data []IdDocumentVerificationAttemptResponse `json:"data,omitempty"`
+
+	// Links holds the self, next and previous HAL links. Without it a caller can request a page
+	// with Skip and Limit but cannot walk to the next one.
+	// [Optional]
+	Links *Links `json:"_links,omitempty"`
 }
 
 // IdDocumentVerificationReportResponse represents the response body for

@@ -73,14 +73,37 @@ type (
 	}
 
 	CardDetailsRequest struct {
-		Type          CardType      `json:"type,omitempty"`
-		CardholderId  string        `json:"cardholder_id,omitempty"`
-		Lifetime      CardLifetime  `json:"lifetime"`
-		Reference     string        `json:"reference,omitempty"`
-		CardProductId string        `json:"card_product_id,omitempty"`
-		DisplayName   string        `json:"display_name,omitempty"`
-		ActivateCard  bool          `json:"activate_card,omitempty"`
-		Metadata      *CardMetadata `json:"metadata,omitempty"`
+		// Type is the card type.
+		// [Required]
+		// Enum: "virtual" "physical"
+		Type CardType `json:"type,omitempty"`
+		// CardholderId is the cardholder's unique identifier.
+		// [Required]
+		// ^crh_[a-z0-9]{26}$
+		CardholderId string `json:"cardholder_id,omitempty"`
+		// Lifetime is how long the card accepts incoming authorizations.
+		// [Optional]
+		Lifetime CardLifetime `json:"lifetime"`
+		// Reference is your reference.
+		// [Optional]
+		// max 256 characters
+		// Example: X-123456-N11
+		Reference string `json:"reference,omitempty"`
+		// CardProductId is the card product's unique identifier.
+		// [Required]
+		CardProductId string `json:"card_product_id,omitempty"`
+		// DisplayName is the name to display on the card.
+		// [Optional]
+		// min 2 characters, max 26 characters
+		// Example: JOHN KENNEDY
+		DisplayName string `json:"display_name,omitempty"`
+		// ActivateCard sets whether to activate the card on creation.
+		// [Optional]
+		// Default: true
+		ActivateCard bool `json:"activate_card,omitempty"`
+		// Metadata is the user's metadata.
+		// [Optional]
+		Metadata *CardMetadata `json:"metadata,omitempty"`
 
 		// RevocationDate schedules the card's automatic revocation.
 		// [Optional]

@@ -71,10 +71,20 @@ type CreateIdentityVerificationAndAttemptRequest struct {
 
 // identityVerificationBase holds fields common to all identity verification response types.
 type identityVerificationBase struct {
-	HttpMetadata  common.HttpMetadata
-	Id            string                    `json:"id,omitempty"`
-	CreatedOn     *time.Time                `json:"created_on,omitempty"`
-	ModifiedOn    *time.Time                `json:"modified_on,omitempty"`
+	HttpMetadata common.HttpMetadata
+	// Id is the resource's unique identifier.
+	// [Optional]
+	Id string `json:"id,omitempty"`
+	// CreatedOn is when the resource was created.
+	// [Optional]
+	// Format: date-time
+	CreatedOn *time.Time `json:"created_on,omitempty"`
+	// ModifiedOn is when the resource was last modified.
+	// [Optional]
+	// Format: date-time
+	ModifiedOn *time.Time `json:"modified_on,omitempty"`
+	// ResponseCodes is the codes explaining the verification outcome.
+	// [Optional]
 	ResponseCodes []identities.ResponseCode `json:"response_codes,omitempty"`
 
 	// DeclaredData is the personal details provided by the applicant.
@@ -91,15 +101,23 @@ type identityVerificationBase struct {
 // and IdentityVerificationAndAttemptResponse.
 type identityVerificationCore struct {
 	identityVerificationBase
-	UserJourneyId string                                `json:"user_journey_id,omitempty"`
-	ApplicantId   string                                `json:"applicant_id,omitempty"`
-	Status        identities.IdentityVerificationStatus `json:"status,omitempty"`
+	// UserJourneyId is your configuration ID.
+	// [Optional]
+	UserJourneyId string `json:"user_journey_id,omitempty"`
+	// ApplicantId is the applicant's unique identifier.
+	// [Required]
+	ApplicantId string `json:"applicant_id,omitempty"`
+	// Status is the verification's status.
+	// [Required]
+	Status identities.IdentityVerificationStatus `json:"status,omitempty"`
 
 	// RiskLabels is one or more codes that provide more information about risks associated with
 	// the verification.
 	// [Optional]
 	RiskLabels []identities.RiskLabel `json:"risk_labels,omitempty"`
 
+	// Documents is the details extracted from the verified documents.
+	// [Optional]
 	Documents []identities.DocumentDetails `json:"documents,omitempty"`
 
 	// Face is the face image captured during the verification.
@@ -110,6 +128,8 @@ type identityVerificationCore struct {
 	// [Optional]
 	Face *identities.FaceImage `json:"face,omitempty"`
 
+	// VerifiedIdentity is the identity the verification established.
+	// [Optional]
 	VerifiedIdentity *identities.VerifiedIdentity `json:"verified_identity,omitempty"`
 
 	// Certifications is the certifications associated with the identity verification.
@@ -159,13 +179,21 @@ type IdentityVerificationResponse struct {
 
 type IdentityVerificationAndAttemptResponse struct {
 	identityVerificationCore
+	// RedirectUrl is the URL to send the applicant to so they can complete the attempt.
+	// [Optional]
+	// Format: uri
 	RedirectUrl string `json:"redirect_url,omitempty"`
 }
 
 type IdentityVerificationAttemptResponse struct {
 	identityVerificationBase
-	Status      identities.AttemptVerificationStatus `json:"status,omitempty"`
-	RedirectUrl string                               `json:"redirect_url,omitempty"`
+	// Status is the attempt's status.
+	// [Required]
+	Status identities.AttemptVerificationStatus `json:"status,omitempty"`
+	// RedirectUrl is the URL the applicant is redirected to after the attempt.
+	// [Optional]
+	// Format: uri
+	RedirectUrl string `json:"redirect_url,omitempty"`
 
 	// PhoneNumber is the applicant's mobile phone number, if the attempt URL was shared via SMS.
 	// [Optional]
@@ -176,6 +204,8 @@ type IdentityVerificationAttemptResponse struct {
 	// [Optional]
 	ClientInformation *identities.IdentityVerificationClientInformation `json:"client_information,omitempty"`
 
+	// ApplicantSessionInformation is the details of the applicant's session during the attempt.
+	// [Optional]
 	ApplicantSessionInformation *identities.ApplicantSessionInformation `json:"applicant_session_information,omitempty"`
 
 	// Links holds the self and verification_url HAL links.

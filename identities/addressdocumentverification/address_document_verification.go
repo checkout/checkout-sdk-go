@@ -16,7 +16,12 @@ const (
 )
 
 type CreateAddressDocumentVerificationRequest struct {
-	ApplicantId   string `json:"applicant_id"`
+	// ApplicantId is the applicant's unique identifier.
+	// [Required]
+	ApplicantId string `json:"applicant_id"`
+
+	// UserJourneyId is your configuration ID.
+	// [Required]
 	UserJourneyId string `json:"user_journey_id"`
 	// DeclaredData is the personal details provided by the applicant. The address document
 	// verification request takes the narrower IdvDeclaredData shape.
@@ -30,11 +35,35 @@ type CreateAddressDocumentVerificationAttemptRequest struct {
 
 // Address is the address extracted from the document.
 type Address struct {
+	// AddressLine1 is the first line of the address.
+	// [Optional]
+	// max 250 characters
+	// Example: 123 Main Street
 	AddressLine1 string `json:"address_line1,omitempty"`
+
+	// AddressLine2 is the second line of the address.
+	// [Optional]
+	// max 250 characters
+	// Example: Apt 4B
 	AddressLine2 string `json:"address_line2,omitempty"`
-	City         string `json:"city,omitempty"`
-	State        string `json:"state,omitempty"`
-	Zip          string `json:"zip,omitempty"`
+
+	// City is the city or town.
+	// [Optional]
+	// max 50 characters
+	// Example: London
+	City string `json:"city,omitempty"`
+
+	// State is the state, county, or province.
+	// [Optional]
+	// max 50 characters
+	// Example: Greater London
+	State string `json:"state,omitempty"`
+
+	// Zip is the postal or ZIP code.
+	// [Optional]
+	// max 50 characters
+	// Example: SW1A 1AA
+	Zip string `json:"zip,omitempty"`
 
 	// Country is the two-letter ISO country code of the address.
 	// [Optional]
@@ -82,19 +111,39 @@ type Links struct {
 
 // addressDocumentVerificationBase holds fields common to all response types.
 type addressDocumentVerificationBase struct {
-	HttpMetadata  common.HttpMetadata
-	Id            string                    `json:"id,omitempty"`
-	CreatedOn     *time.Time                `json:"created_on,omitempty"`
-	ModifiedOn    *time.Time                `json:"modified_on,omitempty"`
+	HttpMetadata common.HttpMetadata
+	// Id is the resource's unique identifier.
+	// [Optional]
+	Id string `json:"id,omitempty"`
+	// CreatedOn is when the resource was created.
+	// [Optional]
+	// Format: date-time
+	CreatedOn *time.Time `json:"created_on,omitempty"`
+	// ModifiedOn is when the resource was last modified.
+	// [Optional]
+	// Format: date-time
+	ModifiedOn *time.Time `json:"modified_on,omitempty"`
+	// ResponseCodes is the codes explaining the verification outcome.
+	// [Optional]
 	ResponseCodes []identities.ResponseCode `json:"response_codes,omitempty"`
-	Links         *Links                    `json:"_links,omitempty"`
+	// Links holds the HAL links related to the resource.
+	// [Optional]
+	Links *Links `json:"_links,omitempty"`
 }
 
 type AddressDocumentVerificationResponse struct {
 	addressDocumentVerificationBase
-	UserJourneyId string                                       `json:"user_journey_id,omitempty"`
-	ApplicantId   string                                       `json:"applicant_id,omitempty"`
-	Status        identities.AddressDocumentVerificationStatus `json:"status,omitempty"`
+	// UserJourneyId is your configuration ID.
+	// [Optional]
+	UserJourneyId string `json:"user_journey_id,omitempty"`
+
+	// ApplicantId is the applicant's unique identifier.
+	// [Required]
+	ApplicantId string `json:"applicant_id,omitempty"`
+
+	// Status is the verification's status.
+	// [Required]
+	Status identities.AddressDocumentVerificationStatus `json:"status,omitempty"`
 
 	// DeclaredData is the personal details provided by the applicant, echoed back by the API.
 	// [Optional]
@@ -105,11 +154,16 @@ type AddressDocumentVerificationResponse struct {
 	// [Optional]
 	RiskLabels []identities.RiskLabel `json:"risk_labels,omitempty"`
 
+	// AddressDocument is the result of the address document check.
+	// [Optional]
 	AddressDocument *AddressDocumentResult `json:"address_document,omitempty"`
 }
 
 type AddressDocumentVerificationAttemptResponse struct {
 	addressDocumentVerificationBase
+
+	// Status is the attempt's status.
+	// [Required]
 	Status identities.AddressDocumentVerificationAttemptStatus `json:"status,omitempty"`
 }
 
@@ -130,8 +184,11 @@ type AddressDocumentVerificationAttemptsResponse struct {
 
 	// Data is the list of attempts for the current page.
 	// [Required]
-	Data  []AddressDocumentVerificationAttemptResponse `json:"data,omitempty"`
-	Links *Links                                       `json:"_links,omitempty"`
+	Data []AddressDocumentVerificationAttemptResponse `json:"data,omitempty"`
+	// Links holds the self, next and previous HAL links. Without it a caller can request a
+	// page with Skip and Limit but cannot walk to the next one.
+	// [Optional]
+	Links *Links `json:"_links,omitempty"`
 }
 
 // AddressDocumentVerificationReportResponse represents the response body for

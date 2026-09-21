@@ -6,6 +6,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/client"
 	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/identities"
 )
 
 type Client struct {
@@ -96,18 +97,27 @@ func (c *Client) CreateIdDocumentVerificationAttemptWithContext(ctx context.Cont
 	return &response, nil
 }
 
-func (c *Client) GetIdDocumentVerificationAttempts(verificationId string) (*IdDocumentVerificationAttemptsResponse, error) {
-	return c.GetIdDocumentVerificationAttemptsWithContext(context.Background(), verificationId)
+// GetIdDocumentVerificationAttempts gets the details of all attempts for a specific ID document verification.
+//
+// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
+func (c *Client) GetIdDocumentVerificationAttempts(verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
+	return c.GetIdDocumentVerificationAttemptsWithContext(context.Background(), verificationId, query)
 }
 
-func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Context, verificationId string) (*IdDocumentVerificationAttemptsResponse, error) {
+// GetIdDocumentVerificationAttemptsWithContext is the context-aware variant of GetIdDocumentVerificationAttempts.
+func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	url, err := common.BuildQueryPath(common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
 	var response IdDocumentVerificationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath), auth, nil, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +156,36 @@ func (c *Client) GetIdDocumentVerificationReportWithContext(ctx context.Context,
 
 	var response IdDocumentVerificationReportResponse
 	err = c.apiClient.GetWithContext(ctx, common.BuildPath(idDocumentVerificationsPath, verificationId, reportPath), auth, nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+// GetIdDocumentVerificationAttemptAssets gets the assets (the front and back images of the
+// document) uploaded for an ID document verification attempt.
+//
+// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
+func (c *Client) GetIdDocumentVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdDocumentVerificationAttemptAssetsResponse, error) {
+	return c.GetIdDocumentVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
+}
+
+// GetIdDocumentVerificationAttemptAssetsWithContext is the context-aware variant of
+// GetIdDocumentVerificationAttemptAssets.
+func (c *Client) GetIdDocumentVerificationAttemptAssetsWithContext(ctx context.Context, verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdDocumentVerificationAttemptAssetsResponse, error) {
+	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
+	if err != nil {
+		return nil, err
+	}
+
+	url, err := common.BuildQueryPath(common.BuildPath(idDocumentVerificationsPath, verificationId, attemptsPath, attemptId, assetsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
+	var response IdDocumentVerificationAttemptAssetsResponse
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

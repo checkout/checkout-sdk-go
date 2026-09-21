@@ -19,8 +19,21 @@ type CreateFaceAuthenticationRequest struct {
 	UserJourneyId string `json:"user_journey_id"`
 }
 
+// CreateFaceAuthenticationAttemptRequest represents the request body for
+// POST /face-authentications/{id}/attempts.
 type CreateFaceAuthenticationAttemptRequest struct {
-	RedirectUrl       string                        `json:"redirect_url"`
+	// RedirectUrl is the URL to redirect the applicant to after the attempt.
+	// [Required]
+	// Format: uri
+	RedirectUrl string `json:"redirect_url"`
+
+	// PhoneNumber is the applicant's mobile phone number, if sharing the attempt URL via SMS.
+	// [Optional]
+	PhoneNumber *identities.PhoneNumber `json:"phone_number,omitempty"`
+
+	// ClientInformation is the applicant's details. The face authentication attempt takes the
+	// narrower FavClientInformation shape, which declares neither document field.
+	// [Optional]
 	ClientInformation *identities.ClientInformation `json:"client_information,omitempty"`
 }
 
@@ -38,16 +51,26 @@ type FaceAuthenticationResponse struct {
 	UserJourneyId string                              `json:"user_journey_id,omitempty"`
 	ApplicantId   string                              `json:"applicant_id,omitempty"`
 	Status        identities.FaceAuthenticationStatus `json:"status,omitempty"`
-	RiskLabels    []string                            `json:"risk_labels,omitempty"`
-	Face          *identities.FaceImage               `json:"face,omitempty"`
+
+	// RiskLabels is one or more codes that provide more information about risks associated with
+	// the verification.
+	// [Optional]
+	RiskLabels []identities.RiskLabel `json:"risk_labels,omitempty"`
+
+	Face *identities.FaceImage `json:"face,omitempty"`
 }
 
 type FaceAuthenticationAttemptResponse struct {
 	faceAuthenticationBase
-	Status                      identities.FaceAuthenticationAttemptStatus `json:"status,omitempty"`
-	RedirectUrl                 string                                     `json:"redirect_url,omitempty"`
-	ClientInformation           *identities.ClientInformation              `json:"client_information,omitempty"`
-	ApplicantSessionInformation *identities.ApplicantSessionInformation    `json:"applicant_session_information,omitempty"`
+	Status      identities.FaceAuthenticationAttemptStatus `json:"status,omitempty"`
+	RedirectUrl string                                     `json:"redirect_url,omitempty"`
+
+	// PhoneNumber is the applicant's mobile phone number, if the attempt URL was shared via SMS.
+	// [Optional]
+	PhoneNumber *identities.PhoneNumber `json:"phone_number,omitempty"`
+
+	ClientInformation           *identities.ClientInformation           `json:"client_information,omitempty"`
+	ApplicantSessionInformation *identities.ApplicantSessionInformation `json:"applicant_session_information,omitempty"`
 }
 
 type FaceAuthenticationAttemptsResponse struct {

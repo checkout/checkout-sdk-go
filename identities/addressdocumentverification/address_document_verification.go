@@ -12,12 +12,16 @@ const (
 	anonymizePath                    = "anonymize"
 	attemptsPath                     = "attempts"
 	reportPath                       = "pdf-report"
+	assetsPath                       = "assets"
 )
 
 type CreateAddressDocumentVerificationRequest struct {
-	ApplicantId   string                   `json:"applicant_id"`
-	UserJourneyId string                   `json:"user_journey_id"`
-	DeclaredData  *identities.DeclaredData `json:"declared_data,omitempty"`
+	ApplicantId   string `json:"applicant_id"`
+	UserJourneyId string `json:"user_journey_id"`
+	// DeclaredData is the personal details provided by the applicant. The address document
+	// verification request takes the narrower IdvDeclaredData shape.
+	// [Optional]
+	DeclaredData *identities.DeclaredData `json:"declared_data,omitempty"`
 }
 
 type CreateAddressDocumentVerificationAttemptRequest struct {
@@ -31,7 +35,13 @@ type Address struct {
 	City         string `json:"city,omitempty"`
 	State        string `json:"state,omitempty"`
 	Zip          string `json:"zip,omitempty"`
-	Country      string `json:"country,omitempty"`
+
+	// Country is the two-letter ISO country code of the address.
+	// [Optional]
+	// Standard: ISO 3166-1 alpha-2 country code
+	// max 2 characters
+	// Example: GB
+	Country common.Country `json:"country,omitempty"`
 }
 
 // AddressDocumentResult is the result of the address document check.
@@ -81,7 +91,53 @@ type AddressDocumentVerificationAttemptsResponse struct {
 	Links        *Links                                       `json:"_links,omitempty"`
 }
 
+// AddressDocumentVerificationReportResponse represents the response body for
+// GET /address-document-verifications/{id}/pdf-report.
 type AddressDocumentVerificationReportResponse struct {
 	HttpMetadata common.HttpMetadata
-	SignedUrl    string `json:"signed_url,omitempty"`
+
+	// PdfReport is the pre-signed URL to the PDF report. Replaced signed_url in the 2026-09-02
+	// spec: IdvPdf now declares pdf_report as its only property, and requires it.
+	// [Required]
+	// Format: uri
+	PdfReport string `json:"pdf_report,omitempty"`
+}
+
+// AddressDocumentVerificationAttemptAsset is a single asset uploaded for an address document
+// verification attempt.
+type AddressDocumentVerificationAttemptAsset struct {
+	// Type is the type of asset.
+	// [Required]
+	// Enum: "document"
+	Type identities.AddressDocumentVerificationAttemptAssetType `json:"type,omitempty"`
+
+	// Links holds the asset_url link, the only link the schema declares, and it is required.
+	// [Required]
+	Links identities.AttemptAssetLinks `json:"_links,omitempty"`
+}
+
+// AddressDocumentVerificationAttemptAssetsResponse represents the response body for
+// GET /address-document-verifications/{id}/attempts/{attemptId}/assets.
+type AddressDocumentVerificationAttemptAssetsResponse struct {
+	HttpMetadata common.HttpMetadata
+
+	// TotalCount is the total number of assets.
+	// [Required]
+	TotalCount int `json:"total_count,omitempty"`
+
+	// Skip is the number of assets skipped.
+	// [Required]
+	Skip int `json:"skip,omitempty"`
+
+	// Limit is the maximum number of assets returned.
+	// [Required]
+	Limit int `json:"limit,omitempty"`
+
+	// Data is the list of assets for the current page. May be empty: the schema allows minItems 0.
+	// [Required]
+	Data []AddressDocumentVerificationAttemptAsset `json:"data,omitempty"`
+
+	// Links holds the self, next and previous links.
+	// [Required]
+	Links map[string]common.Link `json:"_links,omitempty"`
 }

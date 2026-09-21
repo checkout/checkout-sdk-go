@@ -116,18 +116,27 @@ func (c *Client) CreateIdentityVerificationAttemptWithContext(ctx context.Contex
 	return &response, nil
 }
 
-func (c *Client) GetIdentityVerificationAttempts(verificationId string) (*IdentityVerificationAttemptsResponse, error) {
-	return c.GetIdentityVerificationAttemptsWithContext(context.Background(), verificationId)
+// GetIdentityVerificationAttempts gets the details of all attempts for a specific identity verification.
+//
+// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
+func (c *Client) GetIdentityVerificationAttempts(verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
+	return c.GetIdentityVerificationAttemptsWithContext(context.Background(), verificationId, query)
 }
 
-func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context, verificationId string) (*IdentityVerificationAttemptsResponse, error) {
+// GetIdentityVerificationAttemptsWithContext is the context-aware variant of GetIdentityVerificationAttempts.
+func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	url, err := common.BuildQueryPath(common.BuildPath(identityVerificationsPath, verificationId, attemptsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
 	var response IdentityVerificationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(identityVerificationsPath, verificationId, attemptsPath), auth, nil, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

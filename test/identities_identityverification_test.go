@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/errors"
 	"github.com/checkout/checkout-sdk-go/v3/identities"
 	identityverification "github.com/checkout/checkout-sdk-go/v3/identities/identityverification"
@@ -243,7 +244,7 @@ func TestGetIdentityVerificationAttempts(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetIdentityVerificationAttempts(tc.verificationId))
+			tc.checker(client.GetIdentityVerificationAttempts(tc.verificationId, identities.AttemptsQueryFilter{}))
 		})
 	}
 }
@@ -301,7 +302,7 @@ func TestGetIdentityVerificationReport(t *testing.T) {
 			checker: func(response *identityverification.IdentityVerificationReportResponse, err error) {
 				assert.Nil(t, err)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
-				assert.NotEmpty(t, response.SignedUrl)
+				assert.NotEmpty(t, response.PdfReport)
 			},
 		},
 		{
@@ -370,31 +371,57 @@ func TestGetIdentityVerificationAttemptAssets(t *testing.T) {
 
 // # common methods
 
+// identityDeclaredData builds the IdvIdentityDeclaredData shape the identity verification
+// requests accept: the shared two field DeclaredData plus phone_number, email and address.
+func identityDeclaredData() *identities.IdentityDeclaredData {
+	return &identities.IdentityDeclaredData{
+		DeclaredData: identities.DeclaredData{
+			Name:      "John Doe",
+			BirthDate: "1994-10-15",
+		},
+		Email: "john.doe@example.com",
+		PhoneNumber: &identities.PhoneNumber{
+			CountryCode: "+44",
+			Number:      "7700900000",
+		},
+		Address: &identities.IdvAddress{
+			AddressLine1: "123 Main Street",
+			City:         "London",
+			Zip:          "SW1A 1AA",
+			Country:      common.GB,
+		},
+	}
+}
+
 func createIdentityVerificationAndAttemptRequest() identityverification.CreateIdentityVerificationAndAttemptRequest {
 	return identityverification.CreateIdentityVerificationAndAttemptRequest{
-		ApplicantId: applicantResponse.Id,
-		RedirectUrl: SuccessUrl,
-		DeclaredData: &identities.DeclaredData{
-			Name: "John Doe",
-		},
+		ApplicantId:  applicantResponse.Id,
+		RedirectUrl:  SuccessUrl,
+		DeclaredData: identityDeclaredData(),
 	}
 }
 
 func createIdentityVerificationRequest() identityverification.CreateIdentityVerificationRequest {
 	return identityverification.CreateIdentityVerificationRequest{
-		ApplicantId: applicantResponse.Id,
-		DeclaredData: &identities.DeclaredData{
-			Name: "John Doe",
-		},
+		ApplicantId:  applicantResponse.Id,
+		DeclaredData: identityDeclaredData(),
 	}
 }
 
 func createIdentityVerificationAttemptRequest() identityverification.CreateIdentityVerificationAttemptRequest {
 	return identityverification.CreateIdentityVerificationAttemptRequest{
 		RedirectUrl: SuccessUrl,
-		ClientInformation: &identities.ClientInformation{
-			PreSelectedResidenceCountry: "US",
-			PreSelectedLanguage:         "en-US",
+		PhoneNumber: &identities.PhoneNumber{
+			CountryCode: "+44",
+			Number:      "7700900000",
+		},
+		ClientInformation: &identities.IdentityVerificationClientInformation{
+			ClientInformation: identities.ClientInformation{
+				PreSelectedResidenceCountry: common.US,
+				PreSelectedLanguage:         "en-US",
+			},
+			PreSelectedDocumentIssuingCountry: common.GB,
+			PreSelectedDocumentType:           identities.Passport,
 		},
 	}
 }

@@ -97,18 +97,27 @@ func (c *Client) CreateFaceAuthenticationAttemptWithContext(ctx context.Context,
 	return &response, nil
 }
 
-func (c *Client) GetFaceAuthenticationAttempts(faceAuthenticationId string) (*FaceAuthenticationAttemptsResponse, error) {
-	return c.GetFaceAuthenticationAttemptsWithContext(context.Background(), faceAuthenticationId)
+// GetFaceAuthenticationAttempts gets the details of all attempts for a specific face authentication.
+//
+// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
+func (c *Client) GetFaceAuthenticationAttempts(faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
+	return c.GetFaceAuthenticationAttemptsWithContext(context.Background(), faceAuthenticationId, query)
 }
 
-func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, faceAuthenticationId string) (*FaceAuthenticationAttemptsResponse, error) {
+// GetFaceAuthenticationAttemptsWithContext is the context-aware variant of GetFaceAuthenticationAttempts.
+func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	url, err := common.BuildQueryPath(common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
 	var response FaceAuthenticationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath), auth, nil, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

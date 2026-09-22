@@ -99,13 +99,35 @@ func (c *Client) CreateIdDocumentVerificationAttemptWithContext(ctx context.Cont
 
 // GetIdDocumentVerificationAttempts gets the details of all attempts for a specific ID document verification.
 //
-// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
-func (c *Client) GetIdDocumentVerificationAttempts(verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
-	return c.GetIdDocumentVerificationAttemptsWithContext(context.Background(), verificationId, query)
+// Returns the first page using the API's own defaults. To page through the results, use
+// GetIdDocumentVerificationAttemptsQuery. Beta.
+func (c *Client) GetIdDocumentVerificationAttempts(verificationId string) (*IdDocumentVerificationAttemptsResponse, error) {
+	return c.GetIdDocumentVerificationAttemptsWithContext(context.Background(), verificationId)
 }
 
 // GetIdDocumentVerificationAttemptsWithContext is the context-aware variant of GetIdDocumentVerificationAttempts.
-func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
+func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Context, verificationId string) (*IdDocumentVerificationAttemptsResponse, error) {
+	return c.GetIdDocumentVerificationAttemptsQueryWithContext(ctx, verificationId, identities.AttemptsQueryFilter{})
+}
+
+// GetIdDocumentVerificationAttemptsQuery gets the details of all attempts for a specific ID document verification,
+// paginated.
+//
+// Pass Skip and Limit on the query filter to page through the results. An empty filter behaves
+// exactly like GetIdDocumentVerificationAttempts, because BuildQueryPath appends no query string when
+// every value is empty. Beta.
+//
+// This is a separate method rather than an extra parameter on GetIdDocumentVerificationAttempts so that
+// existing callers keep compiling: Go has no overloads and no optional parameters. The
+// Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
+// are paired the same way.
+func (c *Client) GetIdDocumentVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
+	return c.GetIdDocumentVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
+}
+
+// GetIdDocumentVerificationAttemptsQueryWithContext is the context-aware variant of
+// GetIdDocumentVerificationAttemptsQuery.
+func (c *Client) GetIdDocumentVerificationAttemptsQueryWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

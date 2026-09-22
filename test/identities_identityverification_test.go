@@ -244,7 +244,7 @@ func TestGetIdentityVerificationAttempts(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetIdentityVerificationAttempts(tc.verificationId, identities.AttemptsQueryFilter{}))
+			tc.checker(client.GetIdentityVerificationAttempts(tc.verificationId))
 		})
 	}
 }

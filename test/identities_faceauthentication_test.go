@@ -201,7 +201,7 @@ func TestGetFaceAuthenticationAttempts(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetFaceAuthenticationAttempts(tc.faceAuthenticationId, identities.AttemptsQueryFilter{}))
+			tc.checker(client.GetFaceAuthenticationAttempts(tc.faceAuthenticationId))
 		})
 	}
 }

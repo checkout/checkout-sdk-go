@@ -52,9 +52,9 @@ func TestAddressDocumentVerificationClient_BuildsTheAttemptPaths(t *testing.T) {
 		expected string
 	}{
 		{
-			name: "attempts without a filter sends no query string",
+			name: "attempts without a query sends no query string",
 			call: func(c *addressdocumentverification.Client) error {
-				_, err := c.GetAddressDocumentVerificationAttempts("adv_1", identities.AttemptsQueryFilter{})
+				_, err := c.GetAddressDocumentVerificationAttempts("adv_1")
 				return err
 			},
 			expected: "/address-document-verifications/adv_1/attempts",
@@ -62,7 +62,7 @@ func TestAddressDocumentVerificationClient_BuildsTheAttemptPaths(t *testing.T) {
 		{
 			name: "attempts with skip and limit reaches the query string",
 			call: func(c *addressdocumentverification.Client) error {
-				_, err := c.GetAddressDocumentVerificationAttempts(
+				_, err := c.GetAddressDocumentVerificationAttemptsQuery(
 					"adv_1", identities.AttemptsQueryFilter{Skip: 5, Limit: 25})
 				return err
 			},
@@ -109,7 +109,7 @@ func TestIdDocumentVerificationClient_BuildsTheAttemptPaths(t *testing.T) {
 		{
 			name: "attempts without a filter",
 			call: func(c *iddocumentverification.Client) error {
-				_, err := c.GetIdDocumentVerificationAttempts("iddv_1", identities.AttemptsQueryFilter{})
+				_, err := c.GetIdDocumentVerificationAttempts("iddv_1")
 				return err
 			},
 			expected: "/id-document-verifications/iddv_1/attempts",
@@ -117,7 +117,7 @@ func TestIdDocumentVerificationClient_BuildsTheAttemptPaths(t *testing.T) {
 		{
 			name: "attempts with pagination",
 			call: func(c *iddocumentverification.Client) error {
-				_, err := c.GetIdDocumentVerificationAttempts(
+				_, err := c.GetIdDocumentVerificationAttemptsQuery(
 					"iddv_1", identities.AttemptsQueryFilter{Skip: 5, Limit: 25})
 				return err
 			},
@@ -185,7 +185,7 @@ func TestIdentityVerificationClient_BuildsTheAttemptsPath(t *testing.T) {
 			expectGet(apiClient, &captured)
 
 			_, err := identityverification.NewClient(config, apiClient).
-				GetIdentityVerificationAttempts("idv_1", tc.query)
+				GetIdentityVerificationAttemptsQuery("idv_1", tc.query)
 
 			assert.Nil(t, err)
 			assert.Equal(t, tc.expected, captured)
@@ -218,7 +218,7 @@ func TestFaceAuthenticationClient_BuildsTheAttemptsPath(t *testing.T) {
 			expectGet(apiClient, &captured)
 
 			_, err := faceauthentication.NewClient(config, apiClient).
-				GetFaceAuthenticationAttempts("fav_1", tc.query)
+				GetFaceAuthenticationAttemptsQuery("fav_1", tc.query)
 
 			assert.Nil(t, err)
 			assert.Equal(t, tc.expected, captured)
@@ -234,8 +234,99 @@ func TestAttemptsPath_ZeroSkipIsNotExpressible(t *testing.T) {
 	expectGet(apiClient, &captured)
 
 	_, err := identityverification.NewClient(config, apiClient).
-		GetIdentityVerificationAttempts("idv_1", identities.AttemptsQueryFilter{Skip: 0, Limit: 10})
+		GetIdentityVerificationAttemptsQuery("idv_1", identities.AttemptsQueryFilter{Skip: 0, Limit: 10})
 
 	assert.Nil(t, err)
 	assert.Equal(t, "/identity-verifications/idv_1/attempts?limit=10", captured)
+}
+
+// The 2026-09-02 row added pagination to these four endpoints. The query filter went onto a
+// separate Query method rather than onto the existing method, so that callers written against
+// the previous signature keep compiling. That is the same choice UpdateCardHeaders makes.
+//
+// These assert the contract that makes the split safe: the no-argument method has to produce
+// exactly the path it produced before pagination existed, which is also what an empty filter
+// produces. If BuildQueryPath ever started appending a bare "?" for an empty filter, or the
+// delegation were wired to a non-empty default, this is what would catch it.
+func TestAttemptsPath_NoQueryMatchesAnEmptyFilter(t *testing.T) {
+	cases := []struct {
+		name     string
+		noQuery  func(*configuration.Configuration, *mocks.ApiClientMock) error
+		withZero func(*configuration.Configuration, *mocks.ApiClientMock) error
+		expected string
+	}{
+		{
+			name: "address document verification",
+			noQuery: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := addressdocumentverification.NewClient(c, a).
+					GetAddressDocumentVerificationAttempts("adv_1")
+				return err
+			},
+			withZero: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := addressdocumentverification.NewClient(c, a).
+					GetAddressDocumentVerificationAttemptsQuery("adv_1", identities.AttemptsQueryFilter{})
+				return err
+			},
+			expected: "/address-document-verifications/adv_1/attempts",
+		},
+		{
+			name: "ID document verification",
+			noQuery: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := iddocumentverification.NewClient(c, a).
+					GetIdDocumentVerificationAttempts("iddv_1")
+				return err
+			},
+			withZero: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := iddocumentverification.NewClient(c, a).
+					GetIdDocumentVerificationAttemptsQuery("iddv_1", identities.AttemptsQueryFilter{})
+				return err
+			},
+			expected: "/id-document-verifications/iddv_1/attempts",
+		},
+		{
+			name: "identity verification",
+			noQuery: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := identityverification.NewClient(c, a).
+					GetIdentityVerificationAttempts("idv_1")
+				return err
+			},
+			withZero: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := identityverification.NewClient(c, a).
+					GetIdentityVerificationAttemptsQuery("idv_1", identities.AttemptsQueryFilter{})
+				return err
+			},
+			expected: "/identity-verifications/idv_1/attempts",
+		},
+		{
+			name: "face authentication",
+			noQuery: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := faceauthentication.NewClient(c, a).
+					GetFaceAuthenticationAttempts("fav_1")
+				return err
+			},
+			withZero: func(c *configuration.Configuration, a *mocks.ApiClientMock) error {
+				_, err := faceauthentication.NewClient(c, a).
+					GetFaceAuthenticationAttemptsQuery("fav_1", identities.AttemptsQueryFilter{})
+				return err
+			},
+			expected: "/face-authentications/fav_1/attempts",
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			config, apiClient := testConfig(t)
+			var noQueryPath string
+			expectGet(apiClient, &noQueryPath)
+			assert.Nil(t, tc.noQuery(config, apiClient))
+
+			config2, apiClient2 := testConfig(t)
+			var emptyFilterPath string
+			expectGet(apiClient2, &emptyFilterPath)
+			assert.Nil(t, tc.withZero(config2, apiClient2))
+
+			assert.Equal(t, tc.expected, noQueryPath)
+			assert.Equal(t, noQueryPath, emptyFilterPath)
+		})
+	}
 }

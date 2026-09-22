@@ -201,7 +201,7 @@ func TestGetIdDocumentVerificationAttempts(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetIdDocumentVerificationAttempts(tc.verificationId, identities.AttemptsQueryFilter{}))
+			tc.checker(client.GetIdDocumentVerificationAttempts(tc.verificationId))
 		})
 	}
 }
@@ -319,7 +319,7 @@ func TestGetIdDocumentVerificationAttemptsWithPagination(t *testing.T) {
 	t.Skip("Avoid creating identity resources all the time")
 
 	client := buildIdentitiesApi().IdDocumentVerification
-	response, err := client.GetIdDocumentVerificationAttempts(
+	response, err := client.GetIdDocumentVerificationAttemptsQuery(
 		idDocumentVerificationId,
 		identities.AttemptsQueryFilter{Limit: 1},
 	)

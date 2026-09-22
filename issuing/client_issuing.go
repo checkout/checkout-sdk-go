@@ -412,23 +412,25 @@ func (c *Client) UpdateCardWithContext(
 	return c.updateCard(ctx, cardId, request, nil)
 }
 
-// UpdateCardWithHeaders updates a card, sending the optional return-encrypted-cvv and
+// UpdateCardHeaders updates a card, sending the optional return-encrypted-cvv and
 // Encryption-Key headers. Set ReturnEncryptedCvv to "true" together with an EncryptionKey to
 // receive the card's encrypted CVV in the response; supplying the flag without the key returns a
 // 422 with error code encryption_key_required.
 //
 // A separate method rather than a changed signature, because Go has neither optional parameters
-// nor overloads, and UpdateCard is public API.
-func (c *Client) UpdateCardWithHeaders(
+// nor overloads, and UpdateCard is public API. The suffix names the extra input, which is the
+// convention the events client set with RetrieveEvents and RetrieveEventsQuery, and which the
+// four identities Get*AttemptsQuery methods also follow.
+func (c *Client) UpdateCardHeaders(
 	cardId string,
 	request cards.CardUpdateRequest,
 	headers *cards.CardUpdateHeaders,
 ) (*cards.CardUpdateResponse, error) {
-	return c.UpdateCardWithHeadersWithContext(context.Background(), cardId, request, headers)
+	return c.UpdateCardHeadersWithContext(context.Background(), cardId, request, headers)
 }
 
-// UpdateCardWithHeadersWithContext is the context-aware variant of UpdateCardWithHeaders.
-func (c *Client) UpdateCardWithHeadersWithContext(
+// UpdateCardHeadersWithContext is the context-aware variant of UpdateCardHeaders.
+func (c *Client) UpdateCardHeadersWithContext(
 	ctx context.Context,
 	cardId string,
 	request cards.CardUpdateRequest,

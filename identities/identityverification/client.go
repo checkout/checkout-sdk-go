@@ -118,13 +118,35 @@ func (c *Client) CreateIdentityVerificationAttemptWithContext(ctx context.Contex
 
 // GetIdentityVerificationAttempts gets the details of all attempts for a specific identity verification.
 //
-// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
-func (c *Client) GetIdentityVerificationAttempts(verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
-	return c.GetIdentityVerificationAttemptsWithContext(context.Background(), verificationId, query)
+// Returns the first page using the API's own defaults. To page through the results, use
+// GetIdentityVerificationAttemptsQuery. Beta.
+func (c *Client) GetIdentityVerificationAttempts(verificationId string) (*IdentityVerificationAttemptsResponse, error) {
+	return c.GetIdentityVerificationAttemptsWithContext(context.Background(), verificationId)
 }
 
 // GetIdentityVerificationAttemptsWithContext is the context-aware variant of GetIdentityVerificationAttempts.
-func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
+func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context, verificationId string) (*IdentityVerificationAttemptsResponse, error) {
+	return c.GetIdentityVerificationAttemptsQueryWithContext(ctx, verificationId, identities.AttemptsQueryFilter{})
+}
+
+// GetIdentityVerificationAttemptsQuery gets the details of all attempts for a specific identity verification,
+// paginated.
+//
+// Pass Skip and Limit on the query filter to page through the results. An empty filter behaves
+// exactly like GetIdentityVerificationAttempts, because BuildQueryPath appends no query string when
+// every value is empty. Beta.
+//
+// This is a separate method rather than an extra parameter on GetIdentityVerificationAttempts so that
+// existing callers keep compiling: Go has no overloads and no optional parameters. The
+// Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
+// are paired the same way.
+func (c *Client) GetIdentityVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
+	return c.GetIdentityVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
+}
+
+// GetIdentityVerificationAttemptsQueryWithContext is the context-aware variant of
+// GetIdentityVerificationAttemptsQuery.
+func (c *Client) GetIdentityVerificationAttemptsQueryWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

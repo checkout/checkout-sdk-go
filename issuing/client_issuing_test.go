@@ -2,6 +2,7 @@ package issuing
 
 import (
 	"net/http"
+	"reflect"
 	"testing"
 	"time"
 
@@ -1535,4 +1536,101 @@ func TestUpdateCard(t *testing.T) {
 			tc.checker(client.UpdateCard(tc.cardId, tc.request))
 		})
 	}
+}
+
+// UpdateCardHeaders is the part D entry point: same request, plus the optional
+// return-encrypted-cvv and Encryption-Key headers. It is a separate method because Go has no
+// overloads, and the suffix names the extra input, matching RetrieveEventsQuery in the events
+// client and the four identities Get*AttemptsQuery methods.
+//
+// Nothing exercised the public method before this: client/patch_headers_transmission_test.go
+// covers the transmission mechanism but mirrors the headers type locally and drives the HTTP
+// layer, so the method name and the wrapper wiring were only checked by the compiler.
+func TestUpdateCardHeaders(t *testing.T) {
+	request := cards.CardUpdateRequest{Reference: "ref-updated"}
+	headers := &cards.CardUpdateHeaders{
+		ReturnEncryptedCvv: "true",
+		EncryptionKey:      "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A",
+	}
+	response := cards.CardUpdateResponse{
+		HttpMetadata: mocks.HttpMetadataStatusOk,
+		EncryptedCvv: "oJMoNMEEUiQKYOsQ4Zd",
+	}
+
+	t.Run("sends the headers on the body wrapper and returns the encrypted cvv", func(t *testing.T) {
+		apiClient := new(mocks.ApiClientMock)
+		credentials := new(mocks.CredentialsMock)
+		environment := new(mocks.EnvironmentMock)
+		enableTelemetry := true
+
+		credentials.On("GetAuthorization", mock.Anything).
+			Return(&configuration.SdkAuthorization{}, nil)
+
+		var capturedBody interface{}
+		apiClient.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return(nil).
+			Run(func(args mock.Arguments) {
+				capturedBody = args.Get(3)
+				respMapping := args.Get(4).(*cards.CardUpdateResponse)
+				*respMapping = response
+			})
+
+		config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+		result, err := NewClient(config, apiClient).UpdateCardHeaders("crd_1", request, headers)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, result)
+		assert.Equal(t, "oJMoNMEEUiQKYOsQ4Zd", result.EncryptedCvv)
+
+		// The ApiClient finds per-request headers by reflecting over a field named Headers, so the
+		// wrapper has to carry them through rather than drop them.
+		assert.NotNil(t, capturedBody)
+		field := reflect.ValueOf(capturedBody).FieldByName("Headers")
+		assert.True(t, field.IsValid(), "the body wrapper must expose a Headers field")
+		assert.Equal(t, headers, field.Interface())
+	})
+
+	t.Run("leaves the Headers field nil on the plain UpdateCard path", func(t *testing.T) {
+		apiClient := new(mocks.ApiClientMock)
+		credentials := new(mocks.CredentialsMock)
+		environment := new(mocks.EnvironmentMock)
+		enableTelemetry := true
+
+		credentials.On("GetAuthorization", mock.Anything).
+			Return(&configuration.SdkAuthorization{}, nil)
+
+		var capturedBody interface{}
+		apiClient.On("PatchWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return(nil).
+			Run(func(args mock.Arguments) {
+				capturedBody = args.Get(3)
+				respMapping := args.Get(4).(*cards.CardUpdateResponse)
+				*respMapping = cards.CardUpdateResponse{HttpMetadata: mocks.HttpMetadataStatusOk}
+			})
+
+		config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+		_, err := NewClient(config, apiClient).UpdateCard("crd_1", request)
+
+		assert.Nil(t, err)
+		field := reflect.ValueOf(capturedBody).FieldByName("Headers")
+		assert.True(t, field.IsValid())
+		assert.True(t, field.IsNil(), "UpdateCard must not invent headers")
+	})
+
+	t.Run("propagates an authorization error", func(t *testing.T) {
+		apiClient := new(mocks.ApiClientMock)
+		credentials := new(mocks.CredentialsMock)
+		environment := new(mocks.EnvironmentMock)
+		enableTelemetry := true
+
+		credentials.On("GetAuthorization", mock.Anything).
+			Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
+
+		config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+		result, err := NewClient(config, apiClient).UpdateCardHeaders("crd_1", request, headers)
+
+		assert.Nil(t, result)
+		assert.NotNil(t, err)
+		assert.Equal(t, "Invalid authorization type", err.(errors.CheckoutAuthorizationError).Error())
+	})
 }

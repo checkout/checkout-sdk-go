@@ -93,7 +93,7 @@ func TestGetAddressDocumentVerificationAttempts(t *testing.T) {
 	t.Skip("Avoid creating identity resources all the time")
 
 	client := buildIdentitiesApi().AddressDocumentVerification
-	_, err := client.GetAddressDocumentVerificationAttempts("adv_tkoi5db4hryu5cei5vwoabr7we", identities.AttemptsQueryFilter{})
+	_, err := client.GetAddressDocumentVerificationAttempts("adv_tkoi5db4hryu5cei5vwoabr7we")
 	assert.Nil(t, err)
 }
 
@@ -117,7 +117,7 @@ func TestGetAddressDocumentVerificationAttemptsWithPagination(t *testing.T) {
 	t.Skip("Avoid creating identity resources all the time")
 
 	client := buildIdentitiesApi().AddressDocumentVerification
-	response, err := client.GetAddressDocumentVerificationAttempts(
+	response, err := client.GetAddressDocumentVerificationAttemptsQuery(
 		"adv_tkoi5db4hryu5cei5vwoabr7we",
 		identities.AttemptsQueryFilter{Limit: 1},
 	)

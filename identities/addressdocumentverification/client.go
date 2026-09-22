@@ -99,13 +99,35 @@ func (c *Client) CreateAddressDocumentVerificationAttemptWithContext(ctx context
 
 // GetAddressDocumentVerificationAttempts gets the details of all attempts for a specific address document verification.
 //
-// Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
-func (c *Client) GetAddressDocumentVerificationAttempts(verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
-	return c.GetAddressDocumentVerificationAttemptsWithContext(context.Background(), verificationId, query)
+// Returns the first page using the API's own defaults. To page through the results, use
+// GetAddressDocumentVerificationAttemptsQuery. Beta.
+func (c *Client) GetAddressDocumentVerificationAttempts(verificationId string) (*AddressDocumentVerificationAttemptsResponse, error) {
+	return c.GetAddressDocumentVerificationAttemptsWithContext(context.Background(), verificationId)
 }
 
 // GetAddressDocumentVerificationAttemptsWithContext is the context-aware variant of GetAddressDocumentVerificationAttempts.
-func (c *Client) GetAddressDocumentVerificationAttemptsWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
+func (c *Client) GetAddressDocumentVerificationAttemptsWithContext(ctx context.Context, verificationId string) (*AddressDocumentVerificationAttemptsResponse, error) {
+	return c.GetAddressDocumentVerificationAttemptsQueryWithContext(ctx, verificationId, identities.AttemptsQueryFilter{})
+}
+
+// GetAddressDocumentVerificationAttemptsQuery gets the details of all attempts for a specific address document verification,
+// paginated.
+//
+// Pass Skip and Limit on the query filter to page through the results. An empty filter behaves
+// exactly like GetAddressDocumentVerificationAttempts, because BuildQueryPath appends no query string when
+// every value is empty. Beta.
+//
+// This is a separate method rather than an extra parameter on GetAddressDocumentVerificationAttempts so that
+// existing callers keep compiling: Go has no overloads and no optional parameters. The
+// Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
+// are paired the same way.
+func (c *Client) GetAddressDocumentVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
+	return c.GetAddressDocumentVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
+}
+
+// GetAddressDocumentVerificationAttemptsQueryWithContext is the context-aware variant of
+// GetAddressDocumentVerificationAttemptsQuery.
+func (c *Client) GetAddressDocumentVerificationAttemptsQueryWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

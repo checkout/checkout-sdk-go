@@ -286,9 +286,15 @@ func TestCreateEntityV2(t *testing.T) {
 
 func TestCreateEntityV3(t *testing.T) {
 	// v3.0 onboards a sub-entity as a company whose single representative carries a nested individual
-	// + roles. Runs through the accounts-scoped OAuth client (buildAccountsClient) — the one provisioned
-	// for v3.0 onboarding (the general client returns a bare 500). Profile currencies use the platform
-	// scope (USD) while processing_details reflects the sub-entity region (GBP).
+	// + roles. Runs through the accounts-scoped OAuth client (buildAccountsClient), the one provisioned
+	// for v3.0 onboarding (the general client returns a bare 500).
+	//
+	// Every currency here has to sit inside the platform's currency scope, which is USD only. This
+	// previously set processing_details.currency to GBP on the theory that it reflects the
+	// sub-entity region while the profile reflects the platform; the API rejects that with
+	// processing_details_currency_invalid_for_currency_scope. Widening the profile to GBP instead is
+	// also rejected, because the scope itself does not permit GBP. The GB addresses and
+	// settlement_country are unaffected and still accepted.
 	cases := []struct {
 		name    string
 		request accounts.OnboardEntityRequest
@@ -341,7 +347,7 @@ func TestCreateEntityV3(t *testing.T) {
 					AverageTransactionValue:     5000,
 					AverageOrderFulfillmentTime: 3,
 					HighestTransactionValue:     25000,
-					Currency:                    common.GBP,
+					Currency:                    common.USD,
 					SettlementCountry:           "GB",
 					TargetCountries:             []string{"GB"},
 					Payments: &accounts.ProcessingDetailsPayments{

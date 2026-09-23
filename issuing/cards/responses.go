@@ -25,31 +25,36 @@ type (
 	}
 
 	CardDetailsData struct {
-		HttpMetadata     common.HttpMetadata
-		Type             CardType               `json:"type,omitempty"`
-		Id               string                 `json:"id,omitempty"`
-		CardholderId     string                 `json:"cardholder_id,omitempty"`
-		CardProductId    string                 `json:"card_product_id,omitempty"`
-		ClientId         string                 `json:"client_id,omitempty"`
-		EntityId         string                 `json:"entity_id,omitempty"`
-		UserId           string                 `json:"user_id,omitempty"`
-		LastFour         string                 `json:"last_four,omitempty"`
-		ExpiryMonth      int                    `json:"expiry_month,omitempty"`
-		ExpiryYear       int                    `json:"expiry_year,omitempty"`
-		Status           CardStatus             `json:"status,omitempty"`
-		DisplayName      string                 `json:"display_name,omitempty"`
-		BillingCurrency  common.Currency        `json:"billing_currency,omitempty"`
-		IssuingCountry   common.Country         `json:"issuing_country,omitempty"`
-		Scheme           CardScheme             `json:"scheme,omitempty"`
-		Reference        string                 `json:"reference,omitempty"`
-		Metadata         *CardMetadata          `json:"metadata,omitempty"`
-		RevocationDate   string                 `json:"revocation_date,omitempty"`
-		ActivationDate   string                 `json:"activation_date,omitempty"`
-		RootCardId       string                 `json:"root_card_id,omitempty"`
-		ParentCardId     string                 `json:"parent_card_id,omitempty"`
-		CreatedDate      *time.Time             `json:"created_date,omitempty"`
-		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
-		Links            map[string]common.Link `json:"_links,omitempty"`
+		HttpMetadata    common.HttpMetadata
+		Type            CardType        `json:"type,omitempty"`
+		Id              string          `json:"id,omitempty"`
+		CardholderId    string          `json:"cardholder_id,omitempty"`
+		CardProductId   string          `json:"card_product_id,omitempty"`
+		ClientId        string          `json:"client_id,omitempty"`
+		EntityId        string          `json:"entity_id,omitempty"`
+		UserId          string          `json:"user_id,omitempty"`
+		LastFour        string          `json:"last_four,omitempty"`
+		ExpiryMonth     int             `json:"expiry_month,omitempty"`
+		ExpiryYear      int             `json:"expiry_year,omitempty"`
+		Status          CardStatus      `json:"status,omitempty"`
+		DisplayName     string          `json:"display_name,omitempty"`
+		BillingCurrency common.Currency `json:"billing_currency,omitempty"`
+		IssuingCountry  common.Country  `json:"issuing_country,omitempty"`
+		Scheme          CardScheme      `json:"scheme,omitempty"`
+		Reference       string          `json:"reference,omitempty"`
+		Metadata        *CardMetadata   `json:"metadata,omitempty"`
+		RevocationDate  string          `json:"revocation_date,omitempty"`
+
+		// ScheduledActivationDate is the scheduled date of the card's first activation.
+		// Replaced activation_date in the 2026-09-02 spec; IssuingActivationDate was removed.
+		// [Optional]
+		// Example: 2026-06-01T10:00Z
+		ScheduledActivationDate string                 `json:"scheduled_activation_date,omitempty"`
+		RootCardId              string                 `json:"root_card_id,omitempty"`
+		ParentCardId            string                 `json:"parent_card_id,omitempty"`
+		CreatedDate             *time.Time             `json:"created_date,omitempty"`
+		LastModifiedDate        *time.Time             `json:"last_modified_date,omitempty"`
+		Links                   map[string]common.Link `json:"_links,omitempty"`
 	}
 
 	ActivateCardResponse struct {
@@ -137,9 +142,22 @@ type (
 		Links           map[string]common.Link `json:"_links,omitempty"`
 	}
 
+	// CardUpdateResponse represents the response body for PATCH /issuing/cards/{cardId}.
 	CardUpdateResponse struct {
-		HttpMetadata     common.HttpMetadata
-		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
-		Links            map[string]common.Link `json:"_links,omitempty"`
+		HttpMetadata common.HttpMetadata
+
+		// LastModifiedDate is when the card was last modified.
+		// [Optional]
+		// Format: date-time
+		LastModifiedDate *time.Time `json:"last_modified_date,omitempty"`
+
+		// EncryptedCvv is the card's encrypted CVV. Returned only when the return-encrypted-cvv
+		// header is set and an Encryption-Key is supplied, so it is empty on an ordinary update.
+		// [Optional]
+		EncryptedCvv string `json:"encrypted_cvv,omitempty"`
+
+		// Links holds the HAL links related to the card.
+		// [Optional]
+		Links map[string]common.Link `json:"_links,omitempty"`
 	}
 )

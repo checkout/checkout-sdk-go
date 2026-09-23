@@ -112,3 +112,34 @@ func TestGetAddressDocumentVerificationReport(t *testing.T) {
 	_, err := client.GetAddressDocumentVerificationReport("adv_tkoi5db4hryu5cei5vwoabr7we")
 	assert.Nil(t, err)
 }
+
+func TestGetAddressDocumentVerificationAttemptsWithPagination(t *testing.T) {
+	t.Skip("Avoid creating identity resources all the time")
+
+	client := buildIdentitiesApi().AddressDocumentVerification
+	response, err := client.GetAddressDocumentVerificationAttemptsQuery(
+		"adv_tkoi5db4hryu5cei5vwoabr7we",
+		identities.AttemptsQueryFilter{Limit: 1},
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	assert.Equal(t, 1, response.Limit)
+	assert.LessOrEqual(t, len(response.Data), 1)
+}
+
+func TestGetAddressDocumentVerificationAttemptAssets(t *testing.T) {
+	t.Skip("Avoid creating identity resources all the time")
+
+	client := buildIdentitiesApi().AddressDocumentVerification
+	response, err := client.GetAddressDocumentVerificationAttemptAssets(
+		"adv_tkoi5db4hryu5cei5vwoabr7we",
+		"adva_tkoi5db4hryu5cei5vwoabr7we",
+		identities.AttemptAssetsQueryFilter{Limit: 10},
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	for _, asset := range response.Data {
+		assert.Equal(t, identities.DocumentAdvAsset, asset.Type)
+		assert.NotNil(t, asset.Links.AssetUrl.HRef)
+	}
+}

@@ -394,6 +394,8 @@ func (c *Client) SuspendCardWithContext(
 	return &response, nil
 }
 
+// UpdateCard updates the details of an issued card. Only the fields for which you provide values
+// are updated.
 func (c *Client) UpdateCard(
 	cardId string,
 	request cards.CardUpdateRequest,
@@ -401,21 +403,66 @@ func (c *Client) UpdateCard(
 	return c.UpdateCardWithContext(context.Background(), cardId, request)
 }
 
+// UpdateCardWithContext is the context-aware variant of UpdateCard.
 func (c *Client) UpdateCardWithContext(
 	ctx context.Context,
 	cardId string,
 	request cards.CardUpdateRequest,
 ) (*cards.CardUpdateResponse, error) {
+	return c.updateCard(ctx, cardId, request, nil)
+}
+
+// UpdateCardHeaders updates a card, sending the optional return-encrypted-cvv and
+// Encryption-Key headers. Set ReturnEncryptedCvv to "true" together with an EncryptionKey to
+// receive the card's encrypted CVV in the response; supplying the flag without the key returns a
+// 422 with error code encryption_key_required.
+//
+// A separate method rather than a changed signature, because Go has neither optional parameters
+// nor overloads, and UpdateCard is public API. The suffix names the extra input, which is the
+// convention the events client set with RetrieveEvents and RetrieveEventsQuery, and which the
+// four identities Get*AttemptsQuery methods also follow.
+func (c *Client) UpdateCardHeaders(
+	cardId string,
+	request cards.CardUpdateRequest,
+	headers *cards.CardUpdateHeaders,
+) (*cards.CardUpdateResponse, error) {
+	return c.UpdateCardHeadersWithContext(context.Background(), cardId, request, headers)
+}
+
+// UpdateCardHeadersWithContext is the context-aware variant of UpdateCardHeaders.
+func (c *Client) UpdateCardHeadersWithContext(
+	ctx context.Context,
+	cardId string,
+	request cards.CardUpdateRequest,
+	headers *cards.CardUpdateHeaders,
+) (*cards.CardUpdateResponse, error) {
+	return c.updateCard(ctx, cardId, request, headers)
+}
+
+func (c *Client) updateCard(
+	ctx context.Context,
+	cardId string,
+	request cards.CardUpdateRequest,
+	headers *cards.CardUpdateHeaders,
+) (*cards.CardUpdateResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
+
+	// The ApiClient resolves per-request headers by reflecting over a field named Headers, and
+	// json:"-" keeps the wrapper out of the request body. Same shape the accounts client uses.
+	body := struct {
+		cards.CardUpdateRequest
+		Headers *cards.CardUpdateHeaders `json:"-"`
+	}{request, headers}
+
 	var response cards.CardUpdateResponse
 	err = c.apiClient.PatchWithContext(
 		ctx,
 		common.BuildPath(issuingPath, cardsPath, cardId),
 		auth,
-		request,
+		body,
 		&response,
 	)
 	if err != nil {

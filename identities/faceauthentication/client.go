@@ -97,18 +97,49 @@ func (c *Client) CreateFaceAuthenticationAttemptWithContext(ctx context.Context,
 	return &response, nil
 }
 
+// GetFaceAuthenticationAttempts gets the details of all attempts for a specific face authentication.
+//
+// Returns the first page using the API's own defaults. To page through the results, use
+// GetFaceAuthenticationAttemptsQuery. Beta.
 func (c *Client) GetFaceAuthenticationAttempts(faceAuthenticationId string) (*FaceAuthenticationAttemptsResponse, error) {
 	return c.GetFaceAuthenticationAttemptsWithContext(context.Background(), faceAuthenticationId)
 }
 
+// GetFaceAuthenticationAttemptsWithContext is the context-aware variant of GetFaceAuthenticationAttempts.
 func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, faceAuthenticationId string) (*FaceAuthenticationAttemptsResponse, error) {
+	return c.GetFaceAuthenticationAttemptsQueryWithContext(ctx, faceAuthenticationId, identities.AttemptsQueryFilter{})
+}
+
+// GetFaceAuthenticationAttemptsQuery gets the details of all attempts for a specific face authentication,
+// paginated.
+//
+// Pass Skip and Limit on the query filter to page through the results. An empty filter behaves
+// exactly like GetFaceAuthenticationAttempts, because BuildQueryPath appends no query string when
+// every value is empty. Beta.
+//
+// This is a separate method rather than an extra parameter on GetFaceAuthenticationAttempts so that
+// existing callers keep compiling: Go has no overloads and no optional parameters. The
+// Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
+// are paired the same way.
+func (c *Client) GetFaceAuthenticationAttemptsQuery(faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
+	return c.GetFaceAuthenticationAttemptsQueryWithContext(context.Background(), faceAuthenticationId, query)
+}
+
+// GetFaceAuthenticationAttemptsQueryWithContext is the context-aware variant of
+// GetFaceAuthenticationAttemptsQuery.
+func (c *Client) GetFaceAuthenticationAttemptsQueryWithContext(ctx context.Context, faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
 	}
 
+	url, err := common.BuildQueryPath(common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath), query)
+	if err != nil {
+		return nil, err
+	}
+
 	var response FaceAuthenticationAttemptsResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(faceAuthenticationsPath, faceAuthenticationId, attemptsPath), auth, nil, &response)
+	err = c.apiClient.GetWithContext(ctx, url, auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

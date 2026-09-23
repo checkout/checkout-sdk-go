@@ -20,13 +20,25 @@ func BuildPath(params ...string) string {
 	return path
 }
 
+// BuildQueryPath appends the encoded query values to path.
+//
+// An empty filter returns the path unchanged rather than appending a bare "?". That matters for
+// the endpoints whose query filter is optional: before the 2026-09-02 pass the list-attempts
+// endpoints used BuildPath and produced ".../attempts", and a caller passing a zero filter would
+// otherwise have started getting ".../attempts?" instead. A trailing question mark with no query
+// carries no information, so no caller loses anything.
 func BuildQueryPath(path string, queryValues interface{}) (string, error) {
 	values, err := query.Values(queryValues)
 	if err != nil {
 		return "", err
 	}
 
-	return fmt.Sprintf("%s?%s", path, values.Encode()), nil
+	encoded := values.Encode()
+	if encoded == "" {
+		return path, nil
+	}
+
+	return fmt.Sprintf("%s?%s", path, encoded), nil
 }
 
 func EscapeQuotes(s string) string {

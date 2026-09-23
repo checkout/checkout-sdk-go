@@ -259,7 +259,7 @@ func TestGetIdDocumentVerificationReport(t *testing.T) {
 			checker: func(response *iddocumentverification.IdDocumentVerificationReportResponse, err error) {
 				assert.Nil(t, err)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
-				assert.NotEmpty(t, response.SignedUrl)
+				assert.NotEmpty(t, response.PdfReport)
 			},
 		},
 		{
@@ -313,4 +313,39 @@ func validateIdDocumentVerificationAttemptResponse(t *testing.T, response *iddoc
 	assert.NotNil(t, response)
 	assert.NotEmpty(t, response.Id)
 	assert.NotNil(t, response.Status)
+}
+
+func TestGetIdDocumentVerificationAttemptsWithPagination(t *testing.T) {
+	t.Skip("Avoid creating identity resources all the time")
+
+	client := buildIdentitiesApi().IdDocumentVerification
+	response, err := client.GetIdDocumentVerificationAttemptsQuery(
+		idDocumentVerificationId,
+		identities.AttemptsQueryFilter{Limit: 1},
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	assert.Equal(t, 1, response.Limit)
+	assert.LessOrEqual(t, len(response.Data), 1)
+}
+
+func TestGetIdDocumentVerificationAttemptAssets(t *testing.T) {
+	t.Skip("Avoid creating identity resources all the time")
+
+	client := buildIdentitiesApi().IdDocumentVerification
+	response, err := client.GetIdDocumentVerificationAttemptAssets(
+		idDocumentVerificationId,
+		idDocVerificationAttemptId,
+		identities.AttemptAssetsQueryFilter{Limit: 10},
+	)
+	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+	for _, asset := range response.Data {
+		assert.Contains(t,
+			[]identities.IdDocumentVerificationAttemptAssetType{
+				identities.DocumentFrontImageIddvAsset,
+				identities.DocumentBackImageIddvAsset,
+			}, asset.Type)
+		assert.NotNil(t, asset.Links.AssetUrl.HRef)
+	}
 }

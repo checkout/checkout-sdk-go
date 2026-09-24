@@ -1553,11 +1553,11 @@ func TestUpdateCardHeaders(t *testing.T) {
 		EncryptionKey:      "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A",
 	}
 	response := cards.CardUpdateResponse{
-		HttpMetadata: mocks.HttpMetadataStatusOk,
-		EncryptedCvv: "oJMoNMEEUiQKYOsQ4Zd",
+		HttpMetadata:            mocks.HttpMetadataStatusOk,
+		ScheduledRevocationDate: "2027-03-12",
 	}
 
-	t.Run("sends the headers on the body wrapper and returns the encrypted cvv", func(t *testing.T) {
+	t.Run("sends the headers on the body wrapper and returns the response body", func(t *testing.T) {
 		apiClient := new(mocks.ApiClientMock)
 		credentials := new(mocks.CredentialsMock)
 		environment := new(mocks.EnvironmentMock)
@@ -1580,7 +1580,7 @@ func TestUpdateCardHeaders(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.NotNil(t, result)
-		assert.Equal(t, "oJMoNMEEUiQKYOsQ4Zd", result.EncryptedCvv)
+		assert.Equal(t, "2027-03-12", result.ScheduledRevocationDate)
 
 		// The ApiClient finds per-request headers by reflecting over a field named Headers, so the
 		// wrapper has to carry them through rather than drop them.

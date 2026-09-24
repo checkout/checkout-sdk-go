@@ -43,23 +43,39 @@ type (
 		Scheme          CardScheme      `json:"scheme,omitempty"`
 		Reference       string          `json:"reference,omitempty"`
 		Metadata        *CardMetadata   `json:"metadata,omitempty"`
-		RevocationDate  string          `json:"revocation_date,omitempty"`
+
+		// RevocationDate is deprecated. Use ScheduledRevocationDate instead.
+		//
+		// Deprecated: use ScheduledRevocationDate.
+		RevocationDate string `json:"revocation_date,omitempty"`
+
+		// ScheduledRevocationDate is the date (format YYYY-MM-DD) on which the
+		// card is revoked at midnight UTC. Replaces the deprecated RevocationDate.
+		ScheduledRevocationDate string `json:"scheduled_revocation_date,omitempty"`
 
 		// ScheduledActivationDate is the scheduled date of the card's first activation.
 		// Replaced activation_date in the 2026-09-02 spec; IssuingActivationDate was removed.
 		// [Optional]
 		// Example: 2026-06-01T10:00Z
-		ScheduledActivationDate string                 `json:"scheduled_activation_date,omitempty"`
-		RootCardId              string                 `json:"root_card_id,omitempty"`
-		ParentCardId            string                 `json:"parent_card_id,omitempty"`
-		CreatedDate             *time.Time             `json:"created_date,omitempty"`
-		LastModifiedDate        *time.Time             `json:"last_modified_date,omitempty"`
-		Links                   map[string]common.Link `json:"_links,omitempty"`
+		ScheduledActivationDate string     `json:"scheduled_activation_date,omitempty"`
+		RootCardId              string     `json:"root_card_id,omitempty"`
+		ParentCardId            string     `json:"parent_card_id,omitempty"`
+		CreatedDate             *time.Time `json:"created_date,omitempty"`
+
+		// LastActivatedOn is the date and time the card was last activated.
+		// Nil if the card has never been activated.
+		LastActivatedOn  *time.Time             `json:"last_activated_on,omitempty"`
+		LastModifiedDate *time.Time             `json:"last_modified_date,omitempty"`
+		Links            map[string]common.Link `json:"_links,omitempty"`
 	}
 
 	ActivateCardResponse struct {
 		HttpMetadata common.HttpMetadata
-		Links        map[string]common.Link `json:"_links,omitempty"`
+
+		// LastActivatedOn is the time the card was activated. Required on this
+		// response (unlike the nullable LastActivatedOn on CardDetailsData).
+		LastActivatedOn *time.Time             `json:"last_activated_on,omitempty"`
+		Links           map[string]common.Link `json:"_links,omitempty"`
 	}
 
 	RevokeCardResponse struct {
@@ -143,18 +159,25 @@ type (
 	}
 
 	// CardUpdateResponse represents the response body for PATCH /issuing/cards/{cardId}.
+	//
+	// The 2026-09-02 spec (INT-1695) added encrypted_cvv here; the 2026-09-17 spec (INT-1700)
+	// removed it again, so the current spec never includes it. LastModifiedDate stays required
+	// (per swagger's allOf against get-card-response).
 	CardUpdateResponse struct {
 		HttpMetadata common.HttpMetadata
+
+		// ScheduledRevocationDate is the date (format YYYY-MM-DD) on which the
+		// card is revoked at midnight UTC.
+		ScheduledRevocationDate string `json:"scheduled_revocation_date,omitempty"`
+
+		// LastActivatedOn is the date and time the card was last activated.
+		// Nil if the card has never been activated.
+		LastActivatedOn *time.Time `json:"last_activated_on,omitempty"`
 
 		// LastModifiedDate is when the card was last modified.
 		// [Optional]
 		// Format: date-time
 		LastModifiedDate *time.Time `json:"last_modified_date,omitempty"`
-
-		// EncryptedCvv is the card's encrypted CVV. Returned only when the return-encrypted-cvv
-		// header is set and an Encryption-Key is supplied, so it is empty on an ordinary update.
-		// [Optional]
-		EncryptedCvv string `json:"encrypted_cvv,omitempty"`
 
 		// Links holds the HAL links related to the card.
 		// [Optional]

@@ -3,6 +3,7 @@ package issuing
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -11,8 +12,11 @@ import (
 //   - scheduled_activation_date on add-card-request, update-card-request and get-card-response
 //     (renamed from activation_date; the IssuingActivationDate schema was removed)
 //   - revocation_date on add-card-request and update-card-request, now format: date
-//   - encrypted_cvv on update-card-response
 //   - the return-encrypted-cvv and Encryption-Key request headers
+//
+// encrypted_cvv was added to update-card-response by this same 2026-09-02 delta, then removed
+// again by the 2026-09-17 delta (INT-1700, see the tests further down); the current spec never
+// includes it.
 
 func TestCardDetailsRequest_ScheduledActivationAndRevocationDate(t *testing.T) {
 	request := CardDetailsRequest{
@@ -133,26 +137,95 @@ func TestCardDetailsData_DeserializeScheduleFields(t *testing.T) {
 	assert.Equal(t, "crd_parent_abcdefghijkl", data.ParentCardId)
 }
 
-// Part D: the update response gains encrypted_cvv, returned only when the headers ask for it.
-func TestCardUpdateResponse_DeserializesEncryptedCvv(t *testing.T) {
+// Verifies fields added by the 2026-09-17 Checkout.com swagger delta (INT-1700):
+//   - scheduled_revocation_date on add-card-request, update-card-request, get-card-response
+//   - status on update-card-request
+//   - last_activated_on on activate-card-response, add-card-response/get-card-response
+//   - update-card-response drops encrypted_cvv and keeps last_modified_date/_links
+
+func TestCardDetailsRequest_ScheduledRevocationDate(t *testing.T) {
+	request := CardDetailsRequest{
+		Type:                    Virtual,
+		CardholderId:            "crh_test_abcdefghijklmnopqr",
+		ScheduledRevocationDate: "2027-03-12",
+	}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"scheduled_revocation_date":"2027-03-12"`)
+
+	var decoded CardDetailsRequest
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, request.ScheduledRevocationDate, decoded.ScheduledRevocationDate)
+}
+
+func TestCardUpdateRequest_ScheduledRevocationDateAndStatus(t *testing.T) {
+	request := CardUpdateRequest{
+		Reference:               "X-123456-N11",
+		ScheduledRevocationDate: "2027-03-12",
+		Status:                  ActiveCardStatusUpdate,
+	}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"scheduled_revocation_date":"2027-03-12"`)
+	assert.Contains(t, body, `"status":"active"`)
+
+	var decoded CardUpdateRequest
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, request.ScheduledRevocationDate, decoded.ScheduledRevocationDate)
+	assert.Equal(t, request.Status, decoded.Status)
+}
+
+func TestCardUpdateRequest_OmitsScheduledRevocationDateAndStatusWhenUnset(t *testing.T) {
+	marshalled, err := json.Marshal(CardUpdateRequest{})
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.NotContains(t, body, "scheduled_revocation_date")
+	assert.NotContains(t, body, "status")
+}
+
+func TestCardDetailsData_DeserializeScheduledRevocationAndLastActivatedOn(t *testing.T) {
+	// Swagger example payload shape for get-card-response.
 	payload := `{
-		"last_modified_date": "2026-06-01T10:00:00Z",
-		"encrypted_cvv": "oJMoNMEEUiQKYOsQ4Zd"
+		"id": "crd_test_abcdefghijklmnopqr",
+		"scheduled_revocation_date": "2027-03-12",
+		"last_activated_on": "2019-09-10T10:11:12Z"
 	}`
 
-	var response CardUpdateResponse
+	var data CardDetailsData
+	assert.NoError(t, json.Unmarshal([]byte(payload), &data))
+	assert.Equal(t, "2027-03-12", data.ScheduledRevocationDate)
+	assert.NotNil(t, data.LastActivatedOn)
+	assert.Equal(t, "2019-09-10T10:11:12Z", data.LastActivatedOn.UTC().Format(time.RFC3339))
+}
+
+func TestCardDetailsData_LastActivatedOnNilWhenAbsent(t *testing.T) {
+	payload := `{"id": "crd_test_abcdefghijklmnopqr"}`
+
+	var data CardDetailsData
+	assert.NoError(t, json.Unmarshal([]byte(payload), &data))
+	assert.Nil(t, data.LastActivatedOn)
+}
+
+func TestActivateCardResponse_DeserializeLastActivatedOn(t *testing.T) {
+	// Swagger example payload for activate-card-response.
+	payload := `{
+		"last_activated_on": "2019-09-10T10:11:12Z",
+		"_links": {
+			"self": {"href": "https://api.checkout.com/issuing/cards/crd_test"}
+		}
+	}`
+
+	var response ActivateCardResponse
 	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
-	assert.Equal(t, "oJMoNMEEUiQKYOsQ4Zd", response.EncryptedCvv)
-	assert.NotNil(t, response.LastModifiedDate)
+	assert.NotNil(t, response.LastActivatedOn)
+	assert.Equal(t, "2019-09-10T10:11:12Z", response.LastActivatedOn.UTC().Format(time.RFC3339))
+	assert.Contains(t, response.Links, "self")
 }
 
-func TestCardUpdateResponse_EncryptedCvvIsEmptyWhenAbsent(t *testing.T) {
-	var response CardUpdateResponse
-	assert.NoError(t, json.Unmarshal([]byte(`{"last_modified_date":"2026-06-01T10:00:00Z"}`), &response))
-	assert.Empty(t, response.EncryptedCvv)
-}
-
-// The headers travel on a field named Headers with json:"-", so they must never appear in the body.
 func TestCardUpdateHeaders_AreNotPartOfTheRequestBody(t *testing.T) {
 	body := struct {
 		CardUpdateRequest
@@ -184,4 +257,33 @@ func TestCardUpdateHeaders_TagsMatchTheSwaggerHeaderNames(t *testing.T) {
 		"return-encrypted-cvv": "true",
 		"Encryption-Key":       "MIIBIjAN",
 	}, decoded)
+}
+
+func TestCardUpdateResponse_DeserializeSwaggerExample(t *testing.T) {
+	payload := `{
+		"scheduled_revocation_date": "2027-03-12",
+		"last_activated_on": "2019-09-10T10:11:12Z",
+		"last_modified_date": "2019-09-10T10:11:12Z",
+		"encrypted_cvv": "should-be-ignored",
+		"_links": {
+			"self": {"href": "https://api.checkout.com/issuing/cards/crd_test"},
+			"credentials": {"href": "https://api.checkout.com/issuing/cards/crd_test/credentials"},
+			"revoke": {"href": "https://api.checkout.com/issuing/cards/crd_test/revoke"},
+			"controls": {"href": "https://api.checkout.com/issuing/controls?target_id=crd_test"}
+		}
+	}`
+
+	var response CardUpdateResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assert.Equal(t, "2027-03-12", response.ScheduledRevocationDate)
+	assert.NotNil(t, response.LastActivatedOn)
+	assert.NotNil(t, response.LastModifiedDate)
+	assert.Contains(t, response.Links, "self")
+	assert.Contains(t, response.Links, "credentials")
+	assert.Contains(t, response.Links, "revoke")
+	assert.Contains(t, response.Links, "controls")
+
+	marshalled, err := json.Marshal(response)
+	assert.NoError(t, err)
+	assert.NotContains(t, string(marshalled), "encrypted_cvv")
 }

@@ -8,6 +8,18 @@ import (
 
 const PathPayments = "payments"
 
+// ProcessingCardType is the credit or debit selection for a combo card, as declared on
+// processing.card_type.
+//
+// Distinct from common.CardType, which carries the upper-case card-metadata values returned on a
+// card source (CREDIT, DEBIT, PREPAID and so on). This enum is the lower-case request value.
+type ProcessingCardType string
+
+const (
+	ProcessingCardTypeCredit ProcessingCardType = "credit"
+	ProcessingCardTypeDebit  ProcessingCardType = "debit"
+)
+
 type PaymentType string
 
 const (
@@ -742,49 +754,102 @@ type (
 	}
 
 	ProcessingSettings struct {
-		OrderId                 string                    `json:"order_id,omitempty"`
-		TaxAmount               int64                     `json:"tax_amount"`
-		SurchargeAmount         int64                     `json:"surcharge_amount,omitempty"`
-		DiscountAmount          int64                     `json:"discount_amount"`
-		DutyAmount              int64                     `json:"duty_amount"`
-		ShippingAmount          int64                     `json:"shipping_amount"`
-		ShippingTaxAmount       int64                     `json:"shipping_tax_amount"`
-		Aft                     bool                      `json:"aft,omitempty"`
-		PreferredScheme         PreferredSchema           `json:"preferred_scheme,omitempty"`
-		MerchantInitiatedReason MerchantInitiatedReason   `json:"merchant_initiated_reason,omitempty"`
-		CampaignId              int64                     `json:"campaign_id,omitempty"`
-		ProductType             ProductType               `json:"product_type,omitempty"`
-		OpenId                  string                    `json:"open_id,omitempty"`
-		OriginalOrderAmount     int64                     `json:"original_order_amount"`
-		ReceiptId               string                    `json:"receipt_id,omitempty"`
-		TerminalType            TerminalType              `json:"terminal_type,omitempty" default:"WEB"`
-		OsType                  OsType                    `json:"os_type,omitempty"`
-		InvoiceId               string                    `json:"invoice_id,omitempty"`
-		BrandName               string                    `json:"brand_name,omitempty"`
-		Locale                  string                    `json:"locale,omitempty"`
-		ShippingPreference      ShippingPreference        `json:"shipping_preference,omitempty"`
-		UserAction              UserAction                `json:"user_action,omitempty"`
-		SetTransactionContext   []map[string]string       `json:"set_transaction_context,omitempty"`
-		AirlineData             []AirlineData             `json:"airline_data,omitempty"`
-		AccommodationData       []AccommodationData       `json:"accommodation_data,omitempty"`
-		OtpValue                string                    `json:"otp_value,omitempty"`
-		PurchaseCountry         common.Country            `json:"purchase_country,omitempty"`
-		CustomPaymentMethodIds  []string                  `json:"custom_payment_method_ids,omitempty"`
-		MerchantCallbackUrl     string                    `json:"merchant_callback_url,omitempty"`
-		ShippingDelay           int64                     `json:"shipping_delay,omitempty"`
-		ShippingInfo            string                    `json:"shipping_info,omitempty"`
-		LineOfBusiness          string                    `json:"line_of_business,omitempty"`
-		PanPreference           PanProcessedType          `json:"pan_preference,omitempty"`
-		ServiceType             ServiceType               `json:"service_type,omitempty"`
-		ProvisionNetworkToken   bool                      `json:"provision_network_token,omitempty" default:"ture"`
-		SenderInformation       *SenderInformation        `json:"senderInformation,omitempty"`
-		Purpose                 string                    `json:"purpose,omitempty"`
+		OrderId                 string                  `json:"order_id,omitempty"`
+		TaxAmount               int64                   `json:"tax_amount"`
+		SurchargeAmount         int64                   `json:"surcharge_amount,omitempty"`
+		DiscountAmount          int64                   `json:"discount_amount"`
+		DutyAmount              int64                   `json:"duty_amount"`
+		ShippingAmount          int64                   `json:"shipping_amount"`
+		ShippingTaxAmount       int64                   `json:"shipping_tax_amount"`
+		Aft                     bool                    `json:"aft,omitempty"`
+		PreferredScheme         PreferredSchema         `json:"preferred_scheme,omitempty"`
+		MerchantInitiatedReason MerchantInitiatedReason `json:"merchant_initiated_reason,omitempty"`
+		CampaignId              int64                   `json:"campaign_id,omitempty"`
+		ProductType             ProductType             `json:"product_type,omitempty"`
+		OpenId                  string                  `json:"open_id,omitempty"`
+		OriginalOrderAmount     int64                   `json:"original_order_amount"`
+		ReceiptId               string                  `json:"receipt_id,omitempty"`
+		TerminalType            TerminalType            `json:"terminal_type,omitempty" default:"WEB"`
+		OsType                  OsType                  `json:"os_type,omitempty"`
+		InvoiceId               string                  `json:"invoice_id,omitempty"`
+		BrandName               string                  `json:"brand_name,omitempty"`
+		Locale                  string                  `json:"locale,omitempty"`
+		// ShippingPreference is declared on PaymentContextProcessing only, so it is read by
+		// POST /payment-contexts and not by POST /payments, hosted payments or payment links.
+		// One of: no_shipping, set_provided_address, get_from_file
+		ShippingPreference ShippingPreference `json:"shipping_preference,omitempty"`
+
+		// UserAction is declared on PaymentContextProcessing only. Required by PayPal to have
+		// an appropriate payment flow.
+		// One of: pay_now, continue
+		UserAction UserAction `json:"user_action,omitempty"`
+		// SetTransactionContext is not in the current specification, neither NAS nor
+		// Previous (ABC). The gateway discards it. Retained for backwards compatibility.
+		SetTransactionContext []map[string]string `json:"set_transaction_context,omitempty"`
+
+		AirlineData       []AirlineData       `json:"airline_data,omitempty"`
+		AccommodationData []AccommodationData `json:"accommodation_data,omitempty"`
+		// OtpValue is the one time password sent to the customer by SMS. Declared on the
+		// payment contexts payment request and on the capture request, not on
+		// PaymentRequestProcessing.
+		// max 50 characters
+		OtpValue               string         `json:"otp_value,omitempty"`
+		PurchaseCountry        common.Country `json:"purchase_country,omitempty"`
+		CustomPaymentMethodIds []string       `json:"custom_payment_method_ids,omitempty"`
+		MerchantCallbackUrl    string         `json:"merchant_callback_url,omitempty"`
+		// ShippingDelay is not in the current specification, neither NAS nor Previous (ABC).
+		// The gateway discards it. Retained for backwards compatibility.
+		ShippingDelay int64 `json:"shipping_delay,omitempty"`
+
+		// ShippingInfo is not in the current specification, neither NAS nor Previous (ABC).
+		// The gateway discards it. Retained for backwards compatibility.
+		ShippingInfo          string           `json:"shipping_info,omitempty"`
+		LineOfBusiness        string           `json:"line_of_business,omitempty"`
+		PanPreference         PanProcessedType `json:"pan_preference,omitempty"`
+		ServiceType           ServiceType      `json:"service_type,omitempty"`
+		ProvisionNetworkToken bool             `json:"provision_network_token,omitempty" default:"true"`
+		// SenderInformation is Previous API (ABC) only; it is absent from the NAS spec. The
+		// camelCase JSON key is deliberate and correct: the ABC specification spells this
+		// property "senderInformation", not "sender_information". Do not "fix" it to snake_case.
+		SenderInformation *SenderInformation `json:"senderInformation,omitempty"`
+
+		// Purpose is not declared on any processing schema in either specification. The name
+		// appears elsewhere in the spec (files, EPS sources, payment setups) on unrelated
+		// objects. The gateway discards it here. Retained for backwards compatibility.
+		Purpose string `json:"purpose,omitempty"`
+
+		// Dlocal is Previous API (ABC) only; it is absent from the NAS processing schemas.
 		Dlocal                  *DLocalProcessingSettings `json:"dlocal,omitempty"`
 		PartnerCustomerRiskData *PartnerCustomerRiskData  `json:"partner_customer_risk_data,omitempty"`
 		AffiliateId             string                    `json:"affiliate_id,omitempty"`
 		AffiliateUrl            string                    `json:"affiliate_url,omitempty"`
 		PartnerCode             string                    `json:"partner_code,omitempty"`
 		SchemeTransactionLinkId string                    `json:"scheme_transaction_link_id,omitempty"`
+
+		// Aggregator is the aggregator information for this payment.
+		// [Optional]
+		Aggregator *Aggregator `json:"aggregator,omitempty"`
+
+		// CardType specifies whether to process the payment as a credit or debit transaction,
+		// if a combo card is used. Required for domestic payments in Brazil.
+		// [Optional]
+		// One of: credit, debit
+		//
+		// Deliberately not common.CardType: that enum carries the card-metadata values
+		// (CREDIT, DEBIT, PREPAID, ...) in upper case, while this property is the lower-case
+		// processing enum. Reusing it would put "CREDIT" on the wire where the API expects
+		// "credit".
+		CardType ProcessingCardType `json:"card_type,omitempty"`
+
+		// ForeignRetailerAmount is the foreign retailer amount the merchant applied to the
+		// transaction, in the minor currency unit.
+		// [Optional]
+		// minimum 0
+		ForeignRetailerAmount int64 `json:"foreign_retailer_amount,omitempty"`
+
+		// ReconciliationId is the transaction identifier used to track a payment request.
+		// [Optional]
+		ReconciliationId string `json:"reconciliation_id,omitempty"`
 	}
 
 	ThreeDsEnrollment struct {
@@ -1177,40 +1242,56 @@ type (
 	}
 
 	ProcessingData struct {
-		PreferredScheme                  PreferredSchema                  `json:"preferred_scheme,omitempty"`
-		AppId                            string                           `json:"app_id,omitempty"`
-		PartnerCustomerId                string                           `json:"partner_customer_id,omitempty"`
-		PartnerPaymentId                 string                           `json:"partner_payment_id,omitempty"`
-		TaxAmount                        int64                            `json:"tax_amount,omitempty"`
-		PurchaseCountry                  common.Country                   `json:"purchase_country,omitempty"`
-		Locale                           string                           `json:"locale,omitempty"`
-		RetrievalReferenceNumber         string                           `json:"retrieval_reference_number,omitempty"`
-		RecommendationCode               string                           `json:"recommendation_code,omitempty"`
-		PartnerOrderId                   string                           `json:"partner_order_id,omitempty"`
-		PartnerStatus                    string                           `json:"partner_status,omitempty"`
-		PartnerTransactionId             string                           `json:"partner_transaction_id,omitempty"`
-		PartnerErrorCodes                []string                         `json:"partner_error_codes,omitempty"`
-		PartnerErrorMessage              string                           `json:"partner_error_message,omitempty"`
-		PartnerAuthorizationCode         string                           `json:"partner_authorization_code,omitempty"`
-		PartnerAuthorizationResponseCode string                           `json:"partner_authorization_response_code,omitempty"`
-		FraudStatus                      string                           `json:"fraud_status,omitempty"`
-		ProviderAuthorizedPaymentMethod  *ProviderAuthorizedPaymentMethod `json:"provider_authorized_payment_method,omitempty"`
-		CustomPaymentMethodIds           []string                         `json:"custom_payment_method_ids,omitempty"`
-		Aft                              bool                             `json:"aft,omitempty"`
-		MerchantCategoryCode             string                           `json:"merchant_category_code,omitempty"`
-		SchemeMerchantId                 string                           `json:"scheme_merchant_id,omitempty"`
-		PanTypeProcessed                 PanProcessedType                 `json:"pan_type_processed,omitempty"`
-		CkoNetworkTokenAvailable         bool                             `json:"cko_network_token_available,omitempty"`
-		FallbackSourceUsed               bool                             `json:"fallback_source_used,omitempty"`
-		FailureCode                      string                           `json:"failure_code,omitempty"`
-		PartnerCode                      string                           `json:"partner_code,omitempty"`
-		PartnerResponseCode              string                           `json:"partner_response_code,omitempty"`
-		Scheme                           string                           `json:"scheme,omitempty"`
-		PartnerFraudStatus               string                           `json:"partner_fraud_status,omitempty"`
-		PartnerMerchantAdviceCode        string                           `json:"partner_merchant_advice_code,omitempty"`
-		AccommodationData                []AccommodationData              `json:"accommodation_data,omitempty"`
-		AirlineData                      []AirlineData                    `json:"airline_data,omitempty"`
-		SchemeTransactionLinkId          string                           `json:"scheme_transaction_link_id,omitempty"`
+		PreferredScheme   PreferredSchema `json:"preferred_scheme,omitempty"`
+		AppId             string          `json:"app_id,omitempty"`
+		PartnerCustomerId string          `json:"partner_customer_id,omitempty"`
+		PartnerPaymentId  string          `json:"partner_payment_id,omitempty"`
+		TaxAmount         int64           `json:"tax_amount,omitempty"`
+		// PurchaseCountry is declared on the request processing schemas
+		// (PaymentRequestProcessing, PaymentInterfacesProcessing) and on PaymentResponse
+		// .processing, not on ProcessingData. Kept because the API echoes it; see
+		// PaymentProcessing for the response shape that declares it.
+		PurchaseCountry          common.Country `json:"purchase_country,omitempty"`
+		Locale                   string         `json:"locale,omitempty"`
+		RetrievalReferenceNumber string         `json:"retrieval_reference_number,omitempty"`
+		// RecommendationCode is declared on PaymentResponse.processing and
+		// AuthorizationResponse.processing, not on ProcessingData. The field is real; only its
+		// placement here is beyond the schema. See PaymentProcessing.RecommendationCode.
+		RecommendationCode               string   `json:"recommendation_code,omitempty"`
+		PartnerOrderId                   string   `json:"partner_order_id,omitempty"`
+		PartnerStatus                    string   `json:"partner_status,omitempty"`
+		PartnerTransactionId             string   `json:"partner_transaction_id,omitempty"`
+		PartnerErrorCodes                []string `json:"partner_error_codes,omitempty"`
+		PartnerErrorMessage              string   `json:"partner_error_message,omitempty"`
+		PartnerAuthorizationCode         string   `json:"partner_authorization_code,omitempty"`
+		PartnerAuthorizationResponseCode string   `json:"partner_authorization_response_code,omitempty"`
+		// FraudStatus is not in the current specification: zero occurrences in either NAS or
+		// Previous (ABC). Retained for backwards compatibility. Prefer PartnerFraudStatus,
+		// which the spec does declare.
+		FraudStatus string `json:"fraud_status,omitempty"`
+		// ProviderAuthorizedPaymentMethod is not in the current specification: zero
+		// occurrences in either NAS or Previous (ABC). Retained for backwards compatibility.
+		ProviderAuthorizedPaymentMethod *ProviderAuthorizedPaymentMethod `json:"provider_authorized_payment_method,omitempty"`
+		CustomPaymentMethodIds          []string                         `json:"custom_payment_method_ids,omitempty"`
+		Aft                             bool                             `json:"aft,omitempty"`
+		MerchantCategoryCode            string                           `json:"merchant_category_code,omitempty"`
+		SchemeMerchantId                string                           `json:"scheme_merchant_id,omitempty"`
+		PanTypeProcessed                PanProcessedType                 `json:"pan_type_processed,omitempty"`
+		// CkoNetworkTokenAvailable is declared at the top level of PaymentDetails, not under
+		// processing, so this copy never populates from a GET /payments/{id} response. Read it
+		// from nas.GetPaymentResponse.CkoNetworkTokenAvailable instead. Retained for
+		// backwards compatibility.
+		CkoNetworkTokenAvailable  bool                `json:"cko_network_token_available,omitempty"`
+		FallbackSourceUsed        bool                `json:"fallback_source_used,omitempty"`
+		FailureCode               string              `json:"failure_code,omitempty"`
+		PartnerCode               string              `json:"partner_code,omitempty"`
+		PartnerResponseCode       string              `json:"partner_response_code,omitempty"`
+		Scheme                    string              `json:"scheme,omitempty"`
+		PartnerFraudStatus        string              `json:"partner_fraud_status,omitempty"`
+		PartnerMerchantAdviceCode string              `json:"partner_merchant_advice_code,omitempty"`
+		AccommodationData         []AccommodationData `json:"accommodation_data,omitempty"`
+		AirlineData               []AirlineData       `json:"airline_data,omitempty"`
+		SchemeTransactionLinkId   string              `json:"scheme_transaction_link_id,omitempty"`
 	}
 
 	ProviderAuthorizedPaymentMethod struct {

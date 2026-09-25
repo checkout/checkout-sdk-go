@@ -2,6 +2,7 @@ package payments
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -201,6 +202,21 @@ func TestAirlineData_RoundTrip(t *testing.T) {
 	assert.Equal(t, "101", result.FlightLegDetails[0].FlightNumber)
 	assert.Equal(t, "J", result.FlightLegDetails[0].ClassOfTravelling)
 	assert.Equal(t, "x", result.FlightLegDetails[0].StopOverCode)
+}
+
+// Field order follows the specification: ticket, passenger, flight_leg_details. An embedded
+// alias in MarshalJSON would flatten after the sibling fields and emit passenger last.
+func TestAirlineData_MarshalFieldOrder(t *testing.T) {
+	raw, err := json.Marshal(AirlineData{
+		Ticket:           &Ticket{Number: "045"},
+		Passenger:        []Passenger{{FirstName: "John"}},
+		FlightLegDetails: []FlightLegDetails{{FlightNumber: "101"}},
+	})
+	assert.Nil(t, err)
+
+	body := string(raw)
+	assert.True(t, strings.Index(body, `"ticket"`) < strings.Index(body, `"passenger"`), body)
+	assert.True(t, strings.Index(body, `"passenger"`) < strings.Index(body, `"flight_leg_details"`), body)
 }
 
 // TestAirlineData_MarshalsSpecKeyNames asserts on the serialized bytes, so a future rename cannot

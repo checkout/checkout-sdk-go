@@ -77,6 +77,12 @@ type (
 		ClientToken string `json:"client_token,omitempty"`
 	}
 
+	// PaymentContextsPartnerCustomerRiskData is a key-and-value pair with merchant-specific
+	// data for the transaction.
+	//
+	// Deprecated: duplicates payments.PartnerCustomerRiskData, which maps the same
+	// specification shape and is what PaymentContextsProcessing now uses. Retained for
+	// backwards compatibility and will be removed in a future version.
 	PaymentContextsPartnerCustomerRiskData struct {
 		Key   string `json:"key,omitempty"`
 		Value string `json:"value,omitempty"`
@@ -251,10 +257,14 @@ type (
 		// One of: pay_now, continue
 		UserAction payments.UserAction `json:"user_action,omitempty"`
 
-		// PartnerCustomerRiskData holds key-and-value pairs with merchant-specific data for the
-		// transaction.
+		// PartnerCustomerRiskData holds key-and-value pairs with merchant-specific data for
+		// the transaction.
 		// [Optional]
-		PartnerCustomerRiskData []PaymentContextsPartnerCustomerRiskData `json:"partner_customer_risk_data,omitempty"`
+		//
+		// Uses the shared payments.PartnerCustomerRiskData: payment contexts and the
+		// payments request schemas resolve partner_customer_risk_data to the same
+		// specification shape, and maintaining two identical structs for it invited drift.
+		PartnerCustomerRiskData []payments.PartnerCustomerRiskData `json:"partner_customer_risk_data,omitempty"`
 
 		// CustomPaymentMethodIds are promo codes. They define which of the configured payment
 		// options within a payment category (pay_later, pay_over_time, and so on) are shown for

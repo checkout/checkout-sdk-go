@@ -2,6 +2,7 @@ package contexts
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -104,6 +105,37 @@ func TestPaymentContextsAirlineData_MarshalPassengerCardinality(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.Contains(t, string(raw), `"passenger":[{`)
+}
+
+// An empty slice and a nil slice must both drop the key: the API rejects "passenger":[] and
+// "passenger":null with processing_airline_data_0_passenger_invalid, and only absence is accepted.
+func TestPaymentContextsAirlineData_MarshalOmitsPassengerWhenEmpty(t *testing.T) {
+	raw, err := json.Marshal(PaymentContextsAirlineData{
+		Ticket:    &PaymentContextsTicket{Number: "045"},
+		Passenger: []PaymentContextsPassenger{},
+	})
+	assert.Nil(t, err)
+	assert.NotContains(t, string(raw), "passenger")
+
+	raw, err = json.Marshal(PaymentContextsAirlineData{
+		Ticket: &PaymentContextsTicket{Number: "045"},
+	})
+	assert.Nil(t, err)
+	assert.NotContains(t, string(raw), "passenger")
+}
+
+// Field order follows the specification: ticket, passenger, flight_leg_details.
+func TestPaymentContextsAirlineData_MarshalFieldOrder(t *testing.T) {
+	raw, err := json.Marshal(PaymentContextsAirlineData{
+		Ticket:           &PaymentContextsTicket{Number: "045"},
+		Passenger:        []PaymentContextsPassenger{{FirstName: "John"}},
+		FlightLegDetails: []PaymentContextsFlightLegDetails{{FlightNumber: "101"}},
+	})
+	assert.Nil(t, err)
+
+	body := string(raw)
+	assert.True(t, strings.Index(body, `"ticket"`) < strings.Index(body, `"passenger"`), body)
+	assert.True(t, strings.Index(body, `"passenger"`) < strings.Index(body, `"flight_leg_details"`), body)
 }
 
 // TestPaymentContextsPassenger_AddressIsNarrow pins the narrowed address: the specification

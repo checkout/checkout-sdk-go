@@ -1,6 +1,9 @@
 package contexts
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+)
 
 // UnmarshalJSON deserializes PaymentContextsAirlineData, accepting
 // processing.airline_data[].passenger as either an array or a single object.
@@ -25,7 +28,8 @@ func (a *PaymentContextsAirlineData) UnmarshalJSON(data []byte) error {
 
 	a.Passenger = nil
 
-	trimmed := trimJSONSpace(aux.Passenger)
+	// Whitespace is legal before a JSON value, so trim it before testing the first byte.
+	trimmed := bytes.TrimLeft(aux.Passenger, " \t\n\r")
 	if len(trimmed) == 0 || string(trimmed) == "null" {
 		return nil
 	}
@@ -42,20 +46,6 @@ func (a *PaymentContextsAirlineData) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// trimJSONSpace strips the whitespace JSON permits before a value, so the first meaningful byte
-// can be used to tell an array from an object.
-func trimJSONSpace(data []byte) []byte {
-	for len(data) > 0 {
-		switch data[0] {
-		case ' ', '\t', '\n', '\r':
-			data = data[1:]
-		default:
-			return data
-		}
-	}
-	return data
-}
-
 // MarshalJSON serializes PaymentContextsAirlineData, emitting passenger as a single object when
 // there is exactly one passenger and as an array only when there are several.
 //
@@ -64,15 +54,17 @@ func trimJSONSpace(data []byte) []byte {
 // the opposite of what the specification declares. See payments.AirlineData.MarshalJSON for the
 // full cross-surface matrix.
 func (a PaymentContextsAirlineData) MarshalJSON() ([]byte, error) {
-	type alias PaymentContextsAirlineData
-
+	// The fields are listed explicitly, in specification order, rather than embedding an
+	// alias: an embedded struct is flattened after the fields declared beside it, which
+	// would emit passenger last. A new field on PaymentContextsAirlineData must be added here too.
 	aux := struct {
-		alias
-		Passenger interface{} `json:"passenger,omitempty"`
-	}{alias: alias(a)}
-
-	// Clear the embedded copy so passenger is written once, by the override above.
-	aux.alias.Passenger = nil
+		Ticket           *PaymentContextsTicket            `json:"ticket,omitempty"`
+		Passenger        interface{}                       `json:"passenger,omitempty"`
+		FlightLegDetails []PaymentContextsFlightLegDetails `json:"flight_leg_details,omitempty"`
+	}{
+		Ticket:           a.Ticket,
+		FlightLegDetails: a.FlightLegDetails,
+	}
 
 	switch len(a.Passenger) {
 	case 0:

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/checkout/checkout-sdk-go/v3"
 	"github.com/checkout/checkout-sdk-go/v3/accounts"
@@ -976,7 +977,7 @@ func createEntity(t *testing.T, inputReference *string) string {
 
 	entity, err := buildAccountsClient().Accounts.CreateEntity(buildSoleTraderV3Request(reference, "Bruce"), "3.0")
 	if err != nil {
-		assert.Fail(t, fmt.Sprintf("error creating entity - %s", err.Error()))
+		require.Fail(t, fmt.Sprintf("error creating entity - %s", err.Error()))
 	}
 
 	return entity.Id
@@ -1048,7 +1049,7 @@ func createEntityCompany(t *testing.T) string {
 
 	entity, err := buildAccountsClient().Accounts.CreateEntity(r, "2.0")
 	if err != nil {
-		assert.Fail(t, fmt.Sprintf("error creating entity company - %s", err.Error()))
+		require.Fail(t, fmt.Sprintf("error creating entity company - %s", err.Error()))
 	}
 
 	return entity.Id
@@ -1057,7 +1058,7 @@ func createEntityCompany(t *testing.T) string {
 func submitFile(t *testing.T, fileRequest accounts.File) string {
 	file, err := OAuthApi().Accounts.SubmitFile(fileRequest)
 	if err != nil {
-		assert.Fail(t, fmt.Sprintf("error uploading file - %s", err.Error()))
+		require.Fail(t, fmt.Sprintf("error uploading file - %s", err.Error()))
 	}
 
 	return file.Id
@@ -1086,7 +1087,7 @@ func createPaymentInstrument(t *testing.T, entityId string, fileId string) strin
 
 	instrumentResponse, err := buildAccountsClient().Accounts.CreatePaymentInstrument(entityId, paymentInstrument)
 	if err != nil {
-		assert.Fail(t, fmt.Sprintf("error creating payment instrument - %s", err.Error()))
+		require.Fail(t, fmt.Sprintf("error creating payment instrument - %s", err.Error()))
 	}
 
 	return instrumentResponse.Id
@@ -1094,20 +1095,23 @@ func createPaymentInstrument(t *testing.T, entityId string, fileId string) strin
 
 func buildFilesClient() *nas.Api {
 	if oauthFilesApi == nil {
-		oauthFilesApi, _ = checkout.Builder().OAuth().
+		var err error
+		oauthFilesApi, err = checkout.Builder().OAuth().
 			WithClientCredentials(
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
 			WithEnvironment(configuration.Sandbox()).
 			// This client is provisioned for marketplace and not for accounts: requesting accounts
-			// here made the token request fail, and because the Build error is discarded below,
-			// that surfaced as a nil dereference in TestSubmitFileAccounts rather than an auth
-			// error. Switch to configuration.Accounts once the sandbox client is reprovisioned.
+			// here made the token request fail. Switch to configuration.Accounts once the sandbox
+			// client is reprovisioned.
 			WithScopes([]string{configuration.Marketplace, configuration.Files}).
 			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
 			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("buildFilesClient: failed to build the OAuth client (token request failed): %v", err))
+		}
 	}
 
 	return oauthFilesApi
@@ -1115,7 +1119,8 @@ func buildFilesClient() *nas.Api {
 
 func buildPayoutsScheduleClient() *nas.Api {
 	if oauthPayoutsScheduleApi == nil {
-		oauthPayoutsScheduleApi, _ = checkout.Builder().OAuth().
+		var err error
+		oauthPayoutsScheduleApi, err = checkout.Builder().OAuth().
 			WithClientCredentials(
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_SECRET")).
@@ -1125,6 +1130,9 @@ func buildPayoutsScheduleClient() *nas.Api {
 			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("buildPayoutsScheduleClient: failed to build the OAuth client (token request failed): %v", err))
+		}
 	}
 
 	return oauthPayoutsScheduleApi
@@ -1132,7 +1140,8 @@ func buildPayoutsScheduleClient() *nas.Api {
 
 func buildAccountsClient() *nas.Api {
 	if oauthAccountsClient == nil {
-		oauthAccountsClient, _ = checkout.Builder().OAuth().
+		var err error
+		oauthAccountsClient, err = checkout.Builder().OAuth().
 			WithClientCredentials(
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET")).
@@ -1142,6 +1151,9 @@ func buildAccountsClient() *nas.Api {
 			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("buildAccountsClient: failed to build the OAuth client (token request failed): %v", err))
+		}
 	}
 
 	return oauthAccountsClient
@@ -1283,7 +1295,8 @@ func buildCompanyV3Request() accounts.OnboardEntityRequest {
 
 func buildAccountsClientVersion(schemaVersion string) *nas.Api {
 	httpClient := CustomHttpClient(schemaVersion)
-	oauthAccountsClientVersion, _ = checkout.Builder().
+	var err error
+	oauthAccountsClientVersion, err = checkout.Builder().
 		OAuth().
 		WithClientCredentials(
 			os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
@@ -1296,6 +1309,9 @@ func buildAccountsClientVersion(schemaVersion string) *nas.Api {
 		// come back invalid_client. Opting out explicitly until they are provisioned.
 		WithLegacyDomain().
 		Build()
+	if err != nil {
+		panic(fmt.Sprintf("buildAccountsClientVersion: failed to build the OAuth client (token request failed): %v", err))
+	}
 
 	return oauthAccountsClientVersion
 }
@@ -1338,7 +1354,7 @@ func createReserveRuleTestEntity(t *testing.T) string {
 
 	entity, err := buildAccountsClient().Accounts.CreateEntity(request, "2.0")
 	if err != nil {
-		assert.Fail(t, fmt.Sprintf("error creating reserve rule test entity - %s", err.Error()))
+		require.Fail(t, fmt.Sprintf("error creating reserve rule test entity - %s", err.Error()))
 	}
 
 	return entity.Id

@@ -44,36 +44,47 @@ func newRandom() *rand.Rand {
 
 func PreviousApi() *abc.Api {
 	if previousApi == nil {
-		previousApi, _ = checkout.Builder().Previous().
+		var err error
+		previousApi, err = checkout.Builder().Previous().
 			WithEnvironment(configuration.Sandbox()).
 			WithSecretKey(os.Getenv("CHECKOUT_PREVIOUS_SECRET_KEY")).
 			WithPublicKey(os.Getenv("CHECKOUT_PREVIOUS_PUBLIC_KEY")).
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("PreviousApi: failed to build the Previous platform client: %v", err))
+		}
 	}
 	return previousApi
 }
 
 func DefaultApi() *nas.Api {
 	if defaultApi == nil {
-		defaultApi, _ = checkout.Builder().
+		var err error
+		defaultApi, err = checkout.Builder().
 			StaticKeys().
 			WithEnvironment(configuration.Sandbox()).
 			WithSecretKey(os.Getenv("CHECKOUT_DEFAULT_SECRET_KEY")).
 			WithPublicKey(os.Getenv("CHECKOUT_DEFAULT_PUBLIC_KEY")).
 			WithEnvironmentSubdomain(os.Getenv("CHECKOUT_MERCHANT_SUBDOMAIN")).
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("DefaultApi: failed to build the static-keys client: %v", err))
+		}
 	}
 	return defaultApi
 }
 
 func OAuthApi() *nas.Api {
 	if oauthApi == nil {
-		// Intentionally ignore the build error here. Build() reaches the OAuth
-		// token endpoint synchronously; in CI the endpoint occasionally returns
-		// HTML (e.g. proxy challenge / 5xx page), and a panic would abort every
-		// other test in this package's process. Tests that actually need
-		// OAuthApi() will surface the failure clearly when they nil-deref.
-		oauthApi, _ = checkout.Builder().OAuth().
+		// Build() reaches the OAuth token endpoint synchronously; in CI the endpoint
+		// occasionally returns HTML (e.g. proxy challenge / 5xx page) instead of a
+		// token. Surface that failure here, with the real error, instead of
+		// discarding it and letting every caller hit an unexplained nil-pointer
+		// panic later — a swallowed error here previously showed up as a bare
+		// "invalid memory address" panic in TestSetupAccountsSuite with no
+		// indication of the actual OAuth failure underneath it.
+		var err error
+		oauthApi, err = checkout.Builder().OAuth().
 			WithClientCredentials(
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_ID"),
 				os.Getenv("CHECKOUT_DEFAULT_OAUTH_CLIENT_SECRET")).
@@ -83,6 +94,9 @@ func OAuthApi() *nas.Api {
 			// come back invalid_client. Opting out explicitly until they are provisioned.
 			WithLegacyDomain().
 			Build()
+		if err != nil {
+			panic(fmt.Sprintf("OAuthApi: failed to build the OAuth client (token request failed): %v", err))
+		}
 	}
 	return oauthApi
 }

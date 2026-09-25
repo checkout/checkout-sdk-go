@@ -86,10 +86,12 @@ func TestAirlineDataSerializesDatesAsShortDates(t *testing.T) {
 			Number:    "045-21351455613",
 			IssueDate: shortDate(t, 2026, time.September, 20, 8, 15),
 		},
-		Passenger: &Passenger{
+		// passenger is an array on the wire. It was a single object here, which is the shape
+		// the API never accepted.
+		Passenger: []Passenger{{
 			FirstName:   "John",
 			DateOfBirth: shortDate(t, 1990, time.May, 26, 17, 5),
-		},
+		}},
 		FlightLegDetails: []FlightLegDetails{{
 			FlightNumber:  "123456",
 			DepartureDate: shortDate(t, 2026, time.June, 19, 6, 40),
@@ -101,7 +103,11 @@ func TestAirlineDataSerializesDatesAsShortDates(t *testing.T) {
 	assert.Nil(t, json.Unmarshal(raw, &body))
 
 	assert.Equal(t, "2026-09-20", body["ticket"].(map[string]interface{})["issue_date"])
-	assert.Equal(t, "1990-05-26", body["passenger"].(map[string]interface{})["date_of_birth"])
+	// One passenger serializes as an object: see AirlineData.MarshalJSON, which follows the live
+	// API rather than the specification.
+	passenger, ok := body["passenger"].(map[string]interface{})
+	assert.True(t, ok, "a single passenger must serialize as an object")
+	assert.Equal(t, "1990-05-26", passenger["date_of_birth"])
 
 	legs, ok := body["flight_leg_details"].([]interface{})
 	assert.True(t, ok)

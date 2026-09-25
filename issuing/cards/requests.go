@@ -105,11 +105,15 @@ type (
 		// [Optional]
 		Metadata *CardMetadata `json:"metadata,omitempty"`
 
-		// RevocationDate schedules the card's automatic revocation.
-		// [Optional]
-		// Format: yyyy-MM-dd (time is midnight UTC)
-		// Example: 2027-03-12
+		// RevocationDate is deprecated. Use ScheduledRevocationDate instead.
+		//
+		// Deprecated: use ScheduledRevocationDate. If both fields are provided,
+		// ScheduledRevocationDate overrides this value.
 		RevocationDate string `json:"revocation_date,omitempty"`
+
+		// ScheduledRevocationDate is the date (format YYYY-MM-DD) on which the
+		// card is revoked at midnight UTC. Replaces the deprecated RevocationDate.
+		ScheduledRevocationDate string `json:"scheduled_revocation_date,omitempty"`
 
 		// ScheduledActivationDate schedules the card's first activation. Only applies to the
 		// initial activation of a card. Two formats are supported: date only (yyyy-MM-dd,
@@ -194,6 +198,14 @@ func (c *virtualCardRenewRequest) GetRenewType() CardType {
 	return Virtual
 }
 
+// CardStatusUpdate is the only status value accepted by CardUpdateRequest.Status,
+// used to reactivate an inactive or suspended card.
+type CardStatusUpdate string
+
+const (
+	ActiveCardStatusUpdate CardStatusUpdate = "active"
+)
+
 type (
 	// CardUpdateRequest represents the request body for PATCH /issuing/cards/{cardId}.
 	CardUpdateRequest struct {
@@ -220,6 +232,11 @@ type (
 		// Example: 2025
 		ExpiryYear int `json:"expiry_year,omitempty"`
 
+		// Status can be set to "active" to reactivate an inactive or suspended
+		// card. Mutually exclusive with the scheduled_activation_date field:
+		// submitting both results in a scheduled_activation_date_conflicts_with_activation error.
+		Status CardStatusUpdate `json:"status,omitempty"`
+
 		// ScheduledActivationDate schedules the card's first activation. Only applies to the
 		// initial activation of a card. Two formats are supported: date only (yyyy-MM-dd,
 		// treated as midnight UTC), or date with round hour (yyyy-MM-ddTHH:mmZ in UTC, or
@@ -230,11 +247,15 @@ type (
 		// Example: 2026-06-01T10:00Z
 		ScheduledActivationDate string `json:"scheduled_activation_date,omitempty"`
 
-		// RevocationDate schedules the card's automatic revocation.
-		// [Optional]
-		// Format: yyyy-MM-dd (time is midnight UTC)
-		// Example: 2027-03-12
+		// RevocationDate is deprecated. Use ScheduledRevocationDate instead.
+		//
+		// Deprecated: use ScheduledRevocationDate. If both fields are provided,
+		// ScheduledRevocationDate overrides this value.
 		RevocationDate string `json:"revocation_date,omitempty"`
+
+		// ScheduledRevocationDate is the date (format YYYY-MM-DD) on which the
+		// card is revoked at midnight UTC. Replaces the deprecated RevocationDate.
+		ScheduledRevocationDate string `json:"scheduled_revocation_date,omitempty"`
 	}
 
 	// CardUpdateHeaders are the optional HTTP headers accepted when updating a card's details.

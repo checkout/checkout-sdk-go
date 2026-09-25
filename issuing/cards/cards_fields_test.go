@@ -287,3 +287,19 @@ func TestCardUpdateResponse_DeserializeSwaggerExample(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotContains(t, string(marshalled), "encrypted_cvv")
 }
+
+// Verifies the 2026-09-23 spec update: update-card-response gained a virtual/physical
+// discriminator, and the virtual variant adds is_single_use.
+func TestCardUpdateResponse_DeserializesIsSingleUse(t *testing.T) {
+	payload := `{"type": "virtual", "last_modified_date": "2019-09-10T10:11:12Z", "is_single_use": true}`
+
+	var response CardUpdateResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assert.True(t, response.IsSingleUse)
+}
+
+func TestCardUpdateResponse_IsSingleUseOmittedWhenAbsent(t *testing.T) {
+	marshalled, err := json.Marshal(CardUpdateResponse{})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(marshalled), "is_single_use")
+}

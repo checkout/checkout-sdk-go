@@ -179,6 +179,10 @@ type (
 		// Format: date-time
 		LastModifiedDate *time.Time `json:"last_modified_date,omitempty"`
 
+		// IsSingleUse specifies whether the virtual card is set to expire after a single use.
+		// Only present when the underlying card is virtual; physical cards never send it.
+		IsSingleUse bool `json:"is_single_use,omitempty"`
+
 		// Links holds the HAL links related to the card.
 		// [Optional]
 		Links map[string]common.Link `json:"_links,omitempty"`

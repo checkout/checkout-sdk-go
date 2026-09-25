@@ -330,13 +330,33 @@ const (
 )
 
 type (
+	// AirlineData contains information about the airline ticket and flights booked by the
+	// customer.
+	//
+	// Passenger accepts both wire shapes; see AirlineData.UnmarshalJSON.
 	AirlineData struct {
-		Ticket           *Ticket            `json:"ticket,omitempty"`
-		Passenger        *Passenger         `json:"passenger,omitempty"`
+		// Ticket contains information about the airline ticket.
+		// [Optional]
+		Ticket *Ticket `json:"ticket,omitempty"`
+
+		// Passenger contains information about the passenger(s) on the flight.
+		// [Optional]
+		//
+		// The API returns this as an array. Some payment methods, PayPal among them, send a
+		// single object instead, which the specification allows on the payment sessions,
+		// hosted payments and payment links interfaces. Both shapes are accepted on
+		// deserialization and normalized to a slice; marshaling always emits an array.
+		Passenger []Passenger `json:"passenger,omitempty"`
+
+		// FlightLegDetails contains information about the flight leg(s) booked by the customer.
+		// [Optional]
 		FlightLegDetails []FlightLegDetails `json:"flight_leg_details,omitempty"`
 	}
 
+	// Ticket contains information about the airline ticket.
 	Ticket struct {
+		// Number is the ticket's unique identifier.
+		// [Optional]
 		Number string `json:"number,omitempty"`
 
 		// IssueDate is the date the airline ticket was issued.
@@ -344,28 +364,74 @@ type (
 		// Format: yyyy-MM-dd
 		IssueDate *common.APIShortDate `json:"issue_date,omitempty"`
 
-		IssuingCarrierCode     string `json:"issuing_carrier_code,omitempty"`
+		// IssuingCarrierCode is the carrier code of the ticket issuer.
+		// [Optional]
+		IssuingCarrierCode string `json:"issuing_carrier_code,omitempty"`
+
+		// TravelPackageIndicator is C = Car rental reservation, A = Airline flight reservation,
+		// B = Both car rental and airline flight reservations included, N = Unknown.
+		// [Optional]
 		TravelPackageIndicator string `json:"travel_package_indicator,omitempty"`
-		TravelAgencyName       string `json:"travel_agency_name,omitempty"`
-		TravelAgencyCode       string `json:"travel_agency_code,omitempty"`
+
+		// TravelAgencyName is the name of the travel agency.
+		// [Optional]
+		TravelAgencyName string `json:"travel_agency_name,omitempty"`
+
+		// TravelAgencyCode is the unique identifier from IATA or ARC for the travel agency that
+		// issues the ticket.
+		// [Optional]
+		TravelAgencyCode string `json:"travel_agency_code,omitempty"`
 	}
 
+	// Passenger contains information about a passenger on the flight.
 	Passenger struct {
+		// FirstName is the passenger's first name.
+		// [Optional]
 		FirstName string `json:"first_name,omitempty"`
-		LastName  string `json:"last_name,omitempty"`
+
+		// LastName is the passenger's last name.
+		// [Optional]
+		LastName string `json:"last_name,omitempty"`
 
 		// DateOfBirth is the passenger's date of birth.
 		// [Optional]
 		// Format: yyyy-MM-dd
 		DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
 
-		Address *common.Address `json:"address,omitempty"`
+		// Address contains information about the passenger's address.
+		// [Optional]
+		//
+		// The specification defines exactly one property on this object, country. This was
+		// previously the wider common.Address, whose other members the API does not read here.
+		Address *PassengerAddress `json:"address,omitempty"`
 	}
 
+	// PassengerAddress contains information about a passenger's address.
+	PassengerAddress struct {
+		// Country is the two-letter ISO country code of the passenger's country of residence.
+		// [Optional]
+		Country common.Country `json:"country,omitempty"`
+	}
+
+	// FlightLegDetails contains information about a flight leg booked by the customer.
 	FlightLegDetails struct {
-		FlightNumber     string `json:"flight_number,omitempty"`
-		CarrierCode      string `json:"carrier_code,omitempty"`
-		ClassOfTraveling string `json:"class_of_traveling,omitempty"`
+		// FlightNumber is the flight identifier.
+		// [Optional]
+		FlightNumber string `json:"flight_number,omitempty"`
+
+		// CarrierCode is the IATA 2-letter accounting code (PAX) that identifies the carrier.
+		// This field is required if the airline data includes leg details.
+		// [Optional]
+		CarrierCode string `json:"carrier_code,omitempty"`
+
+		// ClassOfTravelling is a one-letter travel class identifier. The following are common:
+		// F = First class, J = Business class, Y = Economy class, W = Premium economy.
+		// [Optional]
+		ClassOfTravelling string `json:"class_of_travelling,omitempty"`
+
+		// DepartureAirport is the IATA three-letter airport code of the departure airport.
+		// This field is required if the airline data includes leg details.
+		// [Optional]
 		DepartureAirport string `json:"departure_airport,omitempty"`
 
 		// DepartureDate is the date of the scheduled take off.
@@ -373,10 +439,24 @@ type (
 		// Format: yyyy-MM-dd
 		DepartureDate *common.APIShortDate `json:"departure_date,omitempty"`
 
-		DepartureTime  string `json:"departure_time,omitempty"`
+		// DepartureTime is the time of the scheduled take off.
+		// [Optional]
+		DepartureTime string `json:"departure_time,omitempty"`
+
+		// ArrivalAirport is the IATA 3-letter airport code of the destination airport.
+		// This field is required if the airline data includes leg details.
+		// [Optional]
 		ArrivalAirport string `json:"arrival_airport,omitempty"`
-		StopoverCode   string `json:"stopover_code,omitempty"`
-		FareBasisCode  string `json:"fare_basis_code,omitempty"`
+
+		// StopOverCode is a one-letter code that indicates whether the passenger is entitled to
+		// make a stopover. Can be a space, O if the passenger is entitled to make a stopover, or
+		// X if they are not.
+		// [Optional]
+		StopOverCode string `json:"stop_over_code,omitempty"`
+
+		// FareBasisCode is the fare basis code, alphanumeric.
+		// [Optional]
+		FareBasisCode string `json:"fare_basis_code,omitempty"`
 	}
 
 	ShippingInfo struct {
@@ -549,9 +629,15 @@ type (
 		LastName      string          `json:"last_name,omitempty"`
 	}
 
+	// Guest contains information about a guest staying at the accommodation.
 	Guest struct {
+		// FirstName is the first name of the guest.
+		// [Optional]
 		FirstName string `json:"first_name,omitempty"`
-		LastName  string `json:"last_name,omitempty"`
+
+		// LastName is the last name of the guest.
+		// [Optional]
+		LastName string `json:"last_name,omitempty"`
 
 		// DateOfBirth is the date of birth of the guest.
 		// [Optional]
@@ -559,13 +645,39 @@ type (
 		DateOfBirth *common.APIShortDate `json:"date_of_birth,omitempty"`
 	}
 
+	// Room contains information about a room booked by the customer.
 	Room struct {
-		Rate                     string `json:"rate,omitempty"`
+		// Rate is, for lodging, the nightly rate for one room. For cruise, it is the total cost
+		// of the cruise.
+		// [Optional]
+		Rate string `json:"rate,omitempty"`
+
+		// NumberOfNightsAtRoomRate is, for lodging, the number of nights charged at the rate
+		// provided in the Rate field. For cruise, it is the length of the cruise in days.
+		// [Optional]
 		NumberOfNightsAtRoomRate string `json:"number_of_nights_at_room_rate,omitempty"`
 	}
 
+	// AccommodationPhone holds phone contact information for an accommodation property.
+	AccommodationPhone struct {
+		// CountryCode is the phone country code.
+		// [Optional]
+		CountryCode string `json:"country_code,omitempty"`
+
+		// Number is the phone number.
+		// [Optional]
+		Number string `json:"number,omitempty"`
+	}
+
+	// AccommodationData contains information about the accommodation booked by the customer.
 	AccommodationData struct {
-		Name             string `json:"name,omitempty"`
+		// Name is, for lodging, the lodging name that appears on the storefront/customer
+		// receipts. For cruise, it is the ship name booked for the cruise.
+		// [Optional]
+		Name string `json:"name,omitempty"`
+
+		// BookingReference is a unique identifier for the booking.
+		// [Optional]
 		BookingReference string `json:"booking_reference,omitempty"`
 
 		// CheckInDate is, for lodging, the actual or scheduled date the guest checked-in. For
@@ -580,13 +692,49 @@ type (
 		// Format: yyyy-MM-dd
 		CheckOutDate *common.APIShortDate `json:"check_out_date,omitempty"`
 
-		Address       *common.Address `json:"address,omitempty"`
-		State         string          `json:"state,omitempty"`
-		Country       common.Country  `json:"country,omitempty"`
-		City          string          `json:"city,omitempty"`
-		NumberOfRooms int             `json:"number_of_rooms,omitempty"`
-		Guests        []Guest         `json:"guests,omitempty"`
-		Room          []Room          `json:"room,omitempty"`
+		// Address contains the address details of the accommodation.
+		// [Optional]
+		//
+		// The specification defines only address_line1 and zip on this object. The wider
+		// common.Address is reused for consistency with the rest of the SDK; the remaining
+		// members are not read by the API on this property.
+		Address *common.Address `json:"address,omitempty"`
+
+		// State is the state or province of the address country (ISO 3166-2 code of up to two
+		// alphanumeric characters).
+		// [Optional]
+		State string `json:"state,omitempty"`
+
+		// Country is the ISO country code of the address.
+		// [Optional]
+		//
+		// A free-form string rather than the common.Country enum: the specification's example is
+		// the three-letter code "USA", which no alpha-2 enum can represent.
+		Country string `json:"country,omitempty"`
+
+		// City is the address city.
+		// [Optional]
+		City string `json:"city,omitempty"`
+
+		// NumberOfRooms is the total number of rooms booked for the accommodation.
+		// [Optional]
+		NumberOfRooms int `json:"number_of_rooms,omitempty"`
+
+		// Guests contains information about the guests staying at the accommodation.
+		// [Optional]
+		Guests []Guest `json:"guests,omitempty"`
+
+		// Room contains information about the rooms booked by the customer.
+		// [Optional]
+		Room []Room `json:"room,omitempty"`
+
+		// PropertyPhone is the property's phone information.
+		// [Optional]
+		PropertyPhone []AccommodationPhone `json:"property_phone,omitempty"`
+
+		// CustomerServicePhone is the customer service phone information.
+		// [Optional]
+		CustomerServicePhone []AccommodationPhone `json:"customer_service_phone,omitempty"`
 	}
 	PartnerCustomerRiskData struct {
 		Key   string `json:"key,omitempty"`

@@ -170,17 +170,17 @@ func getHostedPaymentRequest() *hosted.PaymentHostedRequest {
 					Ticket: &payments.Ticket{
 						Number: "123456",
 					},
-					Passenger: &payments.Passenger{
+					Passenger: []payments.Passenger{{
 						FirstName: "John",
 						LastName:  "Doe",
 						DateOfBirth: func() *common.APIShortDate {
 							d := common.APIShortDate(time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC))
 							return &d
 						}(),
-						Address: &common.Address{
+						Address: &payments.PassengerAddress{
 							Country: common.FR,
 						},
-					},
+					}},
 					FlightLegDetails: []payments.FlightLegDetails{
 						{
 							FlightNumber:     "123456",

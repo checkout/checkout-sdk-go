@@ -808,9 +808,15 @@ type (
 		PanPreference         PanProcessedType `json:"pan_preference,omitempty"`
 		ServiceType           ServiceType      `json:"service_type,omitempty"`
 		ProvisionNetworkToken bool             `json:"provision_network_token,omitempty" default:"true"`
-		// SenderInformation is Previous API (ABC) only; it is absent from the NAS spec. The
-		// camelCase JSON key is deliberate and correct: the ABC specification spells this
-		// property "senderInformation", not "sender_information". Do not "fix" it to snake_case.
+		// SenderInformation is Previous API (ABC) only and is absent from every specification
+		// available to this workspace, under both "senderInformation" and "sender_information",
+		// including the live API reference. No processing schema declares a sender property of
+		// any kind; the current API carries sender details in the top level "sender" object on
+		// the payment request. Deprecated in practice.
+		//
+		// The camelCase JSON tag is long standing and is left exactly as it is. It has never been
+		// confirmed against a live ABC endpoint, so treat it as unverified rather than correct,
+		// and do not change it in either direction without such a confirmation.
 		SenderInformation *SenderInformation `json:"senderInformation,omitempty"`
 
 		// Purpose is not declared on any processing schema in either specification. The name

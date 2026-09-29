@@ -755,19 +755,19 @@ type (
 
 	ProcessingSettings struct {
 		OrderId                 string                  `json:"order_id,omitempty"`
-		TaxAmount               float64                   `json:"tax_amount"`
+		TaxAmount               float64                 `json:"tax_amount"`
 		SurchargeAmount         int64                   `json:"surcharge_amount,omitempty"`
-		DiscountAmount          float64                   `json:"discount_amount"`
-		DutyAmount              float64                   `json:"duty_amount"`
-		ShippingAmount          float64                   `json:"shipping_amount"`
-		ShippingTaxAmount       float64                   `json:"shipping_tax_amount"`
+		DiscountAmount          float64                 `json:"discount_amount"`
+		DutyAmount              float64                 `json:"duty_amount"`
+		ShippingAmount          float64                 `json:"shipping_amount"`
+		ShippingTaxAmount       float64                 `json:"shipping_tax_amount"`
 		Aft                     bool                    `json:"aft,omitempty"`
 		PreferredScheme         PreferredSchema         `json:"preferred_scheme,omitempty"`
 		MerchantInitiatedReason MerchantInitiatedReason `json:"merchant_initiated_reason,omitempty"`
 		CampaignId              int64                   `json:"campaign_id,omitempty"`
 		ProductType             ProductType             `json:"product_type,omitempty"`
 		OpenId                  string                  `json:"open_id,omitempty"`
-		OriginalOrderAmount     float64                   `json:"original_order_amount"`
+		OriginalOrderAmount     float64                 `json:"original_order_amount"`
 		ReceiptId               string                  `json:"receipt_id,omitempty"`
 		TerminalType            TerminalType            `json:"terminal_type,omitempty" default:"WEB"`
 		OsType                  OsType                  `json:"os_type,omitempty"`
@@ -1252,7 +1252,7 @@ type (
 		AppId             string          `json:"app_id,omitempty"`
 		PartnerCustomerId string          `json:"partner_customer_id,omitempty"`
 		PartnerPaymentId  string          `json:"partner_payment_id,omitempty"`
-		TaxAmount         float64           `json:"tax_amount,omitempty"`
+		TaxAmount         float64         `json:"tax_amount,omitempty"`
 		// PurchaseCountry is declared on the request processing schemas
 		// (PaymentRequestProcessing, PaymentInterfacesProcessing) and on PaymentResponse
 		// .processing, not on ProcessingData. Kept because the API echoes it; see
@@ -1340,12 +1340,12 @@ type (
 	CaptureProcessingSettings struct {
 		OrderId               string         `json:"order_id,omitempty"`
 		OtpValue              string         `json:"otp_value,omitempty"`
-		TaxAmount             float64          `json:"tax_amount,omitempty"`
+		TaxAmount             float64        `json:"tax_amount,omitempty"`
 		SurchargeAmount       int64          `json:"surcharge_amount,omitempty"`
-		DiscountAmount        float64          `json:"discount_amount,omitempty"`
-		DutyAmount            float64          `json:"duty_amount,omitempty"`
-		ShippingAmount        float64          `json:"shipping_amount,omitempty"`
-		ShippingTaxAmount     float64          `json:"shipping_tax_amount,omitempty"`
+		DiscountAmount        float64        `json:"discount_amount,omitempty"`
+		DutyAmount            float64        `json:"duty_amount,omitempty"`
+		ShippingAmount        float64        `json:"shipping_amount,omitempty"`
+		ShippingTaxAmount     float64        `json:"shipping_tax_amount,omitempty"`
 		PurchaseCountry       common.Country `json:"purchase_country,omitempty"`
 		ForeignRetailerAmount int64          `json:"foreign_retailer_amount,omitempty"`
 	}

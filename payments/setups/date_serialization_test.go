@@ -20,6 +20,13 @@ import (
 // They were *time.Time, which encoding/json always renders as RFC 3339. These tests pin the
 // yyyy-MM-dd wire format and fail if any field is reverted.
 
+// intPtr is needed because PaymentSetupAccommodation.NumberOfRooms is a *int: a plain int with
+// omitempty drops an explicit zero, and the swagger declares the field integer with no
+// minimum so 0 is representable.
+func intPtr(v int) *int {
+	return &v
+}
+
 func shortDate(t *testing.T, y int, m time.Month, d, hour, min int) *common.APIShortDate {
 	t.Helper()
 	date := common.APIShortDate(time.Date(y, m, d, hour, min, 0, 0, time.UTC))

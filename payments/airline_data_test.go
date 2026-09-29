@@ -285,7 +285,7 @@ func TestAccommodationData_UnmarshalFullSubTree(t *testing.T) {
 	assert.Equal(t, "2023-06-23", shortDateValue(t, stay.CheckOutDate))
 	assert.Equal(t, "123 Beach Road", stay.Address.AddressLine1)
 	assert.Equal(t, "Los Angeles", stay.City)
-	assert.Equal(t, 2, stay.NumberOfRooms)
+	assert.Equal(t, 2, *stay.NumberOfRooms)
 
 	// state and country are free-form strings. Typed as the common.Country enum, country could
 	// not carry "USA", a three-letter code.

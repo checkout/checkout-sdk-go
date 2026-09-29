@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
 // Verifies the fields recently aligned with the Checkout.com swagger spec
@@ -160,4 +162,91 @@ func TestProcessingSettings_SchemeTransactionLinkId(t *testing.T) {
 	marshalled, err = json.Marshal(ProcessingSettings{})
 	assert.NoError(t, err)
 	assert.NotContains(t, string(marshalled), "scheme_transaction_link_id")
+}
+
+// The reported defect, on the exact path the merchant hit.
+//
+// GET /payments/{id} deserializes into nas.GetPaymentResponse, whose ProcessingData is this
+// struct. processing.airline_data[].passenger is an array; AirlineData.Passenger was a single
+// *Passenger, so the whole call failed with:
+//
+//	json: cannot unmarshal array into Go struct field
+//	AirlineData.processing.airline_data.passenger of type payments.Passenger
+//
+// Reported internally, pre-3.3.0. TestProcessingData_UnmarshalAllNewFields above already
+// deserialized airline_data, but only ever supplied {"ticket":{"number":...}}, so it never
+// touched passenger and stayed green for the whole life of the defect.
+func TestProcessingData_AirlinePassengerArray(t *testing.T) {
+	payload := `{
+		"retrieval_reference_number":"909913440644",
+		"airline_data":[{
+			"ticket":{
+				"number":"045-21351455613",
+				"issue_date":"2023-05-20",
+				"travel_package_indicator":"B"
+			},
+			"passenger":[
+				{"first_name":"John","last_name":"White","date_of_birth":"1990-05-26","address":{"country":"US"}},
+				{"first_name":"Jane","last_name":"White","date_of_birth":"1992-01-03","address":{"country":"GB"}}
+			],
+			"flight_leg_details":[{
+				"flight_number":"101",
+				"class_of_travelling":"J",
+				"departure_date":"2023-06-19",
+				"stop_over_code":"x"
+			}]
+		}],
+		"accommodation_data":[{
+			"name":"The Sea View Hotel",
+			"state":"FL",
+			"country":"USA",
+			"room":[{"rate":"70","number_of_nights_at_room_rate":"3"}],
+			"property_phone":[{"country_code":"44","number":"7123456789"}],
+			"customer_service_phone":[{"country_code":"44","number":"7987654321"}]
+		}]
+	}`
+
+	var data ProcessingData
+	err := json.Unmarshal([]byte(payload), &data)
+
+	assert.Nil(t, err)
+	assert.Equal(t, "909913440644", data.RetrievalReferenceNumber)
+
+	assert.Len(t, data.AirlineData, 1)
+	airline := data.AirlineData[0]
+
+	assert.Equal(t, "045-21351455613", airline.Ticket.Number)
+	assert.Equal(t, "B", airline.Ticket.TravelPackageIndicator)
+
+	// Two passengers, so a single-object model could not have held this even by accident.
+	assert.Len(t, airline.Passenger, 2)
+	assert.Equal(t, "John", airline.Passenger[0].FirstName)
+	assert.Equal(t, common.US, airline.Passenger[0].Address.Country)
+	assert.Equal(t, "Jane", airline.Passenger[1].FirstName)
+	assert.Equal(t, common.GB, airline.Passenger[1].Address.Country)
+
+	// These two were dropped on the floor before the rename.
+	assert.Equal(t, "J", airline.FlightLegDetails[0].ClassOfTravelling)
+	assert.Equal(t, "x", airline.FlightLegDetails[0].StopOverCode)
+
+	assert.Len(t, data.AccommodationData, 1)
+	assert.Equal(t, "FL", data.AccommodationData[0].State)
+	assert.Equal(t, "USA", data.AccommodationData[0].Country)
+	assert.Equal(t, "3", data.AccommodationData[0].Room[0].NumberOfNightsAtRoomRate)
+	assert.Equal(t, "7123456789", data.AccommodationData[0].PropertyPhone[0].Number)
+	assert.Equal(t, "7987654321", data.AccommodationData[0].CustomerServicePhone[0].Number)
+}
+
+// The same response body with passenger as a bare object, which PayPal returns.
+func TestProcessingData_AirlinePassengerSingleObject(t *testing.T) {
+	payload := `{"airline_data":[{
+		"ticket":{"number":"045"},
+		"passenger":{"first_name":"John","date_of_birth":"1990-05-26"}
+	}]}`
+
+	var data ProcessingData
+	assert.Nil(t, json.Unmarshal([]byte(payload), &data))
+
+	assert.Len(t, data.AirlineData[0].Passenger, 1)
+	assert.Equal(t, "John", data.AirlineData[0].Passenger[0].FirstName)
 }

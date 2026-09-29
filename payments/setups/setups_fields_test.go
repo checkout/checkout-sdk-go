@@ -290,7 +290,7 @@ func TestPaymentSetupIndustry_AccommodationAllFields(t *testing.T) {
 					Country:      common.GB,
 					Zip:          "NE1 1CK",
 				},
-				NumberOfRooms: 2,
+				NumberOfRooms: intPtr(2),
 				Guests: []PaymentSetupAccommodationGuest{
 					{FirstName: "John", LastName: "Smith", DateOfBirth: shortDate(t, 1970, time.March, 19, 0, 0)},
 				},
@@ -336,4 +336,32 @@ func timePtr(t *testing.T, value string) *time.Time {
 	parsed, err := time.Parse(time.RFC3339, value)
 	assert.NoError(t, err)
 	return &parsed
+}
+
+// NumberOfRooms is a *int precisely so these two cases differ. With a plain int and omitempty an
+// explicit zero was dropped, and the swagger declares the field integer with no minimum.
+func TestPaymentSetupAccommodation_ExplicitZeroRoomsSurvives(t *testing.T) {
+	raw, err := json.Marshal(PaymentSetupAccommodation{
+		Name:          "Checkout Lodge",
+		NumberOfRooms: intPtr(0),
+	})
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+
+	value, present := body["number_of_rooms"]
+	assert.True(t, present, "an explicit zero must survive serialization")
+	assert.Equal(t, float64(0), value)
+}
+
+func TestPaymentSetupAccommodation_OmitsRoomsWhenUnset(t *testing.T) {
+	raw, err := json.Marshal(PaymentSetupAccommodation{Name: "Checkout Lodge"})
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+
+	_, present := body["number_of_rooms"]
+	assert.False(t, present)
 }

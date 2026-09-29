@@ -1040,9 +1040,40 @@ func createEntityCompany(t *testing.T) string {
 			RegisteredAddress:          Address(),
 			Representatives: []accounts.Representative{
 				{
-					FirstName: "John",
-					LastName:  "Doe",
-					Address:   Address(),
+					// The nested `individual` shape, not the flat first_name/last_name/address
+					// fields. Established against the sandbox on 2026-09-29: the flat shape is
+					// rejected with 422 company_representatives_0_invalid on BOTH schema 2.0 and
+					// 3.0, while this nested shape returns 201 on both. The swagger agrees:
+					// GBCompanyFull3-0.company.representatives.items is a oneOf whose "Person of
+					// Interest" variant requires `individual` and `roles`, with `individual`
+					// itself requiring first_name, last_name, date_of_birth, place_of_birth and
+					// address.
+					Individual: &accounts.Individual{
+						FirstName: "John",
+						LastName:  "Doe",
+						Address:   Address(),
+						DateOfBirth: &accounts.DateOfBirth{
+							Day:   1,
+							Month: 1,
+							Year:  1980,
+						},
+						PlaceOfBirth: &accounts.PlaceOfBirth{
+							Country: common.GB,
+						},
+					},
+					// Role coverage is validated across the representative set. A set without an
+					// authorised_signatory, a director and a control_person is rejected with
+					// company_representatives_authorised_signatory_required,
+					// company_representatives_director_required and
+					// company_representatives_control_person_required. Note the swagger's
+					// GBCompanyFull2-0 roles enum lists only ubo and authorised_signatory, so
+					// director and control_person are demanded by the API yet absent from it.
+					Roles: []accounts.EntityRoles{
+						accounts.UboERStringType,
+						accounts.AuthorisedSignatoryERStringType,
+						accounts.DirectorERStringType,
+						accounts.ControlPersonERStringType,
+					},
 				},
 			},
 		},

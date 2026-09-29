@@ -86,10 +86,12 @@ func TestAirlineDataSerializesDatesAsShortDates(t *testing.T) {
 			Number:    "045-21351455613",
 			IssueDate: shortDate(t, 2026, time.September, 20, 8, 15),
 		},
-		Passenger: &Passenger{
+		// passenger is an array on the wire. It was a single object here, which is the shape
+		// the API never accepted.
+		Passenger: []Passenger{{
 			FirstName:   "John",
 			DateOfBirth: shortDate(t, 1990, time.May, 26, 17, 5),
-		},
+		}},
 		FlightLegDetails: []FlightLegDetails{{
 			FlightNumber:  "123456",
 			DepartureDate: shortDate(t, 2026, time.June, 19, 6, 40),
@@ -101,7 +103,11 @@ func TestAirlineDataSerializesDatesAsShortDates(t *testing.T) {
 	assert.Nil(t, json.Unmarshal(raw, &body))
 
 	assert.Equal(t, "2026-09-20", body["ticket"].(map[string]interface{})["issue_date"])
-	assert.Equal(t, "1990-05-26", body["passenger"].(map[string]interface{})["date_of_birth"])
+	// One passenger serializes as an object: see AirlineData.MarshalJSON, which follows the live
+	// API rather than the specification.
+	passenger, ok := body["passenger"].(map[string]interface{})
+	assert.True(t, ok, "a single passenger must serialize as an object")
+	assert.Equal(t, "1990-05-26", passenger["date_of_birth"])
 
 	legs, ok := body["flight_leg_details"].([]interface{})
 	assert.True(t, ok)
@@ -219,4 +225,75 @@ func TestAccommodationDataRejectsDateTimeValues(t *testing.T) {
 
 	assert.NotNil(t, err)
 	assert.Contains(t, err.Error(), "APIShortDate only accepts")
+}
+
+// Marshal-side coverage for property_phone and customer_service_phone. The existing coverage for
+// these two was unmarshal-only, which proves the SDK can read them but not that it can send them.
+// They are declared on AccommodationData only, absent from
+// PaymentInterfacesProcessingAccommodationData, so POST /payments and payment contexts read them
+// while hosted payments, payment links and payment sessions ignore them.
+func TestAccommodationDataMarshalsPhoneArrays(t *testing.T) {
+	raw, err := json.Marshal(AccommodationData{
+		Name: "The Sea View Hotel",
+		PropertyPhone: []AccommodationPhone{{
+			CountryCode: "44",
+			Number:      "7123456789",
+		}},
+		CustomerServicePhone: []AccommodationPhone{{
+			CountryCode: "44",
+			Number:      "7987654321",
+		}},
+	})
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+
+	property := body["property_phone"].([]interface{})
+	assert.Len(t, property, 1)
+	assert.Equal(t, "44", property[0].(map[string]interface{})["country_code"])
+	assert.Equal(t, "7123456789", property[0].(map[string]interface{})["number"])
+
+	service := body["customer_service_phone"].([]interface{})
+	assert.Len(t, service, 1)
+	assert.Equal(t, "7987654321", service[0].(map[string]interface{})["number"])
+}
+
+func TestAccommodationDataOmitsPhoneArraysWhenUnset(t *testing.T) {
+	raw, err := json.Marshal(AccommodationData{Name: "The Sea View Hotel"})
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+
+	_, hasProperty := body["property_phone"]
+	_, hasService := body["customer_service_phone"]
+	assert.False(t, hasProperty)
+	assert.False(t, hasService)
+}
+
+// NumberOfRooms is a *int precisely so that these two cases differ. With a plain int and
+// omitempty they were indistinguishable and an explicit zero was silently dropped.
+func TestAccommodationDataMarshalsExplicitZeroRooms(t *testing.T) {
+	zero := 0
+	raw, err := json.Marshal(AccommodationData{Name: "The Sea View Hotel", NumberOfRooms: &zero})
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+
+	value, present := body["number_of_rooms"]
+	assert.True(t, present, "an explicit zero must survive serialization")
+	assert.Equal(t, float64(0), value)
+}
+
+func TestAccommodationDataOmitsRoomsWhenUnset(t *testing.T) {
+	raw, err := json.Marshal(AccommodationData{Name: "The Sea View Hotel"})
+	assert.Nil(t, err)
+
+	var body map[string]interface{}
+	assert.Nil(t, json.Unmarshal(raw, &body))
+
+	_, present := body["number_of_rooms"]
+	assert.False(t, present)
 }

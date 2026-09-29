@@ -528,8 +528,15 @@ type PaymentSetupAccommodation struct {
 	// Format: yyyy-MM-dd
 	CheckOutDate *common.APIShortDate `json:"check_out_date,omitempty"`
 
-	Address             *common.Address                  `json:"address,omitempty"`
-	NumberOfRooms       int                              `json:"number_of_rooms,omitempty"`
+	Address *common.Address `json:"address,omitempty"`
+
+	// NumberOfRooms is the number of rooms booked.
+	// [Optional]
+	//
+	// A pointer so an explicit zero is distinguishable from "not set". With a plain int and
+	// omitempty, number_of_rooms: 0 was dropped from the payload entirely, and the swagger
+	// declares the field integer with no minimum, so 0 is representable.
+	NumberOfRooms       *int                             `json:"number_of_rooms,omitempty"`
 	Guests              []PaymentSetupAccommodationGuest `json:"guests,omitempty"`
 	Room                []PaymentSetupAccommodationRoom  `json:"room,omitempty"`
 	TotalNumberOfGuests int                              `json:"total_number_of_guests,omitempty"`

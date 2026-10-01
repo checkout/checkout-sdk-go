@@ -4,14 +4,11 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
-// File is a file upload for the Accounts API.
-//   - SubmitFile (POST /files) sends File and Purpose as a multipart request; File is the path to
-//     the file to upload (JPEG, PNG or PDF).
-//   - UploadFile (POST /entities/{entityId}/files) sends only Purpose, as the JSON body the endpoint
-//     defines, and returns an upload link for the file content; File is ignored there.
+// File is a file upload for the Accounts API, sent as a multipart request by SubmitFile
+// (POST /files) and UploadFile (POST /entities/{entityId}/files).
 type File struct {
-	// The path to the file to upload. SubmitFile only.
-	// [Required] for SubmitFile
+	// The path to the file to upload (JPEG, PNG or PDF).
+	// [Required]
 	File string
 	// The purpose of the file upload: the onboarding document the file is for.
 	// [Required]

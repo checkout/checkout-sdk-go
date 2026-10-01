@@ -6,6 +6,8 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
+// BusinessType is the legal type of the company. Must be individual_or_sole_proprietorship for the
+// sole trader variants; which other values a variant accepts depends on the variant.
 type BusinessType string
 
 const (
@@ -30,6 +32,8 @@ const (
 	ClubOrSociety                  BusinessType = "club_or_society"
 )
 
+// CompanyPositionType is the position of a representative within the company (required for the
+// control_person role).
 type CompanyPositionType string
 
 const (
@@ -46,6 +50,8 @@ const (
 	OtherNonExecutiveNonSeniorCPStringType CompanyPositionType = "other_non_executive_non_senior"
 )
 
+// EntityRoles is a role a representative holds within the company. For sole traders, the only
+// accepted role is ubo.
 type EntityRoles string
 
 const (
@@ -56,6 +62,8 @@ const (
 	LegalRepresentativeERStringType EntityRoles = "legal_representative"
 )
 
+// NationalIdType is the classification of a representative's national identification number (US
+// ISV Seller variants).
 type NationalIdType string
 
 const (
@@ -177,6 +185,7 @@ const (
 	OtherPORStringType                    ProofOfRegistrationType = "other"
 )
 
+// OnboardingStatus is the onboarding status of a sub-entity. POST always returns draft.
 type OnboardingStatus string
 
 const (
@@ -216,24 +225,48 @@ type (
 )
 
 type (
+	// Profile is information about the profile of the sub-entity, primarily regarding the products and
+	// services offered.
 	Profile struct {
-		Urls                   []string          `json:"urls,omitempty"`
-		Mccs                   []string          `json:"mccs,omitempty"`
-		DefaultHoldingCurrency common.Currency   `json:"default_holding_currency,omitempty"`
-		HoldingCurrencies      []common.Currency `json:"holding_currencies,omitempty"`
+		// A collection of website URLs the sub-entity accepts payments on.
+		// [Required]
+		// max 100 items; each ^(http|https):\/\/\S{2,293}$, Format: uri
+		Urls []string `json:"urls,omitempty"`
+		// The merchant category codes (4-digit ISO 18245) that most closely describe the business.
+		// [Required]
+		// min 1 item, max 5 items; each ^[0-9]{4}$
+		Mccs []string `json:"mccs,omitempty"`
+		// The default holding currency (ISO 4217).
+		// [Required] on every v3.0 variant; [Optional] on the v2.0 variants.
+		// Format: iso-4217
+		DefaultHoldingCurrency common.Currency `json:"default_holding_currency,omitempty"`
+		// The currencies incoming funds are held in.
+		// [Required] on every v3.0 variant; [Optional] on the v2.0 variants.
+		// min 1 item on v3.0; USD only on the US variants
+		HoldingCurrencies []common.Currency `json:"holding_currencies,omitempty"`
 	}
 
+	// AdditionalInfo is not defined by any Accounts API schema.
+	//
+	// Deprecated: not part of any Accounts API schema; the API does not read it.
 	AdditionalInfo struct {
+		// Deprecated: not defined by any Accounts API schema.
 		Field1 string `json:"field1,omitempty"`
+		// Deprecated: not defined by any Accounts API schema.
 		Field2 string `json:"field2,omitempty"`
+		// Deprecated: not defined by any Accounts API schema.
 		Field3 string `json:"field3,omitempty"`
 	}
 )
 
 type (
+	// RequirementsDue is a field that needs attention before the sub-entity can be onboarded.
 	RequirementsDue struct {
-		Field   string `json:"field,omitempty"`
-		Reason  string `json:"reason,omitempty"`
+		// The field that needs to be addressed.
+		Field string `json:"field,omitempty"`
+		// The reason the field needs attention.
+		Reason string `json:"reason,omitempty"`
+		// A more descriptive message.
 		Message string `json:"message,omitempty"`
 	}
 )
@@ -245,26 +278,73 @@ type (
 )
 
 type (
+	// ProcessingDetails is the sub-entity's expected processing, sent on onboarding requests (Accounts API
+	// v3.0). For the GET response see EntityProcessingDetails, whose amounts are int64.
 	ProcessingDetails struct {
-		SettlementCountry           string                     `json:"settlement_country,omitempty"`
-		TargetCountries             []string                   `json:"target_countries,omitempty"`
-		AnnualProcessingVolume      int                        `json:"annual_processing_volume,omitempty"`
-		AverageTransactionValue     int                        `json:"average_transaction_value,omitempty"`
-		AverageOrderFulfillmentTime int                        `json:"average_order_fulfillment_time,omitempty"`
-		HighestTransactionValue     int                        `json:"highest_transaction_value,omitempty"`
-		Currency                    common.Currency            `json:"currency,omitempty"`
-		Payments                    *ProcessingDetailsPayments `json:"payments,omitempty"`
+		// The country code (iso-3166-1 alpha-2) where the settlement bank account is located.
+		// [Required] on the EEA, GB and US Company and Sole Trader Full (3.0) variants; not part of the US
+		// ISV Seller variants.
+		// Format: iso-3166-1-alpha-2
+		// 2 characters
+		SettlementCountry string `json:"settlement_country,omitempty"`
+		// Target country codes (iso-3166-1 alpha-2) with more than 10% expected volume processing with
+		// Checkout.com.
+		// [Required]
+		// min 1 item, max 10 items
+		TargetCountries []string `json:"target_countries,omitempty"`
+		// The estimated annual processing volume. In minor units without decimals.
+		// [Required]
+		// min 0
+		AnnualProcessingVolume int `json:"annual_processing_volume,omitempty"`
+		// The expected average transaction value. In minor units without decimals.
+		// [Required]
+		// min 0
+		AverageTransactionValue int `json:"average_transaction_value,omitempty"`
+		// The average time in days between accepting payment and fulfilling the order.
+		// [Required] on the US ISV Seller variants only.
+		// min 0
+		AverageOrderFulfillmentTime int `json:"average_order_fulfillment_time,omitempty"`
+		// The expected highest transaction value. In minor units without decimals.
+		// [Required] on the EEA, GB and US Company and Sole Trader Full (3.0) variants; not part of the US
+		// ISV Seller variants.
+		// min 0
+		HighestTransactionValue int `json:"highest_transaction_value,omitempty"`
+		// The currency used for the processing details provided.
+		// [Required]
+		Currency common.Currency `json:"currency,omitempty"`
+		// Payment method-specific processing details.
+		// [Required] on the US ISV Seller variants only.
+		Payments *ProcessingDetailsPayments `json:"payments,omitempty"`
 	}
 
+	// ProcessingDetailsPayments holds payment method-specific processing details (US ISV Seller
+	// variants).
 	ProcessingDetailsPayments struct {
+		// The ACH processing details.
+		// [Required]
 		Ach *ProcessingDetailsAch `json:"ach,omitempty"`
 	}
 
+	// ProcessingDetailsAch holds the expected ACH processing (US ISV Seller variants). All amounts are in
+	// minor units without decimals.
 	ProcessingDetailsAch struct {
-		AnnualAchVolume              int `json:"annual_ach_volume,omitempty"`
-		AverageAchTransactionSize    int `json:"average_ach_transaction_size,omitempty"`
+		// The estimated annual ACH processing volume.
+		// [Required]
+		// min 0
+		AnnualAchVolume int `json:"annual_ach_volume,omitempty"`
+		// The expected average ACH transaction size.
+		// [Required]
+		// min 0
+		AverageAchTransactionSize int `json:"average_ach_transaction_size,omitempty"`
+		// The estimated monthly volume of ACH credit transactions (for example, refunds issued to
+		// customers).
+		// [Required]
+		// min 0
 		EstimatedMonthlyCreditVolume int `json:"estimated_monthly_credit_volume,omitempty"`
-		AverageCreditAmount          int `json:"average_credit_amount,omitempty"`
+		// The average value of an ACH credit transaction (for example, a refund).
+		// [Required]
+		// min 0
+		AverageCreditAmount int `json:"average_credit_amount,omitempty"`
 	}
 )
 
@@ -856,33 +936,53 @@ type (
 )
 
 type (
+	// Capabilities is the capabilities of the entity, as returned by the API. The spec declares the
+	// object without detailing it.
 	Capabilities struct {
+		// Whether the entity can process payments.
 		Payments *Payments `json:"payments,omitempty"`
-		Payouts  *Payouts  `json:"payouts,omitempty"`
-		Issuing  *Issuing  `json:"issuing,omitempty"`
+		// Whether the entity can receive payouts.
+		Payouts *Payouts `json:"payouts,omitempty"`
+		// Whether the entity can issue cards.
+		Issuing *Issuing `json:"issuing,omitempty"`
 	}
 
+	// Payments is the payments capability of the entity.
 	Payments struct {
+		// Whether the capability is available.
 		Available bool `json:"available,omitempty"`
-		Enabled   bool `json:"enabled,omitempty"`
+		// Whether the capability is enabled.
+		Enabled bool `json:"enabled,omitempty"`
 	}
 
+	// Payouts is the payouts capability of the entity.
 	Payouts struct {
+		// Whether the capability is available.
 		Available bool `json:"available,omitempty"`
-		Enabled   bool `json:"enabled,omitempty"`
+		// Whether the capability is enabled.
+		Enabled bool `json:"enabled,omitempty"`
 	}
 
+	// Issuing is the card issuing capability of the entity.
 	Issuing struct {
+		// Whether the capability is available.
 		Available bool `json:"available,omitempty"`
-		Enabled   bool `json:"enabled,omitempty"`
+		// Whether the capability is enabled.
+		Enabled bool `json:"enabled,omitempty"`
 	}
 )
 
 type (
+	// Instrument is a payment instrument of the sub-entity, as returned by GET /accounts/entities/{id}.
+	// The spec declares the list without detailing its items.
 	Instrument struct {
-		Id       string              `json:"id,omitempty"`
-		Label    string              `json:"label,omitempty"`
-		Status   InstrumentStatus    `json:"status,omitempty"`
+		// The ID of the payment instrument.
+		Id string `json:"id,omitempty"`
+		// The label of the payment instrument.
+		Label string `json:"label,omitempty"`
+		// The status of the payment instrument.
+		Status InstrumentStatus `json:"status,omitempty"`
+		// The document supplied with the payment instrument.
 		Document *InstrumentDocument `json:"document,omitempty"`
 	}
 )
@@ -924,27 +1024,73 @@ type (
 )
 
 type (
+	// OnboardEntityRequest is the request body of POST /accounts/entities and PUT
+	// /accounts/entities/{id}. Which fields are required depends on the onboarding variant.
 	OnboardEntityRequest struct {
-		Reference         string                     `json:"reference,omitempty"`
-		ContactDetails    *ContactDetails            `json:"contact_details,omitempty"`
-		Profile           *Profile                   `json:"profile,omitempty"`
-		Company           *Company                   `json:"company,omitempty"`
-		Individual        *Individual                `json:"individual,omitempty"`
-		Documents         *OnboardSubEntityDocuments `json:"documents,omitempty"`
-		ProcessingDetails *ProcessingDetails         `json:"processing_details,omitempty"`
-		IsDraft           bool                       `json:"is_draft,omitempty"`
-		AdditionalInfo    *AdditionalInfo            `json:"additional_info,omitempty"`
-		SellerCategory    string                     `json:"seller_category,omitempty"`
-		AgreedTerms       *AgreedTerms               `json:"agreed_terms,omitempty"`
-		Submitter         *Submitter                 `json:"submitter,omitempty"`
+		// A unique reference you can later use to identify the sub-entity.
+		// [Required]
+		// min 1 character, max 50 characters
+		Reference string `json:"reference,omitempty"`
+		// Contact details of this sub-entity.
+		// [Required], except on EEA Company Full (3.0) where it is [Optional].
+		ContactDetails *ContactDetails `json:"contact_details,omitempty"`
+		// Information about the profile of the sub-entity.
+		// [Required]
+		Profile *Profile `json:"profile,omitempty"`
+		// Information about the company represented by the sub-entity.
+		// [Required] for every company and v3.0 sole trader variant.
+		Company *Company `json:"company,omitempty"`
+		// Information about the individual represented by the sub-entity. Accounts API v2.0 sole traders
+		// only.
+		// [Required] for the v2.0 sole trader variants.
+		//
+		// Deprecated: not used by the Accounts API v3.0 schema, where a sole trader is onboarded as Company
+		// with a representative.
+		Individual *Individual `json:"individual,omitempty"`
+		// The top-level documents used to support the verification of the sub-entity's details.
+		// [Required] on the EEA, GB and US Company and Sole Trader Full (3.0) variants, EEA Company Full
+		// (2.0) and EEA Sole Trader Full (2.0); [Optional] otherwise.
+		Documents *OnboardSubEntityDocuments `json:"documents,omitempty"`
+		// Information about the sub-entity's expected processing.
+		// [Required] for every v3.0 variant.
+		ProcessingDetails *ProcessingDetails `json:"processing_details,omitempty"`
+		// Whether the sub-entity should remain in draft on PUT, skipping due diligence checks. POST always
+		// creates the entity in draft.
+		// [Optional]
+		IsDraft bool `json:"is_draft,omitempty"`
+		// Deprecated: not defined by any Accounts API schema; the API does not read it.
+		AdditionalInfo *AdditionalInfo `json:"additional_info,omitempty"`
+		// The identifier of a seller category set up for your platform. Seller categories define the
+		// pricing, capabilities and risk profile applied to sub-entities.
+		// [Required] for the US ISV Seller variants only.
+		SellerCategory string `json:"seller_category,omitempty"`
+		// Details of the person who agreed to the terms and conditions on behalf of the sub-entity.
+		// [Required] for the US ISV Seller variants only.
+		AgreedTerms *AgreedTerms `json:"agreed_terms,omitempty"`
+		// Deprecated: not defined by any Accounts API schema; the API does not read it.
+		Submitter *Submitter `json:"submitter,omitempty"`
 	}
 
+	// AgreedTerms is the evidence of consent to Checkout.com onboarding: the person who agreed to the
+	// terms and conditions (US ISV Seller variants).
 	AgreedTerms struct {
-		Date      string `json:"date,omitempty"`
+		// Date and time the terms were agreed, in RFC 3339 or ISO 8601 format.
+		// [Required]
+		// Format: date-time
+		Date string `json:"date,omitempty"`
+		// IP address (IPv4 or IPv6) of the person at the time they agreed the terms.
+		// [Required]
 		IpAddress string `json:"ip_address,omitempty"`
-		Name      string `json:"name,omitempty"`
-		Email     string `json:"email,omitempty"`
-		Version   string `json:"version,omitempty"`
+		// First and last name of the person who agreed to the terms.
+		// [Required]
+		Name string `json:"name,omitempty"`
+		// Email address of the person who agreed to the terms.
+		// [Required]
+		// Format: email
+		Email string `json:"email,omitempty"`
+		// Identifier of the terms version that was agreed.
+		// [Required]
+		Version string `json:"version,omitempty"`
 	}
 
 	OnboardSubEntityRequest struct {
@@ -953,13 +1099,20 @@ type (
 )
 
 type (
+	// OnboardEntityResponse is the response of POST /accounts/entities and PUT /accounts/entities/{id}.
 	OnboardEntityResponse struct {
-		HttpMetadata    common.HttpMetadata `json:"http_metadata,omitempty"`
-		Id              string              `json:"id,omitempty"`
-		Reference       string              `json:"reference,omitempty"`
-		Status          OnboardingStatus    `json:"status,omitempty"`
-		Capabilities    *Capabilities       `json:"capabilities,omitempty"`
-		RequirementsDue []RequirementsDue   `json:"requirements_due,omitempty"`
+		// The HTTP metadata of the response.
+		HttpMetadata common.HttpMetadata `json:"http_metadata,omitempty"`
+		// The ID of the sub-entity.
+		Id string `json:"id,omitempty"`
+		// The reference supplied in the request.
+		Reference string `json:"reference,omitempty"`
+		// The onboarding status of the sub-entity; draft after POST.
+		Status OnboardingStatus `json:"status,omitempty"`
+		// The capabilities of the entity.
+		Capabilities *Capabilities `json:"capabilities,omitempty"`
+		// List of requirements due in order to be onboarded.
+		RequirementsDue []RequirementsDue `json:"requirements_due,omitempty"`
 	}
 
 	// OnboardEntityDetails is the details of a sub-entity, as returned by GET /accounts/entities/{id}.
@@ -1048,8 +1201,7 @@ type (
 		Size int64 `json:"size,omitempty"`
 		// The MIME type of the file.
 		MimeType string `json:"mime_type,omitempty"`
-		// The date and time the file was uploaded, in ISO 8601 UTC format; nil until the file content is
-		// uploaded to the link UploadFile returns.
+		// The date and time the file was uploaded, in ISO 8601 UTC format.
 		// Format: date-time (RFC 3339)
 		UploadedOn *time.Time `json:"uploaded_on,omitempty"`
 		// The purpose of the file, as provided in the initial request.
@@ -1095,7 +1247,11 @@ const (
 )
 
 type (
+	// Submitter is not defined by any Accounts API onboarding schema.
+	//
+	// Deprecated: not part of any Accounts API onboarding schema; the API does not read it.
 	Submitter struct {
+		// Deprecated: not defined by any Accounts API onboarding schema.
 		IpAddress string `json:"ip_address,omitempty"`
 	}
 

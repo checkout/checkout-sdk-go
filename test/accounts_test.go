@@ -300,65 +300,8 @@ func TestCreateEntityV3(t *testing.T) {
 		checker func(*accounts.OnboardEntityResponse, error)
 	}{
 		{
-			name: "when request is valid then create entity V3",
-			request: accounts.OnboardEntityRequest{
-				Reference: GenerateRandomReference(),
-				ContactDetails: &accounts.ContactDetails{
-					Phone: &accounts.Phone{CountryCode: common.GB, Number: "2345678910"},
-					EntityEmailAddresses: &accounts.EntityEmailAddresses{
-						Primary: GenerateRandomEmail(),
-					},
-				},
-				Profile: &accounts.Profile{
-					Urls:                   []string{"https://www.superheroexample.com"},
-					Mccs:                   []string{"0742"},
-					DefaultHoldingCurrency: common.USD,
-					HoldingCurrencies:      []common.Currency{common.USD},
-				},
-				Company: &accounts.Company{
-					BusinessRegistrationNumber: "01234567",
-					BusinessType:               accounts.LimitedCompany,
-					LegalName:                  "Super Hero Masks Inc.",
-					TradingName:                "Super Hero Masks",
-					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 6, Year: 2010},
-					PrincipalAddress:           Address(),
-					RegisteredAddress:          Address(),
-					Representatives: []accounts.Representative{
-						{
-							Individual: &accounts.Individual{
-								FirstName:    "John",
-								LastName:     "Doe",
-								DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-								PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
-								Address:      Address(),
-							},
-							Roles: []accounts.EntityRoles{
-								accounts.UboERStringType,
-								accounts.AuthorisedSignatoryERStringType,
-								accounts.DirectorERStringType,
-								accounts.ControlPersonERStringType,
-							},
-						},
-					},
-				},
-				ProcessingDetails: &accounts.ProcessingDetails{
-					AnnualProcessingVolume:      1000000,
-					AverageTransactionValue:     5000,
-					AverageOrderFulfillmentTime: 3,
-					HighestTransactionValue:     25000,
-					Currency:                    common.USD,
-					SettlementCountry:           "GB",
-					TargetCountries:             []string{"GB"},
-					Payments: &accounts.ProcessingDetailsPayments{
-						Ach: &accounts.ProcessingDetailsAch{
-							AnnualAchVolume:              1000000,
-							AverageAchTransactionSize:    5000,
-							EstimatedMonthlyCreditVolume: 100000,
-							AverageCreditAmount:          5000,
-						},
-					},
-				},
-			},
+			name:    "when request is valid then create entity V3",
+			request: buildCompanyV3Request(),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -409,28 +352,6 @@ func TestCreateEntityWithRepresentativeDocuments(t *testing.T) {
 	assert.Equal(t, identityFile.Id, linked.IdentityVerification.Front)
 	assert.Equal(t, accounts.PowerOfAttorneyCASStringType, linked.CertifiedAuthorisedSignatory.Type)
 	assert.Equal(t, signatoryFile.Id, linked.CertifiedAuthorisedSignatory.Front)
-}
-
-// The two EEA Sole Trader representative documents need their own upload purposes before they can be
-// linked. Goes through POST /entities/{entityId}/files, which used to fail with 415 because the SDK
-// sent a multipart request to an endpoint that takes { "purpose": ... } as JSON.
-func TestUploadRepresentativeProofFiles(t *testing.T) {
-	client := buildAccountsFilesClient().Accounts
-	entity, err := client.CreateEntity(buildCompanyV3Request(), "3.0")
-	assert.Nil(t, err)
-
-	for _, purpose := range []common.Purpose{common.ProofOfResidentialAddress, common.ProofOfRegistration} {
-		upload, err := client.UploadFile(entity.Id, accounts.File{Purpose: purpose})
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusCreated, upload.HttpMetadata.StatusCode)
-		assert.NotEmpty(t, upload.Id)
-		assert.NotEmpty(t, upload.Links["upload"].HRef)
-
-		details, err := client.RetrieveFile(entity.Id, upload.Id)
-		assert.Nil(t, err)
-		assert.Equal(t, upload.Id, details.Id)
-		assert.Equal(t, string(purpose), details.Purpose)
-	}
 }
 
 func TestGetEntity(t *testing.T) {

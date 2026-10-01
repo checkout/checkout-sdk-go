@@ -1,7 +1,6 @@
 package accounts
 
 import (
-	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -2379,8 +2378,8 @@ func TestResolveEntityRequirement(t *testing.T) {
 	}
 }
 
-// Regression: UploadFile sent a multipart request, which POST /entities/{entityId}/files rejects with
-// 415; the endpoint takes a JSON body, { "purpose": ... }. The File path is not sent.
+// UploadFile sends the file and its purpose to the files client as a multipart upload on
+// /entities/{entityId}/files; the main API client is not used.
 func TestUploadFile(t *testing.T) {
 	apiClient := new(mocks.ApiClientMock)
 	filesClient := new(mocks.ApiClientMock)
@@ -2390,12 +2389,12 @@ func TestUploadFile(t *testing.T) {
 	credentials.On("GetAuthorization", mock.Anything).Return(&configuration.SdkAuthorization{}, nil)
 
 	var sentPath string
-	var sentBody interface{}
-	filesClient.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+	var sentRequest *common.FileUploadRequest
+	filesClient.On("UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil).
 		Run(func(args mock.Arguments) {
 			sentPath = args.Get(1).(string)
-			sentBody = args.Get(3)
+			sentRequest = args.Get(3).(*common.FileUploadRequest)
 			respMapping := args.Get(4).(*UploadFileResponse)
 			*respMapping = UploadFileResponse{Id: "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", MaximumSizeInBytes: 4194304}
 		})
@@ -2403,14 +2402,16 @@ func TestUploadFile(t *testing.T) {
 	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 	client := NewClient(config, apiClient, filesClient)
 
-	response, err := client.UploadFile("ent_1234", File{File: "./ignored.jpeg", Purpose: common.ProofOfRegistration})
+	response, err := client.UploadFile("ent_1234", File{File: "../test/checkout.jpeg", Purpose: common.ProofOfRegistration})
 
 	assert.Nil(t, err)
 	assert.Equal(t, "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", response.Id)
 	assert.Equal(t, "/entities/ent_1234/files", sentPath)
-	body, _ := json.Marshal(sentBody)
-	assert.JSONEq(t, `{"purpose": "proof_of_registration"}`, string(body))
-	apiClient.AssertNotCalled(t, "PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	if assert.NotNil(t, sentRequest) {
+		assert.Contains(t, sentRequest.W.FormDataContentType(), "multipart/form-data")
+		assert.Contains(t, sentRequest.B.String(), "proof_of_registration")
+	}
+	apiClient.AssertNotCalled(t, "UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestRetrieveFile(t *testing.T) {

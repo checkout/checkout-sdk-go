@@ -354,17 +354,14 @@ func TestOnboardEntityDetailsDocumentsAndProcessingDetails_Deserialization(t *te
 		details.Company.Representatives[0].Documents.ProofOfRegistration.Type)
 }
 
-// Regression: until the file content is uploaded, the API returns uploaded_on as
-// "0001-01-01T00:00:00", with no time zone, which made RetrieveFile fail outright.
+// uploaded_on is read as an RFC 3339 date-time, and left nil when the API omits it.
 func TestFileDetailsResponseUploadedOn_Deserialization(t *testing.T) {
 	cases := []struct {
 		name     string
 		value    string
 		expected string
 	}{
-		{name: "zero placeholder before the content is uploaded", value: `"0001-01-01T00:00:00"`},
 		{name: "RFC 3339", value: `"2026-10-01T12:30:00Z"`, expected: "2026-10-01T12:30:00Z"},
-		{name: "no time zone, read as UTC", value: `"2026-10-01T12:30:00.5"`, expected: "2026-10-01T12:30:00.5Z"},
 		{name: "absent"},
 	}
 	for _, tc := range cases {

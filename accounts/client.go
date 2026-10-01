@@ -540,6 +540,7 @@ func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	return c.SubmitFileWithContext(context.Background(), file)
 }
 
+// SubmitFileWithContext is SubmitFile with a context for cancellation and deadlines.
 func (c *Client) SubmitFileWithContext(
 	ctx context.Context,
 	file File,
@@ -563,13 +564,13 @@ func (c *Client) SubmitFileWithContext(
 	return &response, nil
 }
 
-// UploadFile creates a file upload for a sub-entity (POST /entities/{entityId}/files on the Files
-// host). Only request.Purpose is sent, as the JSON body the endpoint defines; the response carries the
-// file ID and an upload link, and the file content itself is sent to that link.
+// UploadFile uploads a file for a sub-entity (POST /entities/{entityId}/files on the Files host),
+// sending request.File and request.Purpose as a multipart request.
 func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
 	return c.UploadFileWithContext(context.Background(), entityId, request)
 }
 
+// UploadFileWithContext is UploadFile with a context for cancellation and deadlines.
 func (c *Client) UploadFileWithContext(
 	ctx context.Context,
 	entityId string,
@@ -600,6 +601,7 @@ func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, er
 	return c.RetrieveFileWithContext(context.Background(), entityId, fileId)
 }
 
+// RetrieveFileWithContext is RetrieveFile with a context for cancellation and deadlines.
 func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId string) (*FileDetailsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

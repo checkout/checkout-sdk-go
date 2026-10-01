@@ -51,10 +51,11 @@ func TestCaptureCardPayment(t *testing.T) {
 				assert.Equal(t, authorizedAmount, response.Balances.TotalAuthorized)
 				assert.Equal(t, capturedAmount, response.Balances.TotalCaptured)
 				assert.Equal(t, int64(0), response.Balances.TotalRefunded)
-				// The uncaptured remainder is released, not voided: it is neither available
-				// to capture nor to void, and total_voided stays 0. Observed stable from
-				// t+2s to t+24s against the sandbox on 2026-09-10.
-				assert.Equal(t, int64(0), response.Balances.TotalVoided)
+				// The uncaptured remainder is no longer available to capture or to void. The
+				// sandbox settles it either way: released, with total_voided 0 (stable on
+				// 2026-09-10), or voided, with total_voided equal to the remainder (seen in CI
+				// and locally on 2026-10-01, about one run in three). Accept both.
+				assert.Contains(t, []int64{0, authorizedAmount - capturedAmount}, response.Balances.TotalVoided)
 				assert.Equal(t, int64(0), response.Balances.AvailableToCapture)
 				assert.Equal(t, capturedAmount, response.Balances.AvailableToRefund)
 				assert.Equal(t, int64(0), response.Balances.AvailableToVoid)

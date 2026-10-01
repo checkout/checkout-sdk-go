@@ -534,10 +534,13 @@ func (c *Client) UpdateReserveRuleWithContext(
 	return &response, nil
 }
 
+// SubmitFile uploads a file to the Files API (POST /files on the Files host), as a multipart
+// request. The returned ID is what document Front and Back fields take.
 func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	return c.SubmitFileWithContext(context.Background(), file)
 }
 
+// SubmitFileWithContext is SubmitFile with a context for cancellation and deadlines.
 func (c *Client) SubmitFileWithContext(
 	ctx context.Context,
 	file File,
@@ -561,10 +564,13 @@ func (c *Client) SubmitFileWithContext(
 	return &response, nil
 }
 
+// UploadFile uploads a file for a sub-entity (POST /entities/{entityId}/files on the Files host),
+// sending request.File and request.Purpose as a multipart request.
 func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
 	return c.UploadFileWithContext(context.Background(), entityId, request)
 }
 
+// UploadFileWithContext is UploadFile with a context for cancellation and deadlines.
 func (c *Client) UploadFileWithContext(
 	ctx context.Context,
 	entityId string,
@@ -589,10 +595,13 @@ func (c *Client) UploadFileWithContext(
 	return &response, nil
 }
 
+// RetrieveFile retrieves the details of a sub-entity's file
+// (GET /entities/{entityId}/files/{fileId} on the Files host).
 func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, error) {
 	return c.RetrieveFileWithContext(context.Background(), entityId, fileId)
 }
 
+// RetrieveFileWithContext is RetrieveFile with a context for cancellation and deadlines.
 func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId string) (*FileDetailsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

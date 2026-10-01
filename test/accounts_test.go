@@ -19,6 +19,7 @@ import (
 
 var (
 	oauthAccountsClient        *nas.Api
+	oauthAccountsFilesClient   *nas.Api
 	oauthAccountsClientVersion *nas.Api
 	oauthPayoutsScheduleApi    *nas.Api
 	oauthFilesApi              *nas.Api
@@ -127,7 +128,6 @@ func TestCreateEntity(t *testing.T) {
 					FirstName:         "Bruce",
 					LastName:          "Wayne",
 					TradingName:       "Batman's Super Hero Masks",
-					NationalTaxId:     "TAX123456",
 					RegisteredAddress: Address(),
 					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
@@ -152,7 +152,6 @@ func TestCreateEntity(t *testing.T) {
 					FirstName:         "Bruce",
 					LastName:          "Wayne",
 					TradingName:       "Batman's Super Hero Masks",
-					NationalTaxId:     "TAX123456",
 					RegisteredAddress: Address(),
 					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
@@ -301,65 +300,8 @@ func TestCreateEntityV3(t *testing.T) {
 		checker func(*accounts.OnboardEntityResponse, error)
 	}{
 		{
-			name: "when request is valid then create entity V3",
-			request: accounts.OnboardEntityRequest{
-				Reference: GenerateRandomReference(),
-				ContactDetails: &accounts.ContactDetails{
-					Phone: &accounts.Phone{CountryCode: common.GB, Number: "2345678910"},
-					EntityEmailAddresses: &accounts.EntityEmailAddresses{
-						Primary: GenerateRandomEmail(),
-					},
-				},
-				Profile: &accounts.Profile{
-					Urls:                   []string{"https://www.superheroexample.com"},
-					Mccs:                   []string{"0742"},
-					DefaultHoldingCurrency: common.USD,
-					HoldingCurrencies:      []common.Currency{common.USD},
-				},
-				Company: &accounts.Company{
-					BusinessRegistrationNumber: "01234567",
-					BusinessType:               accounts.LimitedCompany,
-					LegalName:                  "Super Hero Masks Inc.",
-					TradingName:                "Super Hero Masks",
-					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 6, Year: 2010},
-					PrincipalAddress:           Address(),
-					RegisteredAddress:          Address(),
-					Representatives: []accounts.Representative{
-						{
-							Individual: &accounts.Individual{
-								FirstName:    "John",
-								LastName:     "Doe",
-								DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-								PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
-								Address:      Address(),
-							},
-							Roles: []accounts.EntityRoles{
-								accounts.UboERStringType,
-								accounts.AuthorisedSignatoryERStringType,
-								accounts.DirectorERStringType,
-								accounts.ControlPersonERStringType,
-							},
-						},
-					},
-				},
-				ProcessingDetails: &accounts.ProcessingDetails{
-					AnnualProcessingVolume:      1000000,
-					AverageTransactionValue:     5000,
-					AverageOrderFulfillmentTime: 3,
-					HighestTransactionValue:     25000,
-					Currency:                    common.USD,
-					SettlementCountry:           "GB",
-					TargetCountries:             []string{"GB"},
-					Payments: &accounts.ProcessingDetailsPayments{
-						Ach: &accounts.ProcessingDetailsAch{
-							AnnualAchVolume:              1000000,
-							AverageAchTransactionSize:    5000,
-							EstimatedMonthlyCreditVolume: 100000,
-							AverageCreditAmount:          5000,
-						},
-					},
-				},
-			},
+			name:    "when request is valid then create entity V3",
+			request: buildCompanyV3Request(),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -376,6 +318,40 @@ func TestCreateEntityV3(t *testing.T) {
 			tc.checker(client.CreateEntity(tc.request, "3.0"))
 		})
 	}
+}
+
+// The representative's documents on schema 3.0. The sandbox platform resolves to a company variant
+// (GB/US scope, USD only), where identity_verification and certified_authorised_signatory are the
+// representative documents the API accepts; the EEA Sole Trader keys are covered by the accounts
+// serialization tests, since this platform rejects them.
+func TestCreateEntityWithRepresentativeDocuments(t *testing.T) {
+	client := buildAccountsFilesClient().Accounts
+
+	identityFile, err := client.SubmitFile(accounts.File{File: "./checkout.jpeg", Purpose: common.IdentityVerification})
+	assert.Nil(t, err)
+	signatoryFile, err := client.SubmitFile(accounts.File{File: "./checkout.jpeg", Purpose: common.CertifiedAuthorisedSignatory})
+	assert.Nil(t, err)
+
+	request := buildCompanyV3Request()
+	request.Company.Representatives[0].Documents = &accounts.OnboardSubEntityDocuments{
+		IdentityVerification: &accounts.IdentityVerification{
+			Type: accounts.PassportIVStringType, Front: identityFile.Id},
+		CertifiedAuthorisedSignatory: &accounts.CertifiedAuthorisedSignatory{
+			Type: accounts.PowerOfAttorneyCASStringType, Front: signatoryFile.Id},
+	}
+
+	entity, err := client.CreateEntity(request, "3.0")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, entity.Id)
+
+	// The documents are linked on the representative, not dropped: the API echoes them back.
+	details, err := client.GetEntity(entity.Id, "3.0")
+	assert.Nil(t, err)
+	linked := details.Company.Representatives[0].Documents
+	assert.Equal(t, accounts.PassportIVStringType, linked.IdentityVerification.Type)
+	assert.Equal(t, identityFile.Id, linked.IdentityVerification.Front)
+	assert.Equal(t, accounts.PowerOfAttorneyCASStringType, linked.CertifiedAuthorisedSignatory.Type)
+	assert.Equal(t, signatoryFile.Id, linked.CertifiedAuthorisedSignatory.Front)
 }
 
 func TestGetEntity(t *testing.T) {
@@ -434,7 +410,6 @@ func TestUpdateEntity(t *testing.T) {
 					FirstName:         "New Name",
 					LastName:          "New LastName",
 					TradingName:       "New Trading Name",
-					NationalTaxId:     "TAX8765432",
 					RegisteredAddress: Address(),
 					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
@@ -454,7 +429,6 @@ func TestUpdateEntity(t *testing.T) {
 					FirstName:         "New Name",
 					LastName:          "New LastName",
 					TradingName:       "New Trading Name",
-					NationalTaxId:     "TAX8765432",
 					RegisteredAddress: Address(),
 					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
@@ -1000,7 +974,6 @@ func createEntity(t *testing.T, inputReference *string) string {
 			FirstName:         "Bruce",
 			LastName:          "Wayne",
 			TradingName:       "Batman's Super Hero Masks",
-			NationalTaxId:     "TAX123456",
 			RegisteredAddress: Address(),
 			DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
 			Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
@@ -1178,6 +1151,84 @@ func buildAccountsClient() *nas.Api {
 	}
 
 	return oauthAccountsClient
+}
+
+// buildAccountsFilesClient is the accounts-scoped OAuth client with the files scope added, which the
+// entity file endpoints and SubmitFile need on top of accounts.
+func buildAccountsFilesClient() *nas.Api {
+	if oauthAccountsFilesClient == nil {
+		oauthAccountsFilesClient, _ = checkout.Builder().OAuth().
+			WithClientCredentials(
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_ID"),
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET")).
+			WithEnvironment(configuration.Sandbox()).
+			WithScopes([]string{configuration.Accounts, configuration.Files}).
+			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+			// come back invalid_client. Opting out explicitly until they are provisioned.
+			WithLegacyDomain().
+			Build()
+	}
+
+	return oauthAccountsFilesClient
+}
+
+// buildCompanyV3Request is a schema 3.0 company request the sandbox platform accepts: every currency
+// sits inside its USD-only currency scope, including the processing details currency.
+func buildCompanyV3Request() accounts.OnboardEntityRequest {
+	return accounts.OnboardEntityRequest{
+		Reference: GenerateRandomReference(),
+		ContactDetails: &accounts.ContactDetails{
+			Phone:                &accounts.Phone{CountryCode: common.GB, Number: "2345678910"},
+			EntityEmailAddresses: &accounts.EntityEmailAddresses{Primary: GenerateRandomEmail()},
+		},
+		Profile: &accounts.Profile{
+			Urls:                   []string{"https://www.superheroexample.com"},
+			Mccs:                   []string{"0742"},
+			DefaultHoldingCurrency: common.USD,
+			HoldingCurrencies:      []common.Currency{common.USD},
+		},
+		Company: &accounts.Company{
+			BusinessRegistrationNumber: "01234567",
+			BusinessType:               accounts.LimitedCompany,
+			LegalName:                  "Super Hero Masks Inc.",
+			TradingName:                "Super Hero Masks",
+			DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 6, Year: 2010},
+			PrincipalAddress:           Address(),
+			RegisteredAddress:          Address(),
+			Representatives: []accounts.Representative{{
+				Individual: &accounts.Individual{
+					FirstName:    "John",
+					LastName:     "Doe",
+					DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
+					PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
+					Address:      Address(),
+				},
+				Roles: []accounts.EntityRoles{
+					accounts.UboERStringType,
+					accounts.AuthorisedSignatoryERStringType,
+					accounts.DirectorERStringType,
+					accounts.ControlPersonERStringType,
+				},
+			}},
+		},
+		ProcessingDetails: &accounts.ProcessingDetails{
+			AnnualProcessingVolume:      1000000,
+			AverageTransactionValue:     5000,
+			AverageOrderFulfillmentTime: 3,
+			HighestTransactionValue:     25000,
+			Currency:                    common.USD,
+			SettlementCountry:           "GB",
+			TargetCountries:             []string{"GB"},
+			Payments: &accounts.ProcessingDetailsPayments{
+				Ach: &accounts.ProcessingDetailsAch{
+					AnnualAchVolume:              1000000,
+					AverageAchTransactionSize:    5000,
+					EstimatedMonthlyCreditVolume: 100000,
+					AverageCreditAmount:          5000,
+				},
+			},
+		},
+	}
 }
 
 func buildAccountsClientVersion(schemaVersion string) *nas.Api {

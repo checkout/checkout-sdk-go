@@ -46,7 +46,6 @@ func TestCreateEntity(t *testing.T) {
 					FirstName:      "Bruce",
 					LastName:       "Wayne",
 					TradingName:    "Batman's Super Hero Masks",
-					NationalTaxId:  "TAX123456",
 					DateOfBirth:    &DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification: &Identification{NationalIdNumber: "AB123456C"},
 				},
@@ -365,7 +364,6 @@ func TestGetEntity(t *testing.T) {
 				FirstName:      "Bruce",
 				LastName:       "Wayne",
 				TradingName:    "Batman's Super Hero Masks",
-				NationalTaxId:  "TAX123456",
 				DateOfBirth:    &DateOfBirth{Day: 5, Month: 6, Year: 1995},
 				Identification: &Identification{NationalIdNumber: "AB123456C"},
 			},
@@ -503,7 +501,6 @@ func TestUpdateEntity(t *testing.T) {
 					FirstName:      "Bruce",
 					LastName:       "Wayne",
 					TradingName:    "Batman's Super Hero Masks",
-					NationalTaxId:  "TAX123456",
 					DateOfBirth:    &DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification: &Identification{NationalIdNumber: "AB123456C"},
 				},
@@ -544,7 +541,6 @@ func TestUpdateEntity(t *testing.T) {
 					FirstName:      "Bruce",
 					LastName:       "Wayne",
 					TradingName:    "Batman's Super Hero Masks",
-					NationalTaxId:  "TAX123456",
 					DateOfBirth:    &DateOfBirth{Day: 5, Month: 6, Year: 1995},
 					Identification: &Identification{NationalIdNumber: "AB123456C"},
 				},
@@ -2380,4 +2376,67 @@ func TestResolveEntityRequirement(t *testing.T) {
 			tc.checker(client.ResolveEntityRequirement(tc.entityId, tc.requirementId, tc.request))
 		})
 	}
+}
+
+// UploadFile sends the file and its purpose to the files client as a multipart upload on
+// /entities/{entityId}/files; the main API client is not used.
+func TestUploadFile(t *testing.T) {
+	apiClient := new(mocks.ApiClientMock)
+	filesClient := new(mocks.ApiClientMock)
+	credentials := new(mocks.CredentialsMock)
+	environment := new(mocks.EnvironmentMock)
+	enableTelemetry := true
+	credentials.On("GetAuthorization", mock.Anything).Return(&configuration.SdkAuthorization{}, nil)
+
+	var sentPath string
+	var sentRequest *common.FileUploadRequest
+	filesClient.On("UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil).
+		Run(func(args mock.Arguments) {
+			sentPath = args.Get(1).(string)
+			sentRequest = args.Get(3).(*common.FileUploadRequest)
+			respMapping := args.Get(4).(*UploadFileResponse)
+			*respMapping = UploadFileResponse{Id: "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", MaximumSizeInBytes: 4194304}
+		})
+
+	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+	client := NewClient(config, apiClient, filesClient)
+
+	response, err := client.UploadFile("ent_1234", File{File: "../test/checkout.jpeg", Purpose: common.ProofOfRegistration})
+
+	assert.Nil(t, err)
+	assert.Equal(t, "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", response.Id)
+	assert.Equal(t, "/entities/ent_1234/files", sentPath)
+	if assert.NotNil(t, sentRequest) {
+		assert.Contains(t, sentRequest.W.FormDataContentType(), "multipart/form-data")
+		assert.Contains(t, sentRequest.B.String(), "proof_of_registration")
+	}
+	apiClient.AssertNotCalled(t, "UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestRetrieveFile(t *testing.T) {
+	apiClient := new(mocks.ApiClientMock)
+	filesClient := new(mocks.ApiClientMock)
+	credentials := new(mocks.CredentialsMock)
+	environment := new(mocks.EnvironmentMock)
+	enableTelemetry := true
+	credentials.On("GetAuthorization", mock.Anything).Return(&configuration.SdkAuthorization{}, nil)
+
+	var sentPath string
+	filesClient.On("GetWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+		Return(nil).
+		Run(func(args mock.Arguments) {
+			sentPath = args.Get(1).(string)
+			respMapping := args.Get(3).(*FileDetailsResponse)
+			*respMapping = FileDetailsResponse{Id: "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", Purpose: "proof_of_registration"}
+		})
+
+	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+	client := NewClient(config, apiClient, filesClient)
+
+	response, err := client.RetrieveFile("ent_1234", "file_aaaaaaaaaaaaaaaaaaaaaaaaaa")
+
+	assert.Nil(t, err)
+	assert.Equal(t, "proof_of_registration", response.Purpose)
+	assert.Equal(t, "/entities/ent_1234/files/file_aaaaaaaaaaaaaaaaaaaaaaaaaa", sentPath)
 }

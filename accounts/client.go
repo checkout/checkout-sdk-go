@@ -534,6 +534,8 @@ func (c *Client) UpdateReserveRuleWithContext(
 	return &response, nil
 }
 
+// SubmitFile uploads a file to the Files API (POST /files on the Files host), as a multipart
+// request. The returned ID is what document Front and Back fields take.
 func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	return c.SubmitFileWithContext(context.Background(), file)
 }
@@ -561,6 +563,9 @@ func (c *Client) SubmitFileWithContext(
 	return &response, nil
 }
 
+// UploadFile creates a file upload for a sub-entity (POST /entities/{entityId}/files on the Files
+// host). Only request.Purpose is sent, as the JSON body the endpoint defines; the response carries the
+// file ID and an upload link, and the file content itself is sent to that link.
 func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
 	return c.UploadFileWithContext(context.Background(), entityId, request)
 }
@@ -589,6 +594,8 @@ func (c *Client) UploadFileWithContext(
 	return &response, nil
 }
 
+// RetrieveFile retrieves the details of a sub-entity's file
+// (GET /entities/{entityId}/files/{fileId} on the Files host).
 func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, error) {
 	return c.RetrieveFileWithContext(context.Background(), entityId, fileId)
 }

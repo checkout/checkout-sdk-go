@@ -352,7 +352,8 @@ type (
 	// ContactDetails holds the contact details of the sub-entity.
 	ContactDetails struct {
 		// The details of the user responsible for onboarding the sub-entity.
-		// [Optional] (not part of the US ISV Seller variants)
+		// [Required] in the hosted onboarding invite request (PlatformsHostedOnboardInviteRequest);
+		// [Optional] in the Full and Lite onboarding variants. Not part of the US ISV Seller variants.
 		Invitee *Invitee `json:"invitee,omitempty"`
 		// The phone number of the sub-entity.
 		// [Required] for every Accounts API v2.0 variant and the US ISV Seller variants; [Optional] for the
@@ -374,9 +375,10 @@ type (
 
 	// Invitee holds the details of the user responsible for onboarding the sub-entity.
 	Invitee struct {
-		// The main email address for this sub-entity. Despite the spec's wording, this is the address of
-		// the invitee, the user responsible for onboarding the sub-entity.
-		// [Optional]
+		// The email of the user responsible for onboarding the sub-entity. The Full and Lite onboarding
+		// variants describe it as the main email address for this sub-entity, but it is the invitee's address.
+		// [Required] in the hosted onboarding invite request (PlatformsHostedOnboardInviteRequest);
+		// [Optional] in the Full and Lite onboarding variants. Not part of the US ISV Seller variants.
 		// Format: email
 		Email string `json:"email,omitempty"`
 	}
@@ -384,9 +386,15 @@ type (
 	// EntityEmailAddresses holds the email addresses for this sub-entity.
 	EntityEmailAddresses struct {
 		// The main email address for this sub-entity.
-		// [Required]
+		// [Required] for every Full, Lite and US ISV Seller variant (email_addresses is not part of the
+		// hosted onboarding invite request).
 		// Format: email
 		Primary string `json:"primary,omitempty"`
+		// The email address of the person responsible for PCI compliance at this sub-entity.
+		// [Required] for the US ISV Seller variants (US ISV Seller Company (3.0) and US ISV Seller Sole
+		// Trader (3.0)), together with Primary. Not part of the other variants.
+		// Format: email
+		PciComplianceContact string `json:"pci_compliance_contact,omitempty"`
 	}
 )
 
@@ -525,10 +533,13 @@ type (
 		// The individual's roles within the company. For sole traders, must be ubo only.
 		// [Required] for every variant except EEA and US Company Lite (2.0), where it is [Optional].
 		Roles []EntityRoles `json:"roles,omitempty"`
-		// Verification documents for the individual representative. The API validates this object strictly
-		// on v3.0: it accepts only identity_verification, certified_authorised_signatory,
-		// proof_of_residential_address and proof_of_registration, and rejects any other key. See
-		// OnboardSubEntityDocuments for which apply to each variant.
+		// Verification documents for the individual representative. The keys it can hold are
+		// identity_verification, certified_authorised_signatory (EEA, GB and US Company Full (3.0) and US
+		// ISV Seller Company (3.0)), proof_of_residential_address and proof_of_registration (EEA Sole
+		// Trader Full (3.0)). The schema is strict (additionalProperties false, any other key is
+		// rejected) only on EEA, GB and US Company Full (3.0) and EEA, GB and US Sole Trader Full (3.0);
+		// it is not strict on the US ISV Seller variants or on v2.0. See OnboardSubEntityDocuments for
+		// which keys apply to each variant.
 		// [Required] for the EEA, GB and US Sole Trader Full (3.0) variants and EEA Company Full (2.0);
 		// [Optional] otherwise.
 		Documents *OnboardSubEntityDocuments `json:"documents,omitempty"`
@@ -566,9 +577,11 @@ type (
 	// different objects on the Accounts API, which accept different keys:
 	//   - The top-level request documents (OnboardEntityRequest.Documents). The API ignores keys it does
 	//     not recognise here rather than rejecting them, so a misplaced document is dropped silently.
-	//   - A representative's documents (Representative.Documents). This object is strict: it accepts
-	//     only IdentityVerification, CertifiedAuthorisedSignatory, ProofOfResidentialAddress and
-	//     ProofOfRegistration, and rejects any other key.
+	//   - A representative's documents (Representative.Documents). It holds only IdentityVerification,
+	//     CertifiedAuthorisedSignatory (EEA, GB and US Company Full (3.0) and US ISV Seller Company
+	//     (3.0)), ProofOfResidentialAddress and ProofOfRegistration (EEA Sole Trader Full (3.0)). The
+	//     schema is strict, rejecting any other key, only on EEA, GB and US Company Full (3.0) and EEA,
+	//     GB and US Sole Trader Full (3.0); it is not strict on the US ISV Seller variants or on v2.0.
 	// Each field below says which of the two it belongs to.
 	OnboardSubEntityDocuments struct {
 		// The document to use to confirm the individual's identity. Valid in both objects:
@@ -1221,7 +1234,8 @@ type (
 		MaximumSizeInBytes int64 `json:"maximum_size_in_bytes,omitempty"`
 		// The MIME file types allowed for the document purpose provided on the initial request.
 		DocumentTypesForPurpose []string `json:"document_types_for_purpose,omitempty"`
-		// The links related to the file, including the upload link.
+		// The links related to the file: "upload", the URL to send the file content to with a
+		// data-binary PUT request, and "self", the file information retrieval URL.
 		Links map[string]common.Link `json:"_links,omitempty"`
 	}
 )

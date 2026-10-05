@@ -1,7 +1,9 @@
 package test
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
@@ -211,8 +213,8 @@ func TestCreateEntityV2(t *testing.T) {
 					// company.representatives on 2026-09-15 with
 					// 422 invalid_request / company_representatives_0_invalid
 					// (request_id ea0252e8-ed58-90ab-8ab7-a6b3c4e6b376). Every shape the SDK can
-					// express was refused -- flat fields, a nested individual, with and without
-					// roles, place_of_birth and identification -- while this same request minus
+					// express was refused (flat fields, a nested individual, with and without
+					// roles, place_of_birth and identification), while this same request minus
 					// the field is accepted. Schema 2.0 is deprecated, so the field was dropped
 					// rather than the test quarantined; TestCreateEntityV3 still covers
 					// representatives on the current schema.
@@ -352,6 +354,63 @@ func TestCreateEntityWithRepresentativeDocuments(t *testing.T) {
 	assert.Equal(t, identityFile.Id, linked.IdentityVerification.Front)
 	assert.Equal(t, accounts.PowerOfAttorneyCASStringType, linked.CertifiedAuthorisedSignatory.Type)
 	assert.Equal(t, signatoryFile.Id, linked.CertifiedAuthorisedSignatory.Front)
+}
+
+// UploadFile only requests an upload link (POST /entities/{entityId}/files with {"purpose": ...});
+// the file content is then sent with a data-binary PUT to the returned upload link, after which the
+// file can be retrieved.
+func TestUploadFileAndRetrieveFile(t *testing.T) {
+	client := buildAccountsFilesClient().Accounts
+
+	entity, err := client.CreateEntity(buildCompanyV3Request(), "3.0")
+	if !assert.Nil(t, err) || !assert.NotEmpty(t, entity.Id) {
+		return
+	}
+
+	upload, err := client.UploadFile(entity.Id, accounts.File{Purpose: common.IdentityVerification})
+	if !assert.Nil(t, err) {
+		return
+	}
+	assert.NotEmpty(t, upload.Id)
+	assert.True(t, upload.MaximumSizeInBytes > 0)
+	assert.Contains(t, upload.DocumentTypesForPurpose, "image/jpeg")
+	uploadLink, ok := upload.Links["upload"]
+	if !assert.True(t, ok) || !assert.NotNil(t, uploadLink.HRef) {
+		return
+	}
+
+	content, err := ioutil.ReadFile("./checkout.jpeg")
+	if !assert.Nil(t, err) {
+		return
+	}
+	putRequest, err := http.NewRequest(http.MethodPut, *uploadLink.HRef, bytes.NewReader(content))
+	if !assert.Nil(t, err) {
+		return
+	}
+	putRequest.Header.Set("Content-Type", "image/jpeg")
+	putResponse, err := http.DefaultClient.Do(putRequest)
+	if !assert.Nil(t, err) {
+		return
+	}
+	defer putResponse.Body.Close()
+	assert.True(t, putResponse.StatusCode/100 == 2, "upload PUT returned status %d", putResponse.StatusCode)
+
+	// The API processes the uploaded content asynchronously. Until it has, the file details carry a
+	// placeholder uploaded_on without a time zone ("0001-01-01T00:00:00") that does not parse as
+	// RFC 3339, so retry for a short while.
+	var details *accounts.FileDetailsResponse
+	for attempt := 0; attempt < 10; attempt++ {
+		details, err = client.RetrieveFile(entity.Id, upload.Id)
+		if err == nil {
+			break
+		}
+		time.Sleep(2 * time.Second)
+	}
+	if !assert.Nil(t, err) {
+		return
+	}
+	assert.Equal(t, upload.Id, details.Id)
+	assert.Equal(t, string(common.IdentityVerification), details.Purpose)
 }
 
 func TestGetEntity(t *testing.T) {

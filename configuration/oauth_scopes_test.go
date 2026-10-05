@@ -72,8 +72,8 @@ func TestOAuthScopeValuesAddedInSpecSync(t *testing.T) {
 	}
 }
 
-// These five scopes appear nowhere in the specification -- not in the clientCredentials scope map
-// and not in any operation's security requirement -- so a sweep driven by the spec alone would
+// These five scopes appear nowhere in the specification (not in the clientCredentials scope map
+// and not in any operation's security requirement), so a sweep driven by the spec alone would
 // delete them. They are kept deliberately: the authorization server still grants them and callers
 // still request them. marketplace is the proof: the sandbox client behind
 // CHECKOUT_DEFAULT_OAUTH_PAYOUT_SCHEDULE_CLIENT_ID is provisioned for it and answers a request for
@@ -103,7 +103,7 @@ func TestLegacyOAuthScopeValuesAreRetained(t *testing.T) {
 // PaymentContext and GatewayPaymentContexts are unrelated scopes despite reading alike, so this
 // pins which is which. It also pins the singular: this constant held "Payment Contexts" (plural)
 // until the spec sync, a value the authorization server defines under no reading of the spec, so
-// every OAuth caller that requested it was rejected -- and rejected for the whole token request,
+// every OAuth caller that requested it was rejected, and rejected for the whole token request,
 // losing every other scope asked for alongside it.
 //
 // The space and capital letter in "Payment Context" are almost certainly a spec authoring defect,
@@ -116,7 +116,7 @@ func TestPaymentContextOAuthScopeValues(t *testing.T) {
 // Go gives these constants the least protection of any SDK in this family: they are untyped string
 // constants at package scope, so nothing stops a caller passing an arbitrary string to WithScopes,
 // and nothing here can be enumerated at runtime the way an enum can. A blank or duplicated value
-// therefore has to be caught by reading the file, which is what allScopes below exists for -- it is
+// therefore has to be caught by reading the file, which is what allScopes below exists for: it is
 // the only inventory of these constants that the compiler will check.
 //
 // Keep allScopes in step with the const block: a constant missing from it is simply not covered.
@@ -202,7 +202,7 @@ func allScopes() map[string]string {
 }
 
 // allScopes is hand-maintained, so on its own it would silently stop covering a constant the moment
-// someone added one and forgot to extend the map -- the exact mistake the sweeps exist to catch. Go
+// someone added one and forgot to extend the map: the exact mistake the sweeps exist to catch. Go
 // cannot enumerate a package's constants at runtime, so this parses the declaration instead and
 // holds the two in step. If it fails, add the reported constant to allScopes rather than editing
 // this test.

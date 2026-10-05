@@ -1,6 +1,7 @@
 package accounts
 
 import (
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -17,7 +18,7 @@ func TestCreateEntity(t *testing.T) {
 	var (
 		onboardEntity = OnboardEntityResponse{
 			HttpMetadata: mocks.HttpMetadataStatusCreated,
-			Id:           "ent_1234",
+			Id:           "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
 			Reference:    "reference",
 			Status:       Active,
 			Capabilities: &Capabilities{
@@ -140,11 +141,11 @@ func TestCreateEntity(t *testing.T) {
 
 func TestGetSubEntityMembers(t *testing.T) {
 	var (
-		entityId = "ent_1234"
+		entityId = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
 
 		subEntityDetails = OnboardSubEntityDetailsResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
-			Data:         []SubEntityMemberData{{UserId: "member_1234"}},
+			Data:         []SubEntityMemberData{{UserId: "usr_56komstqc2qnquzscw3i6ict6n"}},
 			Links:        map[string]common.Link{"self": {HRef: &[]string{"https://example.com"}[0]}},
 		}
 	)
@@ -248,8 +249,8 @@ func TestGetSubEntityMembers(t *testing.T) {
 
 func TestReinviteSubEntityMember(t *testing.T) {
 	var (
-		entityId = "ent_1234"
-		userId   = "user_5678"
+		entityId = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
+		userId   = "usr_pjjpwfytuboe3nsetebzcqdbip"
 
 		reinviteResponse = OnboardSubEntityResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
@@ -345,7 +346,7 @@ func TestReinviteSubEntityMember(t *testing.T) {
 
 func TestGetEntity(t *testing.T) {
 	var (
-		entityId = "ent_1234"
+		entityId = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
 
 		entityDetails = OnboardEntityDetails{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
@@ -470,7 +471,7 @@ func TestUpdateEntity(t *testing.T) {
 	var (
 		onboardEntity = OnboardEntityResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
-			Id:           "ent_1234",
+			Id:           "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
 			Reference:    "reference",
 			Status:       Active,
 			Capabilities: &Capabilities{
@@ -489,7 +490,7 @@ func TestUpdateEntity(t *testing.T) {
 	}{
 		{
 			name:     "when request is correct then update entity",
-			entityId: "ent_1234",
+			entityId: "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
 			request: OnboardEntityRequest{
 				Reference:      "reference",
 				ContactDetails: &ContactDetails{Phone: &Phone{Number: "2345678910"}},
@@ -587,7 +588,7 @@ func TestUpdateEntity(t *testing.T) {
 
 func TestCreatePaymentInstruments(t *testing.T) {
 	var (
-		entityId = "ent_1234"
+		entityId = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
 
 		metadataResponse = common.MetadataResponse{
 			HttpMetadata: mocks.HttpMetadataStatusAccepted,
@@ -746,7 +747,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 
 func TestCreatePaymentInstrument(t *testing.T) {
 	var (
-		entityId = "ent_1234"
+		entityId = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
 
 		idResponse = common.IdResponse{
 			HttpMetadata: mocks.HttpMetadataStatusCreated,
@@ -895,7 +896,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 
 func TestQueryPaymentInstruments(t *testing.T) {
 	var (
-		entityId = "ent_1234"
+		entityId = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
 
 		query = PaymentInstrumentsQuery{
 			Status: InstrumentPending,
@@ -1045,7 +1046,7 @@ func TestQueryPaymentInstruments(t *testing.T) {
 
 func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 	var (
-		entityId            = "ent_1234"
+		entityId            = "ent_hcra7j63fyaf2vbtlnwwbrlvcz"
 		paymentInstrumentId = "1234"
 
 		instrumentDocument = InstrumentDocument{
@@ -1216,8 +1217,8 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 	}{
 		{
 			name:         "when request is correct then update entity",
-			entityId:     "ent_1234",
-			instrumentId: "ppi_1234",
+			entityId:     "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
+			instrumentId: "ppi_7s6mznjbd7uj77sppvtlbdpzu6",
 			request: UpdatePaymentInstrumentRequest{
 				Label:   "new label",
 				Default: true,
@@ -1245,7 +1246,7 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 		{
 			name:         "when entity not_found then return error",
 			entityId:     "not_found",
-			instrumentId: "ppi_1234",
+			instrumentId: "ppi_7s6mznjbd7uj77sppvtlbdpzu6",
 			request: UpdatePaymentInstrumentRequest{
 				Label:   "new label",
 				Default: true,
@@ -1271,7 +1272,7 @@ func TestUpdatePaymentInstrumentDetails(t *testing.T) {
 		},
 		{
 			name:         "when entity not_found then return error",
-			entityId:     "ent_1234",
+			entityId:     "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
 			instrumentId: "not_found",
 			request: UpdatePaymentInstrumentRequest{
 				Label:   "new label",
@@ -1345,7 +1346,7 @@ func TestGetPayoutSchedule(t *testing.T) {
 	}{
 		{
 			name:     "when entity schedule exists then return entity's payout schedule",
-			entityId: "ent_1234",
+			entityId: "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1434,7 +1435,7 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 	}{
 		{
 			name:     "when request is correct then update entity",
-			entityId: "ent_1234",
+			entityId: "ent_hcra7j63fyaf2vbtlnwwbrlvcz",
 			currency: common.USD,
 			request: CurrencySchedule{
 				Enabled:    true,
@@ -1508,7 +1509,7 @@ func TestUpdatePayoutSchedule(t *testing.T) {
 
 func TestCreateReserveRule(t *testing.T) {
 	var (
-		entityId   = "ent_test_12345"
+		entityId   = "ent_ogujwreqy7outjqki2734x6aff"
 		idResponse = common.IdResponse{
 			HttpMetadata: mocks.HttpMetadataStatusCreated,
 			Id:           "rul_test_67890",
@@ -1656,7 +1657,7 @@ func TestCreateReserveRule(t *testing.T) {
 
 func TestGetReserveRules(t *testing.T) {
 	var (
-		entityId = "ent_test_12345"
+		entityId = "ent_ogujwreqy7outjqki2734x6aff"
 
 		reserveRulesResponse = ReserveRulesResponse{
 			HttpMetadata: mocks.HttpMetadataStatusOk,
@@ -1802,7 +1803,7 @@ func TestGetReserveRules(t *testing.T) {
 
 func TestGetReserveRuleDetails(t *testing.T) {
 	var (
-		entityId      = "ent_test_12345"
+		entityId      = "ent_ogujwreqy7outjqki2734x6aff"
 		reserveRuleId = "rul_test_67890"
 
 		percentage = 10.5
@@ -1960,7 +1961,7 @@ func TestGetReserveRuleDetails(t *testing.T) {
 
 func TestUpdateReserveRule(t *testing.T) {
 	var (
-		entityId      = "ent_test_12345"
+		entityId      = "ent_ogujwreqy7outjqki2734x6aff"
 		reserveRuleId = "rul_test_67890"
 		etag          = "Y3Y9MCZydj0w"
 
@@ -2208,7 +2209,7 @@ func TestGetEntityRequirements(t *testing.T) {
 		},
 		{
 			name:     "when credentials invalid then return error",
-			entityId: "ent_xxx",
+			entityId: "ent_d3moll4ap5scr43ivtuv3ka3bi",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -2388,30 +2389,41 @@ func TestUploadFile(t *testing.T) {
 	enableTelemetry := true
 	credentials.On("GetAuthorization", mock.Anything).Return(&configuration.SdkAuthorization{}, nil)
 
+	uploadHref := "https://s3.eu-west-1.amazonaws.com/bucket/ent_hcra7j63fyaf2vbtlnwwbrlvcz/file_aaaaaaaaaaaaaaaaaaaaaaaaaa"
 	var sentPath string
-	var sentRequest *common.FileUploadRequest
-	filesClient.On("UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+	var sentBody []byte
+	filesClient.On("PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).
 		Return(nil).
 		Run(func(args mock.Arguments) {
 			sentPath = args.Get(1).(string)
-			sentRequest = args.Get(3).(*common.FileUploadRequest)
+			body, err := json.Marshal(args.Get(3))
+			assert.Nil(t, err)
+			sentBody = body
 			respMapping := args.Get(4).(*UploadFileResponse)
-			*respMapping = UploadFileResponse{Id: "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", MaximumSizeInBytes: 4194304}
+			*respMapping = UploadFileResponse{
+				Id:                      "file_aaaaaaaaaaaaaaaaaaaaaaaaaa",
+				MaximumSizeInBytes:      4194304,
+				DocumentTypesForPurpose: []string{"image/jpeg", "image/png", "application/pdf"},
+				Links:                   map[string]common.Link{"upload": {HRef: &uploadHref}},
+			}
 		})
 
 	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 	client := NewClient(config, apiClient, filesClient)
 
-	response, err := client.UploadFile("ent_1234", File{File: "../test/checkout.jpeg", Purpose: common.ProofOfRegistration})
+	response, err := client.UploadFile("ent_hcra7j63fyaf2vbtlnwwbrlvcz", File{File: "../test/checkout.jpeg", Purpose: common.ProofOfRegistration})
 
 	assert.Nil(t, err)
 	assert.Equal(t, "file_aaaaaaaaaaaaaaaaaaaaaaaaaa", response.Id)
-	assert.Equal(t, "/entities/ent_1234/files", sentPath)
-	if assert.NotNil(t, sentRequest) {
-		assert.Contains(t, sentRequest.W.FormDataContentType(), "multipart/form-data")
-		assert.Contains(t, sentRequest.B.String(), "proof_of_registration")
+	assert.Equal(t, int64(4194304), response.MaximumSizeInBytes)
+	assert.Equal(t, []string{"image/jpeg", "image/png", "application/pdf"}, response.DocumentTypesForPurpose)
+	if assert.NotNil(t, response.Links["upload"].HRef) {
+		assert.Equal(t, uploadHref, *response.Links["upload"].HRef)
 	}
-	apiClient.AssertNotCalled(t, "UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	assert.Equal(t, "/entities/ent_hcra7j63fyaf2vbtlnwwbrlvcz/files", sentPath)
+	assert.JSONEq(t, `{"purpose":"proof_of_registration"}`, string(sentBody))
+	filesClient.AssertNotCalled(t, "UploadWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+	apiClient.AssertNotCalled(t, "PostWithContext", mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 }
 
 func TestRetrieveFile(t *testing.T) {
@@ -2434,9 +2446,9 @@ func TestRetrieveFile(t *testing.T) {
 	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
 	client := NewClient(config, apiClient, filesClient)
 
-	response, err := client.RetrieveFile("ent_1234", "file_aaaaaaaaaaaaaaaaaaaaaaaaaa")
+	response, err := client.RetrieveFile("ent_hcra7j63fyaf2vbtlnwwbrlvcz", "file_aaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 	assert.Nil(t, err)
 	assert.Equal(t, "proof_of_registration", response.Purpose)
-	assert.Equal(t, "/entities/ent_1234/files/file_aaaaaaaaaaaaaaaaaaaaaaaaaa", sentPath)
+	assert.Equal(t, "/entities/ent_hcra7j63fyaf2vbtlnwwbrlvcz/files/file_aaaaaaaaaaaaaaaaaaaaaaaaaa", sentPath)
 }

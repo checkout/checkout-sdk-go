@@ -564,8 +564,11 @@ func (c *Client) SubmitFileWithContext(
 	return &response, nil
 }
 
-// UploadFile uploads a file for a sub-entity (POST /entities/{entityId}/files on the Files host),
-// sending request.File and request.Purpose as a multipart request.
+// UploadFile requests an upload link for a sub-entity file (POST /entities/{entityId}/files on the
+// Files host). It sends only request.Purpose, as the JSON body {"purpose": ...}; request.File is not
+// read or sent. The response carries the file ID, the maximum size, the accepted MIME types and, in
+// Links["upload"], the pre-signed URL: send the file content to that URL with an HTTP PUT whose body is
+// the raw file bytes and whose Content-Type is one of DocumentTypesForPurpose.
 func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
 	return c.UploadFileWithContext(context.Background(), entityId, request)
 }
@@ -581,13 +584,19 @@ func (c *Client) UploadFileWithContext(
 		return nil, err
 	}
 
-	req, err := common.BuildFileUploadRequest(&request)
-	if err != nil {
-		return nil, err
-	}
+	payload := struct {
+		Purpose common.Purpose `json:"purpose"`
+	}{request.Purpose}
 
 	var response UploadFileResponse
-	err = c.filesClient.UploadWithContext(ctx, common.BuildPath(entitiesPath, entityId, filesPath), auth, req, &response)
+	err = c.filesClient.PostWithContext(
+		ctx,
+		common.BuildPath(entitiesPath, entityId, filesPath),
+		auth,
+		payload,
+		&response,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -63,7 +63,7 @@ func TestProcessingData_UnmarshalAllNewFields(t *testing.T) {
 	// The spec declares check_in_date, check_out_date and guests[].date_of_birth as
 	// format: date, so the API sends them date-only. Before these fields became
 	// common.APIShortDate they were *time.Time, and encoding/json could not parse
-	// "2026-10-01" into one -- the whole response failed with
+	// "2026-10-01" into one, so the whole response failed with
 	// `parsing time "2026-10-01" as "2006-01-02T15:04:05Z07:00"`.
 	assert.NotNil(t, data.AccommodationData[0].CheckInDate)
 	assert.Equal(t,

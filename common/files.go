@@ -34,7 +34,9 @@ const (
 	CompanyVerification          Purpose = "company_verification"
 	FinancialVerification        Purpose = "financial_verification"
 	// Identification is not an onboarding upload purpose: it is not among the values
-	// PlatformsFileUpload defines. Use IdentityVerification.
+	// PlatformsFileUpload defines.
+	//
+	// Deprecated: not accepted by the Accounts onboarding upload endpoints. Use IdentityVerification.
 	Identification            Purpose = "identification"
 	IdentityVerification      Purpose = "identity_verification"
 	TaxVerification           Purpose = "tax_verification"

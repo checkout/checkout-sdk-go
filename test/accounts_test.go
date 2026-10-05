@@ -29,21 +29,29 @@ var (
 	entityId            string
 	entityCompanyId     string
 	paymentInstrumentId string
+	identityFileId      string
+	bankFileId          string
 
 	reference = GenerateRandomReference()
 )
 
 func TestSetupAccountsSuite(t *testing.T) {
-	requestFileId := submitFile(
+	bankFileId = submitFile(
 		t,
 		accounts.File{
 			File:    "./checkout.pdf",
 			Purpose: common.BankVerification,
 		})
+	identityFileId = submitFile(
+		t,
+		accounts.File{
+			File:    "./checkout.jpeg",
+			Purpose: common.IdentityVerification,
+		})
 
 	entityId = createEntity(t, &reference)
 	entityCompanyId = createEntityCompany(t)
-	paymentInstrumentId = createPaymentInstrument(t, entityCompanyId, requestFileId)
+	paymentInstrumentId = createPaymentInstrument(t, entityCompanyId, bankFileId)
 }
 
 func TestSubmitFileAccounts(t *testing.T) {
@@ -118,23 +126,8 @@ func TestCreateEntity(t *testing.T) {
 		checker func(*accounts.OnboardEntityResponse, error)
 	}{
 		{
-			name: "when request is correct then create entity",
-			request: accounts.OnboardEntityRequest{
-				Reference:      GenerateRandomReference(),
-				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				Individual: &accounts.Individual{
-					FirstName:         "Bruce",
-					LastName:          "Wayne",
-					TradingName:       "Batman's Super Hero Masks",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-			},
+			name:    "when request is correct then create entity",
+			request: buildSoleTraderV3Request(GenerateRandomReference(), "Bruce"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -142,23 +135,8 @@ func TestCreateEntity(t *testing.T) {
 			},
 		},
 		{
-			name: "when entity already exists then return error",
-			request: accounts.OnboardEntityRequest{
-				Reference:      reference,
-				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				Individual: &accounts.Individual{
-					FirstName:         "Bruce",
-					LastName:          "Wayne",
-					TradingName:       "Batman's Super Hero Masks",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-			},
+			name:    "when entity already exists then return error",
+			request: buildSoleTraderV3Request(reference, "Bruce"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
@@ -188,8 +166,7 @@ func TestCreateEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			// v2.0 payload (top-level individual) — pin to 2.0 (SDK now defaults to 3.0)
-			tc.checker(client.CreateEntity(tc.request, "2.0"))
+			tc.checker(client.CreateEntity(tc.request, "3.0"))
 		})
 	}
 }
@@ -444,7 +421,7 @@ func TestGetEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetEntity(tc.entityId, "2.0"))
+			tc.checker(client.GetEntity(tc.entityId, "3.0"))
 		})
 	}
 }
@@ -459,47 +436,22 @@ func TestUpdateEntity(t *testing.T) {
 		{
 			name:     "when request is correct then update entity",
 			entityId: entityId,
-			request: accounts.OnboardEntityRequest{
-				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				Individual: &accounts.Individual{
-					FirstName:         "New Name",
-					LastName:          "New LastName",
-					TradingName:       "New Trading Name",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-			},
+			// The reference is set at creation and not sent again on update.
+			request: buildSoleTraderV3Request("", "Brucie"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+
+				details, err := buildAccountsClient().Accounts.GetEntity(entityId, "3.0")
+				assert.Nil(t, err)
+				assert.Equal(t, "Brucie", details.Company.Representatives[0].Individual.FirstName)
 			},
 		},
 		{
 			name:     "when entity not_found then return error",
 			entityId: "ent_zzzzzzzzzzzzzzzzzzzzzzzzzz",
-			request: accounts.OnboardEntityRequest{
-				Individual: &accounts.Individual{
-					FirstName:         "New Name",
-					LastName:          "New LastName",
-					TradingName:       "New Trading Name",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				ContactDetails: &accounts.ContactDetails{
-					Phone: &accounts.Phone{Number: "2345678910"},
-				},
-			},
+			request:  buildSoleTraderV3Request("", "Brucie"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
@@ -513,7 +465,7 @@ func TestUpdateEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.UpdateEntity(tc.entityId, tc.request, "2.0"))
+			tc.checker(client.UpdateEntity(tc.entityId, tc.request, "3.0"))
 		})
 	}
 }
@@ -1022,24 +974,7 @@ func createEntity(t *testing.T, inputReference *string) string {
 		reference = *inputReference
 	}
 
-	r := accounts.OnboardEntityRequest{
-		Reference:      reference,
-		ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-		Profile: &accounts.Profile{
-			Urls: []string{"https://www.superheroexample.com"},
-			Mccs: []string{"0742"},
-		},
-		Individual: &accounts.Individual{
-			FirstName:         "Bruce",
-			LastName:          "Wayne",
-			TradingName:       "Batman's Super Hero Masks",
-			RegisteredAddress: Address(),
-			DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-			Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-		},
-	}
-
-	entity, err := buildAccountsClient().Accounts.CreateEntity(r, "2.0")
+	entity, err := buildAccountsClient().Accounts.CreateEntity(buildSoleTraderV3Request(reference, "Bruce"), "3.0")
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error creating entity - %s", err.Error()))
 	}
@@ -1229,6 +1164,62 @@ func buildAccountsFilesClient() *nas.Api {
 	}
 
 	return oauthAccountsFilesClient
+}
+
+// buildSoleTraderV3Request is a schema 3.0 GB Sole Trader Full request (GBSoleTraderFull3-0): a company
+// of business type individual_or_sole_proprietorship with exactly one ubo representative, the
+// representative's identity document and the top-level bank statement. It replaces the schema 2.0
+// sole trader (a top-level individual), which the sandbox answers with HTTP 500 even for a body that
+// validates against the spec. The processing currency is USD, the only currency in the sandbox
+// platform's currency scope (see buildCompanyV3Request); the addresses and settlement country stay GB.
+// Needs identityFileId and bankFileId, uploaded by TestSetupAccountsSuite.
+func buildSoleTraderV3Request(reference, firstName string) accounts.OnboardEntityRequest {
+	return accounts.OnboardEntityRequest{
+		Reference: reference,
+		ContactDetails: &accounts.ContactDetails{
+			Phone:                &accounts.Phone{CountryCode: common.GB, Number: "2072343000"},
+			EntityEmailAddresses: &accounts.EntityEmailAddresses{Primary: GenerateRandomEmail()},
+		},
+		Profile: &accounts.Profile{
+			Urls:                   []string{"https://www.superheroexample.com"},
+			Mccs:                   []string{"0742"},
+			DefaultHoldingCurrency: common.USD,
+			HoldingCurrencies:      []common.Currency{common.USD},
+		},
+		Company: &accounts.Company{
+			TradingName:         "Batman's Super Hero Masks",
+			BusinessType:        accounts.IndividualOrSoleProprietorship,
+			DateOfIncorporation: &accounts.DateOfIncorporation{Month: 6, Year: 2015},
+			PrincipalAddress:    Address(),
+			Representatives: []accounts.Representative{{
+				Individual: &accounts.Individual{
+					FirstName:    firstName,
+					LastName:     "Wayne",
+					EmailAddress: GenerateRandomEmail(),
+					DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
+					PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
+					Address:      Address(),
+				},
+				Roles: []accounts.EntityRoles{accounts.UboERStringType},
+				Documents: &accounts.OnboardSubEntityDocuments{
+					IdentityVerification: &accounts.IdentityVerification{
+						Type: accounts.PassportIVStringType, Front: identityFileId},
+				},
+			}},
+		},
+		ProcessingDetails: &accounts.ProcessingDetails{
+			SettlementCountry:       "GB",
+			TargetCountries:         []string{"GB"},
+			AnnualProcessingVolume:  1000000,
+			AverageTransactionValue: 5000,
+			HighestTransactionValue: 25000,
+			Currency:                common.USD,
+		},
+		Documents: &accounts.OnboardSubEntityDocuments{
+			BankVerification: &accounts.BankVerification{
+				Type: accounts.BankStatementBVStringType, Front: bankFileId},
+		},
+	}
 }
 
 // buildCompanyV3Request is a schema 3.0 company request the sandbox platform accepts: every currency

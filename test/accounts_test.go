@@ -1,7 +1,9 @@
 package test
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
@@ -19,6 +21,7 @@ import (
 
 var (
 	oauthAccountsClient        *nas.Api
+	oauthAccountsFilesClient   *nas.Api
 	oauthAccountsClientVersion *nas.Api
 	oauthPayoutsScheduleApi    *nas.Api
 	oauthFilesApi              *nas.Api
@@ -26,21 +29,29 @@ var (
 	entityId            string
 	entityCompanyId     string
 	paymentInstrumentId string
+	identityFileId      string
+	bankFileId          string
 
 	reference = GenerateRandomReference()
 )
 
 func TestSetupAccountsSuite(t *testing.T) {
-	requestFileId := submitFile(
+	bankFileId = submitFile(
 		t,
 		accounts.File{
 			File:    "./checkout.pdf",
 			Purpose: common.BankVerification,
 		})
+	identityFileId = submitFile(
+		t,
+		accounts.File{
+			File:    "./checkout.jpeg",
+			Purpose: common.IdentityVerification,
+		})
 
 	entityId = createEntity(t, &reference)
 	entityCompanyId = createEntityCompany(t)
-	paymentInstrumentId = createPaymentInstrument(t, entityCompanyId, requestFileId)
+	paymentInstrumentId = createPaymentInstrument(t, entityCompanyId, bankFileId)
 }
 
 func TestSubmitFileAccounts(t *testing.T) {
@@ -115,24 +126,8 @@ func TestCreateEntity(t *testing.T) {
 		checker func(*accounts.OnboardEntityResponse, error)
 	}{
 		{
-			name: "when request is correct then create entity",
-			request: accounts.OnboardEntityRequest{
-				Reference:      GenerateRandomReference(),
-				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				Individual: &accounts.Individual{
-					FirstName:         "Bruce",
-					LastName:          "Wayne",
-					TradingName:       "Batman's Super Hero Masks",
-					NationalTaxId:     "TAX123456",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-			},
+			name:    "when request is correct then create entity",
+			request: buildSoleTraderV3Request(GenerateRandomReference(), "Bruce"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -140,24 +135,8 @@ func TestCreateEntity(t *testing.T) {
 			},
 		},
 		{
-			name: "when entity already exists then return error",
-			request: accounts.OnboardEntityRequest{
-				Reference:      reference,
-				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				Individual: &accounts.Individual{
-					FirstName:         "Bruce",
-					LastName:          "Wayne",
-					TradingName:       "Batman's Super Hero Masks",
-					NationalTaxId:     "TAX123456",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-			},
+			name:    "when entity already exists then return error",
+			request: buildSoleTraderV3Request(reference, "Bruce"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
@@ -187,8 +166,7 @@ func TestCreateEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			// v2.0 payload (top-level individual) — pin to 2.0 (SDK now defaults to 3.0)
-			tc.checker(client.CreateEntity(tc.request, "2.0"))
+			tc.checker(client.CreateEntity(tc.request, "3.0"))
 		})
 	}
 }
@@ -212,8 +190,8 @@ func TestCreateEntityV2(t *testing.T) {
 					// company.representatives on 2026-09-15 with
 					// 422 invalid_request / company_representatives_0_invalid
 					// (request_id ea0252e8-ed58-90ab-8ab7-a6b3c4e6b376). Every shape the SDK can
-					// express was refused -- flat fields, a nested individual, with and without
-					// roles, place_of_birth and identification -- while this same request minus
+					// express was refused (flat fields, a nested individual, with and without
+					// roles, place_of_birth and identification), while this same request minus
 					// the field is accepted. Schema 2.0 is deprecated, so the field was dropped
 					// rather than the test quarantined; TestCreateEntityV3 still covers
 					// representatives on the current schema.
@@ -301,65 +279,8 @@ func TestCreateEntityV3(t *testing.T) {
 		checker func(*accounts.OnboardEntityResponse, error)
 	}{
 		{
-			name: "when request is valid then create entity V3",
-			request: accounts.OnboardEntityRequest{
-				Reference: GenerateRandomReference(),
-				ContactDetails: &accounts.ContactDetails{
-					Phone: &accounts.Phone{CountryCode: common.GB, Number: "2345678910"},
-					EntityEmailAddresses: &accounts.EntityEmailAddresses{
-						Primary: GenerateRandomEmail(),
-					},
-				},
-				Profile: &accounts.Profile{
-					Urls:                   []string{"https://www.superheroexample.com"},
-					Mccs:                   []string{"0742"},
-					DefaultHoldingCurrency: common.USD,
-					HoldingCurrencies:      []common.Currency{common.USD},
-				},
-				Company: &accounts.Company{
-					BusinessRegistrationNumber: "01234567",
-					BusinessType:               accounts.LimitedCompany,
-					LegalName:                  "Super Hero Masks Inc.",
-					TradingName:                "Super Hero Masks",
-					DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 6, Year: 2010},
-					PrincipalAddress:           Address(),
-					RegisteredAddress:          Address(),
-					Representatives: []accounts.Representative{
-						{
-							Individual: &accounts.Individual{
-								FirstName:    "John",
-								LastName:     "Doe",
-								DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-								PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
-								Address:      Address(),
-							},
-							Roles: []accounts.EntityRoles{
-								accounts.UboERStringType,
-								accounts.AuthorisedSignatoryERStringType,
-								accounts.DirectorERStringType,
-								accounts.ControlPersonERStringType,
-							},
-						},
-					},
-				},
-				ProcessingDetails: &accounts.ProcessingDetails{
-					AnnualProcessingVolume:      1000000,
-					AverageTransactionValue:     5000,
-					AverageOrderFulfillmentTime: 3,
-					HighestTransactionValue:     25000,
-					Currency:                    common.USD,
-					SettlementCountry:           "GB",
-					TargetCountries:             []string{"GB"},
-					Payments: &accounts.ProcessingDetailsPayments{
-						Ach: &accounts.ProcessingDetailsAch{
-							AnnualAchVolume:              1000000,
-							AverageAchTransactionSize:    5000,
-							EstimatedMonthlyCreditVolume: 100000,
-							AverageCreditAmount:          5000,
-						},
-					},
-				},
-			},
+			name:    "when request is valid then create entity V3",
+			request: buildCompanyV3Request(),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
@@ -376,6 +297,97 @@ func TestCreateEntityV3(t *testing.T) {
 			tc.checker(client.CreateEntity(tc.request, "3.0"))
 		})
 	}
+}
+
+// The representative's documents on schema 3.0. The sandbox platform resolves to a company variant
+// (GB/US scope, USD only), where identity_verification and certified_authorised_signatory are the
+// representative documents the API accepts; the EEA Sole Trader keys are covered by the accounts
+// serialization tests, since this platform rejects them.
+func TestCreateEntityWithRepresentativeDocuments(t *testing.T) {
+	client := buildAccountsFilesClient().Accounts
+
+	identityFile, err := client.SubmitFile(accounts.File{File: "./checkout.jpeg", Purpose: common.IdentityVerification})
+	assert.Nil(t, err)
+	signatoryFile, err := client.SubmitFile(accounts.File{File: "./checkout.jpeg", Purpose: common.CertifiedAuthorisedSignatory})
+	assert.Nil(t, err)
+
+	request := buildCompanyV3Request()
+	request.Company.Representatives[0].Documents = &accounts.OnboardSubEntityDocuments{
+		IdentityVerification: &accounts.IdentityVerification{
+			Type: accounts.PassportIVStringType, Front: identityFile.Id},
+		CertifiedAuthorisedSignatory: &accounts.CertifiedAuthorisedSignatory{
+			Type: accounts.PowerOfAttorneyCASStringType, Front: signatoryFile.Id},
+	}
+
+	entity, err := client.CreateEntity(request, "3.0")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, entity.Id)
+
+	// The documents are linked on the representative, not dropped: the API echoes them back.
+	details, err := client.GetEntity(entity.Id, "3.0")
+	assert.Nil(t, err)
+	linked := details.Company.Representatives[0].Documents
+	assert.Equal(t, accounts.PassportIVStringType, linked.IdentityVerification.Type)
+	assert.Equal(t, identityFile.Id, linked.IdentityVerification.Front)
+	assert.Equal(t, accounts.PowerOfAttorneyCASStringType, linked.CertifiedAuthorisedSignatory.Type)
+	assert.Equal(t, signatoryFile.Id, linked.CertifiedAuthorisedSignatory.Front)
+}
+
+// UploadFile only requests an upload link (POST /entities/{entityId}/files with {"purpose": ...});
+// the file content is then sent with a data-binary PUT to the returned upload link, after which the
+// file can be retrieved.
+func TestUploadFileAndRetrieveFile(t *testing.T) {
+	client := buildAccountsFilesClient().Accounts
+
+	entity, err := client.CreateEntity(buildCompanyV3Request(), "3.0")
+	if !assert.Nil(t, err) || !assert.NotEmpty(t, entity.Id) {
+		return
+	}
+
+	upload, err := client.UploadFile(entity.Id, accounts.File{Purpose: common.IdentityVerification})
+	if !assert.Nil(t, err) {
+		return
+	}
+	assert.NotEmpty(t, upload.Id)
+	assert.True(t, upload.MaximumSizeInBytes > 0)
+	assert.Contains(t, upload.DocumentTypesForPurpose, "image/jpeg")
+	uploadLink, ok := upload.Links["upload"]
+	if !assert.True(t, ok) || !assert.NotNil(t, uploadLink.HRef) {
+		return
+	}
+
+	content, err := ioutil.ReadFile("./checkout.jpeg")
+	if !assert.Nil(t, err) {
+		return
+	}
+	putRequest, err := http.NewRequest(http.MethodPut, *uploadLink.HRef, bytes.NewReader(content))
+	if !assert.Nil(t, err) {
+		return
+	}
+	putRequest.Header.Set("Content-Type", "image/jpeg")
+	putResponse, err := http.DefaultClient.Do(putRequest)
+	if !assert.Nil(t, err) {
+		return
+	}
+	defer putResponse.Body.Close()
+	assert.True(t, putResponse.StatusCode/100 == 2, "upload PUT returned status %d", putResponse.StatusCode)
+
+	// The API processes the uploaded content asynchronously. Until it has, the file details carry a
+	// placeholder uploaded_on without a time zone ("0001-01-01T00:00:00") that does not parse as
+	// RFC 3339, so retry for a short while.
+	var details *accounts.FileDetailsResponse
+	for attempt := 0; attempt < 10; attempt++ {
+		details, err = client.RetrieveFile(entity.Id, upload.Id)
+		if err == nil {
+			break
+		}
+		time.Sleep(2 * time.Second)
+	}
+	if !assert.Nil(t, err) {
+		return
+	}
+	assert.Equal(t, upload.Id, details.Id)
+	assert.Equal(t, string(common.IdentityVerification), details.Purpose)
 }
 
 func TestGetEntity(t *testing.T) {
@@ -409,7 +421,7 @@ func TestGetEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.GetEntity(tc.entityId, "2.0"))
+			tc.checker(client.GetEntity(tc.entityId, "3.0"))
 		})
 	}
 }
@@ -424,49 +436,22 @@ func TestUpdateEntity(t *testing.T) {
 		{
 			name:     "when request is correct then update entity",
 			entityId: entityId,
-			request: accounts.OnboardEntityRequest{
-				ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				Individual: &accounts.Individual{
-					FirstName:         "New Name",
-					LastName:          "New LastName",
-					TradingName:       "New Trading Name",
-					NationalTaxId:     "TAX8765432",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-			},
+			// The reference is set at creation and not sent again on update.
+			request: buildSoleTraderV3Request("", "Brucie"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, err)
 				assert.NotNil(t, response)
 				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
+
+				details, err := buildAccountsClient().Accounts.GetEntity(entityId, "3.0")
+				assert.Nil(t, err)
+				assert.Equal(t, "Brucie", details.Company.Representatives[0].Individual.FirstName)
 			},
 		},
 		{
 			name:     "when entity not_found then return error",
 			entityId: "ent_zzzzzzzzzzzzzzzzzzzzzzzzzz",
-			request: accounts.OnboardEntityRequest{
-				Individual: &accounts.Individual{
-					FirstName:         "New Name",
-					LastName:          "New LastName",
-					TradingName:       "New Trading Name",
-					NationalTaxId:     "TAX8765432",
-					RegisteredAddress: Address(),
-					DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-					Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-				},
-				Profile: &accounts.Profile{
-					Urls: []string{"https://www.superheroexample.com"},
-					Mccs: []string{"0742"},
-				},
-				ContactDetails: &accounts.ContactDetails{
-					Phone: &accounts.Phone{Number: "2345678910"},
-				},
-			},
+			request:  buildSoleTraderV3Request("", "Brucie"),
 			checker: func(response *accounts.OnboardEntityResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)
@@ -480,7 +465,7 @@ func TestUpdateEntity(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			tc.checker(client.UpdateEntity(tc.entityId, tc.request, "2.0"))
+			tc.checker(client.UpdateEntity(tc.entityId, tc.request, "3.0"))
 		})
 	}
 }
@@ -989,25 +974,7 @@ func createEntity(t *testing.T, inputReference *string) string {
 		reference = *inputReference
 	}
 
-	r := accounts.OnboardEntityRequest{
-		Reference:      reference,
-		ContactDetails: &accounts.ContactDetails{Phone: &accounts.Phone{Number: "2345678910"}},
-		Profile: &accounts.Profile{
-			Urls: []string{"https://www.superheroexample.com"},
-			Mccs: []string{"0742"},
-		},
-		Individual: &accounts.Individual{
-			FirstName:         "Bruce",
-			LastName:          "Wayne",
-			TradingName:       "Batman's Super Hero Masks",
-			NationalTaxId:     "TAX123456",
-			RegisteredAddress: Address(),
-			DateOfBirth:       &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
-			Identification:    &accounts.Identification{NationalIdNumber: "AB123456C"},
-		},
-	}
-
-	entity, err := buildAccountsClient().Accounts.CreateEntity(r, "2.0")
+	entity, err := buildAccountsClient().Accounts.CreateEntity(buildSoleTraderV3Request(reference, "Bruce"), "3.0")
 	if err != nil {
 		assert.Fail(t, fmt.Sprintf("error creating entity - %s", err.Error()))
 	}
@@ -1178,6 +1145,140 @@ func buildAccountsClient() *nas.Api {
 	}
 
 	return oauthAccountsClient
+}
+
+// buildAccountsFilesClient is the accounts-scoped OAuth client with the files scope added, which the
+// entity file endpoints and SubmitFile need on top of accounts.
+func buildAccountsFilesClient() *nas.Api {
+	if oauthAccountsFilesClient == nil {
+		oauthAccountsFilesClient, _ = checkout.Builder().OAuth().
+			WithClientCredentials(
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_ID"),
+				os.Getenv("CHECKOUT_DEFAULT_OAUTH_ACCOUNTS_CLIENT_SECRET")).
+			WithEnvironment(configuration.Sandbox()).
+			WithScopes([]string{configuration.Accounts, configuration.Files}).
+			// The sandbox OAuth clients lack subdomain provisioning, so the token request would
+			// come back invalid_client. Opting out explicitly until they are provisioned.
+			WithLegacyDomain().
+			Build()
+	}
+
+	return oauthAccountsFilesClient
+}
+
+// buildSoleTraderV3Request is a schema 3.0 GB Sole Trader Full request (GBSoleTraderFull3-0): a company
+// of business type individual_or_sole_proprietorship with exactly one ubo representative, the
+// representative's identity document and the top-level bank statement. It replaces the schema 2.0
+// sole trader (a top-level individual), which the sandbox answers with HTTP 500 even for a body that
+// validates against the spec. The processing currency is USD, the only currency in the sandbox
+// platform's currency scope (see buildCompanyV3Request); the addresses and settlement country stay GB.
+// Needs identityFileId and bankFileId, uploaded by TestSetupAccountsSuite.
+func buildSoleTraderV3Request(reference, firstName string) accounts.OnboardEntityRequest {
+	return accounts.OnboardEntityRequest{
+		Reference: reference,
+		ContactDetails: &accounts.ContactDetails{
+			Phone:                &accounts.Phone{CountryCode: common.GB, Number: "2072343000"},
+			EntityEmailAddresses: &accounts.EntityEmailAddresses{Primary: GenerateRandomEmail()},
+		},
+		Profile: &accounts.Profile{
+			Urls:                   []string{"https://www.superheroexample.com"},
+			Mccs:                   []string{"0742"},
+			DefaultHoldingCurrency: common.USD,
+			HoldingCurrencies:      []common.Currency{common.USD},
+		},
+		Company: &accounts.Company{
+			TradingName:         "Batman's Super Hero Masks",
+			BusinessType:        accounts.IndividualOrSoleProprietorship,
+			DateOfIncorporation: &accounts.DateOfIncorporation{Month: 6, Year: 2015},
+			PrincipalAddress:    Address(),
+			Representatives: []accounts.Representative{{
+				Individual: &accounts.Individual{
+					FirstName:    firstName,
+					LastName:     "Wayne",
+					EmailAddress: GenerateRandomEmail(),
+					DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
+					PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
+					Address:      Address(),
+				},
+				Roles: []accounts.EntityRoles{accounts.UboERStringType},
+				Documents: &accounts.OnboardSubEntityDocuments{
+					IdentityVerification: &accounts.IdentityVerification{
+						Type: accounts.PassportIVStringType, Front: identityFileId},
+				},
+			}},
+		},
+		ProcessingDetails: &accounts.ProcessingDetails{
+			SettlementCountry:       "GB",
+			TargetCountries:         []string{"GB"},
+			AnnualProcessingVolume:  1000000,
+			AverageTransactionValue: 5000,
+			HighestTransactionValue: 25000,
+			Currency:                common.USD,
+		},
+		Documents: &accounts.OnboardSubEntityDocuments{
+			BankVerification: &accounts.BankVerification{
+				Type: accounts.BankStatementBVStringType, Front: bankFileId},
+		},
+	}
+}
+
+// buildCompanyV3Request is a schema 3.0 company request the sandbox platform accepts: every currency
+// sits inside its USD-only currency scope, including the processing details currency.
+func buildCompanyV3Request() accounts.OnboardEntityRequest {
+	return accounts.OnboardEntityRequest{
+		Reference: GenerateRandomReference(),
+		ContactDetails: &accounts.ContactDetails{
+			Phone:                &accounts.Phone{CountryCode: common.GB, Number: "2345678910"},
+			EntityEmailAddresses: &accounts.EntityEmailAddresses{Primary: GenerateRandomEmail()},
+		},
+		Profile: &accounts.Profile{
+			Urls:                   []string{"https://www.superheroexample.com"},
+			Mccs:                   []string{"0742"},
+			DefaultHoldingCurrency: common.USD,
+			HoldingCurrencies:      []common.Currency{common.USD},
+		},
+		Company: &accounts.Company{
+			BusinessRegistrationNumber: "01234567",
+			BusinessType:               accounts.LimitedCompany,
+			LegalName:                  "Super Hero Masks Inc.",
+			TradingName:                "Super Hero Masks",
+			DateOfIncorporation:        &accounts.DateOfIncorporation{Day: 1, Month: 6, Year: 2010},
+			PrincipalAddress:           Address(),
+			RegisteredAddress:          Address(),
+			Representatives: []accounts.Representative{{
+				Individual: &accounts.Individual{
+					FirstName:    "John",
+					LastName:     "Doe",
+					DateOfBirth:  &accounts.DateOfBirth{Day: 5, Month: 6, Year: 1995},
+					PlaceOfBirth: &accounts.PlaceOfBirth{Country: common.GB},
+					Address:      Address(),
+				},
+				Roles: []accounts.EntityRoles{
+					accounts.UboERStringType,
+					accounts.AuthorisedSignatoryERStringType,
+					accounts.DirectorERStringType,
+					accounts.ControlPersonERStringType,
+				},
+			}},
+		},
+		ProcessingDetails: &accounts.ProcessingDetails{
+			AnnualProcessingVolume:      1000000,
+			AverageTransactionValue:     5000,
+			AverageOrderFulfillmentTime: 3,
+			HighestTransactionValue:     25000,
+			Currency:                    common.USD,
+			SettlementCountry:           "GB",
+			TargetCountries:             []string{"GB"},
+			Payments: &accounts.ProcessingDetailsPayments{
+				Ach: &accounts.ProcessingDetailsAch{
+					AnnualAchVolume:              1000000,
+					AverageAchTransactionSize:    5000,
+					EstimatedMonthlyCreditVolume: 100000,
+					AverageCreditAmount:          5000,
+				},
+			},
+		},
+	}
 }
 
 func buildAccountsClientVersion(schemaVersion string) *nas.Api {

@@ -12,7 +12,7 @@ import (
 //
 // It exists because encoding/json renders time.Time as RFC 3339 and offers no per-field
 // override, so a time.Time on a date-only field puts a full timestamp on the wire. Some
-// providers reject that outright -- Tamara returns a gateway error for a timestamp on
+// providers reject that outright: Tamara returns a gateway error for a timestamp on
 // processing.accommodation_data.check_in_date.
 //
 // Construct one by converting a time.Time; the time component is discarded on serialization:
@@ -28,8 +28,8 @@ type APIShortDate time.Time
 // contract break; silently truncating it to a date would hide that. Java rejects date-times on
 // LocalDate for the same reason, and test/apishortdate_test.go pins the rejection.
 //
-// time.Parse is strict about both layouts -- they are mutually exclusive, out-of-range dates and
-// trailing characters are rejected -- so no length guard is needed around the second format.
+// time.Parse is strict about both layouts (they are mutually exclusive, out-of-range dates and
+// trailing characters are rejected), so no length guard is needed around the second format.
 var shortDateFormats = []string{
 	"2006-01-02", // yyyy-MM-dd, the format the specification declares
 	"20060102",   // yyyyMMdd, the compact form some endpoints return

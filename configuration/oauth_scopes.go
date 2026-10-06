@@ -7,8 +7,8 @@ package configuration
 // never declared in that map: compliance-requests, compliance-requests:read,
 // compliance-requests:respond, vault:gpayme-enrollment and vault:tokens-metadata.
 //
-// Five further constants -- issuing:card-mgmt, issuing:client, marketplace, middleware:gateway
-// and middleware:payment-context -- appear nowhere in the specification at all, but the
+// Five further constants (issuing:card-mgmt, issuing:client, marketplace, middleware:gateway
+// and middleware:payment-context) appear nowhere in the specification at all, but the
 // authorization server still grants them and callers still request them, so they are kept for
 // backward compatibility. Each is marked inline. Do not assume a scope is dead because the
 // specification omits it: the sandbox payouts client is provisioned for marketplace and answers

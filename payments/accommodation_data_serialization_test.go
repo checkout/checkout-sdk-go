@@ -15,7 +15,7 @@ import (
 //
 // The specification declares check_in_date, check_out_date, guests[].date_of_birth,
 // ticket.issue_date, passenger.date_of_birth and flight_leg_details[].departure_date as
-// "type": "string", "format": "date" -- so the wire value is yyyy-MM-dd.
+// "type": "string", "format": "date", so the wire value is yyyy-MM-dd.
 //
 // These fields used to be *time.Time. Go's encoding/json marshals time.Time as RFC 3339
 // and offers no per-field override, so the SDK always emitted a full timestamp
@@ -154,7 +154,7 @@ func TestProcessingSettingsSerializesAccommodationDatesAsShortDates(t *testing.T
 // which hangs off the payment-details response, and the API returns these fields
 // date-only. While they were *time.Time this failed outright with
 // `parsing time "2026-10-01" as "2006-01-02T15:04:05Z07:00": cannot parse "" as "T"`,
-// so GetPaymentDetails broke for any lodging payment carrying accommodation_data --
+// so GetPaymentDetails broke for any lodging payment carrying accommodation_data,
 // whether or not the merchant ever sent the field.
 func TestAccommodationDataDeserializesDateOnlyValues(t *testing.T) {
 	payload := `{
@@ -192,7 +192,7 @@ func TestAccommodationDataDateRoundTrip(t *testing.T) {
 
 // A2: common.APIShortDate also accepts the compact yyyyMMdd form, matching the Java SDK's
 // LocalDate deserializer. This confirms the tolerance reaches the migrated fields, not just the
-// type in isolation -- a response using the compact form parses, and re-serializes in the
+// type in isolation: a response using the compact form parses, and re-serializes in the
 // canonical yyyy-MM-dd the specification declares.
 func TestAccommodationDataAcceptsCompactDates(t *testing.T) {
 	payload := `{

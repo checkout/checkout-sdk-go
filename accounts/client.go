@@ -534,10 +534,13 @@ func (c *Client) UpdateReserveRuleWithContext(
 	return &response, nil
 }
 
+// SubmitFile uploads a file to the Files API (POST /files on the Files host), as a multipart
+// request. The returned ID is what document Front and Back fields take.
 func (c *Client) SubmitFile(file File) (*common.IdResponse, error) {
 	return c.SubmitFileWithContext(context.Background(), file)
 }
 
+// SubmitFileWithContext is SubmitFile with a context for cancellation and deadlines.
 func (c *Client) SubmitFileWithContext(
 	ctx context.Context,
 	file File,
@@ -561,10 +564,16 @@ func (c *Client) SubmitFileWithContext(
 	return &response, nil
 }
 
+// UploadFile requests an upload link for a sub-entity file (POST /entities/{entityId}/files on the
+// Files host). It sends only request.Purpose, as the JSON body {"purpose": ...}; request.File is not
+// read or sent. The response carries the file ID, the maximum size, the accepted MIME types and, in
+// Links["upload"], the pre-signed URL: send the file content to that URL with an HTTP PUT whose body is
+// the raw file bytes and whose Content-Type is one of DocumentTypesForPurpose.
 func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
 	return c.UploadFileWithContext(context.Background(), entityId, request)
 }
 
+// UploadFileWithContext is UploadFile with a context for cancellation and deadlines.
 func (c *Client) UploadFileWithContext(
 	ctx context.Context,
 	entityId string,
@@ -575,13 +584,19 @@ func (c *Client) UploadFileWithContext(
 		return nil, err
 	}
 
-	req, err := common.BuildFileUploadRequest(&request)
-	if err != nil {
-		return nil, err
-	}
+	payload := struct {
+		Purpose common.Purpose `json:"purpose"`
+	}{request.Purpose}
 
 	var response UploadFileResponse
-	err = c.filesClient.UploadWithContext(ctx, common.BuildPath(entitiesPath, entityId, filesPath), auth, req, &response)
+	err = c.filesClient.PostWithContext(
+		ctx,
+		common.BuildPath(entitiesPath, entityId, filesPath),
+		auth,
+		payload,
+		&response,
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -589,10 +604,13 @@ func (c *Client) UploadFileWithContext(
 	return &response, nil
 }
 
+// RetrieveFile retrieves the details of a sub-entity's file
+// (GET /entities/{entityId}/files/{fileId} on the Files host).
 func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, error) {
 	return c.RetrieveFileWithContext(context.Background(), entityId, fileId)
 }
 
+// RetrieveFileWithContext is RetrieveFile with a context for cancellation and deadlines.
 func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId string) (*FileDetailsResponse, error) {
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {

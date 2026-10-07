@@ -613,6 +613,7 @@ func TestCashAppPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 	assert.Contains(t, body, `"address_line_3":"Floor 3"`)
 	assert.Contains(t, body, `"administrative_district_level_1":"IL"`)
 	assert.NotContains(t, body, "address_line1")
+	assert.NotContains(t, body, "administrative_district_level1")
 	assert.Contains(t, body, `"redirect_url":"`)
 	assert.Contains(t, body, `"customer_since":"1970-01-18T12:46:04.8000000+00:00"`)
 

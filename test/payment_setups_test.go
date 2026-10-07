@@ -332,9 +332,19 @@ func TestCreatePaymentSetup_WithCashApp_ShouldReturnCashAppDetails(t *testing.T)
 	if !containsString(response.AvailablePaymentMethods, "cashapp") {
 		t.Skip("Cash App Pay is not enabled on the sandbox processing channel")
 	}
-	assert.NotNil(t, response.PaymentMethods)
-	assert.NotNil(t, response.PaymentMethods.CashApp)
-	assert.NotEmpty(t, response.PaymentMethods.CashApp.Status)
+	fetched, err := DefaultApi().PaymentSetups.GetPaymentSetup(response.Id)
+	if !assert.Nil(t, err) || !assert.NotNil(t, fetched) || !assert.NotNil(t, fetched.PaymentMethods) {
+		return
+	}
+	cashApp := fetched.PaymentMethods.CashApp
+	if !assert.NotNil(t, cashApp) {
+		return
+	}
+	assert.NotEmpty(t, cashApp.Status)
+	assert.Equal(t, setups.PaymentMethodInitializationEnabled, cashApp.Initialization)
+	if assert.NotNil(t, cashApp.CustomerProfileSharing) {
+		assert.True(t, *cashApp.CustomerProfileSharing)
+	}
 }
 
 func containsString(values []string, target string) bool {

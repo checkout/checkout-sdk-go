@@ -338,10 +338,12 @@ type PaymentSetupCustomerDevice struct {
 	// Client is the type of client the customer uses to initiate the payment. Required when using
 	// Cash App Pay.
 	// [Optional]
+	// Enum: "web" "mobile_web" "app"
 	Client PaymentSetupDeviceClient `json:"client,omitempty"`
 
 	// Os is the operating system of the customer's device.
 	// [Optional]
+	// Enum: "android" "ios"
 	Os PaymentSetupDeviceOs `json:"os,omitempty"`
 }
 
@@ -591,6 +593,7 @@ type PaymentMethodBase struct {
 	// Payment Setup, this defaults to disabled.
 	// [Optional]
 	// Default: "disabled"
+	// Enum: "disabled" "enabled"
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 }
 
@@ -896,6 +899,7 @@ const (
 type BacsAccountHolder struct {
 	// Type is the type of account holder.
 	// [Optional]
+	// Enum: "individual" "corporate"
 	Type BacsAccountHolderType `json:"type,omitempty"`
 
 	// FirstName is the first name of the account holder.
@@ -1689,6 +1693,7 @@ const (
 type AccountFundingTransactionIdentification struct {
 	// Type is the type of identification used to identify the sender.
 	// [Optional]
+	// Enum: "passport" "driving_license" "national_id"
 	Type AccountFundingTransactionIdentificationType `json:"type,omitempty"`
 
 	// Number is the identification number.
@@ -1753,6 +1758,10 @@ type PaymentSetupAccountFundingTransaction struct {
 
 	// Purpose specifies the purpose of the account funding transaction.
 	// [Optional]
+	// Enum: "donations" "education" "emergency_need" "expatriation" "family_support"
+	// "financial_services" "gifts" "income" "insurance" "investment" "it_services" "leisure"
+	// "loan_payment" "medical_treatment" "other" "pension" "royalties" "savings"
+	// "travel_and_tourism"
 	Purpose AccountFundingTransactionPurpose `json:"purpose,omitempty"`
 
 	// Sender holds the account funding transaction sender details.

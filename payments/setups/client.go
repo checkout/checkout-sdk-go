@@ -104,7 +104,7 @@ func (c *Client) GetPaymentSetupWithContext(ctx context.Context, setupId string)
 //
 // Confirm a Payment Setup to begin processing the payment request with your
 // chosen payment method. paymentMethodName is the name of the payment method
-// to process the payment with (for example, tabby, klarna, card).
+// to process the payment with (for example, tabby, klarna, card, cashapp).
 func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodName string) (*PaymentSetupResponse, error) {
 	return c.ConfirmPaymentSetupWithContext(context.Background(), setupId, paymentMethodName)
 }

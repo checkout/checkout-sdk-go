@@ -254,3 +254,104 @@ func TestPaymentSetupFullWorkflow(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, confirmResponse)
 }
+
+func TestCreatePaymentSetup_WithDeviceFields_ShouldEchoThem(t *testing.T) {
+	device := &setups.PaymentSetupCustomerDevice{
+		Locale:      "en_GB",
+		Fingerprint: "fp_abc123xyz",
+		Ipv4:        "203.0.113.0",
+		Ipv6:        "2001:db8:85a3::8a2e:370:7334",
+		Client:      setups.PaymentSetupDeviceClientWeb,
+		Os:          setups.PaymentSetupDeviceOsAndroid,
+	}
+	request := setups.PaymentSetupRequest{
+		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
+		Amount:              1000,
+		Currency:            common.GBP,
+		Customer:            &setups.PaymentSetupCustomer{Device: device},
+	}
+
+	response, err := DefaultApi().PaymentSetups.CreatePaymentSetup(request)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.NotNil(t, response.Customer)
+	assert.Equal(t, device, response.Customer.Device)
+}
+
+func TestCreatePaymentSetup_WithCustomerIdentifiers_ShouldEchoThem(t *testing.T) {
+	request := setups.PaymentSetupRequest{
+		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
+		Amount:              1000,
+		Currency:            common.GBP,
+		Customer: &setups.PaymentSetupCustomer{
+			Id:        "cus_123456789",
+			Country:   common.GB,
+			TaxNumber: "GB123456789",
+		},
+	}
+
+	response, err := DefaultApi().PaymentSetups.CreatePaymentSetup(request)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.NotNil(t, response.Customer)
+	assert.Equal(t, "cus_123456789", response.Customer.Id)
+	assert.Equal(t, common.GB, response.Customer.Country)
+	assert.Equal(t, "GB123456789", response.Customer.TaxNumber)
+}
+
+func TestCreatePaymentSetup_WithCashApp_ShouldReturnCashAppDetails(t *testing.T) {
+	request := setups.PaymentSetupRequest{
+		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
+		Amount:              1000,
+		Currency:            common.USD,
+		PaymentMethods: &setups.PaymentMethods{
+			CashApp: &setups.CashAppPaymentMethod{
+				PaymentMethodBase:      setups.PaymentMethodBase{Initialization: setups.PaymentMethodInitializationEnabled},
+				CustomerProfileSharing: Bool(true),
+			},
+		},
+		Customer: &setups.PaymentSetupCustomer{
+			Device: &setups.PaymentSetupCustomerDevice{
+				Locale: "en_US",
+				Client: setups.PaymentSetupDeviceClientWeb,
+			},
+		},
+		Settings: &setups.PaymentSetupSettings{
+			SuccessUrl: "https://example.com/success",
+			FailureUrl: "https://example.com/failure",
+		},
+	}
+
+	response, err := DefaultApi().PaymentSetups.CreatePaymentSetup(request)
+
+	if !assert.Nil(t, err) || !assert.NotNil(t, response) {
+		return
+	}
+	if !containsString(response.AvailablePaymentMethods, "cashapp") {
+		t.Skip("Cash App Pay is not enabled on the sandbox processing channel")
+	}
+	fetched, err := DefaultApi().PaymentSetups.GetPaymentSetup(response.Id)
+	if !assert.Nil(t, err) || !assert.NotNil(t, fetched) || !assert.NotNil(t, fetched.PaymentMethods) {
+		return
+	}
+	cashApp := fetched.PaymentMethods.CashApp
+	if !assert.NotNil(t, cashApp) {
+		return
+	}
+	assert.NotEmpty(t, cashApp.Status)
+	assert.Equal(t, setups.PaymentMethodInitializationEnabled, cashApp.Initialization)
+	if assert.NotNil(t, cashApp.CustomerProfileSharing) {
+		assert.True(t, *cashApp.CustomerProfileSharing)
+	}
+}
+
+func containsString(values []string, target string) bool {
+	for _, value := range values {
+		if value == target {
+			return true
+		}
+	}
+	return false
+}

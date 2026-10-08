@@ -402,3 +402,47 @@ func TestCreatePaymentSetup_WithAccountFundingTransactionAndBlik(t *testing.T) {
 	assert.NotNil(t, response.PaymentMethods.Blik)
 	assert.Equal(t, "999111", response.PaymentMethods.Blik.PartnerCode)
 }
+
+func TestConfirmPaymentSetup_WithCashApp(t *testing.T) {
+	var (
+		setupId         = "ps_123456789"
+		confirmResponse = PaymentSetupResponse{
+			Id: setupId,
+			PaymentMethods: &PaymentMethods{
+				CashApp: &CashAppPaymentMethod{
+					PaymentMethodBase: PaymentMethodBase{Status: "action_required"},
+					Action: &CashAppAction{
+						Type:        "redirect",
+						RedirectUrl: "https://sandbox.api.cash.app/customer-request/v1/requests/GRR_f5xg6wrxhtv3p4w24g0wrexa/interstitial?validity_token=bap03y",
+					},
+				},
+			},
+		}
+	)
+
+	apiClient := new(mocks.ApiClientMock)
+	credentials := new(mocks.CredentialsMock)
+	environment := new(mocks.EnvironmentMock)
+	enableTelemetry := true
+
+	credentials.On("GetAuthorization", mock.Anything).
+		Return(&configuration.SdkAuthorization{}, nil)
+	apiClient.On("PostWithContext", mock.Anything, "/payments/setups/ps_123456789/confirm/cashapp", mock.Anything, nil, mock.Anything, mock.Anything).
+		Return(nil).
+		Run(func(args mock.Arguments) {
+			respMapping := args.Get(4).(*PaymentSetupResponse)
+			*respMapping = confirmResponse
+		})
+
+	config := configuration.NewConfiguration(credentials, &enableTelemetry, environment, &http.Client{}, nil)
+	client := NewClient(config, apiClient)
+
+	response, err := client.ConfirmPaymentSetup(setupId, "cashapp")
+
+	assert.Nil(t, err)
+	apiClient.AssertExpectations(t)
+	assert.Equal(t, setupId, response.Id)
+	assert.Equal(t, "action_required", response.PaymentMethods.CashApp.Status)
+	assert.Equal(t, CashAppActionTypeRedirect, response.PaymentMethods.CashApp.Action.Type)
+	assert.Equal(t, confirmResponse.PaymentMethods.CashApp.Action.RedirectUrl, response.PaymentMethods.CashApp.Action.RedirectUrl)
+}

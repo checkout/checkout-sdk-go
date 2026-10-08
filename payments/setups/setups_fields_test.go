@@ -365,3 +365,345 @@ func TestPaymentSetupAccommodation_OmitsRoomsWhenUnset(t *testing.T) {
 	_, present := body["number_of_rooms"]
 	assert.False(t, present)
 }
+
+// Cash App Pay on Payment Setups: payment_methods.cashapp (schema CashApp) and the customer.device
+// fields fingerprint, ipv4, ipv6, client and os. Fixture values are the public swagger examples.
+
+const cashAppRedirectUrl = "https://sandbox.api.cash.app/customer-request/v1/requests/GRR_f5xg6wrxhtv3p4w24g0wrexa/interstitial?validity_token=bap03y"
+
+func TestPaymentSetupRequest_CashAppWireKeyAndMerchantFields(t *testing.T) {
+	request := PaymentSetupRequest{
+		ProcessingChannelId: "pc_aaaaaaaaaaaaaaaaaaaaaaaaaa",
+		Amount:              1000,
+		Currency:            common.USD,
+		PaymentMethods: &PaymentMethods{
+			CashApp: &CashAppPaymentMethod{
+				PaymentMethodBase:      PaymentMethodBase{Initialization: PaymentMethodInitializationEnabled},
+				CustomerProfileSharing: boolPtr(true),
+			},
+		},
+		Customer: &PaymentSetupCustomer{
+			Device: &PaymentSetupCustomerDevice{
+				Locale:      "en_US",
+				Fingerprint: "fp_abc123xyz",
+				Ipv4:        "203.0.113.0",
+				Ipv6:        "2001:db8:85a3::8a2e:370:7334",
+				Client:      PaymentSetupDeviceClientWeb,
+				Os:          PaymentSetupDeviceOsAndroid,
+			},
+		},
+	}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.NotContains(t, body, "cash_app")
+	assert.NotContains(t, body, "cashApp")
+	assert.NotContains(t, body, "customerProfileSharing")
+
+	var decoded map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	methods := decoded["payment_methods"].(map[string]interface{})
+	cashApp, present := methods["cashapp"].(map[string]interface{})
+	assert.True(t, present, "payment_methods must carry the literal key cashapp")
+	assert.Equal(t, map[string]interface{}{
+		"initialization":           "enabled",
+		"customer_profile_sharing": true,
+	}, cashApp)
+
+	device := decoded["customer"].(map[string]interface{})["device"]
+	assert.Equal(t, map[string]interface{}{
+		"locale":      "en_US",
+		"fingerprint": "fp_abc123xyz",
+		"ipv4":        "203.0.113.0",
+		"ipv6":        "2001:db8:85a3::8a2e:370:7334",
+		"client":      "web",
+		"os":          "android",
+	}, device)
+}
+
+// CustomerProfileSharing is a *bool so an explicit false reaches the API instead of being dropped.
+func TestCashAppPaymentMethod_CustomerProfileSharingFalseIsSent(t *testing.T) {
+	marshalled, err := json.Marshal(CashAppPaymentMethod{CustomerProfileSharing: boolPtr(false)})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"customer_profile_sharing":false}`, string(marshalled))
+
+	marshalled, err = json.Marshal(CashAppPaymentMethod{})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{}`, string(marshalled))
+}
+
+func TestPaymentSetupCustomerDevice_ClientAndOsValues(t *testing.T) {
+	cases := []struct {
+		device   PaymentSetupCustomerDevice
+		expected string
+	}{
+		{PaymentSetupCustomerDevice{Client: PaymentSetupDeviceClientWeb}, `{"client":"web"}`},
+		{PaymentSetupCustomerDevice{Client: PaymentSetupDeviceClientMobileWeb}, `{"client":"mobile_web"}`},
+		{PaymentSetupCustomerDevice{Client: PaymentSetupDeviceClientApp}, `{"client":"app"}`},
+		{PaymentSetupCustomerDevice{Os: PaymentSetupDeviceOsAndroid}, `{"os":"android"}`},
+		{PaymentSetupCustomerDevice{Os: PaymentSetupDeviceOsIos}, `{"os":"ios"}`},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.expected, func(t *testing.T) {
+			marshalled, err := json.Marshal(tc.device)
+			assert.NoError(t, err)
+			assert.JSONEq(t, tc.expected, string(marshalled))
+		})
+	}
+}
+
+func TestPaymentSetupCustomerDevice_OnlyLocaleSerializesOnlyLocale(t *testing.T) {
+	marshalled, err := json.Marshal(PaymentSetupCustomerDevice{Locale: "en_US"})
+	assert.NoError(t, err)
+	assert.Equal(t, `{"locale":"en_US"}`, string(marshalled))
+}
+
+// GetPaymentSetup and ConfirmPaymentSetup both return PaymentSetupResponse, so this read covers
+// the get, create, update and confirm responses.
+func TestPaymentSetupResponse_CashAppSwaggerExample(t *testing.T) {
+	payload := `{
+		"id": "ps_test_abcdefghijklmnopqr",
+		"processing_channel_id": "pc_aaaaaaaaaaaaaaaaaaaaaaaaaa",
+		"amount": 1000,
+		"currency": "USD",
+		"available_payment_methods": ["cashapp"],
+		"customer": {
+			"device": {
+				"locale": "en_US",
+				"fingerprint": "fp_abc123xyz",
+				"ipv4": "203.0.113.0",
+				"ipv6": "2001:db8:85a3::8a2e:370:7334",
+				"client": "web",
+				"os": "android"
+			}
+		},
+		"payment_methods": {
+			"cashapp": {
+				"status": "action_required",
+				"flags": [],
+				"initialization": "enabled",
+				"customer_profile_sharing": true,
+				"reference": "ORDER-99",
+				"action": {
+					"type": "redirect",
+					"redirect_url": "` + cashAppRedirectUrl + `"
+				},
+				"customer_profile": {
+					"customer_id": "CST_AYVkuLzfsRqEhf4OyQFxQNv22m7IjNFjO6f2J5CDE2nxAC4-21wJ2H8_2kvsdIsDZMN4",
+					"cashtag": "$CASHTAG_C_TOKEN",
+					"reference_id": "value",
+					"full_name": "John Middle Doe",
+					"given_name": "John",
+					"middle_name": "Middle",
+					"family_name": "Doe",
+					"suffix": "Jr.",
+					"birth_date": "1990-01-01T00:00:00.0000000",
+					"address": {
+						"address_line_1": "123 Main St",
+						"address_line_2": "Apt 2",
+						"address_line_3": "Floor 3",
+						"locality": "Springfield",
+						"sublocality": "Downtown",
+						"administrative_district_level_1": "IL",
+						"postal_code": "62701",
+						"country": "US"
+					},
+					"phone_number": "5555555555",
+					"email_address": "cash@cash.com",
+					"customer_since": "1970-01-18T12:46:04.8000000+00:00"
+				}
+			}
+		}
+	}`
+
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assert.Equal(t, []string{"cashapp"}, response.AvailablePaymentMethods)
+
+	device := response.Customer.Device
+	assert.Equal(t, "en_US", device.Locale)
+	assert.Equal(t, "fp_abc123xyz", device.Fingerprint)
+	assert.Equal(t, "203.0.113.0", device.Ipv4)
+	assert.Equal(t, "2001:db8:85a3::8a2e:370:7334", device.Ipv6)
+	assert.Equal(t, PaymentSetupDeviceClientWeb, device.Client)
+	assert.Equal(t, PaymentSetupDeviceOsAndroid, device.Os)
+
+	cashApp := response.PaymentMethods.CashApp
+	assert.NotNil(t, cashApp)
+	assert.Equal(t, "action_required", cashApp.Status)
+	assert.NotNil(t, cashApp.Flags)
+	assert.Empty(t, cashApp.Flags)
+	assert.Equal(t, PaymentMethodInitializationEnabled, cashApp.Initialization)
+	assert.True(t, *cashApp.CustomerProfileSharing)
+	assert.Equal(t, "ORDER-99", cashApp.Reference)
+	assert.Equal(t, CashAppActionTypeRedirect, cashApp.Action.Type)
+	assert.Equal(t, cashAppRedirectUrl, cashApp.Action.RedirectUrl)
+
+	profile := cashApp.CustomerProfile
+	assert.Equal(t, "CST_AYVkuLzfsRqEhf4OyQFxQNv22m7IjNFjO6f2J5CDE2nxAC4-21wJ2H8_2kvsdIsDZMN4", profile.CustomerId)
+	assert.Equal(t, "$CASHTAG_C_TOKEN", profile.Cashtag)
+	assert.Equal(t, "value", profile.ReferenceId)
+	assert.Equal(t, "John Middle Doe", profile.FullName)
+	assert.Equal(t, "John", profile.GivenName)
+	assert.Equal(t, "Middle", profile.MiddleName)
+	assert.Equal(t, "Doe", profile.FamilyName)
+	assert.Equal(t, "Jr.", profile.Suffix)
+	assert.Equal(t, "1990-01-01T00:00:00.0000000", profile.BirthDate)
+	assert.Equal(t, "5555555555", profile.PhoneNumber)
+	assert.Equal(t, "cash@cash.com", profile.EmailAddress)
+	if assert.NotNil(t, profile.CustomerSince) {
+		assert.True(t, time.Date(1970, 1, 18, 12, 46, 4, 800000000, time.UTC).Equal(*profile.CustomerSince))
+	}
+
+	address := profile.Address
+	assert.Equal(t, "123 Main St", address.AddressLine1)
+	assert.Equal(t, "Apt 2", address.AddressLine2)
+	assert.Equal(t, "Floor 3", address.AddressLine3)
+	assert.Equal(t, "Springfield", address.Locality)
+	assert.Equal(t, "Downtown", address.Sublocality)
+	assert.Equal(t, "IL", address.AdministrativeDistrictLevel1)
+	assert.Equal(t, "62701", address.PostalCode)
+	assert.Equal(t, common.US, address.Country)
+}
+
+func TestCashAppPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
+	customerSince := time.Date(1970, 1, 18, 12, 46, 4, 800000000, time.UTC)
+	original := CashAppPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{
+			Status:         "action_required",
+			Flags:          []string{"example_flag"},
+			Initialization: PaymentMethodInitializationEnabled,
+		},
+		CustomerProfileSharing: boolPtr(true),
+		Reference:              "ORDER-99",
+		Action: &CashAppAction{
+			Type:        "redirect",
+			RedirectUrl: cashAppRedirectUrl,
+		},
+		CustomerProfile: &CashAppCustomerProfile{
+			CustomerId:  "CST_AYVkuLzfsRqEhf4OyQFxQNv22m7IjNFjO6f2J5CDE2nxAC4-21wJ2H8_2kvsdIsDZMN4",
+			Cashtag:     "$CASHTAG_C_TOKEN",
+			ReferenceId: "value",
+			FullName:    "John Middle Doe",
+			GivenName:   "John",
+			MiddleName:  "Middle",
+			FamilyName:  "Doe",
+			Suffix:      "Jr.",
+			BirthDate:   "1990-01-01T00:00:00.0000000",
+			Address: &CashAppAddress{
+				AddressLine1:                 "123 Main St",
+				AddressLine2:                 "Apt 2",
+				AddressLine3:                 "Floor 3",
+				Locality:                     "Springfield",
+				Sublocality:                  "Downtown",
+				AdministrativeDistrictLevel1: "IL",
+				PostalCode:                   "62701",
+				Country:                      common.US,
+			},
+			PhoneNumber:   "5555555555",
+			EmailAddress:  "cash@cash.com",
+			CustomerSince: &customerSince,
+		},
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"address_line_1":"123 Main St"`)
+	assert.Contains(t, body, `"address_line_2":"Apt 2"`)
+	assert.Contains(t, body, `"address_line_3":"Floor 3"`)
+	assert.Contains(t, body, `"administrative_district_level_1":"IL"`)
+	assert.NotContains(t, body, "address_line1")
+	assert.NotContains(t, body, "administrative_district_level1")
+	assert.Contains(t, body, `"redirect_url":"`)
+	assert.Contains(t, body, `"customer_since":"1970-01-18T12:46:04.8Z"`)
+
+	var decoded CashAppPaymentMethod
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}
+
+// Every PaymentSetup.customer property, with the swagger examples.
+func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing.T) {
+	original := PaymentSetupCustomer{
+		Id:      "cus_123456789",
+		Country: common.GB,
+		Email: &PaymentSetupCustomerEmail{
+			Address:  "johnsmith@example.com",
+			Verified: boolPtr(true),
+		},
+		Name:      "John Smith",
+		TaxNumber: "GB123456789",
+		Phone:     &common.Phone{CountryCode: "+44", Number: "207 946 0000"},
+		Device: &PaymentSetupCustomerDevice{
+			Locale:      "en_GB",
+			Fingerprint: "fp_abc123xyz",
+			Ipv4:        "203.0.113.0",
+			Ipv6:        "2001:db8:85a3::8a2e:370:7334",
+			Client:      PaymentSetupDeviceClientApp,
+			Os:          PaymentSetupDeviceOsIos,
+		},
+		MerchantAccount: &CustomerMerchantAccount{
+			Id:                   "acc_123",
+			RegistrationDate:     shortDate(t, 2020, time.January, 1, 0, 0),
+			LastModified:         shortDate(t, 2021, time.February, 2, 0, 0),
+			ReturningCustomer:    boolPtr(true),
+			FirstTransactionDate: shortDate(t, 2020, time.March, 3, 0, 0),
+			LastTransactionDate:  shortDate(t, 2022, time.April, 4, 0, 0),
+			TotalOrderCount:      7,
+			LastPaymentAmount:    1500,
+		},
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"id":"cus_123456789"`)
+	assert.Contains(t, body, `"country":"GB"`)
+	assert.Contains(t, body, `"tax_number":"GB123456789"`)
+	assert.NotContains(t, body, "taxNumber")
+
+	var decoded PaymentSetupCustomer
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+
+	example := `{
+		"country": "GB",
+		"id": "cus_123456789",
+		"email": {"address": "johnsmith@example.com", "verified": true},
+		"name": "John Smith",
+		"tax_number": "GB123456789",
+		"phone": {"country_code": "+44", "number": "207 946 0000"},
+		"device": {"locale": "en_GB", "fingerprint": "fp_abc123xyz", "ipv4": "203.0.113.0",
+			"ipv6": "2001:db8:85a3::8a2e:370:7334", "client": "web", "os": "android"},
+		"merchant_account": {"id": "1234", "registration_date": "2023-05-01", "last_modified": "2023-05-01",
+			"returning_customer": true, "first_transaction_date": "2023-09-15",
+			"last_transaction_date": "2025-03-28", "total_order_count": 6, "last_payment_amount": 55}
+	}`
+	var fromExample PaymentSetupCustomer
+	assert.NoError(t, json.Unmarshal([]byte(example), &fromExample))
+	assert.Equal(t, "cus_123456789", fromExample.Id)
+	assert.Equal(t, common.GB, fromExample.Country)
+	assert.Equal(t, "johnsmith@example.com", fromExample.Email.Address)
+	assert.True(t, *fromExample.Email.Verified)
+	assert.Equal(t, "John Smith", fromExample.Name)
+	assert.Equal(t, "GB123456789", fromExample.TaxNumber)
+	assert.Equal(t, "+44", fromExample.Phone.CountryCode)
+	assert.Equal(t, "207 946 0000", fromExample.Phone.Number)
+	assert.Equal(t, "en_GB", fromExample.Device.Locale)
+	assert.Equal(t, PaymentSetupDeviceClientWeb, fromExample.Device.Client)
+	assert.Equal(t, PaymentSetupDeviceOsAndroid, fromExample.Device.Os)
+	merchantAccount := fromExample.MerchantAccount
+	if assert.NotNil(t, merchantAccount) {
+		assert.Equal(t, "1234", merchantAccount.Id)
+		assert.Equal(t, common.APIShortDate(time.Date(2023, 5, 1, 0, 0, 0, 0, time.UTC)), *merchantAccount.RegistrationDate)
+		assert.Equal(t, common.APIShortDate(time.Date(2023, 5, 1, 0, 0, 0, 0, time.UTC)), *merchantAccount.LastModified)
+		assert.True(t, *merchantAccount.ReturningCustomer)
+		assert.Equal(t, common.APIShortDate(time.Date(2023, 9, 15, 0, 0, 0, 0, time.UTC)), *merchantAccount.FirstTransactionDate)
+		assert.Equal(t, common.APIShortDate(time.Date(2025, 3, 28, 0, 0, 0, 0, time.UTC)), *merchantAccount.LastTransactionDate)
+		assert.Equal(t, 6, merchantAccount.TotalOrderCount)
+		assert.Equal(t, int64(55), merchantAccount.LastPaymentAmount)
+	}
+}

@@ -61,7 +61,6 @@ type PaymentSetupRequest struct {
 	// the cardholder is not present. For example, if the transaction is a recurring payment, or a
 	// mail order/telephone order (MOTO) payment.
 	// [Optional]
-	// Enum: "regular" "recurring" "moto" "installment" "pay_later" "unscheduled"
 	// Default: "regular"
 	PaymentType payments.PaymentType `json:"payment_type,omitempty"`
 
@@ -146,7 +145,6 @@ type PaymentSetupResponse struct {
 	// the cardholder is not present. For example, if the transaction is a recurring payment, or a
 	// mail order/telephone order (MOTO) payment.
 	// [Optional]
-	// Enum: "regular" "recurring" "moto" "installment" "pay_later" "unscheduled"
 	// Default: "regular"
 	PaymentType payments.PaymentType `json:"payment_type,omitempty"`
 
@@ -338,12 +336,10 @@ type PaymentSetupCustomerDevice struct {
 	// Client is the type of client the customer uses to initiate the payment. Required when using
 	// Cash App Pay.
 	// [Optional]
-	// Enum: "web" "mobile_web" "app"
 	Client PaymentSetupDeviceClient `json:"client,omitempty"`
 
 	// Os is the operating system of the customer's device.
 	// [Optional]
-	// Enum: "android" "ios"
 	Os PaymentSetupDeviceOs `json:"os,omitempty"`
 }
 
@@ -593,7 +589,6 @@ type PaymentMethodBase struct {
 	// Payment Setup, this defaults to disabled.
 	// [Optional]
 	// Default: "disabled"
-	// Enum: "disabled" "enabled"
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 }
 
@@ -899,7 +894,6 @@ const (
 type BacsAccountHolder struct {
 	// Type is the type of account holder.
 	// [Optional]
-	// Enum: "individual" "corporate"
 	Type BacsAccountHolderType `json:"type,omitempty"`
 
 	// FirstName is the first name of the account holder.
@@ -1083,13 +1077,20 @@ type CashAppPaymentMethod struct {
 	Action *CashAppAction `json:"action,omitempty"`
 }
 
+// CashAppActionType is the type of the next available action for the Cash App payment method.
+type CashAppActionType string
+
+const (
+	// CashAppActionTypeRedirect redirects the customer to Cash App to authorize the payment.
+	CashAppActionTypeRedirect CashAppActionType = "redirect"
+)
+
 // CashAppAction is the next available action for the Cash App payment method.
 type CashAppAction struct {
 	// Type is the type of action.
 	// [Optional]
 	// Read only
-	// Enum: "redirect"
-	Type string `json:"type,omitempty"`
+	Type CashAppActionType `json:"type,omitempty"`
 
 	// RedirectUrl is the URL to redirect the customer to so they can authorize the payment with
 	// Cash App.
@@ -1164,12 +1165,11 @@ type CashAppCustomerProfile struct {
 	// Read only
 	EmailAddress string `json:"email_address,omitempty"`
 
-	// CustomerSince is the date and time the customer's Cash App account was created. Kept as a
-	// string because the provider's format varies.
+	// CustomerSince is the date and time the customer's Cash App account was created.
 	// [Optional]
 	// Read only
-	// Format: date-time
-	CustomerSince string `json:"customer_since,omitempty"`
+	// Format: date-time (RFC 3339)
+	CustomerSince *time.Time `json:"customer_since,omitempty"`
 }
 
 // CashAppAddress is the customer's address in a Cash App customer profile. It uses Cash App's
@@ -1693,7 +1693,6 @@ const (
 type AccountFundingTransactionIdentification struct {
 	// Type is the type of identification used to identify the sender.
 	// [Optional]
-	// Enum: "passport" "driving_license" "national_id"
 	Type AccountFundingTransactionIdentificationType `json:"type,omitempty"`
 
 	// Number is the identification number.
@@ -1758,10 +1757,6 @@ type PaymentSetupAccountFundingTransaction struct {
 
 	// Purpose specifies the purpose of the account funding transaction.
 	// [Optional]
-	// Enum: "donations" "education" "emergency_need" "expatriation" "family_support"
-	// "financial_services" "gifts" "income" "insurance" "investment" "it_services" "leisure"
-	// "loan_payment" "medical_treatment" "other" "pension" "royalties" "savings"
-	// "travel_and_tourism"
 	Purpose AccountFundingTransactionPurpose `json:"purpose,omitempty"`
 
 	// Sender holds the account funding transaction sender details.

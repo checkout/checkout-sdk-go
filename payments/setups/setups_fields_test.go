@@ -538,7 +538,7 @@ func TestPaymentSetupResponse_CashAppSwaggerExample(t *testing.T) {
 	assert.Equal(t, PaymentMethodInitializationEnabled, cashApp.Initialization)
 	assert.True(t, *cashApp.CustomerProfileSharing)
 	assert.Equal(t, "ORDER-99", cashApp.Reference)
-	assert.Equal(t, "redirect", cashApp.Action.Type)
+	assert.Equal(t, CashAppActionTypeRedirect, cashApp.Action.Type)
 	assert.Equal(t, cashAppRedirectUrl, cashApp.Action.RedirectUrl)
 
 	profile := cashApp.CustomerProfile
@@ -553,7 +553,9 @@ func TestPaymentSetupResponse_CashAppSwaggerExample(t *testing.T) {
 	assert.Equal(t, "1990-01-01T00:00:00.0000000", profile.BirthDate)
 	assert.Equal(t, "5555555555", profile.PhoneNumber)
 	assert.Equal(t, "cash@cash.com", profile.EmailAddress)
-	assert.Equal(t, "1970-01-18T12:46:04.8000000+00:00", profile.CustomerSince)
+	if assert.NotNil(t, profile.CustomerSince) {
+		assert.True(t, time.Date(1970, 1, 18, 12, 46, 4, 800000000, time.UTC).Equal(*profile.CustomerSince))
+	}
 
 	address := profile.Address
 	assert.Equal(t, "123 Main St", address.AddressLine1)
@@ -567,6 +569,7 @@ func TestPaymentSetupResponse_CashAppSwaggerExample(t *testing.T) {
 }
 
 func TestCashAppPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
+	customerSince := time.Date(1970, 1, 18, 12, 46, 4, 800000000, time.UTC)
 	original := CashAppPaymentMethod{
 		PaymentMethodBase: PaymentMethodBase{
 			Status:         "action_required",
@@ -601,7 +604,7 @@ func TestCashAppPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 			},
 			PhoneNumber:   "5555555555",
 			EmailAddress:  "cash@cash.com",
-			CustomerSince: "1970-01-18T12:46:04.8000000+00:00",
+			CustomerSince: &customerSince,
 		},
 	}
 
@@ -615,7 +618,7 @@ func TestCashAppPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 	assert.NotContains(t, body, "address_line1")
 	assert.NotContains(t, body, "administrative_district_level1")
 	assert.Contains(t, body, `"redirect_url":"`)
-	assert.Contains(t, body, `"customer_since":"1970-01-18T12:46:04.8000000+00:00"`)
+	assert.Contains(t, body, `"customer_since":"1970-01-18T12:46:04.8Z"`)
 
 	var decoded CashAppPaymentMethod
 	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
@@ -674,7 +677,10 @@ func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing
 		"tax_number": "GB123456789",
 		"phone": {"country_code": "+44", "number": "207 946 0000"},
 		"device": {"locale": "en_GB", "fingerprint": "fp_abc123xyz", "ipv4": "203.0.113.0",
-			"ipv6": "2001:db8:85a3::8a2e:370:7334", "client": "web", "os": "android"}
+			"ipv6": "2001:db8:85a3::8a2e:370:7334", "client": "web", "os": "android"},
+		"merchant_account": {"id": "1234", "registration_date": "2023-05-01", "last_modified": "2023-05-01",
+			"returning_customer": true, "first_transaction_date": "2023-09-15",
+			"last_transaction_date": "2025-03-28", "total_order_count": 6, "last_payment_amount": 55}
 	}`
 	var fromExample PaymentSetupCustomer
 	assert.NoError(t, json.Unmarshal([]byte(example), &fromExample))
@@ -689,4 +695,15 @@ func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing
 	assert.Equal(t, "en_GB", fromExample.Device.Locale)
 	assert.Equal(t, PaymentSetupDeviceClientWeb, fromExample.Device.Client)
 	assert.Equal(t, PaymentSetupDeviceOsAndroid, fromExample.Device.Os)
+	merchantAccount := fromExample.MerchantAccount
+	if assert.NotNil(t, merchantAccount) {
+		assert.Equal(t, "1234", merchantAccount.Id)
+		assert.Equal(t, common.APIShortDate(time.Date(2023, 5, 1, 0, 0, 0, 0, time.UTC)), *merchantAccount.RegistrationDate)
+		assert.Equal(t, common.APIShortDate(time.Date(2023, 5, 1, 0, 0, 0, 0, time.UTC)), *merchantAccount.LastModified)
+		assert.True(t, *merchantAccount.ReturningCustomer)
+		assert.Equal(t, common.APIShortDate(time.Date(2023, 9, 15, 0, 0, 0, 0, time.UTC)), *merchantAccount.FirstTransactionDate)
+		assert.Equal(t, common.APIShortDate(time.Date(2025, 3, 28, 0, 0, 0, 0, time.UTC)), *merchantAccount.LastTransactionDate)
+		assert.Equal(t, 6, merchantAccount.TotalOrderCount)
+		assert.Equal(t, int64(55), merchantAccount.LastPaymentAmount)
+	}
 }

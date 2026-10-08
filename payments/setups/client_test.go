@@ -443,6 +443,6 @@ func TestConfirmPaymentSetup_WithCashApp(t *testing.T) {
 	apiClient.AssertExpectations(t)
 	assert.Equal(t, setupId, response.Id)
 	assert.Equal(t, "action_required", response.PaymentMethods.CashApp.Status)
-	assert.Equal(t, "redirect", response.PaymentMethods.CashApp.Action.Type)
+	assert.Equal(t, CashAppActionTypeRedirect, response.PaymentMethods.CashApp.Action.Type)
 	assert.Equal(t, confirmResponse.PaymentMethods.CashApp.Action.RedirectUrl, response.PaymentMethods.CashApp.Action.RedirectUrl)
 }

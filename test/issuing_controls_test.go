@@ -28,8 +28,8 @@ func TestCreateControl(t *testing.T) {
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.CreatedDate)
 				assert.NotNil(t, response.LastModifiedDate)
-				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).AmountLimit)
-				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).VelocityWindow)
+				assert.NotNil(t, response.Limit.(controls.VelocityLimit).AmountLimit)
+				assert.NotNil(t, response.Limit.(controls.VelocityLimit).VelocityWindow)
 			},
 		},
 	}
@@ -105,8 +105,8 @@ func TestGetCardControlDetails(t *testing.T) {
 				assert.NotNil(t, response.Id)
 				assert.NotNil(t, response.CreatedDate)
 				assert.NotNil(t, response.LastModifiedDate)
-				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).AmountLimit)
-				assert.NotNil(t, response.Limit.(*controls.VelocityLimit).VelocityWindow)
+				assert.NotNil(t, response.Limit.(controls.VelocityLimit).AmountLimit)
+				assert.NotNil(t, response.Limit.(controls.VelocityLimit).VelocityWindow)
 			},
 		},
 	}

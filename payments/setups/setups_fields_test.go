@@ -12,7 +12,7 @@ import (
 
 // Verifies the Payment Setups schemas aligned with the 2026-06-29 Checkout.com swagger delta:
 //   - PaymentSetup: billing_descriptor, presentment_details, terminal, latest_payment
-//   - payment_methods: bacs, card_present, pay_by_bank, stablecoin
+//   - payment_methods: bacs, card_present, paybybank, stablecoin
 //   - order.amount_allocations[] (+ commission)
 //   - KlarnaAccountHolder.name
 
@@ -117,7 +117,8 @@ func TestPaymentMethods_NewConfigs(t *testing.T) {
 	// wiring keys
 	assert.Contains(t, body, `"bacs":`)
 	assert.Contains(t, body, `"card_present":`)
-	assert.Contains(t, body, `"pay_by_bank":`)
+	assert.Contains(t, body, `"paybybank":`)
+	assert.NotContains(t, body, `"pay_by_bank"`)
 	assert.Contains(t, body, `"stablecoin":`)
 	// bacs
 	assert.Contains(t, body, `"instrument_id":"src_test_abcdefghijklmnopqr"`)
@@ -130,7 +131,7 @@ func TestPaymentMethods_NewConfigs(t *testing.T) {
 	assert.Contains(t, body, `"entry_mode":"chip"`)
 	assert.Contains(t, body, `"key_set_id":"kset_123"`)
 	assert.Contains(t, body, `"block_format":"ISO-0"`)
-	// pay_by_bank
+	// paybybank
 	assert.Contains(t, body, `"bank_id":"bank_123"`)
 	assert.Contains(t, body, `"type":"select_bank"`)
 	assert.Contains(t, body, `"display_name":"Test Bank"`)
@@ -706,4 +707,66 @@ func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing
 		assert.Equal(t, 6, merchantAccount.TotalOrderCount)
 		assert.Equal(t, int64(55), merchantAccount.LastPaymentAmount)
 	}
+}
+
+func TestPaymentSetupResponse_DeserializesPayByBankAction(t *testing.T) {
+	raw := `{"id":"ps_test_123","processing_channel_id":"pc_test_123","amount":1000,"currency":"GBP",
+		"payment_methods":{"paybybank":{"status":"action_required","bank_id":"bank_123",
+		"action":{"type":"select_bank","banks":[{"bank_id":"bank_123","display_name":"Test Bank",
+		"logo_url":"https://example.com/logo.png","available":true}]}}},
+		"risk":{"enabled":false}}`
+
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(raw), &response))
+	assert.NotNil(t, response.PaymentMethods)
+	assert.NotNil(t, response.PaymentMethods.PayByBank)
+	assert.Equal(t, "bank_123", response.PaymentMethods.PayByBank.BankId)
+	assert.NotNil(t, response.PaymentMethods.PayByBank.Action)
+	assert.Equal(t, "select_bank", string(response.PaymentMethods.PayByBank.Action.Type))
+	assert.Len(t, response.PaymentMethods.PayByBank.Action.Banks, 1)
+	bank := response.PaymentMethods.PayByBank.Action.Banks[0]
+	assert.Equal(t, "Test Bank", bank.DisplayName)
+	assert.Equal(t, "https://example.com/logo.png", bank.LogoUrl)
+	assert.True(t, bank.Available)
+	assert.NotNil(t, response.Risk)
+	assert.NotNil(t, response.Risk.Enabled)
+	assert.False(t, *response.Risk.Enabled)
+
+	remarshalled, err := json.Marshal(response)
+	assert.NoError(t, err)
+	assert.Contains(t, string(remarshalled), `"paybybank":`)
+	assert.NotContains(t, string(remarshalled), `"pay_by_bank"`)
+}
+
+func TestPaymentSetupResponse_IgnoresLegacyPayByBankKey(t *testing.T) {
+	raw := `{"payment_methods":{"pay_by_bank":{"bank_id":"bank_123"}}}`
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(raw), &response))
+	assert.Nil(t, response.PaymentMethods.PayByBank)
+}
+
+func TestPaymentSetupRequest_RiskEnabled(t *testing.T) {
+	disabled := false
+	request := PaymentSetupRequest{
+		ProcessingChannelId: "pc_test_123",
+		Amount:              1000,
+		Currency:            common.GBP,
+		Risk:                &PaymentSetupRisk{Enabled: &disabled},
+	}
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshalled), `"risk":{"enabled":false}`)
+
+	var roundtrip PaymentSetupRequest
+	assert.NoError(t, json.Unmarshal(marshalled, &roundtrip))
+	assert.NotNil(t, roundtrip.Risk)
+	assert.False(t, *roundtrip.Risk.Enabled)
+
+	empty, err := json.Marshal(PaymentSetupRequest{Risk: &PaymentSetupRisk{}})
+	assert.NoError(t, err)
+	assert.Contains(t, string(empty), `"risk":{}`)
+
+	omitted, err := json.Marshal(PaymentSetupRequest{})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(omitted), `"risk"`)
 }

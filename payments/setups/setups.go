@@ -114,6 +114,10 @@ type PaymentSetupRequest struct {
 	// Terminal holds the terminal details.
 	// [Optional]
 	Terminal *PaymentSetupTerminal `json:"terminal,omitempty"`
+
+	// Risk holds the risk assessment settings for the Payment Setup.
+	// [Optional]
+	Risk *PaymentSetupRisk `json:"risk,omitempty"`
 }
 
 // PaymentSetupResponse represents the 200 response body of POST /payments/setups,
@@ -205,6 +209,10 @@ type PaymentSetupResponse struct {
 	// [Optional]
 	Terminal *PaymentSetupTerminal `json:"terminal,omitempty"`
 
+	// Risk holds the risk assessment settings for the Payment Setup.
+	// [Optional]
+	Risk *PaymentSetupRisk `json:"risk,omitempty"`
+
 	// LatestPayment is the latest payment for this setup. Returned after a successful
 	// confirmation, including auto-confirm during setup creation.
 	// [Optional]
@@ -248,6 +256,13 @@ type PaymentSetupPresentmentDetails struct {
 	// Currency is the presentment currency, as a three-letter ISO currency code.
 	// [Optional]
 	Currency common.Currency `json:"currency,omitempty"`
+}
+
+// PaymentSetupRisk holds the risk assessment settings for the Payment Setup.
+type PaymentSetupRisk struct {
+	// Enabled indicates whether a risk assessment should be performed. The API defaults to true when omitted.
+	// [Optional]
+	Enabled *bool `json:"enabled,omitempty"`
 }
 
 // PaymentSetupTerminal holds terminal details.
@@ -564,7 +579,7 @@ type PaymentMethods struct {
 
 	// PayByBank is the Pay by Bank (Open Banking) payment method's details and configuration.
 	// [Optional]
-	PayByBank *PayByBankPaymentMethod `json:"pay_by_bank,omitempty"`
+	PayByBank *PayByBankPaymentMethod `json:"paybybank,omitempty"`
 
 	// Stablecoin is the Stablecoin payment method's details and configuration.
 	// [Optional]

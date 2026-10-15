@@ -29,10 +29,10 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 				TransferType: transfers.Commission,
 				Source: &transfers.TransferSourceRequest{
 					Id:       "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-					Amount:   100,
+					Amount:   1,
 					Currency: common.GBP,
 				},
-				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+				Destination: &transfers.TransferDestinationRequest{Id: "ent_ocw5i74vowfg2edpy66izhts2u"},
 			},
 			idempotencyKey: &idempotencyKey,
 			checker: func(response *transfers.TransferResponse, err error) {
@@ -62,10 +62,10 @@ func TestInitiateTransferOfFounds(t *testing.T) {
 				TransferType: transfers.Commission,
 				Source: &transfers.TransferSourceRequest{
 					Id:       "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-					Amount:   100,
+					Amount:   1,
 					Currency: common.GBP,
 				},
-				Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+				Destination: &transfers.TransferDestinationRequest{Id: "ent_ocw5i74vowfg2edpy66izhts2u"},
 			},
 			checker: func(response *transfers.TransferResponse, err error) {
 				assert.Nil(t, response)
@@ -107,7 +107,7 @@ func TestRetrieveTransfer(t *testing.T) {
 				assert.NotNil(t, response.Status)
 				assert.NotNil(t, response.TransferType)
 				assert.NotNil(t, response.Source)
-				assert.Equal(t, int64(100), response.Source.Amount)
+				assert.Equal(t, int64(1), response.Source.Amount)
 				assert.Equal(t, common.GBP, response.Source.Currency)
 				assert.NotNil(t, response.Destination)
 			},
@@ -129,10 +129,10 @@ func createTransferOfFounds(t *testing.T) *transfers.TransferResponse {
 		TransferType: transfers.Commission,
 		Source: &transfers.TransferSourceRequest{
 			Id:       "ent_kidtcgc3ge5unf4a5i6enhnr5m",
-			Amount:   100,
+			Amount:   1,
 			Currency: common.GBP,
 		},
-		Destination: &transfers.TransferDestinationRequest{Id: "ent_w4jelhppmfiufdnatam37wrfc4"},
+		Destination: &transfers.TransferDestinationRequest{Id: "ent_ocw5i74vowfg2edpy66izhts2u"},
 	}
 
 	idempotencyKey := uuid.New().String()

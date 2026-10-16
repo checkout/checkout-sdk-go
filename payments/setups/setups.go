@@ -118,6 +118,13 @@ type PaymentSetupRequest struct {
 	// Risk holds the risk assessment settings for the Payment Setup.
 	// [Optional]
 	Risk *PaymentSetupRisk `json:"risk,omitempty"`
+
+	// Metadata is a set of key/value pairs you can attach to a payment. It can be useful for
+	// storing additional information about the payment. Each value is a string (max 255
+	// characters), a number or a boolean.
+	// [Optional]
+	// max 20 properties
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // PaymentSetupResponse represents the 200 response body of POST /payments/setups,
@@ -218,6 +225,13 @@ type PaymentSetupResponse struct {
 	// [Optional]
 	// Read only
 	LatestPayment map[string]interface{} `json:"latest_payment,omitempty"`
+
+	// Metadata is a set of key/value pairs you can attach to a payment. It can be useful for
+	// storing additional information about the payment. Each value is a string (max 255
+	// characters), a number or a boolean.
+	// [Optional]
+	// max 20 properties
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 // PaymentSetupBilling is the billing details for the payment.
@@ -401,6 +415,11 @@ type CustomerMerchantAccount struct {
 
 // PaymentMethods holds the payment methods that are enabled on your account and available for use.
 type PaymentMethods struct {
+	// AutoConfirm is the payment method that automatically confirms the payment when it is ready,
+	// for example "card".
+	// [Optional]
+	AutoConfirm string `json:"auto_confirm,omitempty"`
+
 	// Instrument is the instrument payment method's details and configuration.
 	// [Optional]
 	Instrument *InstrumentPaymentMethod `json:"instrument,omitempty"`
@@ -554,15 +573,15 @@ type PaymentMethods struct {
 
 	// Googlepay is the Google Pay payment method's details and configuration.
 	// [Optional]
-	Googlepay *SimplePaymentMethod `json:"googlepay,omitempty"`
+	Googlepay *GooglePayPaymentMethod `json:"googlepay,omitempty"`
 
 	// Applepay is the Apple Pay payment method's details and configuration.
 	// [Optional]
-	Applepay *SimplePaymentMethod `json:"applepay,omitempty"`
+	Applepay *ApplePayPaymentMethod `json:"applepay,omitempty"`
 
 	// Card is the Card payment method's details and configuration.
 	// [Optional]
-	Card *SimplePaymentMethod `json:"card,omitempty"`
+	Card *CardPaymentMethod `json:"card,omitempty"`
 
 	// Blik is the Blik payment method's details and configuration.
 	// [Optional]
@@ -727,6 +746,325 @@ type SimplePaymentMethod struct {
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
+// PaymentSetupScheme is a card scheme name, as listed in the schemes of a Payment Setup card,
+// Apple Pay or Google Pay payment method.
+type PaymentSetupScheme string
+
+const (
+	PaymentSetupSchemeAccel           PaymentSetupScheme = "accel"
+	PaymentSetupSchemeAmex            PaymentSetupScheme = "amex"
+	PaymentSetupSchemeCartesBancaires PaymentSetupScheme = "cartes_bancaires"
+	PaymentSetupSchemeChinaUnionPay   PaymentSetupScheme = "china_union_pay"
+	PaymentSetupSchemeDiners          PaymentSetupScheme = "diners"
+	PaymentSetupSchemeDiscover        PaymentSetupScheme = "discover"
+	PaymentSetupSchemeJcb             PaymentSetupScheme = "jcb"
+	PaymentSetupSchemeMada            PaymentSetupScheme = "mada"
+	PaymentSetupSchemeMaestro         PaymentSetupScheme = "maestro"
+	PaymentSetupSchemeMastercard      PaymentSetupScheme = "mastercard"
+	PaymentSetupSchemeNyce            PaymentSetupScheme = "nyce"
+	PaymentSetupSchemeOmannet         PaymentSetupScheme = "omannet"
+	PaymentSetupSchemePulse           PaymentSetupScheme = "pulse"
+	PaymentSetupSchemeShazam          PaymentSetupScheme = "shazam"
+	PaymentSetupSchemeStar            PaymentSetupScheme = "star"
+	PaymentSetupSchemeUpi             PaymentSetupScheme = "upi"
+	PaymentSetupSchemeVisa            PaymentSetupScheme = "visa"
+)
+
+// PaymentSetupCardAccountHolder is the account holder of a card, Apple Pay or Google Pay payment method.
+type PaymentSetupCardAccountHolder struct {
+	// Type is the card account holder type.
+	// [Optional]
+	Type common.AccountHolderType `json:"type,omitempty"`
+
+	// FirstName is the card account holder's first name.
+	// [Optional]
+	FirstName string `json:"first_name,omitempty"`
+
+	// LastName is the card account holder's last name.
+	// [Optional]
+	LastName string `json:"last_name,omitempty"`
+
+	// MiddleName is the card account holder's middle name.
+	// [Optional]
+	MiddleName string `json:"middle_name,omitempty"`
+
+	// CompanyName is the card account holder's company name.
+	// [Optional]
+	CompanyName string `json:"company_name,omitempty"`
+
+	// AccountNameInquiry indicates whether the ANI (account name inquiry) check is performed with
+	// the card scheme (Visa or Mastercard). A pointer so an explicit false is sent.
+	// [Optional]
+	AccountNameInquiry *bool `json:"account_name_inquiry,omitempty"`
+}
+
+// CardToken is the Checkout.com card token of the card payment method.
+type CardToken struct {
+	// Id is the Checkout.com card token identifier.
+	// [Optional]
+	Id string `json:"id,omitempty"`
+}
+
+// CardDetails holds the card details of the card payment method.
+type CardDetails struct {
+	// Number is the card number (without separators).
+	// [Optional]
+	// Write only
+	Number string `json:"number,omitempty"`
+
+	// Last4 is the last four digits of the card number.
+	// [Optional]
+	// Read only
+	Last4 string `json:"last4,omitempty"`
+
+	// Bin is the card issuer's Bank Identification Number (BIN).
+	// [Optional]
+	// Read only
+	Bin string `json:"bin,omitempty"`
+
+	// Scheme is the card scheme.
+	// [Optional]
+	// Read only
+	Scheme string `json:"scheme,omitempty"`
+
+	// ExpiryMonth is the expiry month of the card.
+	// [Optional]
+	ExpiryMonth int `json:"expiry_month,omitempty"`
+
+	// ExpiryYear is the expiry year of the card.
+	// [Optional]
+	ExpiryYear int `json:"expiry_year,omitempty"`
+
+	// Name is the cardholder's name.
+	// [Optional]
+	// Write only
+	Name string `json:"name,omitempty"`
+
+	// Cvv is the card verification value/code. 3 digits, except for American Express (4 digits).
+	// [Optional]
+	// Write only
+	Cvv string `json:"cvv,omitempty"`
+
+	// Stored indicates whether this card is being submitted from your own stored card-on-file
+	// system, rather than being entered by the customer at the time of payment. Set to true when
+	// you provide card details that you already have on file for the customer. A pointer so an
+	// explicit false is sent.
+	// [Optional]
+	// Write only
+	Stored *bool `json:"stored,omitempty"`
+
+	// ExpiresOn is the time by which the card details must be confirmed.
+	// [Optional]
+	// Read only
+	// Format: date-time (ISO 8601)
+	ExpiresOn *time.Time `json:"expires_on,omitempty"`
+
+	// AllowUpdate indicates whether to use the Real-Time Account Updater to update the card
+	// information. A pointer so an explicit false is sent.
+	// [Optional]
+	AllowUpdate *bool `json:"allow_update,omitempty"`
+}
+
+// CardPaymentMethod is the card payment method's details and configuration.
+type CardPaymentMethod struct {
+	PaymentMethodBase
+
+	// Token is the Checkout.com card token to use instead of the raw card details.
+	// [Optional]
+	Token *CardToken `json:"token,omitempty"`
+
+	// Details holds the card details.
+	// [Optional]
+	Details *CardDetails `json:"details,omitempty"`
+
+	// StoreForFutureUse is set to true if you intend to reuse the payment credentials in subsequent
+	// payments. If set to false, a payment instrument will not be included in the payment response.
+	// A pointer so an explicit false is sent.
+	// [Optional]
+	// Write only
+	StoreForFutureUse *bool `json:"store_for_future_use,omitempty"`
+
+	// Phone is the customer's phone number.
+	// [Optional]
+	Phone *common.Phone `json:"phone,omitempty"`
+
+	// AccountHolder holds the card account holder details.
+	// [Optional]
+	AccountHolder *PaymentSetupCardAccountHolder `json:"account_holder,omitempty"`
+
+	// Schemes is the list of supported card scheme names.
+	// [Optional]
+	// Read only
+	Schemes []PaymentSetupScheme `json:"schemes,omitempty"`
+
+	// PreferredScheme is the preferred card scheme to process the payment.
+	// [Optional]
+	PreferredScheme payments.PreferredSchema `json:"preferred_scheme,omitempty"`
+}
+
+// WalletToken is the Checkout.com token of an Apple Pay or Google Pay payment method.
+type WalletToken struct {
+	// Id is the token identifier, prefixed by tok_.
+	// [Required]
+	// Pattern: ^(tok)_(\w{26})$
+	Id string `json:"id"`
+
+	// ExpiresOn is the date and time the token expires.
+	// [Optional]
+	// Format: date-time (ISO 8601)
+	ExpiresOn *time.Time `json:"expires_on,omitempty"`
+}
+
+// ApplePayTokenDataHeader holds additional version-dependent information used to decrypt and
+// verify the payment.
+type ApplePayTokenDataHeader struct {
+	// EphemeralPublicKey is the ephemeral public key bytes, Base64-encoded.
+	// [Optional]
+	// Write only
+	EphemeralPublicKey string `json:"ephemeral_public_key,omitempty"`
+
+	// PublicKeyHash is the hash of the X.509 encoded public key bytes of the merchant's
+	// certificate, Base64-encoded.
+	// [Optional]
+	// Write only
+	PublicKeyHash string `json:"public_key_hash,omitempty"`
+
+	// TransactionId is the transaction identifier, generated on the device, hexadecimal.
+	// [Optional]
+	// Write only
+	TransactionId string `json:"transaction_id,omitempty"`
+}
+
+// ApplePayTokenData is the Apple Pay encrypted payment token data.
+type ApplePayTokenData struct {
+	// Version is the version of the payment token. The token uses EC_v1 for ECC-encrypted data,
+	// and RSA_v1 for RSA-encrypted data.
+	// [Optional]
+	// Write only
+	Version string `json:"version,omitempty"`
+
+	// Data is the encrypted payment data, Base64-encoded.
+	// [Optional]
+	// Write only
+	Data string `json:"data,omitempty"`
+
+	// Signature is the signature of the payment and header data. The signature includes the
+	// signing certificate, its intermediate CA certificate, and information about the signing
+	// algorithm.
+	// [Optional]
+	// Write only
+	Signature string `json:"signature,omitempty"`
+
+	// Header holds additional version-dependent information used to decrypt and verify the payment.
+	// [Optional]
+	// Write only
+	Header *ApplePayTokenDataHeader `json:"header,omitempty"`
+}
+
+// ApplePayPaymentMethod is the Apple Pay payment method's details and configuration.
+type ApplePayPaymentMethod struct {
+	PaymentMethodBase
+
+	// TokenData is the Apple Pay encrypted payment token data.
+	// [Optional]
+	// Write only
+	TokenData *ApplePayTokenData `json:"token_data,omitempty"`
+
+	// Token is the Checkout.com Apple Pay token.
+	// [Optional]
+	Token *WalletToken `json:"token,omitempty"`
+
+	// StoreForFutureUse is set to true if you intend to reuse the payment credentials in subsequent
+	// payments. If set to false, a payment instrument will not be included in the payment response.
+	// A pointer so an explicit false is sent.
+	// [Optional]
+	// Write only
+	StoreForFutureUse *bool `json:"store_for_future_use,omitempty"`
+
+	// Phone is the customer's phone number.
+	// [Optional]
+	Phone *common.Phone `json:"phone,omitempty"`
+
+	// AccountHolder holds the card account holder details.
+	// [Optional]
+	AccountHolder *PaymentSetupCardAccountHolder `json:"account_holder,omitempty"`
+
+	// Schemes is the list of supported card scheme names.
+	// [Optional]
+	// Read only
+	Schemes []PaymentSetupScheme `json:"schemes,omitempty"`
+
+	// PreferredScheme is the preferred card scheme to process the payment.
+	// [Optional]
+	PreferredScheme payments.PreferredSchema `json:"preferred_scheme,omitempty"`
+}
+
+// GooglePayTokenData is the Google Pay encrypted payment token data.
+type GooglePayTokenData struct {
+	// ProtocolVersion is the encryption and signing scheme used to create this message. If not
+	// set, the default is ECv0.
+	// [Optional]
+	// Write only
+	ProtocolVersion string `json:"protocol_version,omitempty"`
+
+	// Signature is the signature that verifies the message came from Google, created using ECDSA.
+	// [Optional]
+	// Write only
+	Signature string `json:"signature,omitempty"`
+
+	// SignedMessage is a serialized JSON string containing the encryptedMessage,
+	// ephemeralPublicKey, and tag. To simplify the signature verification process, this value is
+	// serialized.
+	// [Optional]
+	// Write only
+	SignedMessage string `json:"signed_message,omitempty"`
+
+	// TokenizationKey is the public key provided to the Google API in the
+	// tokenizationSpecification.parameters.gatewayMerchantId field.
+	// [Optional]
+	// Write only
+	TokenizationKey string `json:"tokenization_key,omitempty"`
+}
+
+// GooglePayPaymentMethod is the Google Pay payment method's details and configuration.
+type GooglePayPaymentMethod struct {
+	PaymentMethodBase
+
+	// TokenData is the Google Pay encrypted payment token data.
+	// [Optional]
+	// Write only
+	TokenData *GooglePayTokenData `json:"token_data,omitempty"`
+
+	// Token is the Checkout.com Google Pay token.
+	// [Optional]
+	Token *WalletToken `json:"token,omitempty"`
+
+	// StoreForFutureUse is set to true if you intend to reuse the payment credentials in subsequent
+	// payments. If set to false, a payment instrument will not be included in the payment response.
+	// A pointer so an explicit false is sent.
+	// [Optional]
+	// Write only
+	StoreForFutureUse *bool `json:"store_for_future_use,omitempty"`
+
+	// Phone is the customer's phone number.
+	// [Optional]
+	Phone *common.Phone `json:"phone,omitempty"`
+
+	// AccountHolder holds the card account holder details.
+	// [Optional]
+	AccountHolder *PaymentSetupCardAccountHolder `json:"account_holder,omitempty"`
+
+	// Schemes is the list of supported card scheme names. Google Pay does not list cartes_bancaires.
+	// [Optional]
+	// Read only
+	Schemes []PaymentSetupScheme `json:"schemes,omitempty"`
+
+	// PreferredScheme is the preferred card scheme to process the payment. Google Pay accepts only
+	// visa and mastercard.
+	// [Optional]
+	PreferredScheme payments.PreferredSchema `json:"preferred_scheme,omitempty"`
+}
+
 // InstrumentPaymentMethod is the instrument payment method's details and configuration.
 type InstrumentPaymentMethod struct {
 	PaymentMethodBase
@@ -735,9 +1073,35 @@ type InstrumentPaymentMethod struct {
 	// [Optional]
 	Id string `json:"id,omitempty"`
 
+	// Type is the type of the instrument, for example "bacs".
+	// [Optional]
+	// Read only
+	Type string `json:"type,omitempty"`
+
+	// Action is the next available action for the payment method.
+	// [Optional]
+	// Read only
+	Action *InstrumentAction `json:"action,omitempty"`
+
 	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
 	// [Optional]
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
+}
+
+// InstrumentActionType is the type of the next available action for the instrument payment method.
+type InstrumentActionType string
+
+const (
+	// InstrumentActionTypeSetInstrument sets the instrument on the Payment Setup.
+	InstrumentActionTypeSetInstrument InstrumentActionType = "set_instrument"
+)
+
+// InstrumentAction is the next available action for the instrument payment method.
+type InstrumentAction struct {
+	// Type is the type of action.
+	// [Optional]
+	// Read only
+	Type InstrumentActionType `json:"type,omitempty"`
 }
 
 // MultibancoPaymentMethod is the Multibanco payment method's details and configuration.
@@ -1261,7 +1625,10 @@ type PaymentSetupSettings struct {
 	// Capture indicates whether to capture the payment immediately.
 	// [Optional]
 	// Default: true
-	Capture bool `json:"capture,omitempty"`
+	//
+	// A pointer so an explicit false reaches the API. With a plain bool and omitempty, false was
+	// dropped from the payload and the API applied its default of true, capturing the payment.
+	Capture *bool `json:"capture,omitempty"`
 
 	// ExcludedPaymentMethods is the list of payment methods excluded from the Payment Setup.
 	// [Optional]

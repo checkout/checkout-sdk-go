@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
+	"github.com/checkout/checkout-sdk-go/v3/payments"
 )
 
 // Verifies the Payment Setups schemas aligned with the 2026-06-29 Checkout.com swagger delta:
@@ -769,4 +770,260 @@ func TestPaymentSetupRequest_RiskEnabled(t *testing.T) {
 	omitted, err := json.Marshal(PaymentSetupRequest{})
 	assert.NoError(t, err)
 	assert.NotContains(t, string(omitted), `"risk"`)
+}
+
+// Payment Setup shape gaps against the spec:
+//   - payment_methods.card: token object, details object, schemes, preferred_scheme
+//   - payment_methods.applepay / googlepay: token_data, token object, schemes, preferred_scheme
+//   - settings.capture: an explicit false must reach the API (default true)
+//   - payment_methods.auto_confirm, top-level metadata, instrument.type
+
+func TestCardPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
+	original := CardPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		Token:             &CardToken{Id: "tok_ubfj2q76miwundwlk72vxt2i7q"},
+		Details: &CardDetails{
+			Number:      "4242424242424242",
+			Last4:       "4242",
+			Bin:         "424242",
+			Scheme:      "visa",
+			ExpiryMonth: 12,
+			ExpiryYear:  2030,
+			Name:        "John Smith",
+			Cvv:         "100",
+			Stored:      boolPtr(false),
+			ExpiresOn:   timePtr(t, "2030-01-01T10:00:00Z"),
+			AllowUpdate: boolPtr(true),
+		},
+		StoreForFutureUse: boolPtr(false),
+		Phone:             &common.Phone{CountryCode: "+44", Number: "207 946 0000"},
+		AccountHolder: &PaymentSetupCardAccountHolder{
+			Type:               common.Individual,
+			FirstName:          "John",
+			LastName:           "Smith",
+			MiddleName:         "Paul",
+			CompanyName:        "Acme",
+			AccountNameInquiry: boolPtr(false),
+		},
+		Schemes:         []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeCartesBancaires, PaymentSetupSchemeChinaUnionPay},
+		PreferredScheme: payments.CartesBancaires,
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+
+	var wire map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &wire))
+	assert.Equal(t, map[string]interface{}{"id": "tok_ubfj2q76miwundwlk72vxt2i7q"}, wire["token"])
+	details := wire["details"].(map[string]interface{})
+	assert.Len(t, details, 11)
+	assert.Equal(t, "4242424242424242", details["number"])
+	assert.Equal(t, float64(12), details["expiry_month"])
+	assert.Equal(t, false, details["stored"])
+	assert.Equal(t, "2030-01-01T10:00:00Z", details["expires_on"])
+	assert.Equal(t, false, wire["store_for_future_use"])
+	assert.Equal(t, false, wire["account_holder"].(map[string]interface{})["account_name_inquiry"])
+	assert.Equal(t, []interface{}{"visa", "cartes_bancaires", "china_union_pay"}, wire["schemes"])
+	assert.Equal(t, "cartes_bancaires", wire["preferred_scheme"])
+	for _, flat := range []string{"number", "cvv", "expiry_month", "last4"} {
+		assert.NotContains(t, wire, flat, "card data belongs under details")
+	}
+
+	var restored CardPaymentMethod
+	assert.NoError(t, json.Unmarshal(marshalled, &restored))
+	assert.Equal(t, original, restored)
+}
+
+func TestCardPaymentMethod_SwaggerExample(t *testing.T) {
+	payload := `{"status":"ready","flags":[],"token":{"id":"tok_ubfj2q76miwundwlk72vxt2i7q"},
+		"details":{"last4":"4242","bin":"424242","scheme":"visa","expiry_month":12,"expiry_year":2030,
+		"expires_on":"2030-01-01T10:00:00Z","allow_update":true},
+		"schemes":["visa","mastercard"],"preferred_scheme":"visa"}`
+
+	var card CardPaymentMethod
+	assert.NoError(t, json.Unmarshal([]byte(payload), &card))
+	assert.Equal(t, "ready", card.Status)
+	assert.Equal(t, "tok_ubfj2q76miwundwlk72vxt2i7q", card.Token.Id)
+	assert.Equal(t, "4242", card.Details.Last4)
+	assert.Equal(t, "424242", card.Details.Bin)
+	assert.Equal(t, "visa", card.Details.Scheme)
+	assert.Equal(t, 12, card.Details.ExpiryMonth)
+	assert.Equal(t, 2030, card.Details.ExpiryYear)
+	assert.Equal(t, timePtr(t, "2030-01-01T10:00:00Z"), card.Details.ExpiresOn)
+	assert.Equal(t, boolPtr(true), card.Details.AllowUpdate)
+	assert.Equal(t, []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeMastercard}, card.Schemes)
+	assert.Equal(t, payments.Visa, card.PreferredScheme)
+}
+
+func TestPaymentSetupScheme_EveryValueMatchesTheSpec(t *testing.T) {
+	expected := []string{"accel", "amex", "cartes_bancaires", "china_union_pay", "diners", "discover", "jcb",
+		"mada", "maestro", "mastercard", "nyce", "omannet", "pulse", "shazam", "star", "upi", "visa"}
+	values := []PaymentSetupScheme{PaymentSetupSchemeAccel, PaymentSetupSchemeAmex, PaymentSetupSchemeCartesBancaires,
+		PaymentSetupSchemeChinaUnionPay, PaymentSetupSchemeDiners, PaymentSetupSchemeDiscover, PaymentSetupSchemeJcb,
+		PaymentSetupSchemeMada, PaymentSetupSchemeMaestro, PaymentSetupSchemeMastercard, PaymentSetupSchemeNyce,
+		PaymentSetupSchemeOmannet, PaymentSetupSchemePulse, PaymentSetupSchemeShazam, PaymentSetupSchemeStar,
+		PaymentSetupSchemeUpi, PaymentSetupSchemeVisa}
+
+	assert.Len(t, values, len(expected))
+	for i, value := range values {
+		assert.Equal(t, expected[i], string(value))
+	}
+}
+
+func TestApplePayPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
+	original := ApplePayPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		TokenData: &ApplePayTokenData{
+			Version:   "EC_v1",
+			Data:      "t7GeajLB9skXB6QSWfEpPA4WPhDqB7ekdd+F7588arLzve",
+			Signature: "MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCAMIID4jCCA4ig",
+			Header: &ApplePayTokenDataHeader{
+				EphemeralPublicKey: "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEX",
+				PublicKeyHash:      "tqYV+tmG9aMh+l/K6cicUnPqkb1gUiLjSTM9gEz6Nl0=",
+				TransactionId:      "3cee89679130a4b2617c76118a1790e2b3c0bf9a0e6e4d0c9b1f4b2a4b1e3b2d",
+			},
+		},
+		Token:             &WalletToken{Id: "tok_ubfj2q76miwundwlk72vxt2i7q", ExpiresOn: timePtr(t, "2030-01-01T10:00:00Z")},
+		StoreForFutureUse: boolPtr(true),
+		Phone:             &common.Phone{CountryCode: "+44", Number: "207 946 0000"},
+		AccountHolder:     &PaymentSetupCardAccountHolder{Type: common.Corporate, CompanyName: "Acme"},
+		Schemes:           []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeCartesBancaires},
+		PreferredScheme:   payments.CartesBancaires,
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+
+	var wire map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &wire))
+	token := wire["token"].(map[string]interface{})
+	assert.Equal(t, "tok_ubfj2q76miwundwlk72vxt2i7q", token["id"])
+	assert.Equal(t, "2030-01-01T10:00:00Z", token["expires_on"])
+	assert.NotContains(t, wire, "expires_on", "expires_on belongs under token")
+	tokenData := wire["token_data"].(map[string]interface{})
+	assert.Equal(t, "EC_v1", tokenData["version"])
+	assert.Equal(t, "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEX", tokenData["header"].(map[string]interface{})["ephemeral_public_key"])
+	assert.Equal(t, "cartes_bancaires", wire["preferred_scheme"])
+
+	var restored ApplePayPaymentMethod
+	assert.NoError(t, json.Unmarshal(marshalled, &restored))
+	assert.Equal(t, original, restored)
+}
+
+func TestGooglePayPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
+	original := GooglePayPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		TokenData: &GooglePayTokenData{
+			ProtocolVersion: "ECv2",
+			Signature:       "MEQCIH6Q4OwQ0jAceFEkGF0JID6sJNXxOEi4r+mA7biRxqBQAiAondqoUpU",
+			SignedMessage:   `{"encryptedMessage":"abc"}`,
+			TokenizationKey: "pk_sbox_7za2ndl3ahw2k4cmptr5qgyiv4q",
+		},
+		Token:             &WalletToken{Id: "tok_ubfj2q76miwundwlk72vxt2i7q", ExpiresOn: timePtr(t, "2030-01-01T10:00:00Z")},
+		StoreForFutureUse: boolPtr(false),
+		Phone:             &common.Phone{CountryCode: "+44", Number: "207 946 0000"},
+		AccountHolder:     &PaymentSetupCardAccountHolder{Type: common.Individual, FirstName: "John", LastName: "Smith"},
+		Schemes:           []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeMastercard},
+		PreferredScheme:   payments.Mastercard,
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+
+	var wire map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &wire))
+	assert.Equal(t, "tok_ubfj2q76miwundwlk72vxt2i7q", wire["token"].(map[string]interface{})["id"])
+	assert.NotContains(t, wire, "expires_on", "expires_on belongs under token")
+	assert.Equal(t, "ECv2", wire["token_data"].(map[string]interface{})["protocol_version"])
+	assert.Equal(t, false, wire["store_for_future_use"])
+	assert.Equal(t, "mastercard", wire["preferred_scheme"])
+
+	var restored GooglePayPaymentMethod
+	assert.NoError(t, json.Unmarshal(marshalled, &restored))
+	assert.Equal(t, original, restored)
+}
+
+func TestWalletToken_SwaggerExample(t *testing.T) {
+	payload := `{"status":"ready","flags":[],
+		"token":{"id":"tok_ubfj2q76miwundwlk72vxt2i7q","expires_on":"2030-01-01T10:00:00Z"},
+		"schemes":["visa","mastercard"],"preferred_scheme":"visa"}`
+
+	var applePay ApplePayPaymentMethod
+	var googlePay GooglePayPaymentMethod
+	assert.NoError(t, json.Unmarshal([]byte(payload), &applePay))
+	assert.NoError(t, json.Unmarshal([]byte(payload), &googlePay))
+	assert.Equal(t, "tok_ubfj2q76miwundwlk72vxt2i7q", applePay.Token.Id)
+	assert.Equal(t, timePtr(t, "2030-01-01T10:00:00Z"), applePay.Token.ExpiresOn)
+	assert.Equal(t, payments.Visa, applePay.PreferredScheme)
+	assert.Equal(t, "tok_ubfj2q76miwundwlk72vxt2i7q", googlePay.Token.Id)
+	assert.Equal(t, []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeMastercard}, googlePay.Schemes)
+}
+
+func TestPaymentSetupSettings_ExplicitCaptureFalseIsSent(t *testing.T) {
+	marshalled, err := json.Marshal(PaymentSetupSettings{Capture: boolPtr(false)})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"capture":false}`, string(marshalled))
+
+	unset, err := json.Marshal(PaymentSetupSettings{SuccessUrl: "https://example.com/payments/success"})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(unset), "capture", "an unset capture leaves the API default")
+}
+
+func TestPaymentSetupSettings_RoundTripAndSwaggerExample(t *testing.T) {
+	original := PaymentSetupSettings{
+		SuccessUrl:             "https://example.com/payments/success",
+		FailureUrl:             "https://example.com/payments/fail",
+		Capture:                boolPtr(true),
+		ExcludedPaymentMethods: []string{"card", "klarna", "stcpay"},
+	}
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"success_url":"https://example.com/payments/success",
+		"failure_url":"https://example.com/payments/fail","capture":true,
+		"excluded_payment_methods":["card","klarna","stcpay"]}`, string(marshalled))
+
+	var restored PaymentSetupSettings
+	assert.NoError(t, json.Unmarshal(marshalled, &restored))
+	assert.Equal(t, original, restored)
+}
+
+func TestPaymentSetup_AutoConfirmMetadataAndInstrumentType(t *testing.T) {
+	request := PaymentSetupRequest{
+		ProcessingChannelId: "pc_q4dbxom5jbgudnjzjpz7j2z6uq",
+		Amount:              1000,
+		Currency:            common.GBP,
+		PaymentMethods:      &PaymentMethods{AutoConfirm: "card"},
+		Metadata:            map[string]interface{}{"coupon_code": "NY2018", "partner_id": 123989.5, "vip": true},
+	}
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+	var wire map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &wire))
+	assert.Equal(t, "card", wire["payment_methods"].(map[string]interface{})["auto_confirm"])
+	assert.Equal(t, map[string]interface{}{"coupon_code": "NY2018", "partner_id": 123989.5, "vip": true}, wire["metadata"])
+
+	payload := `{"id":"ps_2Un2jYAVxLsfUfpOvLhEHRW8Ft1",
+		"payment_methods":{"auto_confirm":"card","instrument":{"status":"ready","id":"src_wmlfc3zttb4uzmk6snpwb43jbi","type":"bacs","action":{"type":"set_instrument"}}},
+		"metadata":{"coupon_code":"NY2018"}}`
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assert.Equal(t, "card", response.PaymentMethods.AutoConfirm)
+	assert.Equal(t, "src_wmlfc3zttb4uzmk6snpwb43jbi", response.PaymentMethods.Instrument.Id)
+	assert.Equal(t, "bacs", response.PaymentMethods.Instrument.Type)
+	assert.Equal(t, InstrumentActionTypeSetInstrument, response.PaymentMethods.Instrument.Action.Type)
+
+	instrument := InstrumentPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		Id:                "src_wmlfc3zttb4uzmk6snpwb43jbi",
+		Type:              "bacs",
+		Action:            &InstrumentAction{Type: InstrumentActionTypeSetInstrument},
+	}
+	instrumentJson, err := json.Marshal(instrument)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"status":"ready","flags":["missing_phone"],"id":"src_wmlfc3zttb4uzmk6snpwb43jbi",
+		"type":"bacs","action":{"type":"set_instrument"}}`, string(instrumentJson))
+	var restoredInstrument InstrumentPaymentMethod
+	assert.NoError(t, json.Unmarshal(instrumentJson, &restoredInstrument))
+	assert.Equal(t, instrument, restoredInstrument)
+	assert.Equal(t, "NY2018", response.Metadata["coupon_code"])
 }

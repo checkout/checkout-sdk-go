@@ -1078,9 +1078,30 @@ type InstrumentPaymentMethod struct {
 	// Read only
 	Type string `json:"type,omitempty"`
 
+	// Action is the next available action for the payment method.
+	// [Optional]
+	// Read only
+	Action *InstrumentAction `json:"action,omitempty"`
+
 	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
 	// [Optional]
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
+}
+
+// InstrumentActionType is the type of the next available action for the instrument payment method.
+type InstrumentActionType string
+
+const (
+	// InstrumentActionTypeSetInstrument sets the instrument on the Payment Setup.
+	InstrumentActionTypeSetInstrument InstrumentActionType = "set_instrument"
+)
+
+// InstrumentAction is the next available action for the instrument payment method.
+type InstrumentAction struct {
+	// Type is the type of action.
+	// [Optional]
+	// Read only
+	Type InstrumentActionType `json:"type,omitempty"`
 }
 
 // MultibancoPaymentMethod is the Multibanco payment method's details and configuration.

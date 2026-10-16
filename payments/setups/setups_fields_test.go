@@ -1003,12 +1003,27 @@ func TestPaymentSetup_AutoConfirmMetadataAndInstrumentType(t *testing.T) {
 	assert.Equal(t, map[string]interface{}{"coupon_code": "NY2018", "partner_id": 123989.5, "vip": true}, wire["metadata"])
 
 	payload := `{"id":"ps_2Un2jYAVxLsfUfpOvLhEHRW8Ft1",
-		"payment_methods":{"auto_confirm":"card","instrument":{"status":"ready","id":"src_wmlfc3zttb4uzmk6snpwb43jbi","type":"bacs"}},
+		"payment_methods":{"auto_confirm":"card","instrument":{"status":"ready","id":"src_wmlfc3zttb4uzmk6snpwb43jbi","type":"bacs","action":{"type":"set_instrument"}}},
 		"metadata":{"coupon_code":"NY2018"}}`
 	var response PaymentSetupResponse
 	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
 	assert.Equal(t, "card", response.PaymentMethods.AutoConfirm)
 	assert.Equal(t, "src_wmlfc3zttb4uzmk6snpwb43jbi", response.PaymentMethods.Instrument.Id)
 	assert.Equal(t, "bacs", response.PaymentMethods.Instrument.Type)
+	assert.Equal(t, InstrumentActionTypeSetInstrument, response.PaymentMethods.Instrument.Action.Type)
+
+	instrument := InstrumentPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		Id:                "src_wmlfc3zttb4uzmk6snpwb43jbi",
+		Type:              "bacs",
+		Action:            &InstrumentAction{Type: InstrumentActionTypeSetInstrument},
+	}
+	instrumentJson, err := json.Marshal(instrument)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"status":"ready","flags":["missing_phone"],"id":"src_wmlfc3zttb4uzmk6snpwb43jbi",
+		"type":"bacs","action":{"type":"set_instrument"}}`, string(instrumentJson))
+	var restoredInstrument InstrumentPaymentMethod
+	assert.NoError(t, json.Unmarshal(instrumentJson, &restoredInstrument))
+	assert.Equal(t, instrument, restoredInstrument)
 	assert.Equal(t, "NY2018", response.Metadata["coupon_code"])
 }

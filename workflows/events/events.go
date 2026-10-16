@@ -21,15 +21,22 @@ type (
 	}
 
 	EventResponse struct {
-		HttpMetadata      common.HttpMetadata
-		Id                string                 `json:"id,omitempty"`
-		Source            string                 `json:"source,omitempty"`
-		Type              string                 `json:"type,omitempty"`
-		Timestamp         string                 `json:"timestamp,omitempty"`
-		Version           string                 `json:"version,omitempty"`
+		HttpMetadata common.HttpMetadata
+		Id           string `json:"id,omitempty"`
+		Source       string `json:"source,omitempty"`
+		Type         string `json:"type,omitempty"`
+		Timestamp    string `json:"timestamp,omitempty"`
+		Version      string `json:"version,omitempty"`
+		// Data is the event payload as a generic map, preserved for existing callers.
+		// Use DecodeData or DecodePayment for a typed payload. RawData returns the
+		// original JSON value captured while unmarshalling.
 		Data              map[string]interface{} `json:"data,omitempty"`
 		ActionInvocations []ActionInvocation     `json:"action_invocations,omitempty"`
 		Links             map[string]common.Link `json:"_links,omitempty"`
+
+		// rawData is the original JSON value of data. It stays empty when EventResponse
+		// is constructed in memory instead of decoded from JSON.
+		rawData json.RawMessage
 	}
 
 	SubjectEventsResponse struct {

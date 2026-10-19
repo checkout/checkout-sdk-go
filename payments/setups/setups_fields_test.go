@@ -780,8 +780,8 @@ func TestPaymentSetupRequest_RiskEnabled(t *testing.T) {
 
 func TestCardPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 	original := CardPaymentMethod{
-		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
-		Token:             &CardToken{Id: "tok_ubfj2q76miwundwlk72vxt2i7q"},
+		PaymentSetupPaymentMethod: PaymentSetupPaymentMethod{Status: "ready", Flags: []string{"missing_phone"}},
+		Token:                     &CardToken{Id: "tok_ubfj2q76miwundwlk72vxt2i7q"},
 		Details: &CardDetails{
 			Number:      "4242424242424242",
 			Last4:       "4242",
@@ -872,7 +872,7 @@ func TestPaymentSetupScheme_EveryValueMatchesTheSpec(t *testing.T) {
 
 func TestApplePayPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 	original := ApplePayPaymentMethod{
-		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		PaymentSetupPaymentMethod: PaymentSetupPaymentMethod{Status: "ready", Flags: []string{"missing_phone"}},
 		TokenData: &ApplePayTokenData{
 			Version:   "EC_v1",
 			Data:      "t7GeajLB9skXB6QSWfEpPA4WPhDqB7ekdd+F7588arLzve",
@@ -912,7 +912,7 @@ func TestApplePayPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 
 func TestGooglePayPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 	original := GooglePayPaymentMethod{
-		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		PaymentSetupPaymentMethod: PaymentSetupPaymentMethod{Status: "ready", Flags: []string{"missing_phone"}},
 		TokenData: &GooglePayTokenData{
 			ProtocolVersion: "ECv2",
 			Signature:       "MEQCIH6Q4OwQ0jAceFEkGF0JID6sJNXxOEi4r+mA7biRxqBQAiAondqoUpU",
@@ -924,7 +924,7 @@ func TestGooglePayPaymentMethod_RoundTripKeepsEveryProperty(t *testing.T) {
 		Phone:             &common.Phone{CountryCode: "+44", Number: "207 946 0000"},
 		AccountHolder:     &PaymentSetupCardAccountHolder{Type: common.Individual, FirstName: "John", LastName: "Smith"},
 		Schemes:           []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeMastercard},
-		PreferredScheme:   payments.Mastercard,
+		PreferredScheme:   GooglePayPreferredSchemeMastercard,
 	}
 
 	marshalled, err := json.Marshal(original)
@@ -957,6 +957,15 @@ func TestWalletToken_SwaggerExample(t *testing.T) {
 	assert.Equal(t, payments.Visa, applePay.PreferredScheme)
 	assert.Equal(t, "tok_ubfj2q76miwundwlk72vxt2i7q", googlePay.Token.Id)
 	assert.Equal(t, []PaymentSetupScheme{PaymentSetupSchemeVisa, PaymentSetupSchemeMastercard}, googlePay.Schemes)
+}
+
+func TestGooglePayPreferredScheme_AllowsOnlyVisaAndMastercard(t *testing.T) {
+	assert.Equal(t, "visa", string(GooglePayPreferredSchemeVisa))
+	assert.Equal(t, "mastercard", string(GooglePayPreferredSchemeMastercard))
+
+	marshalled, err := json.Marshal(GooglePayPaymentMethod{PreferredScheme: GooglePayPreferredSchemeVisa})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"preferred_scheme":"visa"}`, string(marshalled))
 }
 
 func TestPaymentSetupSettings_ExplicitCaptureFalseIsSent(t *testing.T) {

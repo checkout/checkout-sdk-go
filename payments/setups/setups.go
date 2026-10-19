@@ -626,6 +626,21 @@ type PaymentMethodBase struct {
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 }
 
+// PaymentSetupPaymentMethod holds the status and flags of a payment method that does not support
+// initialization: card, Apple Pay and Google Pay.
+type PaymentSetupPaymentMethod struct {
+	// Status is the payment method status.
+	// [Optional]
+	// Read only
+	// Enum: "unavailable" "action_required" "ready" "initialization_required" "invalid"
+	Status string `json:"status,omitempty"`
+
+	// Flags is the list of error codes or indicators that highlight missing or invalid information.
+	// [Optional]
+	// Read only
+	Flags []string `json:"flags,omitempty"`
+}
+
 // PaymentMethodOption is a payment method option. Not part of the current Payment Setup schema.
 type PaymentMethodOption struct {
 	// Id is the unique identifier of the payment method option.
@@ -856,7 +871,7 @@ type CardDetails struct {
 	// ExpiresOn is the time by which the card details must be confirmed.
 	// [Optional]
 	// Read only
-	// Format: date-time (ISO 8601)
+	// Format: date-time (RFC 3339)
 	ExpiresOn *time.Time `json:"expires_on,omitempty"`
 
 	// AllowUpdate indicates whether to use the Real-Time Account Updater to update the card
@@ -867,7 +882,7 @@ type CardDetails struct {
 
 // CardPaymentMethod is the card payment method's details and configuration.
 type CardPaymentMethod struct {
-	PaymentMethodBase
+	PaymentSetupPaymentMethod
 
 	// Token is the Checkout.com card token to use instead of the raw card details.
 	// [Optional]
@@ -906,12 +921,12 @@ type CardPaymentMethod struct {
 type WalletToken struct {
 	// Id is the token identifier, prefixed by tok_.
 	// [Required]
-	// Pattern: ^(tok)_(\w{26})$
+	// ^(tok)_(\w{26})$
 	Id string `json:"id"`
 
 	// ExpiresOn is the date and time the token expires.
 	// [Optional]
-	// Format: date-time (ISO 8601)
+	// Format: date-time (RFC 3339)
 	ExpiresOn *time.Time `json:"expires_on,omitempty"`
 }
 
@@ -963,7 +978,7 @@ type ApplePayTokenData struct {
 
 // ApplePayPaymentMethod is the Apple Pay payment method's details and configuration.
 type ApplePayPaymentMethod struct {
-	PaymentMethodBase
+	PaymentSetupPaymentMethod
 
 	// TokenData is the Apple Pay encrypted payment token data.
 	// [Optional]
@@ -1028,7 +1043,7 @@ type GooglePayTokenData struct {
 
 // GooglePayPaymentMethod is the Google Pay payment method's details and configuration.
 type GooglePayPaymentMethod struct {
-	PaymentMethodBase
+	PaymentSetupPaymentMethod
 
 	// TokenData is the Google Pay encrypted payment token data.
 	// [Optional]
@@ -1059,11 +1074,19 @@ type GooglePayPaymentMethod struct {
 	// Read only
 	Schemes []PaymentSetupScheme `json:"schemes,omitempty"`
 
-	// PreferredScheme is the preferred card scheme to process the payment. Google Pay accepts only
-	// visa and mastercard.
+	// PreferredScheme is the preferred card scheme to process the payment.
 	// [Optional]
-	PreferredScheme payments.PreferredSchema `json:"preferred_scheme,omitempty"`
+	// Enum: "visa" "mastercard"
+	PreferredScheme GooglePayPreferredScheme `json:"preferred_scheme,omitempty"`
 }
+
+// GooglePayPreferredScheme is a card scheme Google Pay accepts as the preferred scheme.
+type GooglePayPreferredScheme string
+
+const (
+	GooglePayPreferredSchemeVisa       GooglePayPreferredScheme = "visa"
+	GooglePayPreferredSchemeMastercard GooglePayPreferredScheme = "mastercard"
+)
 
 // InstrumentPaymentMethod is the instrument payment method's details and configuration.
 type InstrumentPaymentMethod struct {

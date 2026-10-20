@@ -663,19 +663,30 @@ type PaymentMethodOption struct {
 	Action *PaymentMethodAction `json:"action,omitempty"`
 }
 
-// PaymentMethodAction is the next available action for a payment method option.
+// PaymentMethodAction is the next available action for the payment method. It is shared by the
+// Klarna, PayPal and stc pay payment methods (and by the legacy payment method options); each
+// method returns only the members that apply to it.
 type PaymentMethodAction struct {
-	// Type is the type of action.
+	// Type is the type of action: "sdk" for Klarna and PayPal, "otp" for stc pay.
 	// [Optional]
+	// Read only
+	// Enum: "sdk" "otp"
 	Type string `json:"type,omitempty"`
 
-	// ClientToken is the client token for the provider SDK.
+	// ClientToken is the client token for the Klarna SDK. Returned for Klarna only.
 	// [Optional]
+	// Read only
 	ClientToken string `json:"client_token,omitempty"`
 
-	// SessionId is the session ID.
+	// SessionId is the session ID. Returned for Klarna only.
 	// [Optional]
+	// Read only
 	SessionId string `json:"session_id,omitempty"`
+
+	// OrderId is the PayPal order ID to use with the PayPal SDK. Returned for PayPal only.
+	// [Optional]
+	// Read only
+	OrderId string `json:"order_id,omitempty"`
 }
 
 // PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
@@ -701,11 +712,22 @@ type PaymentMethodOptions struct {
 type KlarnaPaymentMethod struct {
 	PaymentMethodBase
 
+	// Action is the next available action for the payment method. For Klarna the type is "sdk",
+	// with the client_token and session_id to use with the Klarna SDK.
+	// [Optional]
+	// Read only
+	Action *PaymentMethodAction `json:"action,omitempty"`
+
 	// AccountHolder is the account holder details returned by Klarna after the shopper completes
 	// verification.
 	// [Optional]
 	// Read only
 	AccountHolder *KlarnaAccountHolder `json:"account_holder,omitempty"`
+
+	// Iban is the IBAN of the account used to complete Klarna verification.
+	// [Optional]
+	// Read only
+	Iban string `json:"iban,omitempty"`
 
 	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
 	// [Optional]
@@ -726,7 +748,13 @@ type StcpayPaymentMethod struct {
 
 	// Otp is the one-time password (OTP) for stc pay.
 	// [Optional]
+	// Write only
 	Otp string `json:"otp,omitempty"`
+
+	// Action is the next available action for the payment method. For stc pay the type is "otp".
+	// [Optional]
+	// Read only
+	Action *PaymentMethodAction `json:"action,omitempty"`
 
 	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
 	// [Optional]
@@ -736,6 +764,10 @@ type StcpayPaymentMethod struct {
 // TabbyPaymentMethod is the Tabby payment method's details and configuration.
 type TabbyPaymentMethod struct {
 	PaymentMethodBase
+
+	// PaymentTypes is the available payment types for Tabby (for example, "installments").
+	// [Optional]
+	PaymentTypes []string `json:"payment_types,omitempty"`
 
 	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
 	// [Optional]
@@ -1265,6 +1297,19 @@ type SepaPaymentMethod struct {
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
+// PaypalShippingPreference is where PayPal obtains the shipping information.
+type PaypalShippingPreference string
+
+const (
+	// PaypalShippingPreferenceNoShipping redacts the shipping address from the PayPal pages.
+	PaypalShippingPreferenceNoShipping PaypalShippingPreference = "no_shipping"
+	// PaypalShippingPreferenceGetFromFile obtains the shipping address from the customer's PayPal
+	// account.
+	PaypalShippingPreferenceGetFromFile PaypalShippingPreference = "get_from_file"
+	// PaypalShippingPreferenceSetProvidedAddress uses the shipping address provided by the merchant.
+	PaypalShippingPreferenceSetProvidedAddress PaypalShippingPreference = "set_provided_address"
+)
+
 // PaypalPaymentMethod is the PayPal payment method's details and configuration.
 type PaypalPaymentMethod struct {
 	PaymentMethodBase
@@ -1278,6 +1323,25 @@ type PaypalPaymentMethod struct {
 	// [Optional]
 	// Enum: "pay_now" "continue"
 	UserAction string `json:"user_action,omitempty"`
+
+	// BrandName is the brand name to display in the PayPal checkout experience.
+	// [Optional]
+	// max 127 characters
+	BrandName string `json:"brand_name,omitempty"`
+
+	// ShippingPreference is where to obtain the shipping information.
+	// - no_shipping: redacts the shipping address from the PayPal pages.
+	// - get_from_file: obtains the shipping address from the customer's PayPal account.
+	// - set_provided_address: uses the shipping address provided by the merchant.
+	// [Optional]
+	// Enum: "no_shipping" "get_from_file" "set_provided_address"
+	ShippingPreference PaypalShippingPreference `json:"shipping_preference,omitempty"`
+
+	// Action is the next available action for the payment method. For PayPal the type is "sdk",
+	// with the order_id to use with the PayPal SDK.
+	// [Optional]
+	// Read only
+	Action *PaymentMethodAction `json:"action,omitempty"`
 
 	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
 	// [Optional]

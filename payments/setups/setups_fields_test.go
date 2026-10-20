@@ -1036,3 +1036,148 @@ func TestPaymentSetup_AutoConfirmMetadataAndInstrumentType(t *testing.T) {
 	assert.Equal(t, instrument, restoredInstrument)
 	assert.Equal(t, "NY2018", response.Metadata["coupon_code"])
 }
+
+// Klarna, PayPal, Tabby and stc pay carry their own action and properties directly on the
+// payment method, with no payment_method_options wrapper.
+
+func TestPaymentMethods_PaypalAndTabbyRequestWireKeys(t *testing.T) {
+	methods := PaymentMethods{
+		Paypal: &PaypalPaymentMethod{
+			PaymentMethodBase:  PaymentMethodBase{Initialization: PaymentMethodInitializationEnabled},
+			UserAction:         "pay_now",
+			BrandName:          "Acme Corporation",
+			ShippingPreference: PaypalShippingPreferenceNoShipping,
+		},
+		Tabby: &TabbyPaymentMethod{
+			PaymentMethodBase: PaymentMethodBase{Initialization: PaymentMethodInitializationEnabled},
+			PaymentTypes:      []string{"pay_later"},
+		},
+		Stcpay: &StcpayPaymentMethod{Otp: "123456"},
+	}
+
+	marshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{
+		"paypal":{"initialization":"enabled","user_action":"pay_now","brand_name":"Acme Corporation",
+			"shipping_preference":"no_shipping"},
+		"tabby":{"initialization":"enabled","payment_types":["pay_later"]},
+		"stcpay":{"otp":"123456"}}`, string(marshalled))
+	assert.NotContains(t, string(marshalled), "payment_method_options")
+	assert.NotContains(t, string(marshalled), `"action"`)
+}
+
+func TestPaypalShippingPreference_EveryValueMatchesTheSpec(t *testing.T) {
+	assert.Equal(t, PaypalShippingPreference("no_shipping"), PaypalShippingPreferenceNoShipping)
+	assert.Equal(t, PaypalShippingPreference("get_from_file"), PaypalShippingPreferenceGetFromFile)
+	assert.Equal(t, PaypalShippingPreference("set_provided_address"), PaypalShippingPreferenceSetProvidedAddress)
+}
+
+func TestPaymentSetupResponse_DeserializesFlattenedMethodActions(t *testing.T) {
+	payload := `{"id":"ps_2Un2jYAVxLsfUfpOvLhEHRW8Ft1","payment_methods":{
+		"klarna":{"status":"action_required","flags":["missing_phone"],"initialization":"enabled",
+			"action":{"type":"sdk","client_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJzZXNzaW9uX2lkIiA6ICIw",
+				"session_id":"0b1d9815-165e-42e2-8867-35bc03789e00"},
+			"account_holder":{"name":"John Smith"},"iban":"DE89370400440532013000"},
+		"paypal":{"status":"action_required","initialization":"enabled","user_action":"pay_now",
+			"brand_name":"Acme Corporation","shipping_preference":"no_shipping",
+			"action":{"type":"sdk","order_id":"dd4b1a85-31de-404b-99f4-f143f8ba35ba"}},
+		"tabby":{"status":"ready","initialization":"enabled","payment_types":["pay_later"]},
+		"stcpay":{"status":"action_required","initialization":"enabled","action":{"type":"otp"}}}}`
+
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	methods := response.PaymentMethods
+
+	assert.Equal(t, KlarnaPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{
+			Status:         "action_required",
+			Flags:          []string{"missing_phone"},
+			Initialization: PaymentMethodInitializationEnabled,
+		},
+		Action: &PaymentMethodAction{
+			Type:        "sdk",
+			ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJzZXNzaW9uX2lkIiA6ICIw",
+			SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
+		},
+		AccountHolder: &KlarnaAccountHolder{Name: "John Smith"},
+		Iban:          "DE89370400440532013000",
+	}, *methods.Klarna)
+
+	assert.Equal(t, PaypalPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{
+			Status:         "action_required",
+			Initialization: PaymentMethodInitializationEnabled,
+		},
+		UserAction:         "pay_now",
+		BrandName:          "Acme Corporation",
+		ShippingPreference: PaypalShippingPreferenceNoShipping,
+		Action:             &PaymentMethodAction{Type: "sdk", OrderId: "dd4b1a85-31de-404b-99f4-f143f8ba35ba"},
+	}, *methods.Paypal)
+
+	assert.Equal(t, TabbyPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Initialization: PaymentMethodInitializationEnabled},
+		PaymentTypes:      []string{"pay_later"},
+	}, *methods.Tabby)
+
+	assert.Equal(t, StcpayPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{
+			Status:         "action_required",
+			Initialization: PaymentMethodInitializationEnabled,
+		},
+		Action: &PaymentMethodAction{Type: "otp"},
+	}, *methods.Stcpay)
+}
+
+func TestFlattenedPaymentMethods_RoundTripKeepsEveryProperty(t *testing.T) {
+	base := PaymentMethodBase{
+		Status:         "action_required",
+		Flags:          []string{"missing_phone"},
+		Initialization: PaymentMethodInitializationEnabled,
+	}
+	original := PaymentMethods{
+		Klarna: &KlarnaPaymentMethod{
+			PaymentMethodBase: base,
+			Action: &PaymentMethodAction{
+				Type:        "sdk",
+				ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJzZXNzaW9uX2lkIiA6ICIw",
+				SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
+			},
+			AccountHolder: &KlarnaAccountHolder{Name: "John Smith"},
+			Iban:          "DE89370400440532013000",
+		},
+		Paypal: &PaypalPaymentMethod{
+			PaymentMethodBase:  base,
+			UserAction:         "continue",
+			BrandName:          "Acme Corporation",
+			ShippingPreference: PaypalShippingPreferenceSetProvidedAddress,
+			Action:             &PaymentMethodAction{Type: "sdk", OrderId: "dd4b1a85-31de-404b-99f4-f143f8ba35ba"},
+		},
+		Tabby: &TabbyPaymentMethod{
+			PaymentMethodBase: base,
+			PaymentTypes:      []string{"pay_later", "installments"},
+		},
+		Stcpay: &StcpayPaymentMethod{
+			PaymentMethodBase: base,
+			Otp:               "123456",
+			Action:            &PaymentMethodAction{Type: "otp"},
+		},
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	body := string(marshalled)
+	assert.Contains(t, body, `"client_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJzZXNzaW9uX2lkIiA6ICIw"`)
+	assert.Contains(t, body, `"session_id":"0b1d9815-165e-42e2-8867-35bc03789e00"`)
+	assert.Contains(t, body, `"iban":"DE89370400440532013000"`)
+	assert.Contains(t, body, `"paypal":`)
+	assert.Contains(t, body, `"brand_name":"Acme Corporation"`)
+	assert.Contains(t, body, `"shipping_preference":"set_provided_address"`)
+	assert.Contains(t, body, `"order_id":"dd4b1a85-31de-404b-99f4-f143f8ba35ba"`)
+	assert.Contains(t, body, `"payment_types":["pay_later","installments"]`)
+	assert.Contains(t, body, `"otp":"123456"`)
+	assert.Contains(t, body, `"action":{"type":"otp"}`)
+
+	var decoded PaymentMethods
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}

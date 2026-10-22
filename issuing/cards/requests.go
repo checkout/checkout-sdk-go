@@ -26,7 +26,12 @@ const (
 )
 
 type (
+	// RevokeCardRequest is the optional body for POST /issuing/cards/{cardId}/revoke. The body is
+	// not required: pass RevokeCardRequest{} to revoke without a reason, which sends {}.
 	RevokeCardRequest struct {
+		// Reason is the reason for revoking the card.
+		// [Optional]
+		// Enum: expired, reported_lost, reported_stolen
 		Reason RevokeReason `json:"reason,omitempty"`
 	}
 )
@@ -39,7 +44,12 @@ const (
 )
 
 type (
+	// SuspendCardRequest is the optional body for POST /issuing/cards/{cardId}/suspend. The body is
+	// not required: pass SuspendCardRequest{} to suspend without a reason, which sends {}.
 	SuspendCardRequest struct {
+		// Reason is the reason for suspending the card.
+		// [Optional]
+		// Enum: suspected_lost, suspected_stolen
 		Reason SuspendReason `json:"reason,omitempty"`
 	}
 )
@@ -258,7 +268,11 @@ type (
 		ScheduledRevocationDate string `json:"scheduled_revocation_date,omitempty"`
 	}
 
-	// CardUpdateHeaders are the optional HTTP headers accepted when updating a card's details.
+	// CardUpdateHeaders are the HTTP headers the SDK can send when updating a card's details.
+	// Headers that are set are still sent unchanged.
+	//
+	// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
+	// Will be removed in the next major version.
 	//
 	// Go canonicalises outgoing header names, so return-encrypted-cvv reaches the wire as
 	// Return-Encrypted-Cvv no matter how the tag is spelled. That is correct and unavoidable:

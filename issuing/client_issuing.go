@@ -421,6 +421,9 @@ func (c *Client) UpdateCardWithContext(
 // nor overloads, and UpdateCard is public API. The suffix names the extra input, which is the
 // convention the events client set with RetrieveEvents and RetrieveEventsQuery, and which the
 // four identities Get*AttemptsQuery methods also follow.
+//
+// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
+// Will be removed in the next major version.
 func (c *Client) UpdateCardHeaders(
 	cardId string,
 	request cards.CardUpdateRequest,
@@ -430,6 +433,9 @@ func (c *Client) UpdateCardHeaders(
 }
 
 // UpdateCardHeadersWithContext is the context-aware variant of UpdateCardHeaders.
+//
+// Deprecated: The API no longer supports these headers; use UpdateCardWithContext without
+// headers. Will be removed in the next major version.
 func (c *Client) UpdateCardHeadersWithContext(
 	ctx context.Context,
 	cardId string,

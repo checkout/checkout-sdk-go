@@ -29,7 +29,7 @@ var (
 		ProcessingChannelId: os.Getenv("CHECKOUT_PROCESSING_CHANNEL_ID"),
 		PaymentMethods: &setups.PaymentMethods{
 			Klarna: &setups.KlarnaPaymentMethod{
-				// status, flags and payment_method_options.action are read-only
+				// status, flags and action are read-only
 				// response fields; only initialization is writable on the request.
 				PaymentMethodBase: setups.PaymentMethodBase{
 					Initialization: setups.PaymentMethodInitializationEnabled,

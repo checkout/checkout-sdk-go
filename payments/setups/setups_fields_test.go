@@ -1072,6 +1072,12 @@ func TestPaypalShippingPreference_EveryValueMatchesTheSpec(t *testing.T) {
 	assert.Equal(t, PaypalShippingPreference("set_provided_address"), PaypalShippingPreferenceSetProvidedAddress)
 }
 
+func TestFlattenedMethodActionTypes_EveryValueMatchesTheSpec(t *testing.T) {
+	assert.Equal(t, KlarnaActionType("sdk"), KlarnaActionTypeSdk)
+	assert.Equal(t, PaypalActionType("sdk"), PaypalActionTypeSdk)
+	assert.Equal(t, StcpayActionType("otp"), StcpayActionTypeOtp)
+}
+
 func TestPaymentSetupResponse_DeserializesFlattenedMethodActions(t *testing.T) {
 	payload := `{"id":"ps_2Un2jYAVxLsfUfpOvLhEHRW8Ft1","payment_methods":{
 		"klarna":{"status":"action_required","flags":["missing_phone"],"initialization":"enabled",
@@ -1094,8 +1100,8 @@ func TestPaymentSetupResponse_DeserializesFlattenedMethodActions(t *testing.T) {
 			Flags:          []string{"missing_phone"},
 			Initialization: PaymentMethodInitializationEnabled,
 		},
-		Action: &PaymentMethodAction{
-			Type:        "sdk",
+		Action: &KlarnaAction{
+			Type:        KlarnaActionTypeSdk,
 			ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJzZXNzaW9uX2lkIiA6ICIw",
 			SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
 		},
@@ -1111,7 +1117,7 @@ func TestPaymentSetupResponse_DeserializesFlattenedMethodActions(t *testing.T) {
 		UserAction:         "pay_now",
 		BrandName:          "Acme Corporation",
 		ShippingPreference: PaypalShippingPreferenceNoShipping,
-		Action:             &PaymentMethodAction{Type: "sdk", OrderId: "dd4b1a85-31de-404b-99f4-f143f8ba35ba"},
+		Action:             &PaypalAction{Type: PaypalActionTypeSdk, OrderId: "dd4b1a85-31de-404b-99f4-f143f8ba35ba"},
 	}, *methods.Paypal)
 
 	assert.Equal(t, TabbyPaymentMethod{
@@ -1124,7 +1130,7 @@ func TestPaymentSetupResponse_DeserializesFlattenedMethodActions(t *testing.T) {
 			Status:         "action_required",
 			Initialization: PaymentMethodInitializationEnabled,
 		},
-		Action: &PaymentMethodAction{Type: "otp"},
+		Action: &StcpayAction{Type: StcpayActionTypeOtp},
 	}, *methods.Stcpay)
 }
 
@@ -1137,8 +1143,8 @@ func TestFlattenedPaymentMethods_RoundTripKeepsEveryProperty(t *testing.T) {
 	original := PaymentMethods{
 		Klarna: &KlarnaPaymentMethod{
 			PaymentMethodBase: base,
-			Action: &PaymentMethodAction{
-				Type:        "sdk",
+			Action: &KlarnaAction{
+				Type:        KlarnaActionTypeSdk,
 				ClientToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ewogICJzZXNzaW9uX2lkIiA6ICIw",
 				SessionId:   "0b1d9815-165e-42e2-8867-35bc03789e00",
 			},
@@ -1150,7 +1156,7 @@ func TestFlattenedPaymentMethods_RoundTripKeepsEveryProperty(t *testing.T) {
 			UserAction:         "continue",
 			BrandName:          "Acme Corporation",
 			ShippingPreference: PaypalShippingPreferenceSetProvidedAddress,
-			Action:             &PaymentMethodAction{Type: "sdk", OrderId: "dd4b1a85-31de-404b-99f4-f143f8ba35ba"},
+			Action:             &PaypalAction{Type: PaypalActionTypeSdk, OrderId: "dd4b1a85-31de-404b-99f4-f143f8ba35ba"},
 		},
 		Tabby: &TabbyPaymentMethod{
 			PaymentMethodBase: base,
@@ -1159,7 +1165,7 @@ func TestFlattenedPaymentMethods_RoundTripKeepsEveryProperty(t *testing.T) {
 		Stcpay: &StcpayPaymentMethod{
 			PaymentMethodBase: base,
 			Otp:               "123456",
-			Action:            &PaymentMethodAction{Type: "otp"},
+			Action:            &StcpayAction{Type: StcpayActionTypeOtp},
 		},
 	}
 

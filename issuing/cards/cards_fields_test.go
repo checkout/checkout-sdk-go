@@ -243,8 +243,9 @@ func TestCardUpdateHeaders_AreNotPartOfTheRequestBody(t *testing.T) {
 	assert.NotContains(t, string(marshalled), "Headers")
 }
 
-// The json tags double as header names, so they must match the swagger parameter names exactly.
-func TestCardUpdateHeaders_TagsMatchTheSwaggerHeaderNames(t *testing.T) {
+// The json tags double as header names. The headers are deprecated and no longer in the API
+// specification, but they must keep the names they were sent with until they are removed.
+func TestCardUpdateHeaders_TagsKeepTheHeaderNames(t *testing.T) {
 	marshalled, err := json.Marshal(CardUpdateHeaders{
 		ReturnEncryptedCvv: "true",
 		EncryptionKey:      "MIIBIjAN",
@@ -337,6 +338,17 @@ func TestCardUpdateResponse_FullRoundtrip(t *testing.T) {
 
 	var response CardUpdateResponse
 	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assertFullCardUpdateResponse(t, response)
+
+	marshalled, err := json.Marshal(response)
+	assert.NoError(t, err)
+	var roundtrip CardUpdateResponse
+	assert.NoError(t, json.Unmarshal(marshalled, &roundtrip))
+	assertFullCardUpdateResponse(t, roundtrip)
+	assert.Equal(t, response, roundtrip)
+}
+
+func assertFullCardUpdateResponse(t *testing.T, response CardUpdateResponse) {
 	assert.Equal(t, "crd_fa6psq242dcd6fdn5gifcq1491", response.Id)
 	assert.Equal(t, "cli_vkuhvk4vjn2edkps7dfsq6emqm", response.ClientId)
 	assert.Equal(t, "ent_fa6psq242dcd6fdn5gifcq1491", response.EntityId)
@@ -352,24 +364,30 @@ func TestCardUpdateResponse_FullRoundtrip(t *testing.T) {
 	assert.Equal(t, "USD", string(response.BillingCurrency))
 	assert.Equal(t, "US", string(response.IssuingCountry))
 	assert.Equal(t, "X-123456-N11", response.Reference)
-	assert.Equal(t, "metadata1", response.Metadata.Udf1)
+	if assert.NotNil(t, response.Metadata) {
+		assert.Equal(t, "metadata1", response.Metadata.Udf1)
+	}
 	assert.Equal(t, "2027-03-12", response.ScheduledRevocationDate)
 	assert.Equal(t, "2027-03-12", response.RevocationDate)
 	assert.Equal(t, "2026-06-01T10:00Z", response.ScheduledActivationDate)
-	assert.NotNil(t, response.LastActivatedOn)
+	if assert.NotNil(t, response.LastActivatedOn) {
+		assert.Equal(t, "2019-09-10T10:11:12Z", response.LastActivatedOn.UTC().Format(time.RFC3339))
+	}
 	assert.Equal(t, "crd_root", response.RootCardId)
 	assert.Equal(t, "crd_parent", response.ParentCardId)
 	assert.Equal(t, CardScheme("visa"), response.Scheme)
-	assert.NotNil(t, response.CreatedDate)
-	assert.NotNil(t, response.LastModifiedDate)
+	if assert.NotNil(t, response.CreatedDate) {
+		assert.Equal(t, "2021-09-09T19:41:39Z", response.CreatedDate.UTC().Format(time.RFC3339))
+	}
+	if assert.NotNil(t, response.LastModifiedDate) {
+		assert.Equal(t, "2021-09-09T19:41:39Z", response.LastModifiedDate.UTC().Format(time.RFC3339))
+	}
 	assert.True(t, response.IsSingleUse)
-	assert.Contains(t, response.Links, "self")
-
-	marshalled, err := json.Marshal(response)
-	assert.NoError(t, err)
-	var roundtrip CardUpdateResponse
-	assert.NoError(t, json.Unmarshal(marshalled, &roundtrip))
-	assert.Equal(t, response, roundtrip)
+	if assert.Contains(t, response.Links, "self") {
+		if assert.NotNil(t, response.Links["self"].HRef) {
+			assert.Equal(t, "https://api.checkout.com/issuing/cards/crd_test", *response.Links["self"].HRef)
+		}
+	}
 }
 
 func TestRevokeAndSuspendCardRequest_EmptyBodySendsEmptyObject(t *testing.T) {

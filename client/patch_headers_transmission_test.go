@@ -22,12 +22,12 @@ type cardUpdateHeaders struct {
 // TestPatchWithContext_TransmitsHeadersAndBody verifies end-to-end, through the real ApiClient and
 // transport, that a PATCH carrying a Headers source emits both headers and still sends the body.
 // PatchWithContext has no headers parameter, so the only route is the reflected Headers field.
-// This is what proves part D needs no change to the HttpClient interface.
+// The deprecated card update headers rely on this, with no change to the HttpClient interface.
 func TestPatchWithContext_TransmitsHeadersAndBody(t *testing.T) {
 	var gotMethod, gotCvv, gotKey, gotBody string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotMethod = r.Method
-		// Look up by the spec's lower-case spelling. http.Header.Get is case insensitive, which
+		// Look up by the lower-case spelling the headers were documented with. http.Header.Get is case insensitive, which
 		// is the whole reason the canonicalisation below is harmless.
 		gotCvv = r.Header.Get("return-encrypted-cvv")
 		gotKey = r.Header.Get("Encryption-Key")
@@ -112,7 +112,8 @@ func TestPatchWithContext_NoHeadersWhenTheSourceHasNone(t *testing.T) {
 	assert.Contains(t, gotBody, `"reference":"X-123456-N11"`)
 }
 
-// The encryption key can be sent on its own; only the pairing rule is the API's business.
+// The encryption key is sent on its own when it is the only field set; the SDK does not validate
+// the pairing.
 func TestPatchWithContext_SendsTheKeyWithoutTheFlag(t *testing.T) {
 	var gotCvv, gotKey string
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

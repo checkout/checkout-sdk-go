@@ -1538,14 +1538,9 @@ func TestUpdateCard(t *testing.T) {
 	}
 }
 
-// UpdateCardHeaders is the part D entry point: same request, plus the optional
-// return-encrypted-cvv and Encryption-Key headers. It is a separate method because Go has no
-// overloads, and the suffix names the extra input, matching RetrieveEventsQuery in the events
-// client and the four identities Get*AttemptsQuery methods.
-//
-// Nothing exercised the public method before this: client/patch_headers_transmission_test.go
-// covers the transmission mechanism but mirrors the headers type locally and drives the HTTP
-// layer, so the method name and the wrapper wiring were only checked by the compiler.
+// UpdateCardHeaders is deprecated: the API no longer documents the return-encrypted-cvv and
+// Encryption-Key headers and ignores them. The method must keep sending them when set until it
+// is removed in the next major version, so this test pins the wrapper wiring.
 func TestUpdateCardHeaders(t *testing.T) {
 	request := cards.CardUpdateRequest{Reference: "ref-updated"}
 	headers := &cards.CardUpdateHeaders{

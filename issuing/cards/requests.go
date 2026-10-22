@@ -225,8 +225,7 @@ type (
 		// Example: X-123456-N11
 		Reference string `json:"reference,omitempty"`
 
-		// Metadata is the user's metadata. Declared by update-card-request but absent from this
-		// struct until the 2026-09-02 pass, so it could not be sent at all.
+		// Metadata is the user's metadata.
 		// [Optional]
 		Metadata *CardMetadata `json:"metadata,omitempty"`
 
@@ -245,6 +244,9 @@ type (
 		// Status can be set to "active" to reactivate an inactive or suspended
 		// card. Mutually exclusive with the scheduled_activation_date field:
 		// submitting both results in a scheduled_activation_date_conflicts_with_activation error.
+		// [Optional]
+		// Enum: "active"
+		// Example: active
 		Status CardStatusUpdate `json:"status,omitempty"`
 
 		// ScheduledActivationDate schedules the card's first activation. Only applies to the
@@ -257,19 +259,25 @@ type (
 		// Example: 2026-06-01T10:00Z
 		ScheduledActivationDate string `json:"scheduled_activation_date,omitempty"`
 
-		// RevocationDate is deprecated. Use ScheduledRevocationDate instead.
+		// RevocationDate is the date scheduling the card's automatic revocation (time is
+		// midnight UTC). If both fields are provided, ScheduledRevocationDate overrides this value.
+		// [Optional]
+		// Format: date (YYYY-MM-DD)
 		//
 		// Deprecated: use ScheduledRevocationDate. If both fields are provided,
 		// ScheduledRevocationDate overrides this value.
 		RevocationDate string `json:"revocation_date,omitempty"`
 
-		// ScheduledRevocationDate is the date (format YYYY-MM-DD) on which the
-		// card is revoked at midnight UTC. Replaces the deprecated RevocationDate.
+		// ScheduledRevocationDate is the date on which the card is revoked, at midnight UTC.
+		// Replaces the deprecated RevocationDate.
+		// [Optional]
+		// Format: date (YYYY-MM-DD)
 		ScheduledRevocationDate string `json:"scheduled_revocation_date,omitempty"`
 	}
 
 	// CardUpdateHeaders are the HTTP headers the SDK can send when updating a card's details.
-	// Headers that are set are still sent unchanged.
+	// The API no longer documents them and ignores them (verified against the sandbox). Headers
+	// that are set are still sent unchanged.
 	//
 	// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
 	// Will be removed in the next major version.
@@ -280,18 +288,23 @@ type (
 	// case insensitive per RFC 7230, so the API reads it either way. Do not try to "fix" the
 	// casing; it cannot be done through net/http.
 	CardUpdateHeaders struct {
-		// ReturnEncryptedCvv set to "true" retrieves the card's encrypted credentials in the
-		// response. Requires an RSA public key in the Encryption-Key header, otherwise the API
-		// answers 422 with error code encryption_key_required.
+		// ReturnEncryptedCvv is sent as the return-encrypted-cvv header when set. The API no
+		// longer documents this header and ignores it; the response never includes an
+		// encrypted CVV.
 		// [Optional]
+		//
+		// Deprecated: The API no longer supports this header. Will be removed in the next
+		// major version.
 		// Maps to HTTP header return-encrypted-cvv.
 		// Example: "true"
 		ReturnEncryptedCvv string `json:"return-encrypted-cvv,omitempty"`
 
-		// EncryptionKey is the RSA public key used to encrypt returned credentials. Required when
-		// ReturnEncryptedCvv is set. Provide the public key with the BEGIN PUBLIC KEY and END
-		// PUBLIC KEY headers and any newline characters removed, encoded as Base64.
+		// EncryptionKey is sent as the Encryption-Key header when set. The API no longer
+		// documents this header and ignores it.
 		// [Optional]
+		//
+		// Deprecated: The API no longer supports this header. Will be removed in the next
+		// major version.
 		// Maps to HTTP header Encryption-Key.
 		EncryptionKey string `json:"Encryption-Key,omitempty"`
 	}

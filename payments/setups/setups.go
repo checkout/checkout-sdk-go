@@ -701,15 +701,55 @@ type PaymentMethodOptions struct {
 type KlarnaPaymentMethod struct {
 	PaymentMethodBase
 
+	// Action is the next available action for the payment method.
+	// [Optional]
+	// Read only
+	Action *KlarnaAction `json:"action,omitempty"`
+
 	// AccountHolder is the account holder details returned by Klarna after the shopper completes
 	// verification.
 	// [Optional]
 	// Read only
 	AccountHolder *KlarnaAccountHolder `json:"account_holder,omitempty"`
 
-	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
+	// Iban is the IBAN of the account used to complete Klarna verification.
 	// [Optional]
+	// Read only
+	Iban string `json:"iban,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: not part of the API spec; the API no longer sends it and ignores it on
+	// requests. Use Action instead. It will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
+}
+
+// KlarnaActionType is the type of the next available action for the Klarna payment method.
+type KlarnaActionType string
+
+const (
+	// KlarnaActionTypeSdk completes the payment with the Klarna SDK, using the client_token and
+	// session_id.
+	KlarnaActionTypeSdk KlarnaActionType = "sdk"
+)
+
+// KlarnaAction is the next available action for the Klarna payment method.
+type KlarnaAction struct {
+	// Type is the type of action.
+	// [Optional]
+	// Read only
+	Type KlarnaActionType `json:"type,omitempty"`
+
+	// ClientToken is the client token for the Klarna SDK.
+	// [Optional]
+	// Read only
+	ClientToken string `json:"client_token,omitempty"`
+
+	// SessionId is the session ID.
+	// [Optional]
+	// Read only
+	SessionId string `json:"session_id,omitempty"`
 }
 
 // KlarnaAccountHolder is the account holder details returned by Klarna after the shopper
@@ -726,19 +766,51 @@ type StcpayPaymentMethod struct {
 
 	// Otp is the one-time password (OTP) for stc pay.
 	// [Optional]
+	// Write only
 	Otp string `json:"otp,omitempty"`
 
-	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
+	// Action is the next available action for the payment method.
 	// [Optional]
+	// Read only
+	Action *StcpayAction `json:"action,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: not part of the API spec; the API no longer sends it and ignores it on
+	// requests. Use Action instead. It will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
+}
+
+// StcpayActionType is the type of the next available action for the stc pay payment method.
+type StcpayActionType string
+
+const (
+	// StcpayActionTypeOtp asks for the one-time password the customer received.
+	StcpayActionTypeOtp StcpayActionType = "otp"
+)
+
+// StcpayAction is the next available action for the stc pay payment method.
+type StcpayAction struct {
+	// Type is the type of action.
+	// [Optional]
+	// Read only
+	Type StcpayActionType `json:"type,omitempty"`
 }
 
 // TabbyPaymentMethod is the Tabby payment method's details and configuration.
 type TabbyPaymentMethod struct {
 	PaymentMethodBase
 
-	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
+	// PaymentTypes is the available payment types for Tabby (for example, "installments").
 	// [Optional]
+	PaymentTypes []string `json:"payment_types,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: not part of the API spec; the API no longer sends it and ignores it on
+	// requests. There is no replacement. It will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1265,6 +1337,19 @@ type SepaPaymentMethod struct {
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
+// PaypalShippingPreference is where PayPal obtains the shipping information.
+type PaypalShippingPreference string
+
+const (
+	// PaypalShippingPreferenceNoShipping redacts the shipping address from the PayPal pages.
+	PaypalShippingPreferenceNoShipping PaypalShippingPreference = "no_shipping"
+	// PaypalShippingPreferenceGetFromFile obtains the shipping address from the customer's PayPal
+	// account.
+	PaypalShippingPreferenceGetFromFile PaypalShippingPreference = "get_from_file"
+	// PaypalShippingPreferenceSetProvidedAddress uses the shipping address provided by the merchant.
+	PaypalShippingPreferenceSetProvidedAddress PaypalShippingPreference = "set_provided_address"
+)
+
 // PaypalPaymentMethod is the PayPal payment method's details and configuration.
 type PaypalPaymentMethod struct {
 	PaymentMethodBase
@@ -1279,9 +1364,50 @@ type PaypalPaymentMethod struct {
 	// Enum: "pay_now" "continue"
 	UserAction string `json:"user_action,omitempty"`
 
-	// PaymentMethodOptions holds the payment method options. Not part of the current Payment Setup schema.
+	// BrandName is the brand name to display in the PayPal checkout experience.
 	// [Optional]
+	// max 127 characters
+	BrandName string `json:"brand_name,omitempty"`
+
+	// ShippingPreference is where to obtain the shipping information.
+	// - no_shipping: redacts the shipping address from the PayPal pages.
+	// - get_from_file: obtains the shipping address from the customer's PayPal account.
+	// - set_provided_address: uses the shipping address provided by the merchant.
+	// [Optional]
+	ShippingPreference PaypalShippingPreference `json:"shipping_preference,omitempty"`
+
+	// Action is the next available action for the payment method.
+	// [Optional]
+	// Read only
+	Action *PaypalAction `json:"action,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: not part of the API spec; the API no longer sends it and ignores it on
+	// requests. Use Action instead. It will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
+}
+
+// PaypalActionType is the type of the next available action for the PayPal payment method.
+type PaypalActionType string
+
+const (
+	// PaypalActionTypeSdk completes the payment with the PayPal SDK, using the order_id.
+	PaypalActionTypeSdk PaypalActionType = "sdk"
+)
+
+// PaypalAction is the next available action for the PayPal payment method.
+type PaypalAction struct {
+	// Type is the type of action.
+	// [Optional]
+	// Read only
+	Type PaypalActionType `json:"type,omitempty"`
+
+	// OrderId is the PayPal order ID to use with the PayPal SDK.
+	// [Optional]
+	// Read only
+	OrderId string `json:"order_id,omitempty"`
 }
 
 // BacsAccountHolderType is the type of Bacs account holder.

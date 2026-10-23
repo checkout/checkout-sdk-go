@@ -436,8 +436,8 @@ func (c *Client) UpdateCardHeaders(
 
 // UpdateCardHeadersWithContext is the context-aware variant of UpdateCardHeaders.
 //
-// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
-// Will be removed in the next major version.
+// Deprecated: The API no longer documents these headers; use UpdateCardWithContext without
+// headers. Will be removed in the next major version.
 func (c *Client) UpdateCardHeadersWithContext(
 	ctx context.Context,
 	cardId string,

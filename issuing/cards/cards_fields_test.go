@@ -6,17 +6,17 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
-// Verifies the card scheduling fields aligned with the 2026-09-02 Checkout.com swagger delta:
+// Verifies the card scheduling fields:
 //   - scheduled_activation_date on add-card-request, update-card-request and get-card-response
 //     (renamed from activation_date; the IssuingActivationDate schema was removed)
 //   - revocation_date on add-card-request and update-card-request, now format: date
-//   - the return-encrypted-cvv and Encryption-Key request headers
+//   - the deprecated return-encrypted-cvv and Encryption-Key request headers (still sent when set)
 //
-// encrypted_cvv was added to update-card-response by this same 2026-09-02 delta, then removed
-// again by the 2026-09-17 delta (INT-1700, see the tests further down); the current spec never
-// includes it.
+// update-card-response never includes encrypted_cvv (see the tests further down).
 
 func TestCardDetailsRequest_ScheduledActivationAndRevocationDate(t *testing.T) {
 	request := CardDetailsRequest{
@@ -137,7 +137,7 @@ func TestCardDetailsData_DeserializeScheduleFields(t *testing.T) {
 	assert.Equal(t, "crd_parent_abcdefghijkl", data.ParentCardId)
 }
 
-// Verifies fields added by the 2026-09-17 Checkout.com swagger delta (INT-1700):
+// Verifies these fields:
 //   - scheduled_revocation_date on add-card-request, update-card-request, get-card-response
 //   - status on update-card-request
 //   - last_activated_on on activate-card-response, add-card-response/get-card-response
@@ -243,8 +243,9 @@ func TestCardUpdateHeaders_AreNotPartOfTheRequestBody(t *testing.T) {
 	assert.NotContains(t, string(marshalled), "Headers")
 }
 
-// The json tags double as header names, so they must match the swagger parameter names exactly.
-func TestCardUpdateHeaders_TagsMatchTheSwaggerHeaderNames(t *testing.T) {
+// The json tags double as header names. The headers are deprecated and no longer in the API
+// specification, but they must keep the names they were sent with until they are removed.
+func TestCardUpdateHeaders_TagsKeepTheHeaderNames(t *testing.T) {
 	marshalled, err := json.Marshal(CardUpdateHeaders{
 		ReturnEncryptedCvv: "true",
 		EncryptionKey:      "MIIBIjAN",
@@ -288,8 +289,8 @@ func TestCardUpdateResponse_DeserializeSwaggerExample(t *testing.T) {
 	assert.NotContains(t, string(marshalled), "encrypted_cvv")
 }
 
-// Verifies the 2026-09-23 spec update: update-card-response gained a virtual/physical
-// discriminator, and the virtual variant adds is_single_use.
+// update-card-response has a virtual/physical discriminator; the virtual variant adds
+// is_single_use.
 func TestCardUpdateResponse_DeserializesIsSingleUse(t *testing.T) {
 	payload := `{"type": "virtual", "last_modified_date": "2019-09-10T10:11:12Z", "is_single_use": true}`
 
@@ -302,4 +303,103 @@ func TestCardUpdateResponse_IsSingleUseOmittedWhenAbsent(t *testing.T) {
 	marshalled, err := json.Marshal(CardUpdateResponse{})
 	assert.NoError(t, err)
 	assert.NotContains(t, string(marshalled), "is_single_use")
+}
+
+func TestCardUpdateResponse_FullRoundtrip(t *testing.T) {
+	payload := `{
+		"id": "crd_fa6psq242dcd6fdn5gifcq1491",
+		"client_id": "cli_vkuhvk4vjn2edkps7dfsq6emqm",
+		"entity_id": "ent_fa6psq242dcd6fdn5gifcq1491",
+		"cardholder_id": "crh_d3ozhf43pcq2xbldn2g45qnb44",
+		"card_product_id": "pro_7syjig3jq3mezlc3vjrdpfitl4",
+		"user_id": "usr_fa6psq242dcd6fdn5gifcq1491",
+		"last_four": "1234",
+		"expiry_month": 5,
+		"expiry_year": 2025,
+		"status": "active",
+		"display_name": "JOHN KENNEDY",
+		"type": "virtual",
+		"billing_currency": "USD",
+		"issuing_country": "US",
+		"reference": "X-123456-N11",
+		"metadata": {"udf1": "metadata1"},
+		"scheduled_revocation_date": "2027-03-12",
+		"revocation_date": "2027-03-12",
+		"scheduled_activation_date": "2026-06-01T10:00Z",
+		"last_activated_on": "2019-09-10T10:11:12Z",
+		"root_card_id": "crd_root",
+		"parent_card_id": "crd_parent",
+		"scheme": "visa",
+		"created_date": "2021-09-09T19:41:39Z",
+		"last_modified_date": "2021-09-09T19:41:39Z",
+		"is_single_use": true,
+		"_links": {"self": {"href": "https://api.checkout.com/issuing/cards/crd_test"}}
+	}`
+
+	var response CardUpdateResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assertFullCardUpdateResponse(t, response)
+
+	marshalled, err := json.Marshal(response)
+	assert.NoError(t, err)
+	var roundtrip CardUpdateResponse
+	assert.NoError(t, json.Unmarshal(marshalled, &roundtrip))
+	assertFullCardUpdateResponse(t, roundtrip)
+	assert.Equal(t, response, roundtrip)
+}
+
+func assertFullCardUpdateResponse(t *testing.T, response CardUpdateResponse) {
+	assert.Equal(t, "crd_fa6psq242dcd6fdn5gifcq1491", response.Id)
+	assert.Equal(t, "cli_vkuhvk4vjn2edkps7dfsq6emqm", response.ClientId)
+	assert.Equal(t, "ent_fa6psq242dcd6fdn5gifcq1491", response.EntityId)
+	assert.Equal(t, "crh_d3ozhf43pcq2xbldn2g45qnb44", response.CardholderId)
+	assert.Equal(t, "pro_7syjig3jq3mezlc3vjrdpfitl4", response.CardProductId)
+	assert.Equal(t, "usr_fa6psq242dcd6fdn5gifcq1491", response.UserId)
+	assert.Equal(t, "1234", response.LastFour)
+	assert.Equal(t, 5, response.ExpiryMonth)
+	assert.Equal(t, 2025, response.ExpiryYear)
+	assert.Equal(t, CardStatus("active"), response.Status)
+	assert.Equal(t, "JOHN KENNEDY", response.DisplayName)
+	assert.Equal(t, Virtual, response.Type)
+	assert.Equal(t, "USD", string(response.BillingCurrency))
+	assert.Equal(t, "US", string(response.IssuingCountry))
+	assert.Equal(t, "X-123456-N11", response.Reference)
+	if assert.NotNil(t, response.Metadata) {
+		assert.Equal(t, "metadata1", response.Metadata.Udf1)
+	}
+	assert.Equal(t, "2027-03-12", response.ScheduledRevocationDate)
+	assert.Equal(t, "2027-03-12", response.RevocationDate)
+	assert.Equal(t, "2026-06-01T10:00Z", response.ScheduledActivationDate)
+	if assert.NotNil(t, response.LastActivatedOn) {
+		assert.Equal(t, "2019-09-10T10:11:12Z", response.LastActivatedOn.UTC().Format(time.RFC3339))
+	}
+	assert.Equal(t, "crd_root", response.RootCardId)
+	assert.Equal(t, "crd_parent", response.ParentCardId)
+	assert.Equal(t, CardScheme("visa"), response.Scheme)
+	if assert.NotNil(t, response.CreatedDate) {
+		assert.Equal(t, "2021-09-09T19:41:39Z", response.CreatedDate.UTC().Format(time.RFC3339))
+	}
+	if assert.NotNil(t, response.LastModifiedDate) {
+		assert.Equal(t, "2021-09-09T19:41:39Z", response.LastModifiedDate.UTC().Format(time.RFC3339))
+	}
+	assert.True(t, response.IsSingleUse)
+	if assert.Contains(t, response.Links, "self") {
+		if assert.NotNil(t, response.Links["self"].HRef) {
+			assert.Equal(t, "https://api.checkout.com/issuing/cards/crd_test", *response.Links["self"].HRef)
+		}
+	}
+}
+
+func TestRevokeAndSuspendCardRequest_EmptyBodySendsEmptyObject(t *testing.T) {
+	revoke, err := common.Marshal(RevokeCardRequest{})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{}`, revoke.String())
+
+	suspend, err := common.Marshal(SuspendCardRequest{})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{}`, suspend.String())
+
+	withReason, err := common.Marshal(RevokeCardRequest{Reason: ReportedLost})
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"reason":"reported_lost"}`, withReason.String())
 }

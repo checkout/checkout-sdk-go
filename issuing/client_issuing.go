@@ -332,6 +332,8 @@ func (c *Client) GetCardCredentialsWithContext(
 	return &response, nil
 }
 
+// RevokeCard revokes a card permanently; a revoked card cannot be reactivated.
+// The request body is optional: pass cards.RevokeCardRequest{} to send no reason, which sends {}.
 func (c *Client) RevokeCard(
 	cardId string,
 	revokeCardRequest cards.RevokeCardRequest,
@@ -339,6 +341,8 @@ func (c *Client) RevokeCard(
 	return c.RevokeCardWithContext(context.Background(), cardId, revokeCardRequest)
 }
 
+// RevokeCardWithContext is the context-aware variant of RevokeCard. The request is optional: a zero
+// cards.RevokeCardRequest{} sends {}.
 func (c *Client) RevokeCardWithContext(
 	ctx context.Context,
 	cardId string,
@@ -363,6 +367,8 @@ func (c *Client) RevokeCardWithContext(
 	return &response, nil
 }
 
+// SuspendCard suspends a card; a suspended card declines authorizations until it is reactivated.
+// The request body is optional: pass cards.SuspendCardRequest{} to send no reason, which sends {}.
 func (c *Client) SuspendCard(
 	cardId string,
 	suspendCardRequest cards.SuspendCardRequest,
@@ -370,6 +376,8 @@ func (c *Client) SuspendCard(
 	return c.SuspendCardWithContext(context.Background(), cardId, suspendCardRequest)
 }
 
+// SuspendCardWithContext is the context-aware variant of SuspendCard. The request is optional: a zero
+// cards.SuspendCardRequest{} sends {}.
 func (c *Client) SuspendCardWithContext(
 	ctx context.Context,
 	cardId string,
@@ -412,15 +420,12 @@ func (c *Client) UpdateCardWithContext(
 	return c.updateCard(ctx, cardId, request, nil)
 }
 
-// UpdateCardHeaders updates a card, sending the optional return-encrypted-cvv and
-// Encryption-Key headers. Set ReturnEncryptedCvv to "true" together with an EncryptionKey to
-// receive the card's encrypted CVV in the response; supplying the flag without the key returns a
-// 422 with error code encryption_key_required.
+// UpdateCardHeaders updates a card like UpdateCard and also sends the return-encrypted-cvv and
+// Encryption-Key headers from headers when they are set. The API no longer documents these
+// headers; they are still sent when set, and the response type is the same as for UpdateCard.
 //
-// A separate method rather than a changed signature, because Go has neither optional parameters
-// nor overloads, and UpdateCard is public API. The suffix names the extra input, which is the
-// convention the events client set with RetrieveEvents and RetrieveEventsQuery, and which the
-// four identities Get*AttemptsQuery methods also follow.
+// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
+// Will be removed in the next major version.
 func (c *Client) UpdateCardHeaders(
 	cardId string,
 	request cards.CardUpdateRequest,
@@ -430,6 +435,9 @@ func (c *Client) UpdateCardHeaders(
 }
 
 // UpdateCardHeadersWithContext is the context-aware variant of UpdateCardHeaders.
+//
+// Deprecated: The API no longer documents these headers; use UpdateCardWithContext without
+// headers. Will be removed in the next major version.
 func (c *Client) UpdateCardHeadersWithContext(
 	ctx context.Context,
 	cardId string,

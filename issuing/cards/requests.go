@@ -276,36 +276,34 @@ type (
 	}
 
 	// CardUpdateHeaders are the HTTP headers the SDK can send when updating a card's details.
-	// The API no longer documents them and ignores them (verified against the sandbox). Headers
-	// that are set are still sent unchanged.
-	//
-	// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
-	// Will be removed in the next major version.
+	// The API no longer documents these headers. Headers that are set are still sent unchanged.
 	//
 	// Go canonicalises outgoing header names, so return-encrypted-cvv reaches the wire as
 	// Return-Encrypted-Cvv no matter how the tag is spelled. That is correct and unavoidable:
 	// net/http applies textproto.CanonicalMIMEHeaderKey on write, and HTTP header names are
 	// case insensitive per RFC 7230, so the API reads it either way. Do not try to "fix" the
 	// casing; it cannot be done through net/http.
+	//
+	// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
+	// Will be removed in the next major version.
 	CardUpdateHeaders struct {
 		// ReturnEncryptedCvv is sent as the return-encrypted-cvv header when set. The API no
-		// longer documents this header and ignores it; the response never includes an
-		// encrypted CVV.
+		// longer documents this header.
 		// [Optional]
+		// Maps to HTTP header return-encrypted-cvv.
+		// Example: "true"
 		//
 		// Deprecated: The API no longer supports this header. Will be removed in the next
 		// major version.
-		// Maps to HTTP header return-encrypted-cvv.
-		// Example: "true"
 		ReturnEncryptedCvv string `json:"return-encrypted-cvv,omitempty"`
 
 		// EncryptionKey is sent as the Encryption-Key header when set. The API no longer
-		// documents this header and ignores it.
+		// documents this header.
 		// [Optional]
+		// Maps to HTTP header Encryption-Key.
 		//
 		// Deprecated: The API no longer supports this header. Will be removed in the next
 		// major version.
-		// Maps to HTTP header Encryption-Key.
 		EncryptionKey string `json:"Encryption-Key,omitempty"`
 	}
 )

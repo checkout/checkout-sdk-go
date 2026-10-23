@@ -422,8 +422,7 @@ func (c *Client) UpdateCardWithContext(
 
 // UpdateCardHeaders updates a card like UpdateCard and also sends the return-encrypted-cvv and
 // Encryption-Key headers from headers when they are set. The API no longer documents these
-// headers and ignores them (verified against the sandbox): the response is the same as for
-// UpdateCard and never includes an encrypted CVV.
+// headers; they are still sent when set, and the response type is the same as for UpdateCard.
 //
 // Deprecated: The API no longer supports these headers; use UpdateCard without headers.
 // Will be removed in the next major version.

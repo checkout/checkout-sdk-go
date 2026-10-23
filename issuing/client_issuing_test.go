@@ -1539,7 +1539,7 @@ func TestUpdateCard(t *testing.T) {
 }
 
 // UpdateCardHeaders is deprecated: the API no longer documents the return-encrypted-cvv and
-// Encryption-Key headers and ignores them. The method must keep sending them when set until it
+// Encryption-Key headers. The method must keep sending them when set until it
 // is removed in the next major version, so this test pins the wrapper wiring.
 func TestUpdateCardHeaders(t *testing.T) {
 	request := cards.CardUpdateRequest{Reference: "ref-updated"}

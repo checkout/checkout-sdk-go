@@ -262,7 +262,7 @@ type (
 		// Example: X-123456-N11
 		Reference string `json:"reference,omitempty"`
 
-		// Metadata is user's metadata.
+		// Metadata is the user's metadata.
 		// [Optional]
 		Metadata *CardMetadata `json:"metadata,omitempty"`
 
@@ -278,7 +278,7 @@ type (
 		// Deprecated: use ScheduledRevocationDate.
 		RevocationDate string `json:"revocation_date,omitempty"`
 
-		// ScheduledActivationDate is date scheduling the card's first activation. Only applies to the initial activation of a card.
+		// ScheduledActivationDate is the date scheduling the card's first activation. Only applies to the initial activation of a card.
 		// Two formats are supported: date only (YYYY-MM-DD, treated as midnight UTC), or date with round
 		// hour (YYYY-MM-DDTHH:mmZ in UTC, or YYYY-MM-DDTHH:mm+HH:mm with offset). Only round hours are
 		// allowed when a time is provided (HH:00).

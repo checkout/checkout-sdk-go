@@ -284,7 +284,7 @@ type (
 	// case insensitive per RFC 7230, so the API reads it either way. Do not try to "fix" the
 	// casing; it cannot be done through net/http.
 	//
-	// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
+	// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
 	// Will be removed in the next major version.
 	CardUpdateHeaders struct {
 		// ReturnEncryptedCvv is sent as the return-encrypted-cvv header when set. The API no
@@ -293,8 +293,8 @@ type (
 		// Maps to HTTP header return-encrypted-cvv.
 		// Example: "true"
 		//
-		// Deprecated: The API no longer supports this header. Will be removed in the next
-		// major version.
+		// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
+		// Will be removed in the next major version.
 		ReturnEncryptedCvv string `json:"return-encrypted-cvv,omitempty"`
 
 		// EncryptionKey is sent as the Encryption-Key header when set. The API no longer
@@ -302,8 +302,8 @@ type (
 		// [Optional]
 		// Maps to HTTP header Encryption-Key.
 		//
-		// Deprecated: The API no longer supports this header. Will be removed in the next
-		// major version.
+		// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
+		// Will be removed in the next major version.
 		EncryptionKey string `json:"Encryption-Key,omitempty"`
 	}
 )

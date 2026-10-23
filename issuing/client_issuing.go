@@ -424,7 +424,7 @@ func (c *Client) UpdateCardWithContext(
 // Encryption-Key headers from headers when they are set. The API no longer documents these
 // headers; they are still sent when set, and the response type is the same as for UpdateCard.
 //
-// Deprecated: The API no longer supports these headers; use UpdateCard without headers.
+// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
 // Will be removed in the next major version.
 func (c *Client) UpdateCardHeaders(
 	cardId string,
@@ -436,8 +436,8 @@ func (c *Client) UpdateCardHeaders(
 
 // UpdateCardHeadersWithContext is the context-aware variant of UpdateCardHeaders.
 //
-// Deprecated: The API no longer supports these headers; use UpdateCardWithContext without
-// headers. Will be removed in the next major version.
+// Deprecated: The API no longer documents these headers; use UpdateCard without headers.
+// Will be removed in the next major version.
 func (c *Client) UpdateCardHeadersWithContext(
 	ctx context.Context,
 	cardId string,

@@ -169,7 +169,7 @@ type (
 		Risk                 *payments.RiskRequest       `json:"risk,omitempty"`
 		SuccessUrl           string                      `json:"success_url,omitempty"`
 		FailureUrl           string                      `json:"failure_url,omitempty"`
-		// Deprecated: Use risk.device.network.ipv4 or risk.device.network.ipv6 instead.
+		// Deprecated: Use risk.device.network.ipv4 or risk.device.network.ipv6 instead. This field will be removed in the next major version.
 		PaymentIp         string                        `json:"payment_ip,omitempty"`
 		Sender            Sender                        `json:"sender,omitempty"`
 		Recipient         *payments.PaymentRecipient    `json:"recipient,omitempty"`
@@ -292,7 +292,7 @@ type (
 		Customer          *common.CustomerResponse    `json:"customer,omitempty"`
 		BillingDescriptor *payments.BillingDescriptor `json:"billing_descriptor,omitempty"`
 		ShippingDetails   *payments.ShippingDetails   `json:"shipping,omitempty"`
-		// Deprecated: Use risk.device.network.ipv4 or risk.device.network.ipv6 instead.
+		// PaymentIp is the IP address used to make the payment. Used by Checkout.com's risk engine to check the customer's IP address, only accepts IPv4 and IPv6 addresses.
 		PaymentIp                string                          `json:"payment_ip,omitempty"`
 		Marketplace              *common.MarketplaceData         `json:"marketplace,omitempty"`
 		AmountAllocations        []common.AmountAllocations      `json:"amount_allocations,omitempty"`

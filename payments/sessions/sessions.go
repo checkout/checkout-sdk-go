@@ -99,7 +99,9 @@ type (
 		ExpiresOn                  *time.Time                               `json:"expires_on,omitempty"`
 		EnabledPaymentMethods      []PaymentMethodsType                     `json:"enabled_payment_methods,omitempty"`
 		DisabledPaymentMethods     []PaymentMethodsType                     `json:"disabled_payment_methods,omitempty"`
-		CustomerRetry              *payments.PaymentRetryRequest            `json:"customer_retry,omitempty"`
+		// CustomerRetry configures the parameters for customer retries on the checkout page.
+		// [Optional] When set, max_attempts is required.
+		CustomerRetry *payments.CustomerRetry `json:"customer_retry,omitempty"`
 		// AuthorizationType is the authorization type. Defaults to Final.
 		AuthorizationType nas.AuthorizationType `json:"authorization_type,omitempty" default:"Final"`
 		// PaymentPlan is the information to process a recurring payment request. To be used when the payment_type is Recurring.

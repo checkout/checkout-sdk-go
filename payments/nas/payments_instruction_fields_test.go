@@ -29,3 +29,9 @@ func TestPaymentInstructionResponse_FundsTransferTypeAbsentWhenUnset(t *testing.
 	assert.NoError(t, err)
 	assert.NotContains(t, string(marshalled), "funds_transfer_type")
 }
+
+func TestGetPaymentResponse_DeserializesPaymentIp(t *testing.T) {
+	var response GetPaymentResponse
+	assert.NoError(t, json.Unmarshal([]byte(`{"id":"pay_123","payment_ip":"90.197.169.245"}`), &response))
+	assert.Equal(t, "90.197.169.245", response.PaymentIp)
+}

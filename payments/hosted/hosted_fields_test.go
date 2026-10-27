@@ -97,3 +97,15 @@ func TestPaymentHostedRequest_AccommodationDatesUseShortDateFormat(t *testing.T)
 	// No field anywhere in the HPP body may carry a time component on a date-only field.
 	assert.NotContains(t, string(raw), "T00:00:00")
 }
+
+func TestPaymentHostedRequest_CustomerRetryOnlySendsMaxAttempts(t *testing.T) {
+	maxAttempts := 2
+	request := PaymentHostedRequest{CustomerRetry: &payments.CustomerRetry{MaxAttempts: &maxAttempts}}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+
+	var raw map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &raw))
+	assert.Equal(t, map[string]interface{}{"max_attempts": float64(2)}, raw["customer_retry"])
+}

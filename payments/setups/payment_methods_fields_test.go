@@ -252,14 +252,17 @@ func TestPaymentSetupOrder_TippingAndSurchargeAmounts(t *testing.T) {
 	assert.Equal(t, original, decoded)
 }
 
-func TestCustomerMerchantAccount_LastPaymentAmountKeepsDecimals(t *testing.T) {
-	var account CustomerMerchantAccount
-	assert.NoError(t, json.Unmarshal([]byte(`{"last_payment_amount":55.99}`), &account))
-	assert.Equal(t, 55.99, account.LastPaymentAmount)
-
-	marshalled, err := json.Marshal(account)
+// The API stores last_payment_amount as an integer, so the SDK keeps int64.
+func TestCustomerMerchantAccount_LastPaymentAmountIsAnInteger(t *testing.T) {
+	original := CustomerMerchantAccount{LastPaymentAmount: 55}
+	marshalled, err := json.Marshal(original)
 	assert.NoError(t, err)
-	assert.JSONEq(t, `{"last_payment_amount":55.99}`, string(marshalled))
+	assert.JSONEq(t, `{"last_payment_amount":55}`, string(marshalled))
+
+	var decoded CustomerMerchantAccount
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+	assert.Equal(t, int64(55), decoded.LastPaymentAmount)
 }
 
 func TestPaymentMethods_EmptyMethodsSendNothing(t *testing.T) {

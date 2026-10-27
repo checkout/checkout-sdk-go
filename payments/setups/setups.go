@@ -438,10 +438,11 @@ type CustomerMerchantAccount struct {
 	// [Optional]
 	TotalOrderCount int `json:"total_order_count,omitempty"`
 
-	// LastPaymentAmount is the payment amount of the customer's most recent transaction. A
-	// number, so it can carry decimals such as 55.99.
+	// LastPaymentAmount is the payment amount of the customer's most recent transaction. The
+	// specification types this as a number (example 55.99); the API currently stores it as an
+	// integer.
 	// [Optional]
-	LastPaymentAmount float64 `json:"last_payment_amount,omitempty"`
+	LastPaymentAmount int64 `json:"last_payment_amount,omitempty"`
 }
 
 // ===== Payment Methods Structs =====

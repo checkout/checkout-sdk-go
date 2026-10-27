@@ -65,12 +65,7 @@ func TestPaymentSetupResponse_ReadsLowercasePaymentType(t *testing.T) {
 	assert.Contains(t, string(marshalled), `"payment_type":"pay_later"`)
 }
 
-func TestPaymentSetupTerminalOsKnetAndMandateEnums_Values(t *testing.T) {
-	assert.Equal(t, PaymentSetupTerminalType("web"), PaymentSetupTerminalTypeWeb)
-	assert.Equal(t, PaymentSetupTerminalType("wap"), PaymentSetupTerminalTypeWap)
-	assert.Equal(t, PaymentSetupTerminalType("app"), PaymentSetupTerminalTypeApp)
-	assert.Equal(t, PaymentSetupOsType("android"), PaymentSetupOsTypeAndroid)
-	assert.Equal(t, PaymentSetupOsType("ios"), PaymentSetupOsTypeIos)
+func TestKnetAndMandateEnums_Values(t *testing.T) {
 	assert.Equal(t, KnetLanguage("en"), KnetLanguageEn)
 	assert.Equal(t, KnetLanguage("ar"), KnetLanguageAr)
 	assert.Equal(t, SepaMandateType("core"), SepaMandateTypeCore)
@@ -80,34 +75,9 @@ func TestPaymentSetupTerminalOsKnetAndMandateEnums_Values(t *testing.T) {
 func methodSpecificPaymentMethods() PaymentMethods {
 	status := PaymentSetupPaymentMethod{Status: "action_required", Flags: []string{"example_flag"}}
 	return PaymentMethods{
-		Qpay:       &QpayPaymentMethod{PaymentSetupPaymentMethod: status, NationalId: "21234567890", Description: "Order 123"},
 		Ideal:      &IdealPaymentMethod{PaymentSetupPaymentMethod: status, Description: "2 t-shirts"},
 		Knet:       &KnetPaymentMethod{PaymentSetupPaymentMethod: status, Language: KnetLanguageAr},
 		Bancontact: &BancontactPaymentMethod{PaymentSetupPaymentMethod: status, AccountHolderName: "Jo Doe"},
-		AlipayCn: &AlipayCnPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeWeb},
-		AlipayHk: &AlipayHkPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeApp, OsType: PaymentSetupOsTypeIos},
-		Gcash: &GCashPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeWap, OsType: PaymentSetupOsTypeAndroid},
-		Tng: &TngPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeApp, OsType: PaymentSetupOsTypeAndroid},
-		Dana: &DanaPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeWap, OsType: PaymentSetupOsTypeIos},
-		Kakaopay: &KakaoPayPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeApp, OsType: PaymentSetupOsTypeIos},
-		Truemoney: &TrueMoneyPaymentMethod{PaymentSetupPaymentMethod: status,
-			TerminalType: PaymentSetupTerminalTypeWap, OsType: PaymentSetupOsTypeAndroid},
-		Tamara: &TamaraPaymentMethod{
-			PaymentMethodBase: PaymentMethodBase{Status: "action_required", Flags: []string{"example_flag"},
-				Initialization: PaymentMethodInitializationEnabled},
-			RiskAssessment: &TamaraRiskAssessment{
-				PremiumCustomer:   boolPtr(false),
-				RiskScore:         intPtr(42),
-				OrderCountLast24h: intPtr(0),
-				LinkedDeviceCount: intPtr(2),
-			},
-		},
 	}
 }
 
@@ -117,19 +87,9 @@ func TestMethodSpecificPaymentMethods_WireKeysAndRoundTrip(t *testing.T) {
 	marshalled, err := json.Marshal(original)
 	assert.NoError(t, err)
 	assert.JSONEq(t, `{
-		"qpay":{"status":"action_required","flags":["example_flag"],"national_id":"21234567890","description":"Order 123"},
 		"ideal":{"status":"action_required","flags":["example_flag"],"description":"2 t-shirts"},
 		"knet":{"status":"action_required","flags":["example_flag"],"language":"ar"},
-		"bancontact":{"status":"action_required","flags":["example_flag"],"account_holder_name":"Jo Doe"},
-		"alipay_cn":{"status":"action_required","flags":["example_flag"],"terminal_type":"web"},
-		"alipay_hk":{"status":"action_required","flags":["example_flag"],"terminal_type":"app","os_type":"ios"},
-		"gcash":{"status":"action_required","flags":["example_flag"],"terminal_type":"wap","os_type":"android"},
-		"tng":{"status":"action_required","flags":["example_flag"],"terminal_type":"app","os_type":"android"},
-		"dana":{"status":"action_required","flags":["example_flag"],"terminal_type":"wap","os_type":"ios"},
-		"kakaopay":{"status":"action_required","flags":["example_flag"],"terminal_type":"app","os_type":"ios"},
-		"truemoney":{"status":"action_required","flags":["example_flag"],"terminal_type":"wap","os_type":"android"},
-		"tamara":{"status":"action_required","flags":["example_flag"],"initialization":"enabled",
-			"risk_assessment":{"premium_customer":false,"risk_score":42,"order_count_last24h":0,"linked_device_count":2}}
+		"bancontact":{"status":"action_required","flags":["example_flag"],"account_holder_name":"Jo Doe"}
 	}`, string(marshalled))
 
 	var decoded PaymentMethods
@@ -137,38 +97,40 @@ func TestMethodSpecificPaymentMethods_WireKeysAndRoundTrip(t *testing.T) {
 	assert.Equal(t, original, decoded)
 }
 
+// QPay, Alipay CN and HK, GCash, TNG, Dana, KakaoPay, TrueMoney and Tamara keep the generic type,
+// with the same wire keys as before.
+func TestGenericTypedPaymentMethods_WireKeysAndRoundTrip(t *testing.T) {
+	method := func() *SimplePaymentMethod {
+		return &SimplePaymentMethod{PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"example_flag"}}}
+	}
+	tamara := method()
+	tamara.Initialization = PaymentMethodInitializationEnabled
+	original := PaymentMethods{
+		Qpay: method(), AlipayCn: method(), AlipayHk: method(), Gcash: method(), Tng: method(),
+		Dana: method(), Kakaopay: method(), Truemoney: method(), Tamara: tamara,
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	generic := `{"status":"ready","flags":["example_flag"]}`
+	assert.JSONEq(t, `{"qpay":`+generic+`,"alipay_cn":`+generic+`,"alipay_hk":`+generic+`,
+		"gcash":`+generic+`,"tng":`+generic+`,"dana":`+generic+`,"kakaopay":`+generic+`,
+		"truemoney":`+generic+`,
+		"tamara":{"status":"ready","flags":["example_flag"],"initialization":"enabled"}}`, string(marshalled))
+
+	var decoded PaymentMethods
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}
+
 func TestMethodSpecificPaymentMethods_FromSwaggerExamples(t *testing.T) {
-	// Property examples from the spec: qpay.national_id, ideal.description, TerminalType, OsType and
-	// tamara.risk_assessment. The spec gives no example for the other fields.
-	payload := `{"payment_methods":{
-		"qpay":{"national_id":"21234567890"},
-		"ideal":{"description":"2 t-shirts"},
-		"alipay_cn":{"terminal_type":"web","os_type":"android"},
-		"tamara":{"status":"ready","initialization":"disabled",
-			"risk_assessment":{"premium_customer":false,"risk_score":42,"order_count_last24h":0,"linked_device_count":2}}
-	}}`
+	// Property example from the spec: ideal.description. The spec gives no example for the knet
+	// and bancontact fields.
+	payload := `{"payment_methods":{"ideal":{"description":"2 t-shirts"}}}`
 	var response PaymentSetupResponse
 	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
 	methods := response.PaymentMethods
-	assert.Equal(t, "21234567890", methods.Qpay.NationalId)
 	assert.Equal(t, "2 t-shirts", methods.Ideal.Description)
-	assert.Equal(t, PaymentSetupTerminalTypeWeb, methods.AlipayCn.TerminalType)
-	assert.Equal(t, PaymentSetupOsTypeAndroid, methods.AlipayCn.OsType)
-	assert.Equal(t, "ready", methods.Tamara.Status)
-	assert.Equal(t, PaymentMethodInitializationDisabled, methods.Tamara.Initialization)
-	risk := methods.Tamara.RiskAssessment
-	if assert.NotNil(t, risk) {
-		assert.False(t, *risk.PremiumCustomer)
-		assert.Equal(t, 42, *risk.RiskScore)
-		assert.Equal(t, 0, *risk.OrderCountLast24h)
-		assert.Equal(t, 2, *risk.LinkedDeviceCount)
-	}
-
-	// An explicit false and zero are sent back, not dropped.
-	marshalled, err := json.Marshal(methods.Tamara)
-	assert.NoError(t, err)
-	assert.Contains(t, string(marshalled), `"premium_customer":false`)
-	assert.Contains(t, string(marshalled), `"order_count_last24h":0`)
 }
 
 func TestAchPaymentMethod_AllFieldsWireKeysAndRoundTrip(t *testing.T) {
@@ -280,8 +242,8 @@ func TestPaymentMethods_EmptyMethodsSendNothing(t *testing.T) {
 		Swish:      &SwishPaymentMethod{},
 		Ach:        &AchPaymentMethod{},
 		Sepa:       &SepaPaymentMethod{},
-		Qpay:       &QpayPaymentMethod{},
-		Tamara:     &TamaraPaymentMethod{},
+		Qpay:       &SimplePaymentMethod{},
+		Tamara:     &SimplePaymentMethod{},
 	}
 	marshalled, err := json.Marshal(methods)
 	assert.NoError(t, err)

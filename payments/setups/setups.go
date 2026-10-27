@@ -52,25 +52,6 @@ const (
 	PaymentSetupPaymentTypeUnscheduled PaymentSetupPaymentType = "unscheduled"
 )
 
-// PaymentSetupTerminalType is the client-side terminal type. Indicates whether the customer is
-// using a PC browser, mobile browser, or mobile application.
-type PaymentSetupTerminalType string
-
-const (
-	PaymentSetupTerminalTypeWeb PaymentSetupTerminalType = "web"
-	PaymentSetupTerminalTypeWap PaymentSetupTerminalType = "wap"
-	PaymentSetupTerminalTypeApp PaymentSetupTerminalType = "app"
-)
-
-// PaymentSetupOsType is the customer's operating system type, as used by the os_type of a
-// payment method. Required when terminal_type is not web.
-type PaymentSetupOsType string
-
-const (
-	PaymentSetupOsTypeAndroid PaymentSetupOsType = "android"
-	PaymentSetupOsTypeIos     PaymentSetupOsType = "ios"
-)
-
 // ===== Main Request/Response Structs =====
 
 // PaymentSetupRequest represents the request body for POST /payments/setups and
@@ -482,7 +463,7 @@ type PaymentMethods struct {
 
 	// Qpay is the QPay payment method's details and configuration.
 	// [Optional]
-	Qpay *QpayPaymentMethod `json:"qpay,omitempty"`
+	Qpay *SimplePaymentMethod `json:"qpay,omitempty"`
 
 	// Eps is the EPS payment method's details and configuration.
 	// [Optional]
@@ -518,23 +499,23 @@ type PaymentMethods struct {
 
 	// AlipayCn is the Alipay CN payment method's details and configuration.
 	// [Optional]
-	AlipayCn *AlipayCnPaymentMethod `json:"alipay_cn,omitempty"`
+	AlipayCn *SimplePaymentMethod `json:"alipay_cn,omitempty"`
 
 	// AlipayHk is the Alipay HK payment method's details and configuration.
 	// [Optional]
-	AlipayHk *AlipayHkPaymentMethod `json:"alipay_hk,omitempty"`
+	AlipayHk *SimplePaymentMethod `json:"alipay_hk,omitempty"`
 
 	// Gcash is the GCash payment method's details and configuration.
 	// [Optional]
-	Gcash *GCashPaymentMethod `json:"gcash,omitempty"`
+	Gcash *SimplePaymentMethod `json:"gcash,omitempty"`
 
 	// Tng is the TNG payment method's details and configuration.
 	// [Optional]
-	Tng *TngPaymentMethod `json:"tng,omitempty"`
+	Tng *SimplePaymentMethod `json:"tng,omitempty"`
 
 	// Dana is the Dana payment method's details and configuration.
 	// [Optional]
-	Dana *DanaPaymentMethod `json:"dana,omitempty"`
+	Dana *SimplePaymentMethod `json:"dana,omitempty"`
 
 	// Mobilepay is the MobilePay payment method's details and configuration.
 	// [Optional]
@@ -543,7 +524,7 @@ type PaymentMethods struct {
 
 	// Tamara is the Tamara payment method's details and configuration.
 	// [Optional]
-	Tamara *TamaraPaymentMethod `json:"tamara,omitempty"`
+	Tamara *SimplePaymentMethod `json:"tamara,omitempty"`
 
 	// Mbway is the MBWay payment method's details and configuration.
 	// [Optional]
@@ -561,11 +542,11 @@ type PaymentMethods struct {
 
 	// Kakaopay is the KakaoPay payment method's details and configuration.
 	// [Optional]
-	Kakaopay *KakaoPayPaymentMethod `json:"kakaopay,omitempty"`
+	Kakaopay *SimplePaymentMethod `json:"kakaopay,omitempty"`
 
 	// Truemoney is the TrueMoney payment method's details and configuration.
 	// [Optional]
-	Truemoney *TrueMoneyPaymentMethod `json:"truemoney,omitempty"`
+	Truemoney *SimplePaymentMethod `json:"truemoney,omitempty"`
 
 	// Octopus is the Octopus payment method's details and configuration.
 	// [Optional]
@@ -867,13 +848,15 @@ type BizumPaymentMethod struct {
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
-// SimplePaymentMethod is the details and configuration of a payment method whose schema has only
-// a status and flags: PayNow, EPS, Benefit, Vipps, Twint, MobilePay, MB WAY, WeChat Pay, Octopus,
-// Alma and Sequra.
+// SimplePaymentMethod is the details and configuration of a payment method that carries only the
+// shared payment method members: PayNow, EPS, Benefit, Vipps, Twint, MobilePay, MB WAY, WeChat
+// Pay, Octopus, Alma, Sequra, QPay, Alipay CN, Alipay HK, GCash, TNG, Dana, KakaoPay, TrueMoney
+// and Tamara.
 //
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of these
-// payment method schemas in the Payment Setups API specification; the API ignores it on requests.
-// There is no replacement. Will be removed in the next major version.
+// Initialization, promoted from PaymentMethodBase, is deprecated on this type except for Tamara,
+// whose schema has it. Not part of the other payment method schemas in the Payment Setups API
+// specification; the API ignores it on requests. There is no replacement. Will be removed in the
+// next major version.
 type SimplePaymentMethod struct {
 	PaymentMethodBase
 
@@ -884,21 +867,6 @@ type SimplePaymentMethod struct {
 	// specification; the API ignores it on requests. There is no replacement. Will be removed in
 	// the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
-}
-
-// QpayPaymentMethod is the QPay payment method's details and configuration.
-type QpayPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// NationalId is the Qatari national ID. Must start with 2 or 3, followed by 10 digits.
-	// [Optional]
-	// Write only
-	NationalId string `json:"national_id,omitempty"`
-
-	// Description is a description of the payment order. Alphanumeric characters only.
-	// [Optional]
-	// max 255 characters
-	Description string `json:"description,omitempty"`
 }
 
 // IdealPaymentMethod is the iDEAL payment method's details and configuration.
@@ -942,135 +910,6 @@ type BancontactPaymentMethod struct {
 	// [Optional]
 	// min 3 characters, max 100 characters
 	AccountHolderName string `json:"account_holder_name,omitempty"`
-}
-
-// AlipayCnPaymentMethod is the Alipay CN payment method's details and configuration.
-type AlipayCnPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// AlipayHkPaymentMethod is the Alipay HK payment method's details and configuration.
-type AlipayHkPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// GCashPaymentMethod is the GCash payment method's details and configuration.
-type GCashPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// TngPaymentMethod is the TNG payment method's details and configuration.
-type TngPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// DanaPaymentMethod is the Dana payment method's details and configuration.
-type DanaPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// KakaoPayPaymentMethod is the KakaoPay payment method's details and configuration.
-type KakaoPayPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// TrueMoneyPaymentMethod is the TrueMoney payment method's details and configuration.
-type TrueMoneyPaymentMethod struct {
-	PaymentSetupPaymentMethod
-
-	// TerminalType is the client-side terminal type. Indicates whether the customer is using a PC
-	// browser, mobile browser, or mobile application.
-	// [Optional]
-	TerminalType PaymentSetupTerminalType `json:"terminal_type,omitempty"`
-
-	// OsType is the customer's operating system type. Required when terminal_type is not web.
-	// [Optional]
-	OsType PaymentSetupOsType `json:"os_type,omitempty"`
-}
-
-// TamaraRiskAssessment holds risk signals about the customer, forwarded to Tamara with the payment.
-type TamaraRiskAssessment struct {
-	// PremiumCustomer specifies whether the customer is a premium customer. A pointer so an
-	// explicit false is sent.
-	// [Optional]
-	PremiumCustomer *bool `json:"premium_customer,omitempty"`
-
-	// RiskScore is the customer's risk score. A pointer so an explicit zero is sent.
-	// [Optional]
-	RiskScore *int `json:"risk_score,omitempty"`
-
-	// OrderCountLast24h is the number of orders the customer has made in the last 24 hours. A
-	// pointer so an explicit zero is sent.
-	// [Optional]
-	OrderCountLast24h *int `json:"order_count_last24h,omitempty"`
-
-	// LinkedDeviceCount is the number of devices linked to the customer. A pointer so an explicit
-	// zero is sent.
-	// [Optional]
-	LinkedDeviceCount *int `json:"linked_device_count,omitempty"`
-}
-
-// TamaraPaymentMethod is the Tamara payment method's details and configuration.
-type TamaraPaymentMethod struct {
-	PaymentMethodBase
-
-	// RiskAssessment holds risk signals about the customer, forwarded to Tamara with the payment.
-	// [Optional]
-	RiskAssessment *TamaraRiskAssessment `json:"risk_assessment,omitempty"`
 }
 
 // PaymentSetupScheme is a card scheme name, as listed in the schemes of a Payment Setup card,

@@ -889,7 +889,8 @@ type IdealPaymentMethod struct {
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// Description is a description of the products or services being paid for. Do not include
-	// HTML tags or special characters, as these are rejected by iDEAL.
+	// HTML tags or special characters, as these are rejected by iDEAL. The specification marks this
+	// optional, but the API keeps the method invalid until it is sent.
 	// [Optional]
 	// max 35 characters
 	Description string `json:"description,omitempty"`
@@ -926,7 +927,8 @@ type KnetPaymentMethod struct {
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// Language is the customer's preferred language, as an ISO 639-1 code. For example, the
-	// language selected on your site, if the issuer's site supports it.
+	// language selected on your site, if the issuer's site supports it. The specification marks
+	// this optional, but the API keeps the method invalid until it is sent.
 	// - ar: Arabic
 	// - en: English
 	// [Optional]
@@ -954,7 +956,8 @@ type BancontactPaymentMethod struct {
 	// version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
-	// AccountHolderName is the account holder's name.
+	// AccountHolderName is the account holder's name. The specification marks this optional, but
+	// the API keeps the method invalid until it is sent.
 	// [Optional]
 	// min 3 characters, max 100 characters
 	AccountHolderName string `json:"account_holder_name,omitempty"`

@@ -423,7 +423,7 @@ type CustomerMerchantAccount struct {
 	// specification types this as a number (example 55.99); the API currently stores it as an
 	// integer.
 	// [Optional]
-	LastPaymentAmount int64 `json:"last_payment_amount,omitempty"`
+	LastPaymentAmount float64 `json:"last_payment_amount,omitempty"`
 }
 
 // ===== Payment Methods Structs =====
@@ -606,11 +606,9 @@ type PaymentMethods struct {
 	// [Optional]
 	Bacs *BacsPaymentMethod `json:"bacs,omitempty"`
 
-	// CardPresent is the Card Present payment method's details and configuration.
+	// CardPresent is the Card Present payment method's details and configuration. Not part of the
+	// current Payment Setup schema.
 	// [Optional]
-	//
-	// Deprecated: card_present is no longer part of the Payment Setups API specification. There is
-	// no replacement. Will be removed in the next major version.
 	CardPresent *CardPresentPaymentMethod `json:"card_present,omitempty"`
 
 	// PayByBank is the Pay by Bank (Open Banking) payment method's details and configuration.
@@ -1788,10 +1786,8 @@ type BacsPaymentMethod struct {
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
-// CardPresentPin holds the PIN details of a card present payment.
-//
-// Deprecated: card_present is no longer part of the Payment Setups API specification. There is no
-// replacement. Will be removed in the next major version.
+// CardPresentPin holds the PIN details of a card present payment. Not part of the current
+// Payment Setup schema.
 type CardPresentPin struct {
 	// KeySetId is the identifier of the key set used to encrypt the PIN block.
 	// [Optional]
@@ -1806,10 +1802,8 @@ type CardPresentPin struct {
 	BlockFormat string `json:"block_format,omitempty"`
 }
 
-// CardPresentPaymentMethod is the Card Present payment method's details and configuration.
-//
-// Deprecated: card_present is no longer part of the Payment Setups API specification. There is no
-// replacement. Will be removed in the next major version.
+// CardPresentPaymentMethod is the Card Present payment method's details and configuration. Not
+// part of the current Payment Setup schema.
 type CardPresentPaymentMethod struct {
 	PaymentMethodBase
 

@@ -73,11 +73,11 @@ func TestKnetAndMandateEnums_Values(t *testing.T) {
 }
 
 func methodSpecificPaymentMethods() PaymentMethods {
-	status := PaymentSetupPaymentMethod{Status: "action_required", Flags: []string{"example_flag"}}
+	status := PaymentMethodBase{Status: "action_required", Flags: []string{"example_flag"}}
 	return PaymentMethods{
-		Ideal:      &IdealPaymentMethod{PaymentSetupPaymentMethod: status, Description: "2 t-shirts"},
-		Knet:       &KnetPaymentMethod{PaymentSetupPaymentMethod: status, Language: KnetLanguageAr},
-		Bancontact: &BancontactPaymentMethod{PaymentSetupPaymentMethod: status, AccountHolderName: "Jo Doe"},
+		Ideal:      &IdealPaymentMethod{PaymentMethodBase: status, Description: "2 t-shirts"},
+		Knet:       &KnetPaymentMethod{PaymentMethodBase: status, Language: KnetLanguageAr},
+		Bancontact: &BancontactPaymentMethod{PaymentMethodBase: status, AccountHolderName: "Jo Doe"},
 	}
 }
 
@@ -256,9 +256,9 @@ func TestPaymentMethods_EmptyMethodsSendNothing(t *testing.T) {
 }
 
 // The deprecated members stay on the wire until the next major version, with the same key and
-// value as before, and the types keep embedding PaymentMethodBase, so literals that name it and
-// the promoted Initialization compile as before.
-func TestDeprecatedInitialization_StillSerializes(t *testing.T) {
+// value as before. The types keep embedding PaymentMethodBase, so literals that name it compile
+// as before and the value set there is still sent.
+func TestDeprecatedInitialization_SetThroughPaymentMethodBaseIsSent(t *testing.T) {
 	options := &PaymentMethodOptions{Sdk: &PaymentMethodOption{Id: "opt_123"}}
 	base := PaymentMethodBase{Initialization: PaymentMethodInitializationEnabled}
 	methods := PaymentMethods{
@@ -273,31 +273,115 @@ func TestDeprecatedInitialization_StillSerializes(t *testing.T) {
 		Swish:      &SwishPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
 		Ach:        &AchPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
 		Sepa:       &SepaPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Ideal:      &IdealPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Knet:       &KnetPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Bancontact: &BancontactPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
 		Bacs:       &BacsPaymentMethod{PaymentMethodOptions: options},
 	}
 
 	marshalled, err := json.Marshal(methods)
 	assert.NoError(t, err)
-	withBoth := `{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}}`
-	initOnly := `{"initialization":"enabled"}`
-	assert.JSONEq(t, `{
-		"bizum":`+withBoth+`,"blik":`+withBoth+`,"paybybank":`+initOnly+`,"stablecoin":`+initOnly+`,
-		"instrument":`+withBoth+`,"paynow":`+withBoth+`,"multibanco":`+withBoth+`,"p24":`+withBoth+`,
-		"swish":`+withBoth+`,"ach":`+withBoth+`,"sepa":`+withBoth+`,
-		"bacs":{"payment_method_options":{"sdk":{"id":"opt_123"}}}
-	}`, string(marshalled))
+	assert.JSONEq(t, deprecatedMembersWire, string(marshalled))
+}
 
-	var decoded PaymentMethods
-	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
-	assert.Equal(t, methods, decoded)
-	for _, initialization := range []PaymentMethodInitialization{
-		decoded.Bizum.Initialization, decoded.Blik.Initialization, decoded.PayByBank.Initialization,
-		decoded.Stablecoin.Initialization, decoded.Instrument.Initialization, decoded.Paynow.Initialization,
-		decoded.Multibanco.Initialization, decoded.P24.Initialization, decoded.Swish.Initialization,
-		decoded.Ach.Initialization, decoded.Sepa.Initialization,
-	} {
-		assert.Equal(t, PaymentMethodInitializationEnabled, initialization)
+const deprecatedMembersWire = `{
+	"bizum":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"blik":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"paybybank":{"initialization":"enabled"},
+	"stablecoin":{"initialization":"enabled"},
+	"instrument":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"paynow":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"multibanco":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"p24":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"swish":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"ach":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"sepa":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"ideal":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"knet":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"bancontact":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"bacs":{"payment_method_options":{"sdk":{"id":"opt_123"}}}
+}`
+
+// Setting the deprecated Initialization declared on the type sends the same key and value.
+func TestDeprecatedInitialization_SetOnTheTypeIsSent(t *testing.T) {
+	options := &PaymentMethodOptions{Sdk: &PaymentMethodOption{Id: "opt_123"}}
+	enabled := PaymentMethodInitializationEnabled
+	methods := PaymentMethods{
+		Bizum:      &BizumPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Blik:       &BlikPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		PayByBank:  &PayByBankPaymentMethod{Initialization: enabled},
+		Stablecoin: &StablecoinPaymentMethod{Initialization: enabled},
+		Instrument: &InstrumentPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Paynow:     &SimplePaymentMethod{PaymentMethodBase: PaymentMethodBase{Initialization: enabled}, PaymentMethodOptions: options},
+		Multibanco: &MultibancoPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		P24:        &P24PaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Swish:      &SwishPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Ach:        &AchPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Sepa:       &SepaPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Ideal:      &IdealPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Knet:       &KnetPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Bancontact: &BancontactPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Bacs:       &BacsPaymentMethod{PaymentMethodOptions: options},
 	}
+
+	marshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, deprecatedMembersWire, string(marshalled))
+}
+
+// When both are set, the Initialization declared on the type wins.
+func TestDeprecatedInitialization_TypeFieldWinsOverPaymentMethodBase(t *testing.T) {
+	method := BizumPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Initialization: PaymentMethodInitializationDisabled},
+		Initialization:    PaymentMethodInitializationEnabled,
+	}
+	marshalled, err := json.Marshal(method)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"initialization":"enabled"}`, string(marshalled))
+}
+
+// A received initialization is readable through the type and through PaymentMethodBase, and the
+// other members decode as before.
+func TestDeprecatedInitialization_ReceivedIsSetOnBoth(t *testing.T) {
+	var methods PaymentMethods
+	assert.NoError(t, json.Unmarshal([]byte(deprecatedMembersWire), &methods))
+
+	type both struct{ onType, onBase PaymentMethodInitialization }
+	got := []both{
+		{methods.Bizum.Initialization, methods.Bizum.PaymentMethodBase.Initialization},
+		{methods.Blik.Initialization, methods.Blik.PaymentMethodBase.Initialization},
+		{methods.PayByBank.Initialization, methods.PayByBank.PaymentMethodBase.Initialization},
+		{methods.Stablecoin.Initialization, methods.Stablecoin.PaymentMethodBase.Initialization},
+		{methods.Instrument.Initialization, methods.Instrument.PaymentMethodBase.Initialization},
+		{methods.Paynow.Initialization, methods.Paynow.PaymentMethodBase.Initialization},
+		{methods.Multibanco.Initialization, methods.Multibanco.PaymentMethodBase.Initialization},
+		{methods.P24.Initialization, methods.P24.PaymentMethodBase.Initialization},
+		{methods.Swish.Initialization, methods.Swish.PaymentMethodBase.Initialization},
+		{methods.Ach.Initialization, methods.Ach.PaymentMethodBase.Initialization},
+		{methods.Sepa.Initialization, methods.Sepa.PaymentMethodBase.Initialization},
+		{methods.Ideal.Initialization, methods.Ideal.PaymentMethodBase.Initialization},
+		{methods.Knet.Initialization, methods.Knet.PaymentMethodBase.Initialization},
+		{methods.Bancontact.Initialization, methods.Bancontact.PaymentMethodBase.Initialization},
+	}
+	for _, g := range got {
+		assert.Equal(t, both{PaymentMethodInitializationEnabled, PaymentMethodInitializationEnabled}, g)
+	}
+	assert.Equal(t, "opt_123", methods.Ideal.PaymentMethodOptions.Sdk.Id)
+	assert.Equal(t, "opt_123", methods.Bacs.PaymentMethodOptions.Sdk.Id)
+
+	remarshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, deprecatedMembersWire, string(remarshalled))
+}
+
+// Decoding into an existing value keeps the members the payload does not carry, as the default
+// decoder does.
+func TestDeprecatedInitialization_UnmarshalKeepsExistingMembers(t *testing.T) {
+	method := BizumPaymentMethod{PaymentMethodBase: PaymentMethodBase{Status: "ready"}}
+	assert.NoError(t, json.Unmarshal([]byte(`{"initialization":"disabled"}`), &method))
+	assert.Equal(t, "ready", method.Status)
+	assert.Equal(t, PaymentMethodInitializationDisabled, method.Initialization)
+	assert.Equal(t, PaymentMethodInitializationDisabled, method.PaymentMethodBase.Initialization)
 }
 
 func TestDeprecatedCardPresent_StillSerializes(t *testing.T) {

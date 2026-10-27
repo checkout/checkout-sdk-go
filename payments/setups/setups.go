@@ -624,7 +624,8 @@ type PaymentMethods struct {
 
 // PaymentMethodBase holds the status, flags and initialization of a payment method (schemas
 // PaymentSetupPaymentMethod and PaymentMethodInitialization). Some types that embed it have no
-// initialization in their schema; their doc comment marks the promoted Initialization deprecated.
+// initialization in their schema; they declare their own deprecated Initialization, which shadows
+// this one (see deprecated_initialization.go).
 type PaymentMethodBase struct {
 	// Status is the payment method status.
 	// [Optional]
@@ -833,12 +834,17 @@ type TabbyPaymentMethod struct {
 }
 
 // BizumPaymentMethod is the Bizum payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the
-// Bizum schema in the Payment Setups API specification; the API ignores it on requests. There is no
-// replacement. Will be removed in the next major version.
 type BizumPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Bizum schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
@@ -871,13 +877,29 @@ type SimplePaymentMethod struct {
 
 // IdealPaymentMethod is the iDEAL payment method's details and configuration.
 type IdealPaymentMethod struct {
-	PaymentSetupPaymentMethod
+	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Ideal schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// Description is a description of the products or services being paid for. Do not include
 	// HTML tags or special characters, as these are rejected by iDEAL.
 	// [Optional]
 	// max 35 characters
 	Description string `json:"description,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Ideal schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
 // KnetLanguage is the customer's preferred language for KNET, as an ISO 639-1 code.
@@ -892,7 +914,16 @@ const (
 
 // KnetPaymentMethod is the KNET payment method's details and configuration.
 type KnetPaymentMethod struct {
-	PaymentSetupPaymentMethod
+	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Knet schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// Language is the customer's preferred language, as an ISO 639-1 code. For example, the
 	// language selected on your site, if the issuer's site supports it.
@@ -900,16 +931,41 @@ type KnetPaymentMethod struct {
 	// - en: English
 	// [Optional]
 	Language KnetLanguage `json:"language,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Knet schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
 // BancontactPaymentMethod is the Bancontact payment method's details and configuration.
 type BancontactPaymentMethod struct {
-	PaymentSetupPaymentMethod
+	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Bancontact schema in the Payment Setups API specification; the
+	// API ignores it on requests. There is no replacement. Will be removed in the next major
+	// version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolderName is the account holder's name.
 	// [Optional]
 	// min 3 characters, max 100 characters
 	AccountHolderName string `json:"account_holder_name,omitempty"`
+
+	// PaymentMethodOptions holds the payment method options.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Bancontact schema in the Payment Setups API specification; the
+	// API ignores it on requests. There is no replacement. Will be removed in the next major
+	// version.
+	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
 // PaymentSetupScheme is a card scheme name, as listed in the schemes of a Payment Setup card,
@@ -1240,12 +1296,18 @@ const (
 )
 
 // InstrumentPaymentMethod is the instrument payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the
-// PaymentSetupInstrument schema in the Payment Setups API specification; the API ignores it on
-// requests. There is no replacement. Will be removed in the next major version.
 type InstrumentPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the PaymentSetupInstrument schema in the Payment Setups API
+	// specification; the API ignores it on requests. There is no replacement. Will be removed in
+	// the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// Id is the unique identifier of the selected instrument.
 	// [Optional]
@@ -1287,12 +1349,18 @@ type InstrumentAction struct {
 }
 
 // MultibancoPaymentMethod is the Multibanco payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the
-// Multibanco schema in the Payment Setups API specification; the API ignores it on requests. There
-// is no replacement. Will be removed in the next major version.
 type MultibancoPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Multibanco schema in the Payment Setups API specification; the
+	// API ignores it on requests. There is no replacement. Will be removed in the next major
+	// version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolderName is the account holder's name.
 	// [Optional]
@@ -1322,12 +1390,17 @@ type P24AccountHolder struct {
 }
 
 // P24PaymentMethod is the P24 (Przelewy24) payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the P24
-// schema in the Payment Setups API specification; the API ignores it on requests. There is no
-// replacement. Will be removed in the next major version.
 type P24PaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the P24 schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolder is the account holder's details.
 	// [Optional]
@@ -1355,12 +1428,17 @@ type SwishAccountHolder struct {
 }
 
 // SwishPaymentMethod is the Swish payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the
-// Swish schema in the Payment Setups API specification; the API ignores it on requests. There is no
-// replacement. Will be removed in the next major version.
 type SwishPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Swish schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// BillingDescriptor is a description that appears on the customer's billing statement.
 	// [Optional]
@@ -1426,12 +1504,17 @@ type AchAccountHolderIdentification struct {
 }
 
 // AchPaymentMethod is the ACH payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the Ach
-// schema in the Payment Setups API specification; the API ignores it on requests. There is no
-// replacement. Will be removed in the next major version.
 type AchPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Ach schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountType is the type of Direct Debit account.
 	// [Optional]
@@ -1512,12 +1595,17 @@ type SepaMandate struct {
 }
 
 // SepaPaymentMethod is the SEPA payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the Sepa
-// schema in the Payment Setups API specification; the API ignores it on requests. There is no
-// replacement. Will be removed in the next major version.
 type SepaPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Sepa schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolder is the account holder details.
 	// [Optional]
@@ -1782,12 +1870,17 @@ type PayByBankAction struct {
 }
 
 // PayByBankPaymentMethod is the Pay by Bank (Open Banking) payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the
-// PayByBank schema in the Payment Setups API specification; the API ignores it on requests. There
-// is no replacement. Will be removed in the next major version.
 type PayByBankPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the PayByBank schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// BankId is the identifier of the bank the customer has selected for the payment.
 	// [Optional]
@@ -1972,12 +2065,18 @@ type CashAppAddress struct {
 }
 
 // StablecoinPaymentMethod is the Stablecoin payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the
-// Stablecoin schema in the Payment Setups API specification; the API ignores it on requests. There
-// is no replacement. Will be removed in the next major version.
 type StablecoinPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Stablecoin schema in the Payment Setups API specification; the
+	// API ignores it on requests. There is no replacement. Will be removed in the next major
+	// version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 }
 
 // ===== Support Structs =====
@@ -2529,12 +2628,17 @@ type PaymentSetupAccountFundingTransaction struct {
 }
 
 // BlikPaymentMethod is the Blik payment method's details and configuration.
-//
-// Initialization, promoted from PaymentMethodBase, is deprecated on this type. Not part of the Blik
-// schema in the Payment Setups API specification; the API ignores it on requests. There is no
-// replacement. Will be removed in the next major version.
 type BlikPaymentMethod struct {
 	PaymentMethodBase
+
+	// Initialization is the initialization state of the payment method. It shadows
+	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
+	// sent, and a received value is set on both.
+	// [Optional]
+	//
+	// Deprecated: Not part of the Blik schema in the Payment Setups API specification; the API
+	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// PartnerCode is the 6-digit BLIK code generated by the customer's banking app.
 	// [Optional]

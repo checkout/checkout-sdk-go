@@ -1024,10 +1024,10 @@ func TestPaymentSetup_AutoConfirmMetadataAndInstrumentType(t *testing.T) {
 	assert.Equal(t, InstrumentActionTypeSetInstrument, response.PaymentMethods.Instrument.Action.Type)
 
 	instrument := InstrumentPaymentMethod{
-		PaymentSetupPaymentMethod: PaymentSetupPaymentMethod{Status: "ready", Flags: []string{"missing_phone"}},
-		Id:                        "src_wmlfc3zttb4uzmk6snpwb43jbi",
-		Type:                      "bacs",
-		Action:                    &InstrumentAction{Type: InstrumentActionTypeSetInstrument},
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"missing_phone"}},
+		Id:                "src_wmlfc3zttb4uzmk6snpwb43jbi",
+		Type:              "bacs",
+		Action:            &InstrumentAction{Type: InstrumentActionTypeSetInstrument},
 	}
 	instrumentJson, err := json.Marshal(instrument)
 	assert.NoError(t, err)

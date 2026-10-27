@@ -173,8 +173,8 @@ func TestMethodSpecificPaymentMethods_FromSwaggerExamples(t *testing.T) {
 
 func TestAchPaymentMethod_AllFieldsWireKeysAndRoundTrip(t *testing.T) {
 	original := AchPaymentMethod{
-		PaymentSetupPaymentMethod: PaymentSetupPaymentMethod{Status: "ready", Flags: []string{"example_flag"}},
-		AccountType:               "current",
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"example_flag"}},
+		AccountType:       "current",
 		AccountHolder: &AchAccountHolder{
 			Type:        "corporate",
 			FirstName:   "John",
@@ -207,7 +207,7 @@ func TestAchPaymentMethod_AllFieldsWireKeysAndRoundTrip(t *testing.T) {
 
 func TestSepaPaymentMethod_AllFieldsWireKeysAndRoundTrip(t *testing.T) {
 	original := SepaPaymentMethod{
-		PaymentSetupPaymentMethod: PaymentSetupPaymentMethod{Status: "ready", Flags: []string{"example_flag"}},
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"example_flag"}},
 		AccountHolder: &SepaAccountHolder{
 			Type:        "individual",
 			FirstName:   "John",
@@ -291,21 +291,23 @@ func TestPaymentMethods_EmptyMethodsSendNothing(t *testing.T) {
 }
 
 // The deprecated members stay on the wire until the next major version, with the same key and
-// value as before.
+// value as before, and the types keep embedding PaymentMethodBase, so literals that name it and
+// the promoted Initialization compile as before.
 func TestDeprecatedInitialization_StillSerializes(t *testing.T) {
 	options := &PaymentMethodOptions{Sdk: &PaymentMethodOption{Id: "opt_123"}}
+	base := PaymentMethodBase{Initialization: PaymentMethodInitializationEnabled}
 	methods := PaymentMethods{
-		Bizum:      &BizumPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		Blik:       &BlikPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		PayByBank:  &PayByBankPaymentMethod{Initialization: PaymentMethodInitializationEnabled},
-		Stablecoin: &StablecoinPaymentMethod{Initialization: PaymentMethodInitializationEnabled},
-		Instrument: &InstrumentPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		Paynow:     &SimplePaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		Multibanco: &MultibancoPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		P24:        &P24PaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		Swish:      &SwishPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		Ach:        &AchPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
-		Sepa:       &SepaPaymentMethod{Initialization: PaymentMethodInitializationEnabled, PaymentMethodOptions: options},
+		Bizum:      &BizumPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Blik:       &BlikPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		PayByBank:  &PayByBankPaymentMethod{PaymentMethodBase: base},
+		Stablecoin: &StablecoinPaymentMethod{PaymentMethodBase: base},
+		Instrument: &InstrumentPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Paynow:     &SimplePaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Multibanco: &MultibancoPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		P24:        &P24PaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Swish:      &SwishPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Ach:        &AchPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Sepa:       &SepaPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
 		Bacs:       &BacsPaymentMethod{PaymentMethodOptions: options},
 	}
 
@@ -323,6 +325,14 @@ func TestDeprecatedInitialization_StillSerializes(t *testing.T) {
 	var decoded PaymentMethods
 	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
 	assert.Equal(t, methods, decoded)
+	for _, initialization := range []PaymentMethodInitialization{
+		decoded.Bizum.Initialization, decoded.Blik.Initialization, decoded.PayByBank.Initialization,
+		decoded.Stablecoin.Initialization, decoded.Instrument.Initialization, decoded.Paynow.Initialization,
+		decoded.Multibanco.Initialization, decoded.P24.Initialization, decoded.Swish.Initialization,
+		decoded.Ach.Initialization, decoded.Sepa.Initialization,
+	} {
+		assert.Equal(t, PaymentMethodInitializationEnabled, initialization)
+	}
 }
 
 func TestDeprecatedCardPresent_StillSerializes(t *testing.T) {

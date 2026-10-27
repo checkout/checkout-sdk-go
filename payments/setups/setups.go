@@ -838,8 +838,8 @@ type BizumPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Bizum schema in the Payment Setups API specification; the API
@@ -880,8 +880,8 @@ type IdealPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Ideal schema in the Payment Setups API specification; the API
@@ -917,8 +917,8 @@ type KnetPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Knet schema in the Payment Setups API specification; the API
@@ -945,8 +945,8 @@ type BancontactPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Bancontact schema in the Payment Setups API specification; the
@@ -1300,8 +1300,8 @@ type InstrumentPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the PaymentSetupInstrument schema in the Payment Setups API
@@ -1353,8 +1353,8 @@ type MultibancoPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Multibanco schema in the Payment Setups API specification; the
@@ -1394,8 +1394,8 @@ type P24PaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the P24 schema in the Payment Setups API specification; the API
@@ -1432,8 +1432,8 @@ type SwishPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Swish schema in the Payment Setups API specification; the API
@@ -1508,8 +1508,8 @@ type AchPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Ach schema in the Payment Setups API specification; the API
@@ -1599,8 +1599,8 @@ type SepaPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Sepa schema in the Payment Setups API specification; the API
@@ -1870,8 +1870,8 @@ type PayByBankPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the PayByBank schema in the Payment Setups API specification; the API
@@ -2065,8 +2065,8 @@ type StablecoinPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Stablecoin schema in the Payment Setups API specification; the
@@ -2628,8 +2628,8 @@ type BlikPaymentMethod struct {
 	PaymentMethodBase
 
 	// Initialization is the initialization state of the payment method. It shadows
-	// PaymentMethodBase.Initialization so the deprecation is reported; a value set on either one is
-	// sent, and a received value is set on both.
+	// PaymentMethodBase.Initialization so the deprecation is reported. A value set on either one is
+	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
 	// Deprecated: Not part of the Blik schema in the Payment Setups API specification; the API

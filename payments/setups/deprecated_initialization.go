@@ -9,6 +9,15 @@ import "encoding/json"
 // T{PaymentMethodBase: PaymentMethodBase{Initialization: ...}}, is still sent, and a received
 // value is readable through both fields.
 
+// hasInitialization reports whether data, a JSON object already decoded without error, carries a
+// non-null initialization.
+func hasInitialization(data []byte) bool {
+	var probe struct {
+		Initialization *json.RawMessage `json:"initialization"`
+	}
+	return json.Unmarshal(data, &probe) == nil && probe.Initialization != nil
+}
+
 // MarshalJSON sends Initialization, or PaymentMethodBase.Initialization when Initialization is
 // empty.
 func (m BizumPaymentMethod) MarshalJSON() ([]byte, error) {
@@ -21,13 +30,16 @@ func (m BizumPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *BizumPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias BizumPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -43,13 +55,16 @@ func (m InstrumentPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *InstrumentPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias InstrumentPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -65,13 +80,16 @@ func (m MultibancoPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *MultibancoPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias MultibancoPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -87,13 +105,16 @@ func (m P24PaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *P24PaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias P24PaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -109,13 +130,16 @@ func (m SwishPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *SwishPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias SwishPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -131,13 +155,16 @@ func (m AchPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *AchPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias AchPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -153,13 +180,16 @@ func (m SepaPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *SepaPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias SepaPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -175,13 +205,16 @@ func (m PayByBankPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *PayByBankPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias PayByBankPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -197,13 +230,16 @@ func (m StablecoinPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *StablecoinPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias StablecoinPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -219,13 +255,16 @@ func (m BlikPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *BlikPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias BlikPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -241,13 +280,16 @@ func (m IdealPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *IdealPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias IdealPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -263,13 +305,16 @@ func (m KnetPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *KnetPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias KnetPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }
 
@@ -285,12 +330,15 @@ func (m BancontactPaymentMethod) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON sets a received initialization on both Initialization and
-// PaymentMethodBase.Initialization.
+// PaymentMethodBase.Initialization. Without an initialization in the payload both keep their
+// value, as the default decoder does.
 func (m *BancontactPaymentMethod) UnmarshalJSON(data []byte) error {
 	type alias BancontactPaymentMethod
 	if err := json.Unmarshal(data, (*alias)(m)); err != nil {
 		return err
 	}
-	m.PaymentMethodBase.Initialization = m.Initialization
+	if hasInitialization(data) {
+		m.PaymentMethodBase.Initialization = m.Initialization
+	}
 	return nil
 }

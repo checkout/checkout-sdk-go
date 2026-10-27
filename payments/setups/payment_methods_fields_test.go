@@ -384,6 +384,79 @@ func TestDeprecatedInitialization_UnmarshalKeepsExistingMembers(t *testing.T) {
 	assert.Equal(t, PaymentMethodInitializationDisabled, method.PaymentMethodBase.Initialization)
 }
 
+// shadowedMethods builds the thirteen types with a deprecated Initialization, each set through
+// PaymentMethodBase only.
+func shadowedMethods(initialization PaymentMethodInitialization) PaymentMethods {
+	base := PaymentMethodBase{Initialization: initialization}
+	return PaymentMethods{
+		Bizum: &BizumPaymentMethod{PaymentMethodBase: base}, Blik: &BlikPaymentMethod{PaymentMethodBase: base},
+		PayByBank: &PayByBankPaymentMethod{PaymentMethodBase: base}, Stablecoin: &StablecoinPaymentMethod{PaymentMethodBase: base},
+		Instrument: &InstrumentPaymentMethod{PaymentMethodBase: base}, Multibanco: &MultibancoPaymentMethod{PaymentMethodBase: base},
+		P24: &P24PaymentMethod{PaymentMethodBase: base}, Swish: &SwishPaymentMethod{PaymentMethodBase: base},
+		Ach: &AchPaymentMethod{PaymentMethodBase: base}, Sepa: &SepaPaymentMethod{PaymentMethodBase: base},
+		Ideal: &IdealPaymentMethod{PaymentMethodBase: base}, Knet: &KnetPaymentMethod{PaymentMethodBase: base},
+		Bancontact: &BancontactPaymentMethod{PaymentMethodBase: base},
+	}
+}
+
+// shadowedInitializations returns, per type, the Initialization declared on the type and the one
+// in PaymentMethodBase.
+func shadowedInitializations(m PaymentMethods) [][2]PaymentMethodInitialization {
+	return [][2]PaymentMethodInitialization{
+		{m.Bizum.Initialization, m.Bizum.PaymentMethodBase.Initialization},
+		{m.Blik.Initialization, m.Blik.PaymentMethodBase.Initialization},
+		{m.PayByBank.Initialization, m.PayByBank.PaymentMethodBase.Initialization},
+		{m.Stablecoin.Initialization, m.Stablecoin.PaymentMethodBase.Initialization},
+		{m.Instrument.Initialization, m.Instrument.PaymentMethodBase.Initialization},
+		{m.Multibanco.Initialization, m.Multibanco.PaymentMethodBase.Initialization},
+		{m.P24.Initialization, m.P24.PaymentMethodBase.Initialization},
+		{m.Swish.Initialization, m.Swish.PaymentMethodBase.Initialization},
+		{m.Ach.Initialization, m.Ach.PaymentMethodBase.Initialization},
+		{m.Sepa.Initialization, m.Sepa.PaymentMethodBase.Initialization},
+		{m.Ideal.Initialization, m.Ideal.PaymentMethodBase.Initialization},
+		{m.Knet.Initialization, m.Knet.PaymentMethodBase.Initialization},
+		{m.Bancontact.Initialization, m.Bancontact.PaymentMethodBase.Initialization},
+	}
+}
+
+func shadowedPayload(method string) string {
+	return `{"bizum":` + method + `,"blik":` + method + `,"paybybank":` + method + `,"stablecoin":` + method +
+		`,"instrument":` + method + `,"multibanco":` + method + `,"p24":` + method + `,"swish":` + method +
+		`,"ach":` + method + `,"sepa":` + method + `,"ideal":` + method + `,"knet":` + method +
+		`,"bancontact":` + method + `}`
+}
+
+// Decoding a payload without initialization into a value that had it set through
+// PaymentMethodBase keeps it on both fields, as the default decoder does. A null is the same.
+func TestDeprecatedInitialization_PayloadWithoutItKeepsTheExistingValue(t *testing.T) {
+	for _, method := range []string{`{"status":"ready"}`, `{"status":"ready","initialization":null}`} {
+		methods := shadowedMethods(PaymentMethodInitializationEnabled)
+		assert.NoError(t, json.Unmarshal([]byte(shadowedPayload(method)), &methods))
+		assert.Equal(t, "ready", methods.Bizum.Status)
+		for _, got := range shadowedInitializations(methods) {
+			assert.Equal(t, [2]PaymentMethodInitialization{"", PaymentMethodInitializationEnabled}, got, method)
+		}
+	}
+}
+
+// A value set on the type itself is also kept when the payload has no initialization.
+func TestDeprecatedInitialization_PayloadWithoutItKeepsTheTypeField(t *testing.T) {
+	method := BizumPaymentMethod{Initialization: PaymentMethodInitializationEnabled}
+	assert.NoError(t, json.Unmarshal([]byte(`{"status":"ready"}`), &method))
+	assert.Equal(t, PaymentMethodInitializationEnabled, method.Initialization)
+	assert.Equal(t, PaymentMethodInitialization(""), method.PaymentMethodBase.Initialization)
+}
+
+// Decoding a payload with initialization sets it on both fields, replacing what was there.
+func TestDeprecatedInitialization_PayloadWithItSetsBoth(t *testing.T) {
+	methods := shadowedMethods(PaymentMethodInitializationEnabled)
+	assert.NoError(t, json.Unmarshal([]byte(shadowedPayload(`{"initialization":"disabled"}`)), &methods))
+	for _, got := range shadowedInitializations(methods) {
+		assert.Equal(t, [2]PaymentMethodInitialization{PaymentMethodInitializationDisabled,
+			PaymentMethodInitializationDisabled}, got)
+	}
+}
+
 // card_present serializes under its key.
 func TestCardPresent_SerializesUnderItsKey(t *testing.T) {
 	methods := PaymentMethods{

@@ -504,23 +504,53 @@ type (
 		Market           string `json:"market,omitempty"`
 	}
 
+	// Dunning is the configuration of asynchronous Dunning retries (DunningRetryRequest).
 	Dunning struct {
-		Enabled      bool `json:"enabled,omitempty"`
-		MaxAttempts  int  `json:"max_attempts,omitempty" default:"6"`
-		EndAfterDays int  `json:"end_after_days,omitempty" default:"30"`
+		// Enabled indicates if Checkout.com retries the payment when it's declined with a supported decline code.
+		// [Required]
+		Enabled bool `json:"enabled"`
+		// MaxAttempts is the maximum number of authorization retry attempts, excluding the initial authorization.
+		// [Optional] Minimum 1, maximum 15. Defaults to 6.
+		MaxAttempts int `json:"max_attempts,omitempty" default:"6"`
+		// EndAfterDays is the maximum number of days between the initial request and the final retry attempt.
+		// [Optional] Minimum 1, maximum 60. Defaults to 30.
+		EndAfterDays int `json:"end_after_days,omitempty" default:"30"`
 	}
 
+	// Downtime is the configuration of asynchronous Downtime retries (DowntimeRetryRequest).
 	Downtime struct {
-		Enabled bool `json:"enabled,omitempty"`
+		// Enabled indicates if Checkout.com retries the payment when it's declined due to issuer or acquirer downtime.
+		// [Required]
+		Enabled bool `json:"enabled"`
 	}
 
+	// PaymentRetryRequest is the configuration of asynchronous retries for a payment request (RetryRequest).
 	PaymentRetryRequest struct {
-		Dunning  *Dunning  `json:"dunning,omitempty"`
+		// Dunning is the configuration of asynchronous Dunning retries.
+		// [Optional]
+		Dunning *Dunning `json:"dunning,omitempty"`
+		// Downtime is the configuration of asynchronous Downtime retries.
+		// [Optional]
 		Downtime *Downtime `json:"downtime,omitempty"`
 
-		Enabled      bool `json:"enabled,omitempty"`
-		MaxAttempts  int  `json:"max_attempts,omitempty"`
-		EndAfterDays int  `json:"end_after_days,omitempty"`
+		// Enabled indicates whether asynchronous retries are enabled for the payment.
+		// [Required]
+		Enabled bool `json:"enabled"`
+		// Deprecated: not part of the retry request; use Dunning.MaxAttempts instead.
+		// This field will be removed in the next major version.
+		MaxAttempts int `json:"max_attempts,omitempty"`
+		// Deprecated: not part of the retry request; use Dunning.EndAfterDays instead.
+		// This field will be removed in the next major version.
+		EndAfterDays int `json:"end_after_days,omitempty"`
+	}
+
+	// CustomerRetry configures the parameters for customer retries, which are payment attempts performed by
+	// the customer on the checkout page (customer_retry on hosted payments, payment links and payment sessions).
+	CustomerRetry struct {
+		// MaxAttempts is the maximum number of customer retry attempts, excluding the initial payment attempt.
+		// [Optional] on hosted payments and payment links, [Required] on payment sessions.
+		// Minimum 0, maximum 5. Defaults to 5. A pointer so that 0 is sent.
+		MaxAttempts *int `json:"max_attempts,omitempty"`
 	}
 
 	LocalDescriptor struct {
@@ -1001,11 +1031,24 @@ type (
 		SchemeTransactionLinkId string `json:"scheme_transaction_link_id,omitempty"`
 	}
 
+	// PaymentRetryResponse is the configuration relating to asynchronous retries. It models both
+	// RetryPostResponse (POST /payments) and RetryGetResponse (GET /payments/{id}); AttemptsMade is
+	// only returned by GET /payments/{id}.
 	PaymentRetryResponse struct {
-		Enabled       bool       `json:"enabled,omitempty"`
-		AttemptsMade  int        `json:"attempts_made,omitempty"`
-		MaxAttempts   int        `json:"max_attempts,omitempty"`
-		EndsOn        *time.Time `json:"ends_on,omitempty"`
+		// Enabled indicates whether asynchronous retries are enabled for the payment.
+		// [Required]
+		Enabled bool `json:"enabled"`
+		// AttemptsMade is the number of retries attempted so far. Minimum 0.
+		// [Optional] Only returned by GET /payments/{id}.
+		AttemptsMade int `json:"attempts_made,omitempty"`
+		// MaxAttempts is the maximum number of authorization retry attempts, excluding the initial authorization.
+		// [Optional] Minimum 1, maximum 15. Defaults to 6.
+		MaxAttempts int `json:"max_attempts,omitempty"`
+		// EndsOn is the date on which the retry schedule expires, in ISO 8601 format.
+		// [Optional]
+		EndsOn *time.Time `json:"ends_on,omitempty"`
+		// NextAttemptOn is the date on which the next authorization attempt will take place, in ISO 8601 format.
+		// [Optional]
 		NextAttemptOn *time.Time `json:"next_attempt_on,omitempty"`
 	}
 

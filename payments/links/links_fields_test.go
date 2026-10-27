@@ -39,3 +39,15 @@ func TestPaymentLinkRequest_OmitsNewFieldsWhenUnset(t *testing.T) {
 	assert.NotContains(t, string(marshalled), "authorization_type")
 	assert.NotContains(t, string(marshalled), "payment_plan")
 }
+
+func TestPaymentLinkRequest_CustomerRetryOnlySendsMaxAttempts(t *testing.T) {
+	maxAttempts := 2
+	request := PaymentLinkRequest{CustomerRetry: &payments.CustomerRetry{MaxAttempts: &maxAttempts}}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+
+	var raw map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &raw))
+	assert.Equal(t, map[string]interface{}{"max_attempts": float64(2)}, raw["customer_retry"])
+}

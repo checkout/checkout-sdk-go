@@ -276,7 +276,8 @@ type (
 		Shipping          *payments.ShippingDetailsFlowHostedLinks `json:"shipping,omitempty"`
 		Items             []payments.Product                       `json:"items,omitempty"`
 		ThreeDsRequest    *payments.ThreeDsRequestFlowHostedLinks  `json:"3ds,omitempty"`
-		// Deprecated: IpAddress is deprecated. Use alternative fields for client identification.
+		// Deprecated: IpAddress is deprecated. Use alternative fields for client identification. This field will be removed
+		// in the next major version.
 		IpAddress                  string                               `json:"ip_address,omitempty"`
 		PaymentMethodConfiguration *payments.PaymentMethodConfiguration `json:"payment_method_configuration,omitempty"`
 		Recipient                  *payments.PaymentRecipient           `json:"recipient,omitempty"`

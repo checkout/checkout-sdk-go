@@ -10,9 +10,9 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/common"
 )
 
-// Verifies the Payment Setup payment_type enum, the payment methods with their own spec fields
-// (qpay, ideal, knet, bancontact, the Alipay family and similar wallets, tamara), the ach and sepa
-// fields, order tipping and surcharge amounts, and the members kept only as deprecated.
+// Verifies the Payment Setup payment_type enum, the payment methods with their own types (ideal,
+// knet, bancontact), the methods that keep SimplePaymentMethod, the ach and sepa fields, order
+// tipping and surcharge amounts, and the members kept only as deprecated.
 
 func TestPaymentSetupPaymentType_Values(t *testing.T) {
 	assert.Equal(t, PaymentSetupPaymentType("regular"), PaymentSetupPaymentTypeRegular)
@@ -244,11 +244,15 @@ func TestPaymentMethods_EmptyMethodsSendNothing(t *testing.T) {
 		Sepa:       &SepaPaymentMethod{},
 		Qpay:       &SimplePaymentMethod{},
 		Tamara:     &SimplePaymentMethod{},
+		Ideal:      &IdealPaymentMethod{},
+		Knet:       &KnetPaymentMethod{},
+		Bancontact: &BancontactPaymentMethod{},
 	}
 	marshalled, err := json.Marshal(methods)
 	assert.NoError(t, err)
 	assert.JSONEq(t, `{"bizum":{},"blik":{},"paybybank":{},"stablecoin":{},"instrument":{},"eps":{},
-		"multibanco":{},"p24":{},"swish":{},"ach":{},"sepa":{},"qpay":{},"tamara":{}}`, string(marshalled))
+		"multibanco":{},"p24":{},"swish":{},"ach":{},"sepa":{},"qpay":{},"tamara":{},"ideal":{},
+		"knet":{},"bancontact":{}}`, string(marshalled))
 
 	empty, err := json.Marshal(PaymentMethods{})
 	assert.NoError(t, err)

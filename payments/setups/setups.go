@@ -842,15 +842,15 @@ type BizumPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Bizum schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Bizum schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Bizum schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Bizum schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -861,17 +861,15 @@ type BizumPaymentMethod struct {
 //
 // Initialization, promoted from PaymentMethodBase, is deprecated on this type except for Tamara,
 // whose schema has it. Not part of the other payment method schemas in the Payment Setups API
-// specification; the API ignores it on requests. There is no replacement. Will be removed in the
-// next major version.
+// specification. There is no replacement. Will be removed in the next major version.
 type SimplePaymentMethod struct {
 	PaymentMethodBase
 
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of these payment method schemas in the Payment Setups API
-	// specification; the API ignores it on requests. There is no replacement. Will be removed in
-	// the next major version.
+	// Deprecated: Not part of these payment method schemas in the Payment Setups API specification.
+	// There is no replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -898,8 +896,8 @@ type IdealPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Ideal schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Ideal schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -937,8 +935,8 @@ type KnetPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Knet schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Knet schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -965,9 +963,8 @@ type BancontactPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Bancontact schema in the Payment Setups API specification; the
-	// API ignores it on requests. There is no replacement. Will be removed in the next major
-	// version.
+	// Deprecated: Not part of the Bancontact schema in the Payment Setups API specification. There
+	// is no replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1308,8 +1305,7 @@ type InstrumentPaymentMethod struct {
 	// [Optional]
 	//
 	// Deprecated: Not part of the PaymentSetupInstrument schema in the Payment Setups API
-	// specification; the API ignores it on requests. There is no replacement. Will be removed in
-	// the next major version.
+	// specification. There is no replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// Id is the unique identifier of the selected instrument.
@@ -1330,8 +1326,7 @@ type InstrumentPaymentMethod struct {
 	// [Optional]
 	//
 	// Deprecated: Not part of the PaymentSetupInstrument schema in the Payment Setups API
-	// specification; the API ignores it on requests. There is no replacement. Will be removed in
-	// the next major version.
+	// specification. There is no replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1360,9 +1355,8 @@ type MultibancoPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Multibanco schema in the Payment Setups API specification; the
-	// API ignores it on requests. There is no replacement. Will be removed in the next major
-	// version.
+	// Deprecated: Not part of the Multibanco schema in the Payment Setups API specification. There
+	// is no replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolderName is the account holder's name.
@@ -1373,8 +1367,8 @@ type MultibancoPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Multibanco schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Multibanco schema in the Payment Setups API specification. There
+	// is no replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1401,8 +1395,8 @@ type P24PaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the P24 schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the P24 schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolder is the account holder's details.
@@ -1412,8 +1406,8 @@ type P24PaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the P24 schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the P24 schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1439,8 +1433,8 @@ type SwishPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Swish schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Swish schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// BillingDescriptor is a description that appears on the customer's billing statement.
@@ -1454,8 +1448,8 @@ type SwishPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Swish schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Swish schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1515,8 +1509,8 @@ type AchPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Ach schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Ach schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountType is the type of Direct Debit account.
@@ -1548,8 +1542,8 @@ type AchPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Ach schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Ach schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1606,8 +1600,8 @@ type SepaPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Sepa schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Sepa schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// AccountHolder is the account holder details.
@@ -1635,8 +1629,8 @@ type SepaPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Sepa schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Sepa schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1786,8 +1780,8 @@ type BacsPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Bacs schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Bacs schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }
 
@@ -1877,8 +1871,8 @@ type PayByBankPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the PayByBank schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the PayByBank schema in the Payment Setups API specification. There
+	// is no replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// BankId is the identifier of the bank the customer has selected for the payment.
@@ -2072,9 +2066,8 @@ type StablecoinPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Stablecoin schema in the Payment Setups API specification; the
-	// API ignores it on requests. There is no replacement. Will be removed in the next major
-	// version.
+	// Deprecated: Not part of the Stablecoin schema in the Payment Setups API specification. There
+	// is no replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 }
 
@@ -2635,8 +2628,8 @@ type BlikPaymentMethod struct {
 	// sent; when both are set, this one wins. A received value is set on both.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Blik schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Blik schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	Initialization PaymentMethodInitialization `json:"initialization,omitempty"`
 
 	// PartnerCode is the 6-digit BLIK code generated by the customer's banking app.
@@ -2648,7 +2641,7 @@ type BlikPaymentMethod struct {
 	// PaymentMethodOptions holds the payment method options.
 	// [Optional]
 	//
-	// Deprecated: Not part of the Blik schema in the Payment Setups API specification; the API
-	// ignores it on requests. There is no replacement. Will be removed in the next major version.
+	// Deprecated: Not part of the Blik schema in the Payment Setups API specification. There is no
+	// replacement. Will be removed in the next major version.
 	PaymentMethodOptions *PaymentMethodOptions `json:"payment_method_options,omitempty"`
 }

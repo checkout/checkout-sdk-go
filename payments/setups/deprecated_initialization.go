@@ -7,7 +7,10 @@ import "encoding/json"
 // type declares its own deprecated Initialization that shadows the promoted one. Their JSON
 // methods keep the wire as it was: a value set through PaymentMethodBase, as in
 // T{PaymentMethodBase: PaymentMethodBase{Initialization: ...}}, is still sent, and a received
-// value is readable through both fields.
+// value is readable through both fields. In Go code they stay two separate fields: a value set on
+// one is not readable through the other. Marshalling sends the type's Initialization, or the
+// PaymentMethodBase one when it is empty, and only decoding a payload that carries initialization
+// sets both.
 
 // hasInitialization reports whether data, a JSON object already decoded without error, carries a
 // non-null initialization.

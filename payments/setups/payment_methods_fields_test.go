@@ -1,0 +1,481 @@
+package setups
+
+import (
+	"encoding/json"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/checkout/checkout-sdk-go/v3/common"
+)
+
+// Verifies the Payment Setup payment_type enum, the payment methods with their own types (ideal,
+// knet, bancontact), the methods that keep SimplePaymentMethod, the ach and sepa fields, order
+// tipping and surcharge amounts, and the members kept only as deprecated.
+
+func TestPaymentSetupPaymentType_Values(t *testing.T) {
+	assert.Equal(t, PaymentSetupPaymentType("regular"), PaymentSetupPaymentTypeRegular)
+	assert.Equal(t, PaymentSetupPaymentType("recurring"), PaymentSetupPaymentTypeRecurring)
+	assert.Equal(t, PaymentSetupPaymentType("moto"), PaymentSetupPaymentTypeMoto)
+	assert.Equal(t, PaymentSetupPaymentType("installment"), PaymentSetupPaymentTypeInstallment)
+	assert.Equal(t, PaymentSetupPaymentType("pay_later"), PaymentSetupPaymentTypePayLater)
+	assert.Equal(t, PaymentSetupPaymentType("unscheduled"), PaymentSetupPaymentTypeUnscheduled)
+}
+
+func TestPaymentSetupRequest_PaymentTypeIsLowercaseOnTheWire(t *testing.T) {
+	values := map[PaymentSetupPaymentType]string{
+		PaymentSetupPaymentTypeRegular:     `"payment_type":"regular"`,
+		PaymentSetupPaymentTypeRecurring:   `"payment_type":"recurring"`,
+		PaymentSetupPaymentTypeMoto:        `"payment_type":"moto"`,
+		PaymentSetupPaymentTypeInstallment: `"payment_type":"installment"`,
+		PaymentSetupPaymentTypePayLater:    `"payment_type":"pay_later"`,
+		PaymentSetupPaymentTypeUnscheduled: `"payment_type":"unscheduled"`,
+	}
+	for value, wire := range values {
+		request := PaymentSetupRequest{
+			ProcessingChannelId: "pc_q4dbxom5jbgudnjzjpz7j2z6uq",
+			Amount:              1000,
+			Currency:            common.GBP,
+			PaymentType:         value,
+		}
+		marshalled, err := json.Marshal(request)
+		assert.NoError(t, err)
+		assert.Contains(t, string(marshalled), wire)
+
+		var decoded PaymentSetupRequest
+		assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+		assert.Equal(t, request, decoded)
+	}
+
+	unset, err := json.Marshal(PaymentSetupRequest{ProcessingChannelId: "pc_q4dbxom5jbgudnjzjpz7j2z6uq"})
+	assert.NoError(t, err)
+	assert.NotContains(t, string(unset), "payment_type")
+}
+
+func TestPaymentSetupResponse_ReadsLowercasePaymentType(t *testing.T) {
+	payload := `{"id":"set_6jy4zeybu3fylcm35yaoinjsgi","processing_channel_id":"pc_q4dbxom5jbgudnjzjpz7j2z6uq",
+		"amount":1000,"currency":"GBP","payment_type":"pay_later"}`
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	assert.Equal(t, PaymentSetupPaymentTypePayLater, response.PaymentType)
+
+	marshalled, err := json.Marshal(response)
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshalled), `"payment_type":"pay_later"`)
+}
+
+func TestKnetAndMandateEnums_Values(t *testing.T) {
+	assert.Equal(t, KnetLanguage("en"), KnetLanguageEn)
+	assert.Equal(t, KnetLanguage("ar"), KnetLanguageAr)
+	assert.Equal(t, SepaMandateType("core"), SepaMandateTypeCore)
+	assert.Equal(t, SepaMandateType("b2b"), SepaMandateTypeB2b)
+}
+
+func methodSpecificPaymentMethods() PaymentMethods {
+	status := PaymentMethodBase{Status: "action_required", Flags: []string{"example_flag"}}
+	return PaymentMethods{
+		Ideal:      &IdealPaymentMethod{PaymentMethodBase: status, Description: "2 t-shirts"},
+		Knet:       &KnetPaymentMethod{PaymentMethodBase: status, Language: KnetLanguageAr},
+		Bancontact: &BancontactPaymentMethod{PaymentMethodBase: status, AccountHolderName: "Jo Doe"},
+	}
+}
+
+func TestMethodSpecificPaymentMethods_WireKeysAndRoundTrip(t *testing.T) {
+	original := methodSpecificPaymentMethods()
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{
+		"ideal":{"status":"action_required","flags":["example_flag"],"description":"2 t-shirts"},
+		"knet":{"status":"action_required","flags":["example_flag"],"language":"ar"},
+		"bancontact":{"status":"action_required","flags":["example_flag"],"account_holder_name":"Jo Doe"}
+	}`, string(marshalled))
+
+	var decoded PaymentMethods
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}
+
+// QPay, Alipay CN and HK, GCash, TNG, Dana, KakaoPay, TrueMoney and Tamara keep the generic type,
+// with the same wire keys as before.
+func TestGenericTypedPaymentMethods_WireKeysAndRoundTrip(t *testing.T) {
+	method := func() *SimplePaymentMethod {
+		return &SimplePaymentMethod{PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"example_flag"}}}
+	}
+	tamara := method()
+	tamara.Initialization = PaymentMethodInitializationEnabled
+	original := PaymentMethods{
+		Qpay: method(), AlipayCn: method(), AlipayHk: method(), Gcash: method(), Tng: method(),
+		Dana: method(), Kakaopay: method(), Truemoney: method(), Tamara: tamara,
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	generic := `{"status":"ready","flags":["example_flag"]}`
+	assert.JSONEq(t, `{"qpay":`+generic+`,"alipay_cn":`+generic+`,"alipay_hk":`+generic+`,
+		"gcash":`+generic+`,"tng":`+generic+`,"dana":`+generic+`,"kakaopay":`+generic+`,
+		"truemoney":`+generic+`,
+		"tamara":{"status":"ready","flags":["example_flag"],"initialization":"enabled"}}`, string(marshalled))
+
+	var decoded PaymentMethods
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}
+
+func TestMethodSpecificPaymentMethods_FromSwaggerExamples(t *testing.T) {
+	// Property example from the spec: ideal.description. The spec gives no example for the knet
+	// and bancontact fields.
+	payload := `{"payment_methods":{"ideal":{"description":"2 t-shirts"}}}`
+	var response PaymentSetupResponse
+	assert.NoError(t, json.Unmarshal([]byte(payload), &response))
+	methods := response.PaymentMethods
+	assert.Equal(t, "2 t-shirts", methods.Ideal.Description)
+}
+
+func TestAchPaymentMethod_AllFieldsWireKeysAndRoundTrip(t *testing.T) {
+	original := AchPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"example_flag"}},
+		AccountType:       "current",
+		AccountHolder: &AchAccountHolder{
+			Type:        "corporate",
+			FirstName:   "John",
+			LastName:    "Smith",
+			CompanyName: "Acme Corporation",
+			DateOfBirth: "1985-05-15",
+			Identification: &AchAccountHolderIdentification{
+				Type:           "ssn",
+				IssuingCountry: "US",
+				Number:         "123456789",
+			},
+		},
+		AccountNumber: "4099999992",
+		BankCode:      "011075150",
+		Country:       common.US,
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"status":"ready","flags":["example_flag"],"account_type":"current",
+		"account_holder":{"type":"corporate","first_name":"John","last_name":"Smith",
+			"company_name":"Acme Corporation","date_of_birth":"1985-05-15",
+			"identification":{"type":"ssn","issuing_country":"US","number":"123456789"}},
+		"account_number":"4099999992","bank_code":"011075150","country":"US"}`, string(marshalled))
+
+	var decoded AchPaymentMethod
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}
+
+func TestSepaPaymentMethod_AllFieldsWireKeysAndRoundTrip(t *testing.T) {
+	original := SepaPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Status: "ready", Flags: []string{"example_flag"}},
+		AccountHolder: &SepaAccountHolder{
+			Type:        "individual",
+			FirstName:   "John",
+			LastName:    "Smith",
+			CompanyName: "Acme Corporation",
+		},
+		AccountNumber: "DE89370400440532013000",
+		Country:       common.DE,
+		Currency:      "EUR",
+		Mandate: &SepaMandate{
+			Id:              "mandate_123",
+			Type:            SepaMandateTypeB2b,
+			DateOfSignature: shortDate(t, 2026, time.January, 15, 0, 0),
+		},
+	}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"status":"ready","flags":["example_flag"],
+		"account_holder":{"type":"individual","first_name":"John","last_name":"Smith","company_name":"Acme Corporation"},
+		"account_number":"DE89370400440532013000","country":"DE","currency":"EUR",
+		"mandate":{"id":"mandate_123","type":"b2b","date_of_signature":"2026-01-15"}}`, string(marshalled))
+
+	var decoded SepaPaymentMethod
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+
+	var core SepaMandate
+	assert.NoError(t, json.Unmarshal([]byte(`{"type":"core"}`), &core))
+	assert.Equal(t, SepaMandateTypeCore, core.Type)
+}
+
+func TestPaymentSetupOrder_TippingAndSurchargeAmounts(t *testing.T) {
+	original := PaymentSetupOrder{TippingAmount: 2, SurchargeAmount: 3}
+
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"tipping_amount":2,"surcharge_amount":3}`, string(marshalled))
+
+	var decoded PaymentSetupOrder
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+}
+
+// last_payment_amount is a number in the specification (example 55.99), so decimals are kept.
+func TestCustomerMerchantAccount_LastPaymentAmountKeepsDecimals(t *testing.T) {
+	original := CustomerMerchantAccount{LastPaymentAmount: 55.99}
+	marshalled, err := json.Marshal(original)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"last_payment_amount":55.99}`, string(marshalled))
+
+	var decoded CustomerMerchantAccount
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, original, decoded)
+	assert.Equal(t, 55.99, decoded.LastPaymentAmount)
+}
+
+func TestPaymentMethods_EmptyMethodsSendNothing(t *testing.T) {
+	// Status and flags are read only and initialization has no SDK default, so an empty method
+	// sends an empty object.
+	methods := PaymentMethods{
+		Bizum:      &BizumPaymentMethod{},
+		Blik:       &BlikPaymentMethod{},
+		PayByBank:  &PayByBankPaymentMethod{},
+		Stablecoin: &StablecoinPaymentMethod{},
+		Instrument: &InstrumentPaymentMethod{},
+		Eps:        &SimplePaymentMethod{},
+		Multibanco: &MultibancoPaymentMethod{},
+		P24:        &P24PaymentMethod{},
+		Swish:      &SwishPaymentMethod{},
+		Ach:        &AchPaymentMethod{},
+		Sepa:       &SepaPaymentMethod{},
+		Qpay:       &SimplePaymentMethod{},
+		Tamara:     &SimplePaymentMethod{},
+		Ideal:      &IdealPaymentMethod{},
+		Knet:       &KnetPaymentMethod{},
+		Bancontact: &BancontactPaymentMethod{},
+	}
+	marshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"bizum":{},"blik":{},"paybybank":{},"stablecoin":{},"instrument":{},"eps":{},
+		"multibanco":{},"p24":{},"swish":{},"ach":{},"sepa":{},"qpay":{},"tamara":{},"ideal":{},
+		"knet":{},"bancontact":{}}`, string(marshalled))
+
+	empty, err := json.Marshal(PaymentMethods{})
+	assert.NoError(t, err)
+	assert.Equal(t, `{}`, string(empty))
+}
+
+// The deprecated members stay on the wire until the next major version, with the same key and
+// value as before. The types keep embedding PaymentMethodBase, so literals that name it compile
+// as before and the value set there is still sent.
+func TestDeprecatedInitialization_SetThroughPaymentMethodBaseIsSent(t *testing.T) {
+	options := &PaymentMethodOptions{Sdk: &PaymentMethodOption{Id: "opt_123"}}
+	base := PaymentMethodBase{Initialization: PaymentMethodInitializationEnabled}
+	methods := PaymentMethods{
+		Bizum:      &BizumPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Blik:       &BlikPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		PayByBank:  &PayByBankPaymentMethod{PaymentMethodBase: base},
+		Stablecoin: &StablecoinPaymentMethod{PaymentMethodBase: base},
+		Instrument: &InstrumentPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Paynow:     &SimplePaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Multibanco: &MultibancoPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		P24:        &P24PaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Swish:      &SwishPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Ach:        &AchPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Sepa:       &SepaPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Ideal:      &IdealPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Knet:       &KnetPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Bancontact: &BancontactPaymentMethod{PaymentMethodBase: base, PaymentMethodOptions: options},
+		Bacs:       &BacsPaymentMethod{PaymentMethodOptions: options},
+	}
+
+	marshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, deprecatedMembersWire, string(marshalled))
+}
+
+const deprecatedMembersWire = `{
+	"bizum":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"blik":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"paybybank":{"initialization":"enabled"},
+	"stablecoin":{"initialization":"enabled"},
+	"instrument":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"paynow":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"multibanco":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"p24":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"swish":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"ach":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"sepa":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"ideal":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"knet":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"bancontact":{"initialization":"enabled","payment_method_options":{"sdk":{"id":"opt_123"}}},
+	"bacs":{"payment_method_options":{"sdk":{"id":"opt_123"}}}
+}`
+
+// Setting the deprecated Initialization declared on the type sends the same key and value.
+func TestDeprecatedInitialization_SetOnTheTypeIsSent(t *testing.T) {
+	options := &PaymentMethodOptions{Sdk: &PaymentMethodOption{Id: "opt_123"}}
+	enabled := PaymentMethodInitializationEnabled
+	methods := PaymentMethods{
+		Bizum:      &BizumPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Blik:       &BlikPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		PayByBank:  &PayByBankPaymentMethod{Initialization: enabled},
+		Stablecoin: &StablecoinPaymentMethod{Initialization: enabled},
+		Instrument: &InstrumentPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Paynow:     &SimplePaymentMethod{PaymentMethodBase: PaymentMethodBase{Initialization: enabled}, PaymentMethodOptions: options},
+		Multibanco: &MultibancoPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		P24:        &P24PaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Swish:      &SwishPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Ach:        &AchPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Sepa:       &SepaPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Ideal:      &IdealPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Knet:       &KnetPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Bancontact: &BancontactPaymentMethod{Initialization: enabled, PaymentMethodOptions: options},
+		Bacs:       &BacsPaymentMethod{PaymentMethodOptions: options},
+	}
+
+	marshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, deprecatedMembersWire, string(marshalled))
+}
+
+// When both are set, the Initialization declared on the type wins.
+func TestDeprecatedInitialization_TypeFieldWinsOverPaymentMethodBase(t *testing.T) {
+	method := BizumPaymentMethod{
+		PaymentMethodBase: PaymentMethodBase{Initialization: PaymentMethodInitializationDisabled},
+		Initialization:    PaymentMethodInitializationEnabled,
+	}
+	marshalled, err := json.Marshal(method)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"initialization":"enabled"}`, string(marshalled))
+}
+
+// A received initialization is readable through the type and through PaymentMethodBase, and the
+// other members decode as before.
+func TestDeprecatedInitialization_ReceivedIsSetOnBoth(t *testing.T) {
+	var methods PaymentMethods
+	assert.NoError(t, json.Unmarshal([]byte(deprecatedMembersWire), &methods))
+
+	type both struct{ onType, onBase PaymentMethodInitialization }
+	got := []both{
+		{methods.Bizum.Initialization, methods.Bizum.PaymentMethodBase.Initialization},
+		{methods.Blik.Initialization, methods.Blik.PaymentMethodBase.Initialization},
+		{methods.PayByBank.Initialization, methods.PayByBank.PaymentMethodBase.Initialization},
+		{methods.Stablecoin.Initialization, methods.Stablecoin.PaymentMethodBase.Initialization},
+		{methods.Instrument.Initialization, methods.Instrument.PaymentMethodBase.Initialization},
+		{methods.Paynow.Initialization, methods.Paynow.PaymentMethodBase.Initialization},
+		{methods.Multibanco.Initialization, methods.Multibanco.PaymentMethodBase.Initialization},
+		{methods.P24.Initialization, methods.P24.PaymentMethodBase.Initialization},
+		{methods.Swish.Initialization, methods.Swish.PaymentMethodBase.Initialization},
+		{methods.Ach.Initialization, methods.Ach.PaymentMethodBase.Initialization},
+		{methods.Sepa.Initialization, methods.Sepa.PaymentMethodBase.Initialization},
+		{methods.Ideal.Initialization, methods.Ideal.PaymentMethodBase.Initialization},
+		{methods.Knet.Initialization, methods.Knet.PaymentMethodBase.Initialization},
+		{methods.Bancontact.Initialization, methods.Bancontact.PaymentMethodBase.Initialization},
+	}
+	for _, g := range got {
+		assert.Equal(t, both{PaymentMethodInitializationEnabled, PaymentMethodInitializationEnabled}, g)
+	}
+	assert.Equal(t, "opt_123", methods.Ideal.PaymentMethodOptions.Sdk.Id)
+	assert.Equal(t, "opt_123", methods.Bacs.PaymentMethodOptions.Sdk.Id)
+
+	remarshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, deprecatedMembersWire, string(remarshalled))
+}
+
+// Decoding into an existing value keeps the members the payload does not carry, as the default
+// decoder does.
+func TestDeprecatedInitialization_UnmarshalKeepsExistingMembers(t *testing.T) {
+	method := BizumPaymentMethod{PaymentMethodBase: PaymentMethodBase{Status: "ready"}}
+	assert.NoError(t, json.Unmarshal([]byte(`{"initialization":"disabled"}`), &method))
+	assert.Equal(t, "ready", method.Status)
+	assert.Equal(t, PaymentMethodInitializationDisabled, method.Initialization)
+	assert.Equal(t, PaymentMethodInitializationDisabled, method.PaymentMethodBase.Initialization)
+}
+
+// shadowedMethods builds the thirteen types with a deprecated Initialization, each set through
+// PaymentMethodBase only.
+func shadowedMethods(initialization PaymentMethodInitialization) PaymentMethods {
+	base := PaymentMethodBase{Initialization: initialization}
+	return PaymentMethods{
+		Bizum: &BizumPaymentMethod{PaymentMethodBase: base}, Blik: &BlikPaymentMethod{PaymentMethodBase: base},
+		PayByBank: &PayByBankPaymentMethod{PaymentMethodBase: base}, Stablecoin: &StablecoinPaymentMethod{PaymentMethodBase: base},
+		Instrument: &InstrumentPaymentMethod{PaymentMethodBase: base}, Multibanco: &MultibancoPaymentMethod{PaymentMethodBase: base},
+		P24: &P24PaymentMethod{PaymentMethodBase: base}, Swish: &SwishPaymentMethod{PaymentMethodBase: base},
+		Ach: &AchPaymentMethod{PaymentMethodBase: base}, Sepa: &SepaPaymentMethod{PaymentMethodBase: base},
+		Ideal: &IdealPaymentMethod{PaymentMethodBase: base}, Knet: &KnetPaymentMethod{PaymentMethodBase: base},
+		Bancontact: &BancontactPaymentMethod{PaymentMethodBase: base},
+	}
+}
+
+// shadowedInitializations returns, per type, the Initialization declared on the type and the one
+// in PaymentMethodBase.
+func shadowedInitializations(m PaymentMethods) [][2]PaymentMethodInitialization {
+	return [][2]PaymentMethodInitialization{
+		{m.Bizum.Initialization, m.Bizum.PaymentMethodBase.Initialization},
+		{m.Blik.Initialization, m.Blik.PaymentMethodBase.Initialization},
+		{m.PayByBank.Initialization, m.PayByBank.PaymentMethodBase.Initialization},
+		{m.Stablecoin.Initialization, m.Stablecoin.PaymentMethodBase.Initialization},
+		{m.Instrument.Initialization, m.Instrument.PaymentMethodBase.Initialization},
+		{m.Multibanco.Initialization, m.Multibanco.PaymentMethodBase.Initialization},
+		{m.P24.Initialization, m.P24.PaymentMethodBase.Initialization},
+		{m.Swish.Initialization, m.Swish.PaymentMethodBase.Initialization},
+		{m.Ach.Initialization, m.Ach.PaymentMethodBase.Initialization},
+		{m.Sepa.Initialization, m.Sepa.PaymentMethodBase.Initialization},
+		{m.Ideal.Initialization, m.Ideal.PaymentMethodBase.Initialization},
+		{m.Knet.Initialization, m.Knet.PaymentMethodBase.Initialization},
+		{m.Bancontact.Initialization, m.Bancontact.PaymentMethodBase.Initialization},
+	}
+}
+
+func shadowedPayload(method string) string {
+	return `{"bizum":` + method + `,"blik":` + method + `,"paybybank":` + method + `,"stablecoin":` + method +
+		`,"instrument":` + method + `,"multibanco":` + method + `,"p24":` + method + `,"swish":` + method +
+		`,"ach":` + method + `,"sepa":` + method + `,"ideal":` + method + `,"knet":` + method +
+		`,"bancontact":` + method + `}`
+}
+
+// Decoding a payload without initialization into a value that had it set through
+// PaymentMethodBase keeps it on both fields, as the default decoder does. A null is the same.
+func TestDeprecatedInitialization_PayloadWithoutItKeepsTheExistingValue(t *testing.T) {
+	for _, method := range []string{`{"status":"ready"}`, `{"status":"ready","initialization":null}`} {
+		methods := shadowedMethods(PaymentMethodInitializationEnabled)
+		assert.NoError(t, json.Unmarshal([]byte(shadowedPayload(method)), &methods))
+		assert.Equal(t, "ready", methods.Bizum.Status)
+		for _, got := range shadowedInitializations(methods) {
+			assert.Equal(t, [2]PaymentMethodInitialization{"", PaymentMethodInitializationEnabled}, got, method)
+		}
+	}
+}
+
+// A value set on the type itself is also kept when the payload has no initialization.
+func TestDeprecatedInitialization_PayloadWithoutItKeepsTheTypeField(t *testing.T) {
+	method := BizumPaymentMethod{Initialization: PaymentMethodInitializationEnabled}
+	assert.NoError(t, json.Unmarshal([]byte(`{"status":"ready"}`), &method))
+	assert.Equal(t, PaymentMethodInitializationEnabled, method.Initialization)
+	assert.Equal(t, PaymentMethodInitialization(""), method.PaymentMethodBase.Initialization)
+}
+
+// Decoding a payload with initialization sets it on both fields, replacing what was there.
+func TestDeprecatedInitialization_PayloadWithItSetsBoth(t *testing.T) {
+	methods := shadowedMethods(PaymentMethodInitializationEnabled)
+	assert.NoError(t, json.Unmarshal([]byte(shadowedPayload(`{"initialization":"disabled"}`)), &methods))
+	for _, got := range shadowedInitializations(methods) {
+		assert.Equal(t, [2]PaymentMethodInitialization{PaymentMethodInitializationDisabled,
+			PaymentMethodInitializationDisabled}, got)
+	}
+}
+
+// card_present serializes under its key.
+func TestCardPresent_SerializesUnderItsKey(t *testing.T) {
+	methods := PaymentMethods{
+		CardPresent: &CardPresentPaymentMethod{
+			PaymentMethodBase: PaymentMethodBase{Initialization: PaymentMethodInitializationDisabled},
+			Track2:            "track2data",
+			Pin:               &CardPresentPin{KeySetId: "kset_123", Block: "block_data", BlockFormat: "ISO-0"},
+		},
+	}
+	marshalled, err := json.Marshal(methods)
+	assert.NoError(t, err)
+	assert.JSONEq(t, `{"card_present":{"initialization":"disabled","track2":"track2data",
+		"pin":{"key_set_id":"kset_123","block":"block_data","block_format":"ISO-0"}}}`, string(marshalled))
+
+	var decoded PaymentMethods
+	assert.NoError(t, json.Unmarshal(marshalled, &decoded))
+	assert.Equal(t, methods, decoded)
+}

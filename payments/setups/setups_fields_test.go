@@ -655,13 +655,14 @@ func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing
 			FirstTransactionDate: shortDate(t, 2020, time.March, 3, 0, 0),
 			LastTransactionDate:  shortDate(t, 2022, time.April, 4, 0, 0),
 			TotalOrderCount:      7,
-			LastPaymentAmount:    1500,
+			LastPaymentAmount:    55.99,
 		},
 	}
 
 	marshalled, err := json.Marshal(original)
 	assert.NoError(t, err)
 	body := string(marshalled)
+	assert.Contains(t, body, `"last_payment_amount":55.99`)
 	assert.Contains(t, body, `"id":"cus_123456789"`)
 	assert.Contains(t, body, `"country":"GB"`)
 	assert.Contains(t, body, `"tax_number":"GB123456789"`)
@@ -682,7 +683,7 @@ func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing
 			"ipv6": "2001:db8:85a3::8a2e:370:7334", "client": "web", "os": "android"},
 		"merchant_account": {"id": "1234", "registration_date": "2023-05-01", "last_modified": "2023-05-01",
 			"returning_customer": true, "first_transaction_date": "2023-09-15",
-			"last_transaction_date": "2025-03-28", "total_order_count": 6, "last_payment_amount": 55}
+			"last_transaction_date": "2025-03-28", "total_order_count": 6, "last_payment_amount": 55.99}
 	}`
 	var fromExample PaymentSetupCustomer
 	assert.NoError(t, json.Unmarshal([]byte(example), &fromExample))
@@ -706,7 +707,7 @@ func TestPaymentSetupCustomer_AllPropertiesRoundTripAndSwaggerExample(t *testing
 		assert.Equal(t, common.APIShortDate(time.Date(2023, 9, 15, 0, 0, 0, 0, time.UTC)), *merchantAccount.FirstTransactionDate)
 		assert.Equal(t, common.APIShortDate(time.Date(2025, 3, 28, 0, 0, 0, 0, time.UTC)), *merchantAccount.LastTransactionDate)
 		assert.Equal(t, 6, merchantAccount.TotalOrderCount)
-		assert.Equal(t, int64(55), merchantAccount.LastPaymentAmount)
+		assert.Equal(t, 55.99, merchantAccount.LastPaymentAmount)
 	}
 }
 

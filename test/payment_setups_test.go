@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
-	"github.com/checkout/checkout-sdk-go/v3/payments"
 	"github.com/checkout/checkout-sdk-go/v3/payments/setups"
 )
 
@@ -15,7 +14,7 @@ var (
 	paymentSetupRequest = setups.PaymentSetupRequest{
 		Amount:      1000,
 		Currency:    common.GBP,
-		PaymentType: payments.Regular,
+		PaymentType: setups.PaymentSetupPaymentTypeRegular,
 		Reference:   "PS-TEST-REF-001",
 		Description: "Integration test payment setup",
 		Customer: &setups.PaymentSetupCustomer{
@@ -48,7 +47,7 @@ var (
 	updatePaymentSetupRequest = setups.PaymentSetupRequest{
 		Amount:      1500,
 		Currency:    common.GBP,
-		PaymentType: payments.Regular,
+		PaymentType: setups.PaymentSetupPaymentTypeRegular,
 		Reference:   "PS-TEST-REF-001-UPDATED",
 		Description: "Updated integration test payment setup",
 		Customer: &setups.PaymentSetupCustomer{

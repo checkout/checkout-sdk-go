@@ -97,3 +97,54 @@ func TestPaymentHostedRequest_AccommodationDatesUseShortDateFormat(t *testing.T)
 	// No field anywhere in the HPP body may carry a time component on a date-only field.
 	assert.NotContains(t, string(raw), "T00:00:00")
 }
+
+func TestPaymentHostedRequest_CustomerRetryOnlySendsMaxAttempts(t *testing.T) {
+	maxAttempts := 2
+	request := PaymentHostedRequest{CustomerRetry: &payments.CustomerRetry{MaxAttempts: &maxAttempts}}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+
+	var raw map[string]interface{}
+	assert.NoError(t, json.Unmarshal(marshalled, &raw))
+	assert.Equal(t, map[string]interface{}{"max_attempts": float64(2)}, raw["customer_retry"])
+}
+
+// Roundtrip of the documented scalar properties using the swagger field examples.
+func TestPaymentHostedRequest_RoundtripsSwaggerExampleValues(t *testing.T) {
+	maxAttempts := 2
+	request := PaymentHostedRequest{
+		Currency:            common.GBP,
+		Amount:              1000,
+		PaymentType:         payments.Regular,
+		PaymentIp:           "90.197.169.245",
+		Reference:           "ORD-123A",
+		Description:         "Payment for Gold Necklace",
+		DisplayName:         "The Jewelry Shop",
+		ProcessingChannelId: "pc_q4dbxom5jbgudnjzjpz7j2z6uq",
+		SuccessUrl:          "https://example.com/payments/success",
+		CancelUrl:           "https://example.com/payments/cancel",
+		FailureUrl:          "https://example.com/payments/failure",
+		Locale:              payments.EnGBLT,
+		Capture:             true,
+		CustomerRetry:       &payments.CustomerRetry{MaxAttempts: &maxAttempts},
+		AuthorizationType:   nas.FinalAuthorizationType,
+	}
+
+	marshalled, err := json.Marshal(request)
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshalled), `"payment_type":"Regular"`)
+	assert.Contains(t, string(marshalled), `"payment_ip":"90.197.169.245"`)
+	assert.Contains(t, string(marshalled), `"customer_retry":{"max_attempts":2}`)
+
+	var roundtrip PaymentHostedRequest
+	assert.NoError(t, json.Unmarshal(marshalled, &roundtrip))
+	assert.Equal(t, request, roundtrip)
+}
+
+func TestPaymentHostedRequest_CustomerRetrySendsZeroMaxAttempts(t *testing.T) {
+	zero := 0
+	marshalled, err := json.Marshal(PaymentHostedRequest{CustomerRetry: &payments.CustomerRetry{MaxAttempts: &zero}})
+	assert.NoError(t, err)
+	assert.Contains(t, string(marshalled), `"customer_retry":{"max_attempts":0}`)
+}

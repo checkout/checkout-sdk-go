@@ -173,6 +173,15 @@ func TestCreateEntity(t *testing.T) {
 }
 
 func TestCreateEntityV2(t *testing.T) {
+	// No state: since 2026-10-30 the sandbox rejects every GB state value tried ("London",
+	// "LND", "ENG", "GB-LND", "Greater London") on schema 2.0 company addresses with
+	// 422 company_principal_address_state_invalid / company_registered_address_state_invalid,
+	// while the same address without state is accepted.
+	companyAddress := func() *common.Address {
+		address := Address()
+		address.State = ""
+		return address
+	}
 	cases := []struct {
 		name    string
 		request accounts.OnboardEntityRequest
@@ -185,8 +194,8 @@ func TestCreateEntityV2(t *testing.T) {
 				Company: &accounts.Company{
 					LegalName:         "Company " + GenerateRandomString(3),
 					TradingName:       "Trading " + GenerateRandomString(3),
-					PrincipalAddress:  Address(),
-					RegisteredAddress: Address(),
+					PrincipalAddress:  companyAddress(),
+					RegisteredAddress: companyAddress(),
 					// No representatives: schema 2.0 company onboarding started rejecting
 					// company.representatives on 2026-09-15 with
 					// 422 invalid_request / company_representatives_0_invalid

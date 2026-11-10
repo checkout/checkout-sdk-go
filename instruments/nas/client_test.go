@@ -313,7 +313,8 @@ func TestGet(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:         "when credentials invalid then return error",
+			instrumentId: instrumentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -692,7 +693,8 @@ func TestDelete(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:         "when credentials invalid then return error",
+			instrumentId: instrumentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

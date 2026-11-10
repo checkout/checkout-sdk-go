@@ -38,11 +38,25 @@ func (c *Client) CreateHostedPaymentsPageSessionWithContext(ctx context.Context,
 	return &response, nil
 }
 
+// GetHostedPaymentsPageDetails sends GET /hosted-payments/{id}: get Hosted Payments Page details.
+//
+// hostedPaymentId is the {id} path value.
+//
+// It returns the PaymentHostedDetails, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." hostedPaymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetHostedPaymentsPageDetails(hostedPaymentId string) (*PaymentHostedDetails, error) {
 	return c.GetHostedPaymentsPageDetailsWithContext(context.Background(), hostedPaymentId)
 }
 
+// GetHostedPaymentsPageDetailsWithContext is GetHostedPaymentsPageDetails with a caller-supplied context.
 func (c *Client) GetHostedPaymentsPageDetailsWithContext(ctx context.Context, hostedPaymentId string) (*PaymentHostedDetails, error) {
+	hostedPaymentId, err := common.EncodePathSegment(hostedPaymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err

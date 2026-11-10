@@ -445,7 +445,8 @@ func TestGetPaymentDetails(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			paymentId: paymentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -555,7 +556,8 @@ func TestGetPaymentActions(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			paymentId: paymentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -663,7 +665,8 @@ func TestCapturePayment(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			paymentId: paymentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -820,7 +823,8 @@ func TestRefundPayment(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			paymentId: paymentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -837,8 +841,9 @@ func TestRefundPayment(t *testing.T) {
 			},
 		},
 		{
-			name:    "when refund not allowed then return error",
-			request: payments.RefundRequest{},
+			name:      "when refund not allowed then return error",
+			paymentId: paymentId,
+			request:   payments.RefundRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -856,8 +861,9 @@ func TestRefundPayment(t *testing.T) {
 			},
 		},
 		{
-			name:    "when payment not found then return error",
-			request: payments.RefundRequest{},
+			name:      "when payment not found then return error",
+			paymentId: paymentId,
+			request:   payments.RefundRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -878,8 +884,9 @@ func TestRefundPayment(t *testing.T) {
 			},
 		},
 		{
-			name:    "when request invalid then return error",
-			request: payments.RefundRequest{},
+			name:      "when request invalid then return error",
+			paymentId: paymentId,
+			request:   payments.RefundRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -973,7 +980,8 @@ func TestVoidPayment(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			paymentId: paymentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -990,8 +998,9 @@ func TestVoidPayment(t *testing.T) {
 			},
 		},
 		{
-			name:    "when void not allowed then return error",
-			request: payments.VoidRequest{},
+			name:      "when void not allowed then return error",
+			paymentId: paymentId,
+			request:   payments.VoidRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1009,8 +1018,9 @@ func TestVoidPayment(t *testing.T) {
 			},
 		},
 		{
-			name:    "when payment not found then return error",
-			request: payments.VoidRequest{},
+			name:      "when payment not found then return error",
+			paymentId: paymentId,
+			request:   payments.VoidRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1031,8 +1041,9 @@ func TestVoidPayment(t *testing.T) {
 			},
 		},
 		{
-			name:    "when request invalid then return error",
-			request: payments.VoidRequest{},
+			name:      "when request invalid then return error",
+			paymentId: paymentId,
+			request:   payments.VoidRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)

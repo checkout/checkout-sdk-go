@@ -38,11 +38,25 @@ func (c *Client) CreatePaymentLinkWithContext(ctx context.Context, request Payme
 	return &response, nil
 }
 
+// GetPaymentLink sends GET /payment-links/{id}: get Payment Link details.
+//
+// paymentLinkId is the {id} path value.
+//
+// It returns the PaymentLinkDetails, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentLinkId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentLink(paymentLinkId string) (*PaymentLinkDetails, error) {
 	return c.GetPaymentLinkWithContext(context.Background(), paymentLinkId)
 }
 
+// GetPaymentLinkWithContext is GetPaymentLink with a caller-supplied context.
 func (c *Client) GetPaymentLinkWithContext(ctx context.Context, paymentLinkId string) (*PaymentLinkDetails, error) {
+	paymentLinkId, err := common.EncodePathSegment(paymentLinkId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err

@@ -769,7 +769,7 @@ func TestRevokeCard(t *testing.T) {
 	}{
 		{
 			name:    "when revoke a card and this request is correct then should return a response",
-			cardId:  "",
+			cardId:  "crd_fa6psq242dcd6fdn5gifcq1491",
 			request: request,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -1209,7 +1209,8 @@ func TestSimulateIncrement(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:          "when credentials invalid then return error",
+			transactionId: "transaction_id",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1304,7 +1305,8 @@ func TestSimulateClearing(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:          "when credentials invalid then return error",
+			transactionId: "transaction_id",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1401,7 +1403,8 @@ func TestSimulateReversal(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:          "when credentials invalid then return error",
+			transactionId: "transaction_id",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

@@ -38,11 +38,25 @@ func (c *Client) CreateWithContext(ctx context.Context, request CustomerRequest)
 	return &response, nil
 }
 
+// Get sends GET /customers/{identifier}: get customer details.
+//
+// customerId is the {identifier} path value: the customer's ID or email.
+//
+// It returns the GetCustomerResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." customerId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) Get(customerId string) (*GetCustomerResponse, error) {
 	return c.GetWithContext(context.Background(), customerId)
 }
 
+// GetWithContext is Get with a caller-supplied context.
 func (c *Client) GetWithContext(ctx context.Context, customerId string) (*GetCustomerResponse, error) {
+	customerId, err := common.EncodePathSegment(customerId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -57,11 +71,25 @@ func (c *Client) GetWithContext(ctx context.Context, customerId string) (*GetCus
 	return &response, nil
 }
 
+// Update sends PATCH /customers/{identifier}: update customer details.
+//
+// customerId is the {identifier} path value: the customer's ID. request is sent as the JSON body.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." customerId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) Update(customerId string, request CustomerRequest) (*common.MetadataResponse, error) {
 	return c.UpdateWithContext(context.Background(), customerId, request)
 }
 
+// UpdateWithContext is Update with a caller-supplied context.
 func (c *Client) UpdateWithContext(ctx context.Context, customerId string, request CustomerRequest) (*common.MetadataResponse, error) {
+	customerId, err := common.EncodePathSegment(customerId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -76,11 +104,25 @@ func (c *Client) UpdateWithContext(ctx context.Context, customerId string, reque
 	return &response, nil
 }
 
+// Delete sends DELETE /customers/{identifier}: delete a customer.
+//
+// customerId is the {identifier} path value: the customer's ID.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." customerId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) Delete(customerId string) (*common.MetadataResponse, error) {
 	return c.DeleteWithContext(context.Background(), customerId)
 }
 
+// DeleteWithContext is Delete with a caller-supplied context.
 func (c *Client) DeleteWithContext(ctx context.Context, customerId string) (*common.MetadataResponse, error) {
+	customerId, err := common.EncodePathSegment(customerId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

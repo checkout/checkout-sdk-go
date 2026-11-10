@@ -97,11 +97,25 @@ func (c *Client) RequestPayoutWithContext(ctx context.Context, request PayoutReq
 	return &response, nil
 }
 
+// GetPaymentDetails sends GET /payments/{id}: get payment details.
+//
+// paymentId is the {id} path value: the payment or payment session identifier.
+//
+// It returns the GetPaymentResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentDetails(paymentId string) (*GetPaymentResponse, error) {
 	return c.GetPaymentDetailsWithContext(context.Background(), paymentId)
 }
 
+// GetPaymentDetailsWithContext is GetPaymentDetails with a caller-supplied context.
 func (c *Client) GetPaymentDetailsWithContext(ctx context.Context, paymentId string) (*GetPaymentResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -116,11 +130,25 @@ func (c *Client) GetPaymentDetailsWithContext(ctx context.Context, paymentId str
 	return &response, nil
 }
 
+// GetPaymentActions sends GET /payments/{id}/actions: get payment actions.
+//
+// paymentId is the {id} path value: the payment identifier.
+//
+// It returns the GetPaymentActionsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentActions(paymentId string) (*GetPaymentActionsResponse, error) {
 	return c.GetPaymentActionsWithContext(context.Background(), paymentId)
 }
 
+// GetPaymentActionsWithContext is GetPaymentActions with a caller-supplied context.
 func (c *Client) GetPaymentActionsWithContext(ctx context.Context, paymentId string) (*GetPaymentActionsResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -141,6 +169,15 @@ func (c *Client) GetPaymentActionsWithContext(ctx context.Context, paymentId str
 	return &response, nil
 }
 
+// CapturePayment sends POST /payments/{id}/captures: capture a payment.
+//
+// paymentId is the {id} path value: the payment identifier. captureRequest is sent as the JSON
+// body. idempotencyKey, when not nil, is sent as the Cko-Idempotency-Key header.
+//
+// It returns the payments.CaptureResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) CapturePayment(
 	paymentId string,
 	captureRequest CaptureRequest,
@@ -149,12 +186,18 @@ func (c *Client) CapturePayment(
 	return c.CapturePaymentWithContext(context.Background(), paymentId, captureRequest, idempotencyKey)
 }
 
+// CapturePaymentWithContext is CapturePayment with a caller-supplied context.
 func (c *Client) CapturePaymentWithContext(
 	ctx context.Context,
 	paymentId string,
 	captureRequest CaptureRequest,
 	idempotencyKey *string,
 ) (*payments.CaptureResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -176,6 +219,15 @@ func (c *Client) CapturePaymentWithContext(
 	return &response, nil
 }
 
+// CapturePaymentWithoutRequest sends POST /payments/{id}/captures: capture a payment.
+//
+// paymentId is the {id} path value: the payment identifier. idempotencyKey, when not nil, is sent
+// as the Cko-Idempotency-Key header.
+//
+// It returns the payments.CaptureResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) CapturePaymentWithoutRequest(
 	paymentId string,
 	idempotencyKey *string,
@@ -183,11 +235,17 @@ func (c *Client) CapturePaymentWithoutRequest(
 	return c.CapturePaymentWithoutRequestWithContext(context.Background(), paymentId, idempotencyKey)
 }
 
+// CapturePaymentWithoutRequestWithContext is CapturePaymentWithoutRequest with a caller-supplied context.
 func (c *Client) CapturePaymentWithoutRequestWithContext(
 	ctx context.Context,
 	paymentId string,
 	idempotencyKey *string,
 ) (*payments.CaptureResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -209,6 +267,15 @@ func (c *Client) CapturePaymentWithoutRequestWithContext(
 	return &response, nil
 }
 
+// RefundPayment sends POST /payments/{id}/refunds: refund a payment.
+//
+// paymentId is the {id} path value: the payment identifier. refundRequest is sent as the JSON body.
+// idempotencyKey, when not nil, is sent as the Cko-Idempotency-Key header.
+//
+// It returns the payments.RefundResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RefundPayment(
 	paymentId string,
 	refundRequest *payments.RefundRequest,
@@ -217,12 +284,18 @@ func (c *Client) RefundPayment(
 	return c.RefundPaymentWithContext(context.Background(), paymentId, refundRequest, idempotencyKey)
 }
 
+// RefundPaymentWithContext is RefundPayment with a caller-supplied context.
 func (c *Client) RefundPaymentWithContext(
 	ctx context.Context,
 	paymentId string,
 	refundRequest *payments.RefundRequest,
 	idempotencyKey *string,
 ) (*payments.RefundResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -244,6 +317,15 @@ func (c *Client) RefundPaymentWithContext(
 	return &response, nil
 }
 
+// VoidPayment sends POST /payments/{id}/voids: void a payment.
+//
+// paymentId is the {id} path value: the payment identifier. voidRequest is sent as the JSON body.
+// idempotencyKey, when not nil, is sent as the Cko-Idempotency-Key header.
+//
+// It returns the payments.VoidResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) VoidPayment(
 	paymentId string,
 	voidRequest *payments.VoidRequest,
@@ -252,12 +334,18 @@ func (c *Client) VoidPayment(
 	return c.VoidPaymentWithContext(context.Background(), paymentId, voidRequest, idempotencyKey)
 }
 
+// VoidPaymentWithContext is VoidPayment with a caller-supplied context.
 func (c *Client) VoidPaymentWithContext(
 	ctx context.Context,
 	paymentId string,
 	voidRequest *payments.VoidRequest,
 	idempotencyKey *string,
 ) (*payments.VoidResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err

@@ -55,7 +55,8 @@ func TestSimulateRefund(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials are invalid then return authorization error",
+			name:          "when credentials are invalid then return authorization error",
+			transactionId: "transaction_id",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

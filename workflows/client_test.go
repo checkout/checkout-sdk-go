@@ -248,7 +248,8 @@ func TestGetWorkflow(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:       "when credentials invalid then return error",
+			workflowId: "wor_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -445,7 +446,8 @@ func TestRemoveWorkflow(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:       "when credentials invalid then return error",
+			workflowId: "wor_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -989,7 +991,8 @@ func TestGetEvent(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:    "when credentials invalid then return error",
+			eventId: "evt_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1092,7 +1095,8 @@ func TestGetSubjectEvents(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			subjectId: "sub_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1185,7 +1189,8 @@ func TestReflowByEvent(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:    "when credentials invalid then return error",
+			eventId: "evt_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1277,7 +1282,8 @@ func TestReflowBySubject(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			subjectId: "sub_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1371,7 +1377,9 @@ func TestReflowByEventAndWorkflow(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:       "when credentials invalid then return error",
+			eventId:    "evt_1234",
+			workflowId: "wor_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1489,7 +1497,9 @@ func TestReflowBySubjectAndWorkflow(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:       "when credentials invalid then return error",
+			subjectId:  "sub_1234",
+			workflowId: "wor_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1719,8 +1729,9 @@ func TestGetActionInvocations(t *testing.T) {
 		checker          func(*actions.ActionInvocationsResponse, error)
 	}{
 		{
-			name:    "when event and action IDs are valid then return action details",
-			eventId: "evt_1234",
+			name:     "when event and action IDs are valid then return action details",
+			actionId: "act_1234",
+			eventId:  "evt_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1746,7 +1757,9 @@ func TestGetActionInvocations(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			eventId:  "evt_1234",
+			actionId: "act_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

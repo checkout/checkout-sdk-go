@@ -89,14 +89,28 @@ func (c *Client) CreateCardholderWithContext(
 	return &response, nil
 }
 
+// GetCardholder sends GET /issuing/cardholders/{cardholderId}: get cardholder details.
+//
+// cardholderId is the {cardholderId} path value: the cardholder's unique identifier.
+//
+// It returns the cardholders.CardholderDetailsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetCardholder(cardholderId string) (*cardholders.CardholderDetailsResponse, error) {
 	return c.GetCardholderWithContext(context.Background(), cardholderId)
 }
 
+// GetCardholderWithContext is GetCardholder with a caller-supplied context.
 func (c *Client) GetCardholderWithContext(
 	ctx context.Context,
 	cardholderId string,
 ) (*cardholders.CardholderDetailsResponse, error) {
+	cardholderId, err := common.EncodePathSegment(cardholderId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -115,14 +129,28 @@ func (c *Client) GetCardholderWithContext(
 	return &response, nil
 }
 
+// GetCardholderCards sends GET /issuing/cardholders/{cardholderId}/cards: get a cardholder's cards.
+//
+// cardholderId is the {cardholderId} path value: the cardholder's unique identifier.
+//
+// It returns the cardholders.CardholderCardsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetCardholderCards(cardholderId string) (*cardholders.CardholderCardsResponse, error) {
 	return c.GetCardholderCardsWithContext(context.Background(), cardholderId)
 }
 
+// GetCardholderCardsWithContext is GetCardholderCards with a caller-supplied context.
 func (c *Client) GetCardholderCardsWithContext(
 	ctx context.Context,
 	cardholderId string,
 ) (*cardholders.CardholderCardsResponse, error) {
+	cardholderId, err := common.EncodePathSegment(cardholderId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -168,11 +196,25 @@ func (c *Client) CreateCardWithContext(
 	return &response, nil
 }
 
+// GetCardDetails sends GET /issuing/cards/{cardId}: get card details.
+//
+// cardId is the {cardId} path value: the card's unique identifier.
+//
+// It returns the cards.CardDetailsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetCardDetails(cardId string) (*cards.CardDetailsResponse, error) {
 	return c.GetCardDetailsWithContext(context.Background(), cardId)
 }
 
+// GetCardDetailsWithContext is GetCardDetails with a caller-supplied context.
 func (c *Client) GetCardDetailsWithContext(ctx context.Context, cardId string) (*cards.CardDetailsResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -187,6 +229,15 @@ func (c *Client) GetCardDetailsWithContext(ctx context.Context, cardId string) (
 	return &response, nil
 }
 
+// EnrollThreeDS sends POST /issuing/cards/{cardId}/3ds-enrollment: enroll a card in 3DS.
+//
+// cardId is the {cardId} path value: the card's unique identifier. enrollmentRequest is sent as the
+// JSON body.
+//
+// It returns the cards.ThreeDSEnrollmentResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) EnrollThreeDS(
 	cardId string,
 	enrollmentRequest cards.ThreeDSEnrollmentRequest,
@@ -194,11 +245,17 @@ func (c *Client) EnrollThreeDS(
 	return c.EnrollThreeDSWithContext(context.Background(), cardId, enrollmentRequest)
 }
 
+// EnrollThreeDSWithContext is EnrollThreeDS with a caller-supplied context.
 func (c *Client) EnrollThreeDSWithContext(
 	ctx context.Context,
 	cardId string,
 	enrollmentRequest cards.ThreeDSEnrollmentRequest,
 ) (*cards.ThreeDSEnrollmentResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -218,6 +275,15 @@ func (c *Client) EnrollThreeDSWithContext(
 	return &response, nil
 }
 
+// UpdateThreeDS sends PATCH /issuing/cards/{cardId}/3ds-enrollment: update a card's 3DS details.
+//
+// cardId is the {cardId} path value: the card's unique identifier. threeDSUpdateRequest is sent as
+// the JSON body.
+//
+// It returns the cards.ThreeDSUpdateResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateThreeDS(
 	cardId string,
 	threeDSUpdateRequest cards.ThreeDSUpdateRequest,
@@ -225,11 +291,17 @@ func (c *Client) UpdateThreeDS(
 	return c.UpdateThreeDSWithContext(context.Background(), cardId, threeDSUpdateRequest)
 }
 
+// UpdateThreeDSWithContext is UpdateThreeDS with a caller-supplied context.
 func (c *Client) UpdateThreeDSWithContext(
 	ctx context.Context,
 	cardId string,
 	threeDSUpdateRequest cards.ThreeDSUpdateRequest,
 ) (*cards.ThreeDSUpdateResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -248,14 +320,29 @@ func (c *Client) UpdateThreeDSWithContext(
 	return &response, nil
 }
 
+// GetCardThreeDSDetails sends GET /issuing/cards/{cardId}/3ds-enrollment: get a card's 3DS
+// enrollment details.
+//
+// cardId is the {cardId} path value: the card's unique identifier.
+//
+// It returns the cards.ThreeDSEnrollmentDetailsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetCardThreeDSDetails(cardId string) (*cards.ThreeDSEnrollmentDetailsResponse, error) {
 	return c.GetCardThreeDSDetailsWithContext(context.Background(), cardId)
 }
 
+// GetCardThreeDSDetailsWithContext is GetCardThreeDSDetails with a caller-supplied context.
 func (c *Client) GetCardThreeDSDetailsWithContext(
 	ctx context.Context,
 	cardId string,
 ) (*cards.ThreeDSEnrollmentDetailsResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -274,14 +361,28 @@ func (c *Client) GetCardThreeDSDetailsWithContext(
 	return &response, nil
 }
 
+// ActivateCard sends POST /issuing/cards/{cardId}/activate: activate a card.
+//
+// cardId is the {cardId} path value: the card's unique identifier.
+//
+// It returns the cards.ActivateCardResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) ActivateCard(cardId string) (*cards.ActivateCardResponse, error) {
 	return c.ActivateCardWithContext(context.Background(), cardId)
 }
 
+// ActivateCardWithContext is ActivateCard with a caller-supplied context.
 func (c *Client) ActivateCardWithContext(
 	ctx context.Context,
 	cardId string,
 ) (*cards.ActivateCardResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -301,6 +402,15 @@ func (c *Client) ActivateCardWithContext(
 	return &response, nil
 }
 
+// GetCardCredentials sends GET /issuing/cards/{cardId}/credentials: get the card credentials.
+//
+// cardId is the {cardId} path value: the card's unique identifier. credentialsQuery is sent as the
+// query string.
+//
+// It returns the cards.CardCredentialsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetCardCredentials(
 	cardId string,
 	credentialsQuery cards.CardCredentialsQuery,
@@ -308,11 +418,17 @@ func (c *Client) GetCardCredentials(
 	return c.GetCardCredentialsWithContext(context.Background(), cardId, credentialsQuery)
 }
 
+// GetCardCredentialsWithContext is GetCardCredentials with a caller-supplied context.
 func (c *Client) GetCardCredentialsWithContext(
 	ctx context.Context,
 	cardId string,
 	credentialsQuery cards.CardCredentialsQuery,
 ) (*cards.CardCredentialsResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -334,6 +450,14 @@ func (c *Client) GetCardCredentialsWithContext(
 
 // RevokeCard revokes a card permanently; a revoked card cannot be reactivated.
 // The request body is optional: pass cards.RevokeCardRequest{} to send no reason, which sends {}.
+//
+// cardId is the {cardId} path value: the card's unique identifier. revokeCardRequest is sent as the
+// JSON body.
+//
+// It returns the cards.RevokeCardResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RevokeCard(
 	cardId string,
 	revokeCardRequest cards.RevokeCardRequest,
@@ -348,6 +472,11 @@ func (c *Client) RevokeCardWithContext(
 	cardId string,
 	revokeCardRequest cards.RevokeCardRequest,
 ) (*cards.RevokeCardResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -369,6 +498,14 @@ func (c *Client) RevokeCardWithContext(
 
 // SuspendCard suspends a card; a suspended card declines authorizations until it is reactivated.
 // The request body is optional: pass cards.SuspendCardRequest{} to send no reason, which sends {}.
+//
+// cardId is the {cardId} path value: the card's unique identifier. suspendCardRequest is sent as
+// the JSON body.
+//
+// It returns the cards.SuspendCardResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SuspendCard(
 	cardId string,
 	suspendCardRequest cards.SuspendCardRequest,
@@ -383,6 +520,11 @@ func (c *Client) SuspendCardWithContext(
 	cardId string,
 	suspendCardRequest cards.SuspendCardRequest,
 ) (*cards.SuspendCardResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -404,6 +546,16 @@ func (c *Client) SuspendCardWithContext(
 
 // UpdateCard updates the details of an issued card. Only the fields for which you provide values
 // are updated.
+//
+// PATCH /issuing/cards/{cardId}
+//
+// cardId is the {cardId} path value: the card's unique identifier. request is sent as the JSON
+// body.
+//
+// It returns the cards.CardUpdateResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateCard(
 	cardId string,
 	request cards.CardUpdateRequest,
@@ -423,6 +575,9 @@ func (c *Client) UpdateCardWithContext(
 // UpdateCardHeaders updates a card like UpdateCard and also sends the return-encrypted-cvv and
 // Encryption-Key headers from headers when they are set. The API no longer documents these
 // headers; they are still sent when set, and the response type is the same as for UpdateCard.
+//
+// cardId, request, the return value and the CheckoutArgumentError for an empty, "." or ".."
+// cardId are as for UpdateCard.
 //
 // Deprecated: The API no longer documents these headers; use UpdateCard without headers.
 // Will be removed in the next major version.
@@ -453,6 +608,11 @@ func (c *Client) updateCard(
 	request cards.CardUpdateRequest,
 	headers *cards.CardUpdateHeaders,
 ) (*cards.CardUpdateResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -527,14 +687,28 @@ func (c *Client) GetCardControlsWithContext(
 	return &response, nil
 }
 
+// GetCardControlDetails sends GET /issuing/controls/{controlId}: get control details.
+//
+// controlId is the {controlId} path value: the control's unique identifier.
+//
+// It returns the controls.CardControlResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetCardControlDetails(controlId string) (*controls.CardControlResponse, error) {
 	return c.GetCardControlDetailsWithContext(context.Background(), controlId)
 }
 
+// GetCardControlDetailsWithContext is GetCardControlDetails with a caller-supplied context.
 func (c *Client) GetCardControlDetailsWithContext(
 	ctx context.Context,
 	controlId string,
 ) (*controls.CardControlResponse, error) {
+	controlId, err := common.EncodePathSegment(controlId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -553,6 +727,15 @@ func (c *Client) GetCardControlDetailsWithContext(
 	return &response, nil
 }
 
+// UpdateCardControl sends PUT /issuing/controls/{controlId}: update a control.
+//
+// controlId is the {controlId} path value: the control's unique identifier.
+// updateCardControlRequest is sent as the JSON body.
+//
+// It returns the controls.CardControlResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateCardControl(
 	controlId string,
 	updateCardControlRequest controls.UpdateCardControlRequest,
@@ -560,11 +743,17 @@ func (c *Client) UpdateCardControl(
 	return c.UpdateCardControlWithContext(context.Background(), controlId, updateCardControlRequest)
 }
 
+// UpdateCardControlWithContext is UpdateCardControl with a caller-supplied context.
 func (c *Client) UpdateCardControlWithContext(
 	ctx context.Context,
 	controlId string,
 	updateCardControlRequest controls.UpdateCardControlRequest,
 ) (*controls.CardControlResponse, error) {
+	controlId, err := common.EncodePathSegment(controlId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -584,14 +773,28 @@ func (c *Client) UpdateCardControlWithContext(
 	return &response, nil
 }
 
+// RemoveCardControl sends DELETE /issuing/controls/{controlId}: remove a control.
+//
+// controlId is the {controlId} path value: the control's unique identifier.
+//
+// It returns the common.IdResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveCardControl(controlId string) (*common.IdResponse, error) {
 	return c.RemoveCardControlWithContext(context.Background(), controlId)
 }
 
+// RemoveCardControlWithContext is RemoveCardControl with a caller-supplied context.
 func (c *Client) RemoveCardControlWithContext(
 	ctx context.Context,
 	controlId string,
 ) (*common.IdResponse, error) {
+	controlId, err := common.EncodePathSegment(controlId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -638,6 +841,16 @@ func (c *Client) SimulateAuthorizationWithContext(
 	return &response, nil
 }
 
+// SimulateIncrement sends POST /issuing/simulate/authorizations/{id}/authorizations: simulate
+// incrementing an authorization.
+//
+// transactionId is the {id} path value: the transaction's unique identifier. request is sent as the
+// JSON body.
+//
+// It returns the testing.CardSimulationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) SimulateIncrement(
 	transactionId string,
 	request testing.CardSimulationRequest,
@@ -645,11 +858,17 @@ func (c *Client) SimulateIncrement(
 	return c.SimulateIncrementWithContext(context.Background(), transactionId, request)
 }
 
+// SimulateIncrementWithContext is SimulateIncrement with a caller-supplied context.
 func (c *Client) SimulateIncrementWithContext(
 	ctx context.Context,
 	transactionId string,
 	request testing.CardSimulationRequest,
 ) (*testing.CardSimulationResponse, error) {
+	transactionId, err := common.EncodePathSegment(transactionId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -669,6 +888,16 @@ func (c *Client) SimulateIncrementWithContext(
 	return &response, nil
 }
 
+// SimulateClearing sends POST /issuing/simulate/authorizations/{id}/presentments: simulate
+// clearing.
+//
+// transactionId is the {id} path value: the transaction's unique identifier. request is sent as the
+// JSON body.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) SimulateClearing(
 	transactionId string,
 	request testing.CardSimulationRequest,
@@ -676,11 +905,17 @@ func (c *Client) SimulateClearing(
 	return c.SimulateClearingWithContext(context.Background(), transactionId, request)
 }
 
+// SimulateClearingWithContext is SimulateClearing with a caller-supplied context.
 func (c *Client) SimulateClearingWithContext(
 	ctx context.Context,
 	transactionId string,
 	request testing.CardSimulationRequest,
 ) (*common.MetadataResponse, error) {
+	transactionId, err := common.EncodePathSegment(transactionId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -700,6 +935,15 @@ func (c *Client) SimulateClearingWithContext(
 	return &response, nil
 }
 
+// SimulateReversal sends POST /issuing/simulate/authorizations/{id}/reversals: simulate reversal.
+//
+// transactionId is the {id} path value: the transaction's unique identifier. request is sent as the
+// JSON body.
+//
+// It returns the testing.CardSimulationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) SimulateReversal(
 	transactionId string,
 	request testing.CardSimulationRequest,
@@ -707,11 +951,17 @@ func (c *Client) SimulateReversal(
 	return c.SimulateReversalWithContext(context.Background(), transactionId, request)
 }
 
+// SimulateReversalWithContext is SimulateReversal with a caller-supplied context.
 func (c *Client) SimulateReversalWithContext(
 	ctx context.Context,
 	transactionId string,
 	request testing.CardSimulationRequest,
 ) (*testing.CardSimulationResponse, error) {
+	transactionId, err := common.EncodePathSegment(transactionId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -731,6 +981,15 @@ func (c *Client) SimulateReversalWithContext(
 	return &response, nil
 }
 
+// UpdateCardholder sends PATCH /issuing/cardholders/{cardholderId}: update a cardholder.
+//
+// cardholderId is the {cardholderId} path value: the cardholder's unique identifier. request is
+// sent as the JSON body.
+//
+// It returns the cardholders.CardholderUpdateResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateCardholder(
 	cardholderId string,
 	request cardholders.CardholderRequest,
@@ -738,11 +997,17 @@ func (c *Client) UpdateCardholder(
 	return c.UpdateCardholderWithContext(context.Background(), cardholderId, request)
 }
 
+// UpdateCardholderWithContext is UpdateCardholder with a caller-supplied context.
 func (c *Client) UpdateCardholderWithContext(
 	ctx context.Context,
 	cardholderId string,
 	request cardholders.CardholderRequest,
 ) (*cardholders.CardholderUpdateResponse, error) {
+	cardholderId, err := common.EncodePathSegment(cardholderId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -761,15 +1026,30 @@ func (c *Client) UpdateCardholderWithContext(
 	return &response, nil
 }
 
+// RenewCard sends POST /issuing/cards/{cardId}/renew: renew a card.
+//
+// cardId is the {cardId} path value: the card's unique identifier. request is sent as the JSON
+// body.
+//
+// It returns the cards.RenewCardResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RenewCard(cardId string, request cards.RenewCardRequest) (*cards.RenewCardResponse, error) {
 	return c.RenewCardWithContext(context.Background(), cardId, request)
 }
 
+// RenewCardWithContext is RenewCard with a caller-supplied context.
 func (c *Client) RenewCardWithContext(
 	ctx context.Context,
 	cardId string,
 	request cards.RenewCardRequest,
 ) (*cards.RenewCardResponse, error) {
+	cardId, err := common.EncodePathSegment(cardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -844,14 +1124,29 @@ func (c *Client) CreateControlGroupWithContext(
 	return &response, nil
 }
 
+// GetControlGroupDetails sends GET /issuing/controls/control-groups/{controlGroupId}: get control
+// group details.
+//
+// controlGroupId is the {controlGroupId} path value: the control group's unique identifier.
+//
+// It returns the controlgroups.ControlGroupResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlGroupId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetControlGroupDetails(controlGroupId string) (*controlgroups.ControlGroupResponse, error) {
 	return c.GetControlGroupDetailsWithContext(context.Background(), controlGroupId)
 }
 
+// GetControlGroupDetailsWithContext is GetControlGroupDetails with a caller-supplied context.
 func (c *Client) GetControlGroupDetailsWithContext(
 	ctx context.Context,
 	controlGroupId string,
 ) (*controlgroups.ControlGroupResponse, error) {
+	controlGroupId, err := common.EncodePathSegment(controlGroupId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -870,14 +1165,29 @@ func (c *Client) GetControlGroupDetailsWithContext(
 	return &response, nil
 }
 
+// RemoveControlGroup sends DELETE /issuing/controls/control-groups/{controlGroupId}: remove a
+// control group.
+//
+// controlGroupId is the {controlGroupId} path value: the control group's unique identifier.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlGroupId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveControlGroup(controlGroupId string) (*common.MetadataResponse, error) {
 	return c.RemoveControlGroupWithContext(context.Background(), controlGroupId)
 }
 
+// RemoveControlGroupWithContext is RemoveControlGroup with a caller-supplied context.
 func (c *Client) RemoveControlGroupWithContext(
 	ctx context.Context,
 	controlGroupId string,
 ) (*common.MetadataResponse, error) {
+	controlGroupId, err := common.EncodePathSegment(controlGroupId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -950,16 +1260,31 @@ func (c *Client) CreateControlProfileWithContext(
 	return &response, nil
 }
 
+// GetControlProfileDetails sends GET /issuing/controls/control-profiles/{controlProfileId}: get
+// control profile details.
+//
+// controlProfileId is the {controlProfileId} path value: the control profile's unique identifier.
+//
+// It returns the controlprofiles.ControlProfileResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetControlProfileDetails(
 	controlProfileId string,
 ) (*controlprofiles.ControlProfileResponse, error) {
 	return c.GetControlProfileDetailsWithContext(context.Background(), controlProfileId)
 }
 
+// GetControlProfileDetailsWithContext is GetControlProfileDetails with a caller-supplied context.
 func (c *Client) GetControlProfileDetailsWithContext(
 	ctx context.Context,
 	controlProfileId string,
 ) (*controlprofiles.ControlProfileResponse, error) {
+	controlProfileId, err := common.EncodePathSegment(controlProfileId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -978,6 +1303,16 @@ func (c *Client) GetControlProfileDetailsWithContext(
 	return &response, nil
 }
 
+// UpdateControlProfile sends PATCH /issuing/controls/control-profiles/{controlProfileId}: update a
+// control profile.
+//
+// controlProfileId is the {controlProfileId} path value: the control profile's unique identifier.
+// request is sent as the JSON body.
+//
+// It returns the controlprofiles.ControlProfileResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateControlProfile(
 	controlProfileId string,
 	request controlprofiles.ControlProfileRequest,
@@ -985,11 +1320,17 @@ func (c *Client) UpdateControlProfile(
 	return c.UpdateControlProfileWithContext(context.Background(), controlProfileId, request)
 }
 
+// UpdateControlProfileWithContext is UpdateControlProfile with a caller-supplied context.
 func (c *Client) UpdateControlProfileWithContext(
 	ctx context.Context,
 	controlProfileId string,
 	request controlprofiles.ControlProfileRequest,
 ) (*controlprofiles.ControlProfileResponse, error) {
+	controlProfileId, err := common.EncodePathSegment(controlProfileId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1008,14 +1349,29 @@ func (c *Client) UpdateControlProfileWithContext(
 	return &response, nil
 }
 
+// RemoveControlProfile sends DELETE /issuing/controls/control-profiles/{controlProfileId}: remove a
+// control profile.
+//
+// controlProfileId is the {controlProfileId} path value: the control profile's unique identifier.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveControlProfile(controlProfileId string) (*common.MetadataResponse, error) {
 	return c.RemoveControlProfileWithContext(context.Background(), controlProfileId)
 }
 
+// RemoveControlProfileWithContext is RemoveControlProfile with a caller-supplied context.
 func (c *Client) RemoveControlProfileWithContext(
 	ctx context.Context,
 	controlProfileId string,
 ) (*common.MetadataResponse, error) {
+	controlProfileId, err := common.EncodePathSegment(controlProfileId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1033,16 +1389,38 @@ func (c *Client) RemoveControlProfileWithContext(
 	return &response, nil
 }
 
+// AddTargetToControlProfile sends POST
+// /issuing/controls/control-profiles/{controlProfileId}/add/{targetId}: add target to control
+// profile.
+//
+// controlProfileId is the {controlProfileId} path value: the control profile's unique identifier.
+// targetId is the {targetId} path value: the ID of the card to apply the control profile to.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
+// or targetId returns a CheckoutArgumentError and sends no request.
 func (c *Client) AddTargetToControlProfile(
 	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
 	return c.AddTargetToControlProfileWithContext(context.Background(), controlProfileId, targetId)
 }
 
+// AddTargetToControlProfileWithContext is AddTargetToControlProfile with a caller-supplied context.
 func (c *Client) AddTargetToControlProfileWithContext(
 	ctx context.Context,
 	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
+	controlProfileId, err := common.EncodePathSegment(controlProfileId)
+	if err != nil {
+		return nil, err
+	}
+
+	targetId, err = common.EncodePathSegment(targetId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1062,16 +1440,39 @@ func (c *Client) AddTargetToControlProfileWithContext(
 	return &response, nil
 }
 
+// RemoveTargetFromControlProfile sends POST
+// /issuing/controls/control-profiles/{controlProfileId}/remove/{targetId}: remove target from
+// control profile.
+//
+// controlProfileId is the {controlProfileId} path value: the control profile's unique identifier.
+// targetId is the {targetId} path value: the ID of the card the control profile should no longer
+// apply to.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
+// or targetId returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveTargetFromControlProfile(
 	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
 	return c.RemoveTargetFromControlProfileWithContext(context.Background(), controlProfileId, targetId)
 }
 
+// RemoveTargetFromControlProfileWithContext is RemoveTargetFromControlProfile with a caller-supplied context.
 func (c *Client) RemoveTargetFromControlProfileWithContext(
 	ctx context.Context,
 	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
+	controlProfileId, err := common.EncodePathSegment(controlProfileId)
+	if err != nil {
+		return nil, err
+	}
+
+	targetId, err = common.EncodePathSegment(targetId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1091,14 +1492,28 @@ func (c *Client) RemoveTargetFromControlProfileWithContext(
 	return &response, nil
 }
 
+// GetDigitalCard sends GET /issuing/digital-cards/{digitalCardId}: get digital card details.
+//
+// digitalCardId is the {digitalCardId} path value: the digital card's unique identifier.
+//
+// It returns the digitalcards.GetDigitalCardResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." digitalCardId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetDigitalCard(digitalCardId string) (*digitalcards.GetDigitalCardResponse, error) {
 	return c.GetDigitalCardWithContext(context.Background(), digitalCardId)
 }
 
+// GetDigitalCardWithContext is GetDigitalCard with a caller-supplied context.
 func (c *Client) GetDigitalCardWithContext(
 	ctx context.Context,
 	digitalCardId string,
 ) (*digitalcards.GetDigitalCardResponse, error) {
+	digitalCardId, err := common.EncodePathSegment(digitalCardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1148,14 +1563,28 @@ func (c *Client) CreateDisputeWithContext(
 	return &response, nil
 }
 
+// GetDispute sends GET /issuing/disputes/{disputeId}: get an Issuing dispute.
+//
+// disputeId is the {disputeId} path value: the unique identifier for the Issuing dispute.
+//
+// It returns the disputes.IssuingDisputeResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetDispute(disputeId string) (*disputes.IssuingDisputeResponse, error) {
 	return c.GetDisputeWithContext(context.Background(), disputeId)
 }
 
+// GetDisputeWithContext is GetDispute with a caller-supplied context.
 func (c *Client) GetDisputeWithContext(
 	ctx context.Context,
 	disputeId string,
 ) (*disputes.IssuingDisputeResponse, error) {
+	disputeId, err := common.EncodePathSegment(disputeId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1174,15 +1603,30 @@ func (c *Client) GetDisputeWithContext(
 	return &response, nil
 }
 
+// CancelDispute sends POST /issuing/disputes/{disputeId}/cancel: cancel an Issuing dispute.
+//
+// disputeId is the {disputeId} path value: the unique identifier for the Issuing dispute.
+// idempotencyKey, when not nil, is sent as the Cko-Idempotency-Key header.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) CancelDispute(disputeId string, idempotencyKey *string) (*common.MetadataResponse, error) {
 	return c.CancelDisputeWithContext(context.Background(), disputeId, idempotencyKey)
 }
 
+// CancelDisputeWithContext is CancelDispute with a caller-supplied context.
 func (c *Client) CancelDisputeWithContext(
 	ctx context.Context,
 	disputeId string,
 	idempotencyKey *string,
 ) (*common.MetadataResponse, error) {
+	disputeId, err := common.EncodePathSegment(disputeId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1202,6 +1646,16 @@ func (c *Client) CancelDisputeWithContext(
 	return &response, nil
 }
 
+// EscalateDispute sends POST /issuing/disputes/{disputeId}/escalate: escalate an Issuing dispute.
+//
+// disputeId is the {disputeId} path value: the unique identifier for the Issuing dispute. request
+// is sent as the JSON body. idempotencyKey, when not nil, is sent as the Cko-Idempotency-Key
+// header.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) EscalateDispute(
 	disputeId string,
 	request disputes.EscalateDisputeRequest,
@@ -1210,12 +1664,18 @@ func (c *Client) EscalateDispute(
 	return c.EscalateDisputeWithContext(context.Background(), disputeId, request, idempotencyKey)
 }
 
+// EscalateDisputeWithContext is EscalateDispute with a caller-supplied context.
 func (c *Client) EscalateDisputeWithContext(
 	ctx context.Context,
 	disputeId string,
 	request disputes.EscalateDisputeRequest,
 	idempotencyKey *string,
 ) (*common.MetadataResponse, error) {
+	disputeId, err := common.EncodePathSegment(disputeId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1237,6 +1697,15 @@ func (c *Client) EscalateDisputeWithContext(
 
 // AmendDispute submits an amendment to a dispute that is currently blocked from proceeding.
 // It handles both chargeback-stage and escalation-stage amendments.
+//
+// disputeId is the {disputeId} path value: the unique identifier for the Issuing dispute. request
+// is sent as the JSON body. idempotencyKey, when not nil, is sent as the Cko-Idempotency-Key
+// header.
+//
+// It returns the disputes.IssuingDisputeResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) AmendDispute(
 	disputeId string,
 	request disputes.AmendDisputeRequest,
@@ -1245,12 +1714,18 @@ func (c *Client) AmendDispute(
 	return c.AmendDisputeWithContext(context.Background(), disputeId, request, idempotencyKey)
 }
 
+// AmendDisputeWithContext is AmendDispute with a caller-supplied context.
 func (c *Client) AmendDisputeWithContext(
 	ctx context.Context,
 	disputeId string,
 	request disputes.AmendDisputeRequest,
 	idempotencyKey *string,
 ) (*disputes.IssuingDisputeResponse, error) {
+	disputeId, err := common.EncodePathSegment(disputeId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1270,6 +1745,15 @@ func (c *Client) AmendDisputeWithContext(
 	return &response, nil
 }
 
+// SimulateRefund sends POST /issuing/simulate/authorizations/{id}/refunds: simulate refund.
+//
+// transactionId is the {id} path value: the transaction's unique identifier. request is sent as the
+// JSON body.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) SimulateRefund(
 	transactionId string,
 	request testing.SimulateRefundRequest,
@@ -1277,11 +1761,17 @@ func (c *Client) SimulateRefund(
 	return c.SimulateRefundWithContext(context.Background(), transactionId, request)
 }
 
+// SimulateRefundWithContext is SimulateRefund with a caller-supplied context.
 func (c *Client) SimulateRefundWithContext(
 	ctx context.Context,
 	transactionId string,
 	request testing.SimulateRefundRequest,
 ) (*common.MetadataResponse, error) {
+	transactionId, err := common.EncodePathSegment(transactionId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -1356,14 +1846,28 @@ func (c *Client) GetListTransactionsWithContext(
 	return &response, nil
 }
 
+// GetSingleTransaction sends GET /issuing/transactions/{transactionId}: get a single transaction.
+//
+// transactionId is the {transactionId} path value: the transaction's unique identifier.
+//
+// It returns the transactions.TransactionResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetSingleTransaction(transactionId string) (*transactions.TransactionResponse, error) {
 	return c.GetSingleTransactionWithContext(context.Background(), transactionId)
 }
 
+// GetSingleTransactionWithContext is GetSingleTransaction with a caller-supplied context.
 func (c *Client) GetSingleTransactionWithContext(
 	ctx context.Context,
 	transactionId string,
 ) (*transactions.TransactionResponse, error) {
+	transactionId, err := common.EncodePathSegment(transactionId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

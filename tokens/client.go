@@ -123,11 +123,25 @@ func (c *Client) RequestPinTokenWithContext(ctx context.Context, request PinToke
 	return &response, nil
 }
 
+// GetTokenMetadata sends GET /tokens/{tokenId}/metadata: get token metadata.
+//
+// tokenId is the {tokenId} path value: the token ID.
+//
+// It returns the TokenMetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." tokenId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) GetTokenMetadata(tokenId string) (*TokenMetadataResponse, error) {
 	return c.GetTokenMetadataWithContext(context.Background(), tokenId)
 }
 
+// GetTokenMetadataWithContext is GetTokenMetadata with a caller-supplied context.
 func (c *Client) GetTokenMetadataWithContext(ctx context.Context, tokenId string) (*TokenMetadataResponse, error) {
+	tokenId, err := common.EncodePathSegment(tokenId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

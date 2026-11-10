@@ -39,11 +39,25 @@ func (c *Client) ForwardAnApiRequestWithContext(ctx context.Context, request For
 	return &response, nil
 }
 
+// GetForwardRequest sends GET /forward/{id}: get forward request.
+//
+// forwardId is the {id} path value: the unique identifier of the forward request.
+//
+// It returns the GetForwardResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." forwardId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetForwardRequest(forwardId string) (*GetForwardResponse, error) {
 	return c.GetForwardRequestWithContext(context.Background(), forwardId)
 }
 
+// GetForwardRequestWithContext is GetForwardRequest with a caller-supplied context.
 func (c *Client) GetForwardRequestWithContext(ctx context.Context, forwardId string) (*GetForwardResponse, error) {
+	forwardId, err := common.EncodePathSegment(forwardId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -96,11 +110,25 @@ func (c *Client) ListSecretsWithContext(ctx context.Context) (*ListSecretsRespon
 	return &response, nil
 }
 
+// UpdateSecret sends PATCH /secrets/{name}: update secret.
+//
+// name is the {name} path value: secret name. request is sent as the JSON body.
+//
+// It returns the SingleSecretResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." name returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateSecret(name string, request UpdateSecretRequest) (*SingleSecretResponse, error) {
 	return c.UpdateSecretWithContext(context.Background(), name, request)
 }
 
+// UpdateSecretWithContext is UpdateSecret with a caller-supplied context.
 func (c *Client) UpdateSecretWithContext(ctx context.Context, name string, request UpdateSecretRequest) (*SingleSecretResponse, error) {
+	name, err := common.EncodePathSegment(name)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -115,11 +143,25 @@ func (c *Client) UpdateSecretWithContext(ctx context.Context, name string, reque
 	return &response, nil
 }
 
+// DeleteSecret sends DELETE /secrets/{name}: delete secret.
+//
+// name is the {name} path value: secret name.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." name returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) DeleteSecret(name string) (*common.MetadataResponse, error) {
 	return c.DeleteSecretWithContext(context.Background(), name)
 }
 
+// DeleteSecretWithContext is DeleteSecret with a caller-supplied context.
 func (c *Client) DeleteSecretWithContext(ctx context.Context, name string) (*common.MetadataResponse, error) {
+	name, err := common.EncodePathSegment(name)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

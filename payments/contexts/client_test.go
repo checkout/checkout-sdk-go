@@ -177,7 +177,8 @@ func TestGetAPaymentContext(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:             "when credentials invalid then return error",
+			paymentContextId: "pay_1234",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

@@ -119,3 +119,46 @@ func TestOauthShouldBuildWithAuthorizationUriAndLegacyDomain(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, api)
 }
+
+// The token server's certificate is trusted only by tokenServer.Client(), so a successful build
+// proves the token request went through the client given to WithHttpClient.
+func TestOauthTokenRequestUsesTheConfiguredHttpClient(t *testing.T) {
+	tokenServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"token","expires_in":3600,"token_type":"Bearer"}`))
+	}))
+	defer tokenServer.Close()
+
+	api, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithAuthorizationUri(tokenServer.URL).
+		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
+		WithHttpClient(tokenServer.Client()).
+		Build()
+
+	assert.Nil(t, err)
+	assert.NotNil(t, api)
+}
+
+func TestOauthTokenRequestWithoutHttpClientDoesNotTrustCustomCa(t *testing.T) {
+	tokenServer := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"token","expires_in":3600,"token_type":"Bearer"}`))
+	}))
+	defer tokenServer.Close()
+
+	api, err := checkout.Builder().
+		OAuth().
+		WithClientCredentials("client_id", "client_secret").
+		WithAuthorizationUri(tokenServer.URL).
+		WithEnvironment(configuration.Sandbox()).
+		WithLegacyDomain().
+		Build()
+
+	assert.Nil(t, api)
+	if assert.NotNil(t, err) {
+		assert.Contains(t, err.Error(), "certificate")
+	}
+}

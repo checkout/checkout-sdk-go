@@ -141,6 +141,7 @@ func TestGetReportFile(t *testing.T) {
 		{
 			name:     "when report doesn't exist then return error",
 			reportId: "not_found",
+			fileId:   "not_found",
 			checker: func(response *common.ContentResponse, err error) {
 				assert.Nil(t, response)
 				assert.NotNil(t, err)

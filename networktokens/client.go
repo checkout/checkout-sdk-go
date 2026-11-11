@@ -45,6 +45,14 @@ func (c *Client) ProvisionNetworkTokenWithContext(ctx context.Context, request P
 }
 
 // GetNetworkToken retrieves the network token identified by networkTokenId.
+//
+// networkTokenId is the {network_token_id} path value: unique token ID assigned by Checkout.com
+// for each token.
+//
+// It returns the NetworkTokenResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." networkTokenId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetNetworkToken(networkTokenId string) (*NetworkTokenResponse, error) {
 	return c.GetNetworkTokenWithContext(context.Background(), networkTokenId)
 }
@@ -52,6 +60,11 @@ func (c *Client) GetNetworkToken(networkTokenId string) (*NetworkTokenResponse, 
 // GetNetworkTokenWithContext is like GetNetworkToken but accepts a context for cancellation
 // and deadline propagation.
 func (c *Client) GetNetworkTokenWithContext(ctx context.Context, networkTokenId string) (*NetworkTokenResponse, error) {
+	networkTokenId, err := common.EncodePathSegment(networkTokenId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -67,6 +80,14 @@ func (c *Client) GetNetworkTokenWithContext(ctx context.Context, networkTokenId 
 }
 
 // RequestCryptogram generates a cryptogram for the network token identified by networkTokenId.
+//
+// networkTokenId is the {network_token_id} path value: unique token ID assigned by Checkout.com
+// for each token. request is sent as the JSON body.
+//
+// It returns the RequestCryptogramResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." networkTokenId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RequestCryptogram(networkTokenId string, request RequestCryptogramRequest) (*RequestCryptogramResponse, error) {
 	return c.RequestCryptogramWithContext(context.Background(), networkTokenId, request)
 }
@@ -74,6 +95,11 @@ func (c *Client) RequestCryptogram(networkTokenId string, request RequestCryptog
 // RequestCryptogramWithContext is like RequestCryptogram but accepts a context for cancellation
 // and deadline propagation.
 func (c *Client) RequestCryptogramWithContext(ctx context.Context, networkTokenId string, request RequestCryptogramRequest) (*RequestCryptogramResponse, error) {
+	networkTokenId, err := common.EncodePathSegment(networkTokenId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -89,6 +115,14 @@ func (c *Client) RequestCryptogramWithContext(ctx context.Context, networkTokenI
 }
 
 // DeleteNetworkToken deletes the network token identified by networkTokenId.
+//
+// networkTokenId is the {network_token_id} path value: unique token ID assigned by Checkout.com
+// for each token. request is sent as the JSON body.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." networkTokenId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) DeleteNetworkToken(networkTokenId string, request DeleteNetworkTokenRequest) (*common.MetadataResponse, error) {
 	return c.DeleteNetworkTokenWithContext(context.Background(), networkTokenId, request)
 }
@@ -96,6 +130,11 @@ func (c *Client) DeleteNetworkToken(networkTokenId string, request DeleteNetwork
 // DeleteNetworkTokenWithContext is like DeleteNetworkToken but accepts a context for
 // cancellation and deadline propagation.
 func (c *Client) DeleteNetworkTokenWithContext(ctx context.Context, networkTokenId string, request DeleteNetworkTokenRequest) (*common.MetadataResponse, error) {
+	networkTokenId, err := common.EncodePathSegment(networkTokenId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err

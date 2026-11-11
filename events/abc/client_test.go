@@ -323,7 +323,8 @@ func TestRetrieveEvent(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:    "when credentials invalid then return error",
+			eventId: eventId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -404,8 +405,9 @@ func TestRetrieveEventNotification(t *testing.T) {
 		checker          func(*EventNotificationResponse, error)
 	}{
 		{
-			name:    "when event exists then return event",
-			eventId: eventId,
+			name:           "when event exists then return event",
+			notificationId: "not_zzzzzzzzzzzzzzzzzzzzzzzzzz",
+			eventId:        eventId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -428,7 +430,9 @@ func TestRetrieveEventNotification(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return errorr",
+			name:           "when credentials invalid then return errorr",
+			eventId:        eventId,
+			notificationId: "not_zzzzzzzzzzzzzzzzzzzzzzzzzz",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -529,7 +533,9 @@ func TestRetryWebhook(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			webhookId: webhookId,
+			eventId:   eventId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -547,8 +553,9 @@ func TestRetryWebhook(t *testing.T) {
 			},
 		},
 		{
-			name:    "when webhook does not exist then return error",
-			eventId: "evt_zzzzzzzzzzzzzzzzzzzzzzzzzz",
+			name:      "when webhook does not exist then return error",
+			webhookId: webhookId,
+			eventId:   "evt_zzzzzzzzzzzzzzzzzzzzzzzzzz",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -570,6 +577,7 @@ func TestRetryWebhook(t *testing.T) {
 		},
 		{
 			name:      "when webhook does not exist then return error",
+			eventId:   eventId,
 			webhookId: "evt_zzzzzzzzzzzzzzzzzzzzzzzzzz",
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -648,7 +656,8 @@ func TestRetryAllWebhooks(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:    "when credentials invalid then return error",
+			eventId: eventId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

@@ -40,11 +40,28 @@ func (c *Client) CreateAddressDocumentVerificationWithContext(ctx context.Contex
 	return &response, nil
 }
 
+// GetAddressDocumentVerification sends GET
+// /address-document-verifications/{address_document_verification_id}: get an address document
+// verification.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier.
+//
+// It returns the AddressDocumentVerificationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerification(verificationId string) (*AddressDocumentVerificationResponse, error) {
 	return c.GetAddressDocumentVerificationWithContext(context.Background(), verificationId)
 }
 
+// GetAddressDocumentVerificationWithContext is GetAddressDocumentVerification with a caller-supplied context.
 func (c *Client) GetAddressDocumentVerificationWithContext(ctx context.Context, verificationId string) (*AddressDocumentVerificationResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -59,11 +76,28 @@ func (c *Client) GetAddressDocumentVerificationWithContext(ctx context.Context, 
 	return &response, nil
 }
 
+// AnonymizeAddressDocumentVerification sends POST
+// /address-document-verifications/{address_document_verification_id}/anonymize: anonymize an
+// address document verification.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier.
+//
+// It returns the AddressDocumentVerificationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeAddressDocumentVerification(verificationId string) (*AddressDocumentVerificationResponse, error) {
 	return c.AnonymizeAddressDocumentVerificationWithContext(context.Background(), verificationId)
 }
 
+// AnonymizeAddressDocumentVerificationWithContext is AnonymizeAddressDocumentVerification with a caller-supplied context.
 func (c *Client) AnonymizeAddressDocumentVerificationWithContext(ctx context.Context, verificationId string) (*AddressDocumentVerificationResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -78,11 +112,28 @@ func (c *Client) AnonymizeAddressDocumentVerificationWithContext(ctx context.Con
 	return &response, nil
 }
 
+// CreateAddressDocumentVerificationAttempt sends POST
+// /address-document-verifications/{address_document_verification_id}/attempts: create an address
+// document verification attempt.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier. request is sent as the JSON body.
+//
+// It returns the AddressDocumentVerificationAttemptResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) CreateAddressDocumentVerificationAttempt(verificationId string, request CreateAddressDocumentVerificationAttemptRequest) (*AddressDocumentVerificationAttemptResponse, error) {
 	return c.CreateAddressDocumentVerificationAttemptWithContext(context.Background(), verificationId, request)
 }
 
+// CreateAddressDocumentVerificationAttemptWithContext is CreateAddressDocumentVerificationAttempt with a caller-supplied context.
 func (c *Client) CreateAddressDocumentVerificationAttemptWithContext(ctx context.Context, verificationId string, request CreateAddressDocumentVerificationAttemptRequest) (*AddressDocumentVerificationAttemptResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -121,6 +172,14 @@ func (c *Client) GetAddressDocumentVerificationAttemptsWithContext(ctx context.C
 // existing callers keep compiling: Go has no overloads and no optional parameters. The
 // Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
 // are paired the same way.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier.
+//
+// It returns the AddressDocumentVerificationAttemptsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
 	return c.GetAddressDocumentVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
 }
@@ -128,6 +187,11 @@ func (c *Client) GetAddressDocumentVerificationAttemptsQuery(verificationId stri
 // GetAddressDocumentVerificationAttemptsQueryWithContext is the context-aware variant of
 // GetAddressDocumentVerificationAttemptsQuery.
 func (c *Client) GetAddressDocumentVerificationAttemptsQueryWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -147,11 +211,34 @@ func (c *Client) GetAddressDocumentVerificationAttemptsQueryWithContext(ctx cont
 	return &response, nil
 }
 
+// GetAddressDocumentVerificationAttempt sends GET
+// /address-document-verifications/{address_document_verification_id}/attempts/{attempt_id}: get an
+// address document verification attempt.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier. attemptId is the {attempt_id} path value: the attempt's unique
+// identifier.
+//
+// It returns the AddressDocumentVerificationAttemptResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// or attemptId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationAttempt(verificationId, attemptId string) (*AddressDocumentVerificationAttemptResponse, error) {
 	return c.GetAddressDocumentVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
 
+// GetAddressDocumentVerificationAttemptWithContext is GetAddressDocumentVerificationAttempt with a caller-supplied context.
 func (c *Client) GetAddressDocumentVerificationAttemptWithContext(ctx context.Context, verificationId, attemptId string) (*AddressDocumentVerificationAttemptResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
+	attemptId, err = common.EncodePathSegment(attemptId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -166,11 +253,28 @@ func (c *Client) GetAddressDocumentVerificationAttemptWithContext(ctx context.Co
 	return &response, nil
 }
 
+// GetAddressDocumentVerificationReport sends GET
+// /address-document-verifications/{address_document_verification_id}/pdf-report: get address
+// document verification report.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier.
+//
+// It returns the AddressDocumentVerificationReportResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationReport(verificationId string) (*AddressDocumentVerificationReportResponse, error) {
 	return c.GetAddressDocumentVerificationReportWithContext(context.Background(), verificationId)
 }
 
+// GetAddressDocumentVerificationReportWithContext is GetAddressDocumentVerificationReport with a caller-supplied context.
 func (c *Client) GetAddressDocumentVerificationReportWithContext(ctx context.Context, verificationId string) (*AddressDocumentVerificationReportResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -189,6 +293,15 @@ func (c *Client) GetAddressDocumentVerificationReportWithContext(ctx context.Con
 // address document verification attempt.
 //
 // Results are paginated: pass Skip and Limit on the query filter to page through them. Beta.
+//
+// verificationId is the {address_document_verification_id} path value: the address document
+// verification's unique identifier. attemptId is the {attempt_id} path value: the attempt's unique
+// identifier.
+//
+// It returns the AddressDocumentVerificationAttemptAssetsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// or attemptId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*AddressDocumentVerificationAttemptAssetsResponse, error) {
 	return c.GetAddressDocumentVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
 }
@@ -196,6 +309,16 @@ func (c *Client) GetAddressDocumentVerificationAttemptAssets(verificationId, att
 // GetAddressDocumentVerificationAttemptAssetsWithContext is the context-aware variant of
 // GetAddressDocumentVerificationAttemptAssets.
 func (c *Client) GetAddressDocumentVerificationAttemptAssetsWithContext(ctx context.Context, verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*AddressDocumentVerificationAttemptAssetsResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
+	attemptId, err = common.EncodePathSegment(attemptId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

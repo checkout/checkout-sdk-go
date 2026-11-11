@@ -56,11 +56,25 @@ func (c *Client) CreatePaymentSetupWithContext(ctx context.Context, request Paym
 // You should update the payment setup whenever there are significant changes
 // in the data relevant to the customer's transaction. For example, when the
 // customer makes a change that impacts the total payment amount.
+//
+// setupId is the {id} path value: the unique identifier of the Payment Setup to update. request is
+// sent as the JSON body.
+//
+// It returns the PaymentSetupResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) UpdatePaymentSetup(setupId string, request PaymentSetupRequest) (*PaymentSetupResponse, error) {
 	return c.UpdatePaymentSetupWithContext(context.Background(), setupId, request)
 }
 
+// UpdatePaymentSetupWithContext is UpdatePaymentSetup with a caller-supplied context.
 func (c *Client) UpdatePaymentSetupWithContext(ctx context.Context, setupId string, request PaymentSetupRequest) (*PaymentSetupResponse, error) {
+	setupId, err := common.EncodePathSegment(setupId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -79,11 +93,24 @@ func (c *Client) UpdatePaymentSetupWithContext(ctx context.Context, setupId stri
 // Beta
 //
 // Retrieves a Payment Setup.
+//
+// setupId is the {id} path value: the unique identifier of the Payment Setup to retrieve.
+//
+// It returns the PaymentSetupResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentSetup(setupId string) (*PaymentSetupResponse, error) {
 	return c.GetPaymentSetupWithContext(context.Background(), setupId)
 }
 
+// GetPaymentSetupWithContext is GetPaymentSetup with a caller-supplied context.
 func (c *Client) GetPaymentSetupWithContext(ctx context.Context, setupId string) (*PaymentSetupResponse, error) {
+	setupId, err := common.EncodePathSegment(setupId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -105,11 +132,29 @@ func (c *Client) GetPaymentSetupWithContext(ctx context.Context, setupId string)
 // Confirm a Payment Setup to begin processing the payment request with your
 // chosen payment method. paymentMethodName is the name of the payment method
 // to process the payment with (for example, tabby, klarna, card, cashapp).
+//
+// setupId is the {id} path value: the unique identifier of the Payment Setup.
+//
+// It returns the PaymentSetupResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId or
+// paymentMethodName returns a CheckoutArgumentError and sends no request.
 func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodName string) (*PaymentSetupResponse, error) {
 	return c.ConfirmPaymentSetupWithContext(context.Background(), setupId, paymentMethodName)
 }
 
+// ConfirmPaymentSetupWithContext is ConfirmPaymentSetup with a caller-supplied context.
 func (c *Client) ConfirmPaymentSetupWithContext(ctx context.Context, setupId string, paymentMethodName string) (*PaymentSetupResponse, error) {
+	setupId, err := common.EncodePathSegment(setupId)
+	if err != nil {
+		return nil, err
+	}
+
+	paymentMethodName, err = common.EncodePathSegment(paymentMethodName)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

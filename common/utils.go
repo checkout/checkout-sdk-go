@@ -3,14 +3,20 @@ package common
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
 	"github.com/google/go-querystring/query"
+
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
 
 var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
 
+// BuildPath joins the segments with "/" and prefixes the result with "/". Segments are used as
+// given: constants may contain "/", and every caller-supplied value must go through
+// EncodePathSegment first.
 func BuildPath(params ...string) string {
 	var path string
 	for _, s := range params {
@@ -18,6 +24,16 @@ func BuildPath(params ...string) string {
 	}
 
 	return path
+}
+
+// EncodePathSegment percent-encodes a caller-supplied value so that it is sent as exactly one
+// path segment. An empty value, "." or ".." returns a CheckoutArgumentError.
+func EncodePathSegment(segment string) (string, error) {
+	if segment == "" || segment == "." || segment == ".." {
+		return "", errors.CheckoutArgumentError("invalid path segment")
+	}
+
+	return url.PathEscape(segment), nil
 }
 
 // BuildQueryPath appends the encoded query values to path.

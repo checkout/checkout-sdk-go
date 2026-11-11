@@ -59,11 +59,27 @@ func (c *Client) CreateIdentityVerificationWithContext(ctx context.Context, requ
 	return &response, nil
 }
 
+// GetIdentityVerification sends GET /identity-verifications/{identity_verification_id}: get an
+// identity verification.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier.
+//
+// It returns the IdentityVerificationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerification(verificationId string) (*IdentityVerificationResponse, error) {
 	return c.GetIdentityVerificationWithContext(context.Background(), verificationId)
 }
 
+// GetIdentityVerificationWithContext is GetIdentityVerification with a caller-supplied context.
 func (c *Client) GetIdentityVerificationWithContext(ctx context.Context, verificationId string) (*IdentityVerificationResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -78,11 +94,27 @@ func (c *Client) GetIdentityVerificationWithContext(ctx context.Context, verific
 	return &response, nil
 }
 
+// AnonymizeIdentityVerification sends POST
+// /identity-verifications/{identity_verification_id}/anonymize: anonymize an identity verification.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier.
+//
+// It returns the IdentityVerificationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeIdentityVerification(verificationId string) (*IdentityVerificationResponse, error) {
 	return c.AnonymizeIdentityVerificationWithContext(context.Background(), verificationId)
 }
 
+// AnonymizeIdentityVerificationWithContext is AnonymizeIdentityVerification with a caller-supplied context.
 func (c *Client) AnonymizeIdentityVerificationWithContext(ctx context.Context, verificationId string) (*IdentityVerificationResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -97,11 +129,28 @@ func (c *Client) AnonymizeIdentityVerificationWithContext(ctx context.Context, v
 	return &response, nil
 }
 
+// CreateIdentityVerificationAttempt sends POST
+// /identity-verifications/{identity_verification_id}/attempts: create an identity verification
+// attempt.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier. request is sent as the JSON body.
+//
+// It returns the IdentityVerificationAttemptResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) CreateIdentityVerificationAttempt(verificationId string, request CreateIdentityVerificationAttemptRequest) (*IdentityVerificationAttemptResponse, error) {
 	return c.CreateIdentityVerificationAttemptWithContext(context.Background(), verificationId, request)
 }
 
+// CreateIdentityVerificationAttemptWithContext is CreateIdentityVerificationAttempt with a caller-supplied context.
 func (c *Client) CreateIdentityVerificationAttemptWithContext(ctx context.Context, verificationId string, request CreateIdentityVerificationAttemptRequest) (*IdentityVerificationAttemptResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -140,6 +189,14 @@ func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context,
 // existing callers keep compiling: Go has no overloads and no optional parameters. The
 // Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
 // are paired the same way.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier.
+//
+// It returns the IdentityVerificationAttemptsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
 	return c.GetIdentityVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
 }
@@ -147,6 +204,11 @@ func (c *Client) GetIdentityVerificationAttemptsQuery(verificationId string, que
 // GetIdentityVerificationAttemptsQueryWithContext is the context-aware variant of
 // GetIdentityVerificationAttemptsQuery.
 func (c *Client) GetIdentityVerificationAttemptsQueryWithContext(ctx context.Context, verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -166,11 +228,33 @@ func (c *Client) GetIdentityVerificationAttemptsQueryWithContext(ctx context.Con
 	return &response, nil
 }
 
+// GetIdentityVerificationAttempt sends GET
+// /identity-verifications/{identity_verification_id}/attempts/{attempt_id}: get an identity
+// verification attempt.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier. attemptId is the {attempt_id} path value: the attempt's unique identifier.
+//
+// It returns the IdentityVerificationAttemptResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// or attemptId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationAttempt(verificationId, attemptId string) (*IdentityVerificationAttemptResponse, error) {
 	return c.GetIdentityVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
 
+// GetIdentityVerificationAttemptWithContext is GetIdentityVerificationAttempt with a caller-supplied context.
 func (c *Client) GetIdentityVerificationAttemptWithContext(ctx context.Context, verificationId, attemptId string) (*IdentityVerificationAttemptResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
+	attemptId, err = common.EncodePathSegment(attemptId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -185,11 +269,27 @@ func (c *Client) GetIdentityVerificationAttemptWithContext(ctx context.Context, 
 	return &response, nil
 }
 
+// GetIdentityVerificationReport sends GET
+// /identity-verifications/{identity_verification_id}/pdf-report: get identity verification report.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier.
+//
+// It returns the IdentityVerificationReportResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationReport(verificationId string) (*IdentityVerificationReportResponse, error) {
 	return c.GetIdentityVerificationReportWithContext(context.Background(), verificationId)
 }
 
+// GetIdentityVerificationReportWithContext is GetIdentityVerificationReport with a caller-supplied context.
 func (c *Client) GetIdentityVerificationReportWithContext(ctx context.Context, verificationId string) (*IdentityVerificationReportResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -204,11 +304,34 @@ func (c *Client) GetIdentityVerificationReportWithContext(ctx context.Context, v
 	return &response, nil
 }
 
+// GetIdentityVerificationAttemptAssets sends GET
+// /identity-verifications/{identity_verification_id}/attempts/{attempt_id}/assets: get identity
+// verification attempt assets.
+//
+// verificationId is the {identity_verification_id} path value: the identity verification's unique
+// identifier. attemptId is the {attempt_id} path value: the attempt's unique identifier. query is
+// sent as the query string.
+//
+// It returns the IdentityVerificationAttemptAssetsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
+// or attemptId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdentityVerificationAttemptAssetsResponse, error) {
 	return c.GetIdentityVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
 }
 
+// GetIdentityVerificationAttemptAssetsWithContext is GetIdentityVerificationAttemptAssets with a caller-supplied context.
 func (c *Client) GetIdentityVerificationAttemptAssetsWithContext(ctx context.Context, verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdentityVerificationAttemptAssetsResponse, error) {
+	verificationId, err := common.EncodePathSegment(verificationId)
+	if err != nil {
+		return nil, err
+	}
+
+	attemptId, err = common.EncodePathSegment(attemptId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

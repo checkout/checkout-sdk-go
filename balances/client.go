@@ -22,15 +22,29 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 	}
 }
 
+// RetrieveEntityBalances sends GET /balances/{id}: retrieve entity balances.
+//
+// entityId is the {id} path value: the ID of the entity. query is sent as the query string.
+//
+// It returns the QueryResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveEntityBalances(entityId string, query QueryFilter) (*QueryResponse, error) {
 	return c.RetrieveEntityBalancesWithContext(context.Background(), entityId, query)
 }
 
+// RetrieveEntityBalancesWithContext is RetrieveEntityBalances with a caller-supplied context.
 func (c *Client) RetrieveEntityBalancesWithContext(
 	ctx context.Context,
 	entityId string,
 	query QueryFilter,
 ) (*QueryResponse, error) {
+	entityId, err := common.EncodePathSegment(entityId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -69,6 +83,11 @@ func (c *Client) RetrieveEntityBalancesWithContext(
 //
 // Both arguments are required. A blank value for either returns a CheckoutArgumentError without
 // making a request, matching the java and .NET SDKs' validateParams semantics.
+//
+// It returns the TopUpInstructionsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
+// currencyAccountId returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveTopUpInstructions(entityId, currencyAccountId string) (*TopUpInstructionsResponse, error) {
 	return c.RetrieveTopUpInstructionsWithContext(context.Background(), entityId, currencyAccountId)
 }
@@ -83,6 +102,16 @@ func (c *Client) RetrieveTopUpInstructionsWithContext(
 	}
 	if strings.TrimSpace(currencyAccountId) == "" {
 		return nil, errors.CheckoutArgumentError("currencyAccountId cannot be blank")
+	}
+
+	entityId, err := common.EncodePathSegment(entityId)
+	if err != nil {
+		return nil, err
+	}
+
+	currencyAccountId, err = common.EncodePathSegment(currencyAccountId)
+	if err != nil {
+		return nil, err
 	}
 
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)

@@ -430,7 +430,8 @@ func TestGetEntity(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -681,6 +682,7 @@ func TestCreatePaymentInstruments(t *testing.T) {
 		},
 		{
 			name:              "when request is not correct then return error",
+			entityId:          entityId,
 			paymentInstrument: PaymentInstrument{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -708,7 +710,8 @@ func TestCreatePaymentInstruments(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -830,6 +833,7 @@ func TestCreatePaymentInstrument(t *testing.T) {
 		},
 		{
 			name:                     "when request is not correct then return error",
+			entityId:                 entityId,
 			paymentInstrumentRequest: PaymentInstrumentRequest{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
@@ -857,7 +861,8 @@ func TestCreatePaymentInstrument(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -979,8 +984,9 @@ func TestQueryPaymentInstruments(t *testing.T) {
 			},
 		},
 		{
-			name:  "when request is not correct then return error",
-			query: PaymentInstrumentsQuery{},
+			name:     "when request is not correct then return error",
+			entityId: entityId,
+			query:    PaymentInstrumentsQuery{},
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1007,7 +1013,8 @@ func TestQueryPaymentInstruments(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1107,8 +1114,9 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 			},
 		},
 		{
-			name:     "when send a bad request then return error",
-			entityId: entityId,
+			name:                "when send a bad request then return error",
+			paymentInstrumentId: paymentInstrumentId,
+			entityId:            entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1130,7 +1138,8 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 		},
 		{
 			name:                "when request is not correct then return error",
-			paymentInstrumentId: "",
+			entityId:            entityId,
+			paymentInstrumentId: paymentInstrumentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(&configuration.SdkAuthorization{}, nil)
@@ -1157,7 +1166,9 @@ func TestRetrievePaymentInstrumentDetails(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:                "when credentials invalid then return error",
+			entityId:            entityId,
+			paymentInstrumentId: paymentInstrumentId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1548,7 +1559,8 @@ func TestCreateReserveRule(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1695,7 +1707,8 @@ func TestGetReserveRules(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:     "when credentials invalid then return error",
+			entityId: entityId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -1850,7 +1863,9 @@ func TestGetReserveRuleDetails(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:          "when credentials invalid then return error",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -2007,7 +2022,9 @@ func TestUpdateReserveRule(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:          "when credentials invalid then return error",
+			entityId:      entityId,
+			reserveRuleId: reserveRuleId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

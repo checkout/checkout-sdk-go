@@ -113,6 +113,13 @@ func (c *Client) CreateInventoryReservationWithContext(
 // GetInventoryReservation retrieves a reservation by id.
 //
 // GET /inventory/reservations/{id}
+//
+// id is the {id} path value: the reservation identifier.
+//
+// It returns the InventoryReservation, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetInventoryReservation(id string) (*InventoryReservation, error) {
 	return c.GetInventoryReservationWithContext(context.Background(), id)
 }
@@ -122,6 +129,11 @@ func (c *Client) GetInventoryReservationWithContext(
 	ctx context.Context,
 	id string,
 ) (*InventoryReservation, error) {
+	id, err := common.EncodePathSegment(id)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -146,7 +158,12 @@ func (c *Client) GetInventoryReservationWithContext(
 //
 // POST /inventory/reservations/{id}/commit
 //
-// The request has no body.
+// id is the {id} path value: the reservation identifier. The request has no body.
+//
+// It returns the InventoryReservation, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CommitInventoryReservation(id string) (*InventoryReservation, error) {
 	return c.CommitInventoryReservationWithContext(context.Background(), id)
 }
@@ -157,6 +174,11 @@ func (c *Client) CommitInventoryReservationWithContext(
 	ctx context.Context,
 	id string,
 ) (*InventoryReservation, error) {
+	id, err := common.EncodePathSegment(id)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -182,7 +204,12 @@ func (c *Client) CommitInventoryReservationWithContext(
 //
 // POST /inventory/reservations/{id}/release
 //
-// The request has no body.
+// id is the {id} path value: the reservation identifier. The request has no body.
+//
+// It returns the InventoryReservation, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) ReleaseInventoryReservation(id string) (*InventoryReservation, error) {
 	return c.ReleaseInventoryReservationWithContext(context.Background(), id)
 }
@@ -193,6 +220,11 @@ func (c *Client) ReleaseInventoryReservationWithContext(
 	ctx context.Context,
 	id string,
 ) (*InventoryReservation, error) {
+	id, err := common.EncodePathSegment(id)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -218,6 +250,14 @@ func (c *Client) ReleaseInventoryReservationWithContext(
 // with Expand set to "product" to embed the variant's product knowledge in the response.
 //
 // GET /inventory/{variant_id}
+//
+// variantId is the {variant_id} path value: the merchant-provided identifier for the variant. query
+// is sent as the query string.
+//
+// It returns the InventoryLevels, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetInventoryLevels(variantId string, query InventoryLevelsQuery) (*InventoryLevels, error) {
 	return c.GetInventoryLevelsWithContext(context.Background(), variantId, query)
 }
@@ -228,6 +268,11 @@ func (c *Client) GetInventoryLevelsWithContext(
 	variantId string,
 	query InventoryLevelsQuery,
 ) (*InventoryLevels, error) {
+	variantId, err := common.EncodePathSegment(variantId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -250,6 +295,14 @@ func (c *Client) GetInventoryLevelsWithContext(
 // SetInventoryLevels creates or updates a variant's stock levels.
 //
 // PUT /inventory/{variant_id}
+//
+// variantId is the {variant_id} path value: the merchant-provided identifier for the variant.
+// request is sent as the JSON body.
+//
+// It returns the InventoryLevels, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) SetInventoryLevels(
 	variantId string,
 	request InventorySetLevelsRequest,
@@ -263,6 +316,11 @@ func (c *Client) SetInventoryLevelsWithContext(
 	variantId string,
 	request InventorySetLevelsRequest,
 ) (*InventoryLevels, error) {
+	variantId, err := common.EncodePathSegment(variantId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -290,6 +348,13 @@ func (c *Client) SetInventoryLevelsWithContext(
 // GET /inventory/{variant_id}/product
 //
 // Beta: this operation is marked Beta in the API specification.
+//
+// variantId is the {variant_id} path value: the merchant-provided identifier for the variant.
+//
+// It returns the InventoryProductKnowledge, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetInventoryProduct(variantId string) (*InventoryProductKnowledge, error) {
 	return c.GetInventoryProductWithContext(context.Background(), variantId)
 }
@@ -299,6 +364,11 @@ func (c *Client) GetInventoryProductWithContext(
 	ctx context.Context,
 	variantId string,
 ) (*InventoryProductKnowledge, error) {
+	variantId, err := common.EncodePathSegment(variantId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -324,6 +394,14 @@ func (c *Client) GetInventoryProductWithContext(
 // PUT /inventory/{variant_id}/product
 //
 // Beta: this operation is marked Beta in the API specification.
+//
+// variantId is the {variant_id} path value: the merchant-provided identifier for the variant.
+// request is sent as the JSON body.
+//
+// It returns the InventoryProductKnowledge, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) SetInventoryProduct(
 	variantId string,
 	request InventorySetProductRequest,
@@ -337,6 +415,11 @@ func (c *Client) SetInventoryProductWithContext(
 	variantId string,
 	request InventorySetProductRequest,
 ) (*InventoryProductKnowledge, error) {
+	variantId, err := common.EncodePathSegment(variantId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err
@@ -363,6 +446,13 @@ func (c *Client) SetInventoryProductWithContext(
 // DELETE /inventory/{variant_id}/product
 //
 // Beta: this operation is marked Beta in the API specification. Returns 204 with no body.
+//
+// variantId is the {variant_id} path value: the merchant-provided identifier for the variant.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) DeleteInventoryProduct(variantId string) (*common.MetadataResponse, error) {
 	return c.DeleteInventoryProductWithContext(context.Background(), variantId)
 }
@@ -372,6 +462,11 @@ func (c *Client) DeleteInventoryProductWithContext(
 	ctx context.Context,
 	variantId string,
 ) (*common.MetadataResponse, error) {
+	variantId, err := common.EncodePathSegment(variantId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.OAuth)
 	if err != nil {
 		return nil, err

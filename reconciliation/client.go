@@ -43,11 +43,25 @@ func (c *Client) QueryPaymentsReportWithContext(ctx context.Context, query Payme
 	return &response, nil
 }
 
+// GetSinglePaymentReport sends GET /reporting/payments/{paymentId}.
+//
+// paymentId is the {paymentId} path value.
+//
+// It returns the PaymentReportsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetSinglePaymentReport(paymentId string) (*PaymentReportsResponse, error) {
 	return c.GetSinglePaymentReportWithContext(context.Background(), paymentId)
 }
 
+// GetSinglePaymentReportWithContext is GetSinglePaymentReport with a caller-supplied context.
 func (c *Client) GetSinglePaymentReportWithContext(ctx context.Context, paymentId string) (*PaymentReportsResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -110,11 +124,25 @@ func (c *Client) RetrieveCVSPaymentsReportWithContext(ctx context.Context, query
 	return &response, nil
 }
 
+// RetrieveCVSSingleStatementReport sends GET /reporting/statements/{statementId}/payments/download.
+//
+// statementId is the {statementId} path value.
+//
+// It returns the common.ContentResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." statementId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveCVSSingleStatementReport(statementId string) (*common.ContentResponse, error) {
 	return c.RetrieveCVSSingleStatementReportWithContext(context.Background(), statementId)
 }
 
+// RetrieveCVSSingleStatementReportWithContext is RetrieveCVSSingleStatementReport with a caller-supplied context.
 func (c *Client) RetrieveCVSSingleStatementReportWithContext(ctx context.Context, statementId string) (*common.ContentResponse, error) {
+	statementId, err := common.EncodePathSegment(statementId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err

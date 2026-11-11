@@ -40,11 +40,27 @@ func (c *Client) CreateFaceAuthenticationWithContext(ctx context.Context, reques
 	return &response, nil
 }
 
+// GetFaceAuthentication sends GET /face-authentications/{face_authentication_id}: get a face
+// authentication.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier.
+//
+// It returns the FaceAuthenticationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthentication(faceAuthenticationId string) (*FaceAuthenticationResponse, error) {
 	return c.GetFaceAuthenticationWithContext(context.Background(), faceAuthenticationId)
 }
 
+// GetFaceAuthenticationWithContext is GetFaceAuthentication with a caller-supplied context.
 func (c *Client) GetFaceAuthenticationWithContext(ctx context.Context, faceAuthenticationId string) (*FaceAuthenticationResponse, error) {
+	faceAuthenticationId, err := common.EncodePathSegment(faceAuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -59,11 +75,27 @@ func (c *Client) GetFaceAuthenticationWithContext(ctx context.Context, faceAuthe
 	return &response, nil
 }
 
+// AnonymizeFaceAuthentication sends POST /face-authentications/{face_authentication_id}/anonymize:
+// anonymize a face authentication.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier.
+//
+// It returns the FaceAuthenticationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId returns a CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeFaceAuthentication(faceAuthenticationId string) (*FaceAuthenticationResponse, error) {
 	return c.AnonymizeFaceAuthenticationWithContext(context.Background(), faceAuthenticationId)
 }
 
+// AnonymizeFaceAuthenticationWithContext is AnonymizeFaceAuthentication with a caller-supplied context.
 func (c *Client) AnonymizeFaceAuthenticationWithContext(ctx context.Context, faceAuthenticationId string) (*FaceAuthenticationResponse, error) {
+	faceAuthenticationId, err := common.EncodePathSegment(faceAuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -78,11 +110,27 @@ func (c *Client) AnonymizeFaceAuthenticationWithContext(ctx context.Context, fac
 	return &response, nil
 }
 
+// CreateFaceAuthenticationAttempt sends POST
+// /face-authentications/{face_authentication_id}/attempts: create a face authentication attempt.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier. request is sent as the JSON body.
+//
+// It returns the FaceAuthenticationAttemptResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId returns a CheckoutArgumentError and sends no request.
 func (c *Client) CreateFaceAuthenticationAttempt(faceAuthenticationId string, request CreateFaceAuthenticationAttemptRequest) (*FaceAuthenticationAttemptResponse, error) {
 	return c.CreateFaceAuthenticationAttemptWithContext(context.Background(), faceAuthenticationId, request)
 }
 
+// CreateFaceAuthenticationAttemptWithContext is CreateFaceAuthenticationAttempt with a caller-supplied context.
 func (c *Client) CreateFaceAuthenticationAttemptWithContext(ctx context.Context, faceAuthenticationId string, request CreateFaceAuthenticationAttemptRequest) (*FaceAuthenticationAttemptResponse, error) {
+	faceAuthenticationId, err := common.EncodePathSegment(faceAuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -121,6 +169,14 @@ func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, f
 // existing callers keep compiling: Go has no overloads and no optional parameters. The
 // Query suffix follows the events client, where RetrieveEvents and RetrieveEventsQuery
 // are paired the same way.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier.
+//
+// It returns the FaceAuthenticationAttemptsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttemptsQuery(faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
 	return c.GetFaceAuthenticationAttemptsQueryWithContext(context.Background(), faceAuthenticationId, query)
 }
@@ -128,6 +184,11 @@ func (c *Client) GetFaceAuthenticationAttemptsQuery(faceAuthenticationId string,
 // GetFaceAuthenticationAttemptsQueryWithContext is the context-aware variant of
 // GetFaceAuthenticationAttemptsQuery.
 func (c *Client) GetFaceAuthenticationAttemptsQueryWithContext(ctx context.Context, faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
+	faceAuthenticationId, err := common.EncodePathSegment(faceAuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -147,11 +208,33 @@ func (c *Client) GetFaceAuthenticationAttemptsQueryWithContext(ctx context.Conte
 	return &response, nil
 }
 
+// GetFaceAuthenticationAttempt sends GET
+// /face-authentications/{face_authentication_id}/attempts/{attempt_id}: get a face authentication
+// attempt.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier. attemptId is the {attempt_id} path value: the attempt's unique identifier.
+//
+// It returns the FaceAuthenticationAttemptResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId or attemptId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttempt(faceAuthenticationId, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
 	return c.GetFaceAuthenticationAttemptWithContext(context.Background(), faceAuthenticationId, attemptId)
 }
 
+// GetFaceAuthenticationAttemptWithContext is GetFaceAuthenticationAttempt with a caller-supplied context.
 func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, faceAuthenticationId, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
+	faceAuthenticationId, err := common.EncodePathSegment(faceAuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
+	attemptId, err = common.EncodePathSegment(attemptId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -166,11 +249,34 @@ func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, fa
 	return &response, nil
 }
 
+// GetFaceAuthenticationAttemptAssets sends GET
+// /face-authentications/{face_authentication_id}/attempts/{attempt_id}/assets: get face
+// authentication attempt assets.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier. attemptId is the {attempt_id} path value: the attempt's unique identifier. query is
+// sent as the query string.
+//
+// It returns the FaceAuthenticationAttemptAssetsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId or attemptId returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttemptAssets(faceAuthenticationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*FaceAuthenticationAttemptAssetsResponse, error) {
 	return c.GetFaceAuthenticationAttemptAssetsWithContext(context.Background(), faceAuthenticationId, attemptId, query)
 }
 
+// GetFaceAuthenticationAttemptAssetsWithContext is GetFaceAuthenticationAttemptAssets with a caller-supplied context.
 func (c *Client) GetFaceAuthenticationAttemptAssetsWithContext(ctx context.Context, faceAuthenticationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*FaceAuthenticationAttemptAssetsResponse, error) {
+	faceAuthenticationId, err := common.EncodePathSegment(faceAuthenticationId)
+	if err != nil {
+		return nil, err
+	}
+
+	attemptId, err = common.EncodePathSegment(attemptId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

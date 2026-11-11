@@ -112,11 +112,25 @@ func (c *Client) RetrieveEventsQueryWithContext(ctx context.Context, query Query
 	return &response, nil
 }
 
+// RetrieveEvent sends GET /events/{eventId}.
+//
+// eventId is the {eventId} path value.
+//
+// It returns the EventResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveEvent(eventId string) (*EventResponse, error) {
 	return c.RetrieveEventWithContext(context.Background(), eventId)
 }
 
+// RetrieveEventWithContext is RetrieveEvent with a caller-supplied context.
 func (c *Client) RetrieveEventWithContext(ctx context.Context, eventId string) (*EventResponse, error) {
+	eventId, err := common.EncodePathSegment(eventId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -131,6 +145,14 @@ func (c *Client) RetrieveEventWithContext(ctx context.Context, eventId string) (
 	return &response, nil
 }
 
+// RetrieveEventNotification sends GET /events/{eventId}/notifications/{notificationId}.
+//
+// eventId is the {eventId} path value. notificationId is the {notificationId} path value.
+//
+// It returns the EventNotificationResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId or
+// notificationId returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveEventNotification(
 	eventId string,
 	notificationId string,
@@ -138,11 +160,22 @@ func (c *Client) RetrieveEventNotification(
 	return c.RetrieveEventNotificationWithContext(context.Background(), eventId, notificationId)
 }
 
+// RetrieveEventNotificationWithContext is RetrieveEventNotification with a caller-supplied context.
 func (c *Client) RetrieveEventNotificationWithContext(
 	ctx context.Context,
 	eventId string,
 	notificationId string,
 ) (*EventNotificationResponse, error) {
+	eventId, err := common.EncodePathSegment(eventId)
+	if err != nil {
+		return nil, err
+	}
+
+	notificationId, err = common.EncodePathSegment(notificationId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -157,11 +190,30 @@ func (c *Client) RetrieveEventNotificationWithContext(
 	return &response, nil
 }
 
+// RetryWebhook sends POST /events/{eventId}/webhooks/{webhookId}.
+//
+// eventId is the {eventId} path value. webhookId is the {webhookId} path value.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId or
+// webhookId returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetryWebhook(eventId string, webhookId string) (*common.MetadataResponse, error) {
 	return c.RetryWebhookWithContext(context.Background(), eventId, webhookId)
 }
 
+// RetryWebhookWithContext is RetryWebhook with a caller-supplied context.
 func (c *Client) RetryWebhookWithContext(ctx context.Context, eventId string, webhookId string) (*common.MetadataResponse, error) {
+	eventId, err := common.EncodePathSegment(eventId)
+	if err != nil {
+		return nil, err
+	}
+
+	webhookId, err = common.EncodePathSegment(webhookId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err
@@ -183,11 +235,25 @@ func (c *Client) RetryWebhookWithContext(ctx context.Context, eventId string, we
 	return &response, nil
 }
 
+// RetryAllWebhooks sends POST /events/{eventId}/webhooks/retry.
+//
+// eventId is the {eventId} path value.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId returns
+// a CheckoutArgumentError and sends no request.
 func (c *Client) RetryAllWebhooks(eventId string) (*common.MetadataResponse, error) {
 	return c.RetryAllWebhooksWithContext(context.Background(), eventId)
 }
 
+// RetryAllWebhooksWithContext is RetryAllWebhooks with a caller-supplied context.
 func (c *Client) RetryAllWebhooksWithContext(ctx context.Context, eventId string) (*common.MetadataResponse, error) {
+	eventId, err := common.EncodePathSegment(eventId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKey)
 	if err != nil {
 		return nil, err

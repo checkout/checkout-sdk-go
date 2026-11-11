@@ -39,11 +39,25 @@ func (c *Client) RequestPaymentContextsWithContext(ctx context.Context, request 
 	return &response, nil
 }
 
+// GetPaymentContextDetails sends GET /payment-contexts/{id}: get Payment Context details.
+//
+// paymentContextId is the {id} path value: payment Context's unique identifier.
+//
+// It returns the PaymentContextDetailsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentContextId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentContextDetails(paymentContextId string) (*PaymentContextDetailsResponse, error) {
 	return c.GetPaymentContextDetailsWithContext(context.Background(), paymentContextId)
 }
 
+// GetPaymentContextDetailsWithContext is GetPaymentContextDetails with a caller-supplied context.
 func (c *Client) GetPaymentContextDetailsWithContext(ctx context.Context, paymentContextId string) (*PaymentContextDetailsResponse, error) {
+	paymentContextId, err := common.EncodePathSegment(paymentContextId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

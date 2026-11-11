@@ -207,7 +207,8 @@ func TestGetDisputeDetails(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -300,7 +301,8 @@ func TestAccept(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -493,7 +495,8 @@ func TestGetEvidence(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -586,7 +589,8 @@ func TestSubmitEvidence(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -689,7 +693,8 @@ func TestGetCompiledSubmittedEvidence(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -793,7 +798,8 @@ func TestGetDisputeSchemeFiles(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -886,7 +892,8 @@ func TestSubmitArbitrationEvidence(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))
@@ -988,7 +995,8 @@ func TestGetSubmittedArbitrationEvidence(t *testing.T) {
 			},
 		},
 		{
-			name: "when credentials invalid then return error",
+			name:      "when credentials invalid then return error",
+			disputeId: disputeId,
 			getAuthorization: func(m *mock.Mock) mock.Call {
 				return *m.On("GetAuthorization", mock.Anything).
 					Return(nil, errors.CheckoutAuthorizationError("Invalid authorization type"))

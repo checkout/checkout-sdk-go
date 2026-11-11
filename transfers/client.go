@@ -73,14 +73,28 @@ func (c *Client) InitiateTransferOfFundsWithContext(
 	return &response, nil
 }
 
+// RetrieveTransfer sends GET /transfers/{id}: retrieve a transfer.
+//
+// transferId is the {id} path value: the transfer identifier.
+//
+// It returns the TransferDetails, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transferId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveTransfer(transferId string) (*TransferDetails, error) {
 	return c.RetrieveTransferWithContext(context.Background(), transferId)
 }
 
+// RetrieveTransferWithContext is RetrieveTransfer with a caller-supplied context.
 func (c *Client) RetrieveTransferWithContext(
 	ctx context.Context,
 	transferId string,
 ) (*TransferDetails, error) {
+	transferId, err := common.EncodePathSegment(transferId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

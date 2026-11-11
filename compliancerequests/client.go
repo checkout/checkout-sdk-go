@@ -23,6 +23,13 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 }
 
 // GetComplianceRequest retrieves the compliance request associated with the given payment ID.
+//
+// paymentId is the {payment_id} path value: the compliance request's payment ID.
+//
+// It returns the GetComplianceRequestResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetComplianceRequest(paymentId string) (*GetComplianceRequestResponse, error) {
 	return c.GetComplianceRequestWithContext(context.Background(), paymentId)
 }
@@ -30,6 +37,11 @@ func (c *Client) GetComplianceRequest(paymentId string) (*GetComplianceRequestRe
 // GetComplianceRequestWithContext is like GetComplianceRequest but accepts a context for
 // cancellation and deadline propagation.
 func (c *Client) GetComplianceRequestWithContext(ctx context.Context, paymentId string) (*GetComplianceRequestResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err
@@ -45,6 +57,14 @@ func (c *Client) GetComplianceRequestWithContext(ctx context.Context, paymentId 
 }
 
 // RespondToComplianceRequest submits the merchant's compliance response for the given payment ID.
+//
+// paymentId is the {payment_id} path value: the compliance request's payment ID. request is sent as
+// the JSON body.
+//
+// It returns the common.MetadataResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RespondToComplianceRequest(paymentId string, request RespondToComplianceRequestRequest) (*common.MetadataResponse, error) {
 	return c.RespondToComplianceRequestWithContext(context.Background(), paymentId, request)
 }
@@ -52,6 +72,11 @@ func (c *Client) RespondToComplianceRequest(paymentId string, request RespondToC
 // RespondToComplianceRequestWithContext is like RespondToComplianceRequest but accepts a
 // context for cancellation and deadline propagation.
 func (c *Client) RespondToComplianceRequestWithContext(ctx context.Context, paymentId string, request RespondToComplianceRequestRequest) (*common.MetadataResponse, error) {
+	paymentId, err := common.EncodePathSegment(paymentId)
+	if err != nil {
+		return nil, err
+	}
+
 	auth, err := c.configuration.Credentials.GetAuthorization(configuration.SecretKeyOrOauth)
 	if err != nil {
 		return nil, err

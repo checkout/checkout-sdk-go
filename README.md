@@ -148,7 +148,7 @@ before any request is sent. Check the error type (for example with a type switch
 `errors.CheckoutAPIError` directly.
 
 ## Custom Http Client
-Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows:
+Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows. With OAuth, the same client also sends the token requests; if it has no `Timeout`, they are limited to 5 seconds.
 
 ```go
 import (
@@ -159,7 +159,7 @@ import (
 )
 
 httpClient := http.Client{
-    Timeout: time.Duration(20) * time.Millisecond,
+    Timeout: time.Duration(20) * time.Second,
 }
 
 api, err := checkout.Builder().

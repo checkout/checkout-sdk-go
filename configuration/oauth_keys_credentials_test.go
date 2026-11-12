@@ -260,3 +260,115 @@ func TestTokenResponseWithoutTokenOrLifetimeIsRejected(t *testing.T) {
 		})
 	}
 }
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
+
+// waitForRenewal returns once a token request is in flight on credentials.
+func waitForRenewal(t *testing.T, credentials *OAuthSdkCredentials) {
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		credentials.mutex.Lock()
+		inFlight := credentials.renewal != nil
+		credentials.mutex.Unlock()
+		if inFlight {
+			return
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	t.Fatal("no token request started")
+}
+
+func TestWaitersGetAnErrorWhenTheTokenRequestPanics(t *testing.T) {
+	release := make(chan struct{})
+	var calls int32
+	credentials := &OAuthSdkCredentials{
+		ClientId:         "client_id",
+		ClientSecret:     "client_secret",
+		AuthorizationUri: "https://access.checkout.example/connect/token",
+		HttpClient: &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			if atomic.AddInt32(&calls, 1) > 1 {
+				return nil, errors.CheckoutAPIError{Status: "later request"}
+			}
+			<-release
+			panic("transport failure")
+		})},
+		Log: DefaultLogger(),
+	}
+
+	leaderDone := make(chan interface{})
+	go func() {
+		defer func() { leaderDone <- recover() }()
+		_, _ = credentials.GetAuthorization(OAuth)
+	}()
+	waitForRenewal(t, credentials)
+
+	waiterErrors := make(chan error, 3)
+	for i := 0; i < 3; i++ {
+		go func() {
+			_, err := credentials.GetAuthorization(OAuth)
+			waiterErrors <- err
+		}()
+	}
+	close(release)
+
+	assert.Equal(t, "transport failure", <-leaderDone)
+	for i := 0; i < 3; i++ {
+		select {
+		case err := <-waiterErrors:
+			assert.Error(t, err)
+		case <-time.After(5 * time.Second):
+			t.Fatal("a waiter is still blocked after the token request panicked")
+		}
+	}
+}
+
+func TestLockIsNotHeldDuringTheTokenRequest(t *testing.T) {
+	started := make(chan struct{}, 1)
+	release := make(chan struct{})
+	stop := make(chan struct{})
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		started <- struct{}{}
+		select {
+		case <-release:
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(tokenResponse))
+		case <-stop:
+		}
+	}))
+	defer server.Close()
+	defer close(stop)
+
+	credentials := &OAuthSdkCredentials{
+		ClientId:         "client_id",
+		ClientSecret:     "client_secret",
+		AuthorizationUri: server.URL,
+		Log:              DefaultLogger(),
+	}
+	done := make(chan error, 1)
+	go func() {
+		_, err := credentials.GetAuthorization(OAuth)
+		done <- err
+	}()
+	select {
+	case <-started:
+	case <-time.After(5 * time.Second):
+		t.Fatal("no token request started")
+	}
+
+	locked := make(chan struct{})
+	go func() {
+		credentials.mutex.Lock()
+		credentials.mutex.Unlock()
+		close(locked)
+	}()
+	select {
+	case <-locked:
+	case <-time.After(2 * time.Second):
+		t.Fatal("the lock is held while the token request is in flight")
+	}
+
+	close(release)
+	assert.NoError(t, <-done)
+}

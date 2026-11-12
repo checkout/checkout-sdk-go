@@ -153,7 +153,8 @@ Go SDK supports your own configuration for `http client` using `http.Client` fro
 ```go
 import (
     "net/http"
-    
+    "time"
+
     "github.com/checkout/checkout-sdk-go/v3"
     "github.com/checkout/checkout-sdk-go/v3/configuration"
 )
@@ -166,8 +167,8 @@ api, err := checkout.Builder().
                      StaticKeys().
                      WithEnvironment(configuration.Sandbox()).
                      WithHttpClient(&httpClient).
-                     WithSecretKey("secret_key")).
-                     WithPublicKey("public_key")). // optional, only required for operations related with tokens
+                     WithSecretKey("secret_key").
+                     WithPublicKey("public_key"). // optional, only required for operations related with tokens
                      Build()
 ```
 

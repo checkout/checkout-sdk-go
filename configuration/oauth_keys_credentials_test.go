@@ -392,3 +392,18 @@ func TestTokenResponseWithTheLargestExpiresInIsAccepted(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int32(1), atomic.LoadInt32(&requests))
 }
+
+func TestTokenRequestWithoutHttpClientIsBounded(t *testing.T) {
+	stop := make(chan struct{})
+	server := httptest.NewServer(delayedTokenHandler(10*time.Second, stop))
+	defer server.Close()
+	defer close(stop)
+
+	start := time.Now()
+	credentials, err := NewOAuthSdkCredentialsWithHttpClient("client_id", "client_secret", server.URL, nil, nil, nil)
+	elapsed := time.Since(start)
+
+	assert.Nil(t, credentials)
+	assert.Error(t, err)
+	assert.True(t, elapsed >= 4*time.Second && elapsed < 8*time.Second, "token request took %s", elapsed)
+}

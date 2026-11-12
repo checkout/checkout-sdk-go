@@ -192,7 +192,8 @@ func (f *OAuthSdkCredentials) renew(renewal *tokenRenewal) (token string, err er
 	return accessToken.Token, nil
 }
 
-// requestAccessToken sends the token request and returns the new token.
+// requestAccessToken sends the token request and returns the new token. It returns an error when
+// the response has no access_token or an expires_in that is not positive.
 func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -239,6 +240,10 @@ func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 			return nil, err
 		}
 		return nil, errors.CheckoutAuthorizationError(oauthErr.Description)
+	}
+
+	if oauthResp.AccessToken == "" || oauthResp.ExpiresIn <= 0 {
+		return nil, errors.CheckoutAuthorizationError("OAuth token response is invalid")
 	}
 
 	accessToken := &OAuthAccessToken{

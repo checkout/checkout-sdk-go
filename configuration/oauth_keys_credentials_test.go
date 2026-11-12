@@ -234,3 +234,29 @@ func TestFinishedRenewalDoesNotPinItsResult(t *testing.T) {
 	}
 	assert.Equal(t, int32(1), atomic.LoadInt32(&requests))
 }
+
+func TestTokenResponseWithoutTokenOrLifetimeIsRejected(t *testing.T) {
+	cases := map[string]string{
+		"empty object":        `{}`,
+		"null":                `null`,
+		"empty token":         `{"access_token":"","expires_in":3600}`,
+		"missing expires_in":  `{"access_token":"token"}`,
+		"zero expires_in":     `{"access_token":"token","expires_in":0}`,
+		"negative expires_in": `{"access_token":"token","expires_in":-5}`,
+	}
+	for name, body := range cases {
+		body := body
+		t.Run(name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(body))
+			}))
+			defer server.Close()
+
+			credentials, err := NewOAuthSdkCredentials("client_id", "client_secret", server.URL, nil, nil)
+
+			assert.Nil(t, credentials)
+			assert.IsType(t, errors.CheckoutAuthorizationError(""), err)
+		})
+	}
+}

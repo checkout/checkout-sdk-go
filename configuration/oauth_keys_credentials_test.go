@@ -75,7 +75,7 @@ func TestTokenRequestWithoutHttpClientDoesNotTrustCustomCa(t *testing.T) {
 }
 
 // On expiry, concurrent callers share one token renewal.
-// Run with -race to also check the cached token is never read and written concurrently.
+// Run with -race, which also checks the reads and writes of the cached token.
 func TestConcurrentGetAuthorizationSendsOneTokenRequest(t *testing.T) {
 	var requests int32
 	server := httptest.NewServer(tokenHandler(&requests))

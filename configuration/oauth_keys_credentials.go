@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io/ioutil"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -193,7 +194,8 @@ func (f *OAuthSdkCredentials) renew(renewal *tokenRenewal) (token string, err er
 }
 
 // requestAccessToken sends the token request and returns the new token. It returns an error when
-// the response has no access_token or an expires_in that is not positive.
+// the response has no access_token, or an expires_in that is not positive or does not fit in a
+// time.Duration.
 func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -242,7 +244,7 @@ func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 		return nil, errors.CheckoutAuthorizationError(oauthErr.Description)
 	}
 
-	if oauthResp.AccessToken == "" || oauthResp.ExpiresIn <= 0 {
+	if oauthResp.AccessToken == "" || oauthResp.ExpiresIn <= 0 || oauthResp.ExpiresIn > maxExpiresIn {
 		return nil, errors.CheckoutAuthorizationError("OAuth token response is invalid")
 	}
 
@@ -252,6 +254,9 @@ func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 	}
 	return accessToken, nil
 }
+
+// maxExpiresIn is the largest expires_in, in seconds, that fits in a time.Duration.
+const maxExpiresIn = time.Duration(math.MaxInt64 / int64(time.Second))
 
 // tokenRequestTimeout bounds the token request when its client sets no Timeout (zero or negative).
 const tokenRequestTimeout = time.Duration(5) * time.Second

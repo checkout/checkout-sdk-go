@@ -237,12 +237,13 @@ func TestFinishedRenewalDoesNotPinItsResult(t *testing.T) {
 
 func TestTokenResponseWithoutTokenOrLifetimeIsRejected(t *testing.T) {
 	cases := map[string]string{
-		"empty object":        `{}`,
-		"null":                `null`,
-		"empty token":         `{"access_token":"","expires_in":3600}`,
-		"missing expires_in":  `{"access_token":"token"}`,
-		"zero expires_in":     `{"access_token":"token","expires_in":0}`,
-		"negative expires_in": `{"access_token":"token","expires_in":-5}`,
+		"empty object":           `{}`,
+		"null":                   `null`,
+		"empty token":            `{"access_token":"","expires_in":3600}`,
+		"missing expires_in":     `{"access_token":"token"}`,
+		"zero expires_in":        `{"access_token":"token","expires_in":0}`,
+		"negative expires_in":    `{"access_token":"token","expires_in":-5}`,
+		"overflowing expires_in": `{"access_token":"token","expires_in":10000000000}`,
 	}
 	for name, body := range cases {
 		body := body
@@ -371,4 +372,23 @@ func TestLockIsNotHeldDuringTheTokenRequest(t *testing.T) {
 
 	close(release)
 	assert.NoError(t, <-done)
+}
+
+func TestTokenResponseWithTheLargestExpiresInIsAccepted(t *testing.T) {
+	var requests int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		atomic.AddInt32(&requests, 1)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"access_token":"token","expires_in":9223372036}`))
+	}))
+	defer server.Close()
+
+	credentials, err := NewOAuthSdkCredentials("client_id", "client_secret", server.URL, nil, nil)
+	if !assert.NoError(t, err) {
+		return
+	}
+	_, err = credentials.GetAuthorization(OAuth)
+
+	assert.NoError(t, err)
+	assert.Equal(t, int32(1), atomic.LoadInt32(&requests))
 }

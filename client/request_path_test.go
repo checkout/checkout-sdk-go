@@ -62,34 +62,37 @@ func (r *recordingServer) apiClient() *client.ApiClient {
 	}
 }
 
-func TestCallerValueWithSeparatorsStaysInOnePathSegment(t *testing.T) {
+func TestCallerValueWithReservedCharactersStaysInOnePathSegment(t *testing.T) {
 	server := newRecordingServer(t)
 	customersClient := customers.NewClient(server.configuration(), server.apiClient())
+	disputesClient := disputes.NewClient(server.configuration(), server.apiClient())
 
-	_, err := customersClient.Get("cus_x/y?z#w")
+	_, err := customersClient.Get("cus_x?z#w")
 	assert.Nil(t, err)
-	_, err = customersClient.Get("../x/y")
+	_, err = disputesClient.SubmitEvidence("dsp_x?z#w")
 	assert.Nil(t, err)
 
 	assert.Equal(t, []string{
-		"GET /customers/cus_x%2Fy%3Fz%23w",
-		"GET /customers/..%2Fx%2Fy",
+		"GET /customers/cus_x%3Fz%23w",
+		"POST /disputes/dsp_x%3Fz%23w/evidence",
 	}, server.sent())
 }
 
-func TestDisputeIdWithSeparatorsStaysInOnePathSegment(t *testing.T) {
-	server := newRecordingServer(t)
-	disputesClient := disputes.NewClient(server.configuration(), server.apiClient())
+// The API decodes %2F and %5C back into separators, so such values never reach the transport.
+func TestCallerValueWithSeparatorsIsRejectedBeforeAnyRequest(t *testing.T) {
+	for _, id := range []string{"cus_x/y", "../x/y", `..\x`, "x\r\ny", "x\x00y"} {
+		t.Run(id, func(t *testing.T) {
+			server := newRecordingServer(t)
+			customersClient := customers.NewClient(server.configuration(), server.apiClient())
+			disputesClient := disputes.NewClient(server.configuration(), server.apiClient())
 
-	_, err := disputesClient.SubmitEvidence("dsp_x/y?z#w")
-	assert.Nil(t, err)
-	_, err = disputesClient.GetDisputeDetails("../x/y")
-	assert.Nil(t, err)
-
-	assert.Equal(t, []string{
-		"POST /disputes/dsp_x%2Fy%3Fz%23w/evidence",
-		"GET /disputes/..%2Fx%2Fy",
-	}, server.sent())
+			_, err := customersClient.Get(id)
+			assert.IsType(t, errors.CheckoutArgumentError(""), err)
+			_, err = disputesClient.GetDisputeDetails(id)
+			assert.IsType(t, errors.CheckoutArgumentError(""), err)
+			assert.Empty(t, server.sent())
+		})
+	}
 }
 
 func TestInvalidPathSegmentIsRejectedBeforeAnyRequest(t *testing.T) {
@@ -112,13 +115,13 @@ func TestBaseUrlAndConstantSegmentsAreNotEncoded(t *testing.T) {
 	klarnaClient := klarna.NewClient(server.configuration(), server.apiClient())
 	sepaClient := sepa.NewClient(server.configuration(), server.apiClient())
 
-	_, err := klarnaClient.CapturePayment("pay_x/y", klarna.OrderCaptureRequest{})
+	_, err := klarnaClient.CapturePayment("pay_x?y", klarna.OrderCaptureRequest{})
 	assert.Nil(t, err)
-	_, err = sepaClient.GetMandate("man_x/y")
+	_, err = sepaClient.GetMandate("man_x?y")
 	assert.Nil(t, err)
 
 	assert.Equal(t, []string{
-		"POST /klarna-external/orders/pay_x%2Fy/captures",
-		"GET /sepa/mandates/man_x%2Fy",
+		"POST /klarna-external/orders/pay_x%3Fy/captures",
+		"GET /sepa/mandates/man_x%3Fy",
 	}, server.sent())
 }

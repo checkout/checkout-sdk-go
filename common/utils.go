@@ -27,13 +27,26 @@ func BuildPath(params ...string) string {
 }
 
 // EncodePathSegment percent-encodes a caller-supplied value so that it is sent as exactly one
-// path segment. An empty value, "." or ".." returns a CheckoutArgumentError.
+// path segment. An empty value, "." or "..", or a value containing "/", "\\" or an ASCII control
+// character returns a CheckoutArgumentError. Separators are refused rather than encoded because
+// the API decodes "%2F" and "%5C" back into separators.
 func EncodePathSegment(segment string) (string, error) {
-	if segment == "" || segment == "." || segment == ".." {
+	if segment == "" || segment == "." || segment == ".." || hasForbiddenCharacter(segment) {
 		return "", errors.CheckoutArgumentError("invalid path segment")
 	}
 
 	return url.PathEscape(segment), nil
+}
+
+func hasForbiddenCharacter(segment string) bool {
+	for i := 0; i < len(segment); i++ {
+		c := segment[i]
+		if c == '/' || c == '\\' || c <= 0x1F || c == 0x7F {
+			return true
+		}
+	}
+
+	return false
 }
 
 // BuildQueryPath appends the encoded query values to path.

@@ -67,8 +67,9 @@ func (c *Client) CreateIdentityVerificationWithContext(ctx context.Context, requ
 //
 // It returns the IdentityVerificationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerification(verificationId string) (*IdentityVerificationResponse, error) {
 	return c.GetIdentityVerificationWithContext(context.Background(), verificationId)
 }
@@ -102,8 +103,9 @@ func (c *Client) GetIdentityVerificationWithContext(ctx context.Context, verific
 //
 // It returns the IdentityVerificationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeIdentityVerification(verificationId string) (*IdentityVerificationResponse, error) {
 	return c.AnonymizeIdentityVerificationWithContext(context.Background(), verificationId)
 }
@@ -138,8 +140,9 @@ func (c *Client) AnonymizeIdentityVerificationWithContext(ctx context.Context, v
 //
 // It returns the IdentityVerificationAttemptResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CreateIdentityVerificationAttempt(verificationId string, request CreateIdentityVerificationAttemptRequest) (*IdentityVerificationAttemptResponse, error) {
 	return c.CreateIdentityVerificationAttemptWithContext(context.Background(), verificationId, request)
 }
@@ -195,8 +198,9 @@ func (c *Client) GetIdentityVerificationAttemptsWithContext(ctx context.Context,
 //
 // It returns the IdentityVerificationAttemptsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*IdentityVerificationAttemptsResponse, error) {
 	return c.GetIdentityVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
 }
@@ -238,7 +242,8 @@ func (c *Client) GetIdentityVerificationAttemptsQueryWithContext(ctx context.Con
 // It returns the IdentityVerificationAttemptResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// or attemptId returns a CheckoutArgumentError and sends no request.
+// or attemptId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationAttempt(verificationId, attemptId string) (*IdentityVerificationAttemptResponse, error) {
 	return c.GetIdentityVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
@@ -277,8 +282,9 @@ func (c *Client) GetIdentityVerificationAttemptWithContext(ctx context.Context, 
 //
 // It returns the IdentityVerificationReportResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationReport(verificationId string) (*IdentityVerificationReportResponse, error) {
 	return c.GetIdentityVerificationReportWithContext(context.Background(), verificationId)
 }
@@ -315,7 +321,8 @@ func (c *Client) GetIdentityVerificationReportWithContext(ctx context.Context, v
 // It returns the IdentityVerificationAttemptAssetsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// or attemptId returns a CheckoutArgumentError and sends no request.
+// or attemptId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdentityVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdentityVerificationAttemptAssetsResponse, error) {
 	return c.GetIdentityVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
 }

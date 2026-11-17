@@ -79,8 +79,9 @@ func (c *Client) InitiateTransferOfFundsWithContext(
 //
 // It returns the TransferDetails, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transferId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transferId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveTransfer(transferId string) (*TransferDetails, error) {
 	return c.RetrieveTransferWithContext(context.Background(), transferId)
 }

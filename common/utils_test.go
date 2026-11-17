@@ -46,7 +46,6 @@ func TestEncodePathSegmentRejectsInvalidSegments(t *testing.T) {
 		{"empty", ""},
 		{"dot", "."},
 		{"dot dot", ".."},
-		// The API decodes %2F and %5C back into separators, so these are refused, not encoded.
 		{"slash", "x/y"},
 		{"dots and slashes", "../x/y"},
 		{"encoded dots and slash", "%2e%2e/x"},
@@ -55,6 +54,11 @@ func TestEncodePathSegmentRejectsInvalidSegments(t *testing.T) {
 		{"null", "x\x00y"},
 		{"unit separator", "x\x1fy"},
 		{"delete", "x\x7fy"},
+		{"overlong slash", "x\xc0\xafy"},
+		{"overlong dots", "\xc0\xae\xc0\xae"},
+		{"invalid byte", "x\xffy"},
+		{"encoded surrogate", "x\xed\xa0\x80y"},
+		{"truncated sequence", "x\xe2\x82"},
 	}
 
 	for _, tc := range cases {
@@ -63,7 +67,7 @@ func TestEncodePathSegmentRejectsInvalidSegments(t *testing.T) {
 
 			assert.Equal(t, "", encoded)
 			assert.IsType(t, errors.CheckoutArgumentError(""), err)
-			assert.Equal(t, "invalid path segment", err.Error())
+			assert.EqualError(t, err, "invalid path segment")
 		})
 	}
 }

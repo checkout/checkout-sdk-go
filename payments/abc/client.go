@@ -103,8 +103,9 @@ func (c *Client) RequestPayoutWithContext(ctx context.Context, request PayoutReq
 //
 // It returns the GetPaymentResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentDetails(paymentId string) (*GetPaymentResponse, error) {
 	return c.GetPaymentDetailsWithContext(context.Background(), paymentId)
 }
@@ -136,8 +137,9 @@ func (c *Client) GetPaymentDetailsWithContext(ctx context.Context, paymentId str
 //
 // It returns the GetPaymentActionsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentActions(paymentId string) (*GetPaymentActionsResponse, error) {
 	return c.GetPaymentActionsWithContext(context.Background(), paymentId)
 }
@@ -176,8 +178,9 @@ func (c *Client) GetPaymentActionsWithContext(ctx context.Context, paymentId str
 //
 // It returns the payments.CaptureResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CapturePayment(
 	paymentId string,
 	captureRequest CaptureRequest,
@@ -226,8 +229,9 @@ func (c *Client) CapturePaymentWithContext(
 //
 // It returns the payments.CaptureResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CapturePaymentWithoutRequest(
 	paymentId string,
 	idempotencyKey *string,
@@ -274,8 +278,9 @@ func (c *Client) CapturePaymentWithoutRequestWithContext(
 //
 // It returns the payments.RefundResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RefundPayment(
 	paymentId string,
 	refundRequest *payments.RefundRequest,
@@ -324,8 +329,9 @@ func (c *Client) RefundPaymentWithContext(
 //
 // It returns the payments.VoidResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) VoidPayment(
 	paymentId string,
 	voidRequest *payments.VoidRequest,

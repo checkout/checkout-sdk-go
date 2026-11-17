@@ -78,17 +78,28 @@ func TestCallerValueWithReservedCharactersStaysInOnePathSegment(t *testing.T) {
 	}, server.sent())
 }
 
-// The API decodes %2F and %5C back into separators, so such values never reach the transport.
 func TestCallerValueWithSeparatorsIsRejectedBeforeAnyRequest(t *testing.T) {
-	for _, id := range []string{"cus_x/y", "../x/y", `..\x`, "x\r\ny", "x\x00y"} {
-		t.Run(id, func(t *testing.T) {
+	cases := []struct {
+		name string
+		id   string
+	}{
+		{"separator", "cus_x/y"},
+		{"dot segment and separator", "../x/y"},
+		{"backslash", `..\x`},
+		{"line break", "x\r\ny"},
+		{"control character", "x\x00y"},
+		{"invalid text", "x\xc0\xafy"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
 			server := newRecordingServer(t)
 			customersClient := customers.NewClient(server.configuration(), server.apiClient())
 			disputesClient := disputes.NewClient(server.configuration(), server.apiClient())
 
-			_, err := customersClient.Get(id)
+			_, err := customersClient.Get(tc.id)
 			assert.IsType(t, errors.CheckoutArgumentError(""), err)
-			_, err = disputesClient.GetDisputeDetails(id)
+			_, err = disputesClient.GetDisputeDetails(tc.id)
 			assert.IsType(t, errors.CheckoutArgumentError(""), err)
 			assert.Empty(t, server.sent())
 		})

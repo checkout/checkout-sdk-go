@@ -143,8 +143,8 @@ response, err := api.Payments.RequestPayment(request)
 All the API responses that do not fall in the 2** status codes will return a `errors.CheckoutApiError`. The
 error encapsulates the `StatusCode`, `Status` and a the `ErrorDetails`, if available.
 
-A value that cannot be sent as a request path segment (empty, `.` or `..`) returns an `errors.CheckoutArgumentError`
-before any request is sent. Check the error type (for example with a type switch) instead of asserting
+A value that cannot be sent as a request path segment (empty, `.` or `..`, or one containing a slash, a backslash, a
+control character or invalid UTF-8) returns an `errors.CheckoutArgumentError` before any request is sent. Check the error type (for example with a type switch) instead of asserting
 `errors.CheckoutAPIError` directly.
 
 ## Custom Http Client

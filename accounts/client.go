@@ -78,8 +78,9 @@ func (c *Client) CreateEntityWithContext(
 //
 // It returns the OnboardSubEntityDetailsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetSubEntityMembers(entityId string) (*OnboardSubEntityDetailsResponse, error) {
 	return c.GetSubEntityMembersWithContext(context.Background(), entityId)
 }
@@ -117,7 +118,8 @@ func (c *Client) GetSubEntityMembersWithContext(
 // It returns the OnboardSubEntityResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// userId returns a CheckoutArgumentError and sends no request.
+// userId, or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) ReinviteSubEntityMember(
 	entityId string,
 	userId string,
@@ -170,8 +172,9 @@ func (c *Client) ReinviteSubEntityMemberWithContext(
 //
 // It returns the OnboardEntityDetails, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetEntity(entityId string, schemaVersion string) (*OnboardEntityDetails, error) {
 	return c.GetEntityWithContext(context.Background(), entityId, schemaVersion)
 }
@@ -209,8 +212,9 @@ func (c *Client) GetEntityWithContext(ctx context.Context, entityId string, sche
 //
 // It returns the OnboardEntityResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateEntity(entityId string, request OnboardEntityRequest, schemaVersion string) (*OnboardEntityResponse, error) {
 	return c.UpdateEntityWithContext(context.Background(), entityId, request, schemaVersion)
 }
@@ -252,8 +256,9 @@ func (c *Client) UpdateEntityWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 //
 // Deprecated: Use CreatePaymentInstrument IdResponse for CreatePaymentInstrument instead.
 func (c *Client) CreatePaymentInstruments(
@@ -304,8 +309,9 @@ func (c *Client) CreatePaymentInstrumentsWithContext(
 //
 // It returns the common.IdResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CreatePaymentInstrument(
 	entityId string,
 	request PaymentInstrumentRequest,
@@ -354,7 +360,8 @@ func (c *Client) CreatePaymentInstrumentWithContext(
 // It returns the PaymentInstrumentDetailsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// paymentInstrumentId returns a CheckoutArgumentError and sends no request.
+// paymentInstrumentId, or one containing a slash, a backslash, a control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrievePaymentInstrumentDetails(
 	entityId string,
 	paymentInstrumentId string,
@@ -407,7 +414,8 @@ func (c *Client) RetrievePaymentInstrumentDetailsWithContext(
 // It returns the common.IdResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// instrumentId returns a CheckoutArgumentError and sends no request.
+// instrumentId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdatePaymentInstrumentDetails(
 	entityId, instrumentId string,
 	request UpdatePaymentInstrumentRequest,
@@ -458,8 +466,9 @@ func (c *Client) UpdatePaymentInstrumentDetailsWithContext(
 //
 // It returns the PaymentInstrumentQueryResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) QueryPaymentInstruments(
 	entityId string,
 	query PaymentInstrumentsQuery,
@@ -507,8 +516,9 @@ func (c *Client) QueryPaymentInstrumentsWithContext(
 //
 // It returns the PayoutSchedule, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RetrievePayoutSchedule(entityId string) (*PayoutSchedule, error) {
 	return c.RetrievePayoutScheduleWithContext(context.Background(), entityId)
 }
@@ -551,8 +561,9 @@ func (c *Client) RetrievePayoutScheduleWithContext(
 //
 // It returns the common.IdResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdatePayoutSchedule(
 	entityId string,
 	currency common.Currency,
@@ -604,8 +615,9 @@ func (c *Client) UpdatePayoutScheduleWithContext(
 //
 // It returns the common.IdResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CreateReserveRule(entityId string, request ReserveRuleRequest) (*common.IdResponse, error) {
 	return c.CreateReserveRuleWithContext(context.Background(), entityId, request)
 }
@@ -648,8 +660,9 @@ func (c *Client) CreateReserveRuleWithContext(
 //
 // It returns the ReserveRulesResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetReserveRules(entityId string) (*ReserveRulesResponse, error) {
 	return c.GetReserveRulesWithContext(context.Background(), entityId)
 }
@@ -690,7 +703,8 @@ func (c *Client) GetReserveRulesWithContext(ctx context.Context, entityId string
 // It returns the ReserveRuleResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// reserveRuleId returns a CheckoutArgumentError and sends no request.
+// reserveRuleId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetReserveRuleDetails(entityId, reserveRuleId string) (*ReserveRuleResponse, error) {
 	return c.GetReserveRuleDetailsWithContext(context.Background(), entityId, reserveRuleId)
 }
@@ -739,7 +753,8 @@ func (c *Client) GetReserveRuleDetailsWithContext(
 // It returns the common.IdResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// reserveRuleId returns a CheckoutArgumentError and sends no request.
+// reserveRuleId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateReserveRule(
 	entityId, reserveRuleId, etag string,
 	request ReserveRuleRequest,
@@ -829,8 +844,9 @@ func (c *Client) SubmitFileWithContext(
 //
 // It returns the UploadFileResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UploadFile(entityId string, request File) (*UploadFileResponse, error) {
 	return c.UploadFileWithContext(context.Background(), entityId, request)
 }
@@ -880,7 +896,8 @@ func (c *Client) UploadFileWithContext(
 // It returns the FileDetailsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// fileId returns a CheckoutArgumentError and sends no request.
+// fileId, or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveFile(entityId, fileId string) (*FileDetailsResponse, error) {
 	return c.RetrieveFileWithContext(context.Background(), entityId, fileId)
 }
@@ -918,8 +935,9 @@ func (c *Client) RetrieveFileWithContext(ctx context.Context, entityId, fileId s
 //
 // It returns the EntityRequirementListResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetEntityRequirements(entityId string, schemaVersion string) (*EntityRequirementListResponse, error) {
 	return c.GetEntityRequirementsWithContext(context.Background(), entityId, schemaVersion)
 }
@@ -958,7 +976,8 @@ func (c *Client) GetEntityRequirementsWithContext(ctx context.Context, entityId 
 // It returns the EntityRequirementDetailsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// requirementId returns a CheckoutArgumentError and sends no request.
+// requirementId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetEntityRequirementDetails(entityId, requirementId string) (*EntityRequirementDetailsResponse, error) {
 	return c.GetEntityRequirementDetailsWithContext(context.Background(), entityId, requirementId)
 }
@@ -999,7 +1018,8 @@ func (c *Client) GetEntityRequirementDetailsWithContext(ctx context.Context, ent
 // It returns the EntityRequirementUpdateResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// requirementId returns a CheckoutArgumentError and sends no request.
+// requirementId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) ResolveEntityRequirement(entityId, requirementId string, request EntityRequirementUpdateRequest) (*EntityRequirementUpdateResponse, error) {
 	return c.ResolveEntityRequirementWithContext(context.Background(), entityId, requirementId, request)
 }

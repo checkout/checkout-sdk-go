@@ -45,7 +45,8 @@ func (c *Client) RequestPaymentContextsWithContext(ctx context.Context, request 
 //
 // It returns the PaymentContextDetailsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentContextId
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// paymentContextId, or one containing a slash, a backslash, a control character or invalid UTF-8,
 // returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentContextDetails(paymentContextId string) (*PaymentContextDetailsResponse, error) {
 	return c.GetPaymentContextDetailsWithContext(context.Background(), paymentContextId)

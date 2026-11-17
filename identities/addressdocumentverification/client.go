@@ -49,8 +49,9 @@ func (c *Client) CreateAddressDocumentVerificationWithContext(ctx context.Contex
 //
 // It returns the AddressDocumentVerificationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerification(verificationId string) (*AddressDocumentVerificationResponse, error) {
 	return c.GetAddressDocumentVerificationWithContext(context.Background(), verificationId)
 }
@@ -85,8 +86,9 @@ func (c *Client) GetAddressDocumentVerificationWithContext(ctx context.Context, 
 //
 // It returns the AddressDocumentVerificationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeAddressDocumentVerification(verificationId string) (*AddressDocumentVerificationResponse, error) {
 	return c.AnonymizeAddressDocumentVerificationWithContext(context.Background(), verificationId)
 }
@@ -121,8 +123,9 @@ func (c *Client) AnonymizeAddressDocumentVerificationWithContext(ctx context.Con
 //
 // It returns the AddressDocumentVerificationAttemptResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CreateAddressDocumentVerificationAttempt(verificationId string, request CreateAddressDocumentVerificationAttemptRequest) (*AddressDocumentVerificationAttemptResponse, error) {
 	return c.CreateAddressDocumentVerificationAttemptWithContext(context.Background(), verificationId, request)
 }
@@ -178,8 +181,9 @@ func (c *Client) GetAddressDocumentVerificationAttemptsWithContext(ctx context.C
 //
 // It returns the AddressDocumentVerificationAttemptsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*AddressDocumentVerificationAttemptsResponse, error) {
 	return c.GetAddressDocumentVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
 }
@@ -222,7 +226,8 @@ func (c *Client) GetAddressDocumentVerificationAttemptsQueryWithContext(ctx cont
 // It returns the AddressDocumentVerificationAttemptResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// or attemptId returns a CheckoutArgumentError and sends no request.
+// or attemptId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationAttempt(verificationId, attemptId string) (*AddressDocumentVerificationAttemptResponse, error) {
 	return c.GetAddressDocumentVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
@@ -262,8 +267,9 @@ func (c *Client) GetAddressDocumentVerificationAttemptWithContext(ctx context.Co
 //
 // It returns the AddressDocumentVerificationReportResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationReport(verificationId string) (*AddressDocumentVerificationReportResponse, error) {
 	return c.GetAddressDocumentVerificationReportWithContext(context.Background(), verificationId)
 }
@@ -301,7 +307,8 @@ func (c *Client) GetAddressDocumentVerificationReportWithContext(ctx context.Con
 // It returns the AddressDocumentVerificationAttemptAssetsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// or attemptId returns a CheckoutArgumentError and sends no request.
+// or attemptId, or one containing a slash, a backslash, a control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetAddressDocumentVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*AddressDocumentVerificationAttemptAssetsResponse, error) {
 	return c.GetAddressDocumentVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
 }

@@ -50,8 +50,9 @@ func (c *Client) GetAllReportsWithContext(ctx context.Context, query QueryFilter
 //
 // It returns the ReportResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." reportId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." reportId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetReportDetails(reportId string) (*ReportResponse, error) {
 	return c.GetReportDetailsWithContext(context.Background(), reportId)
 }
@@ -85,7 +86,8 @@ func (c *Client) GetReportDetailsWithContext(ctx context.Context, reportId strin
 // It returns the common.ContentResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." reportId or
-// fileId returns a CheckoutArgumentError and sends no request.
+// fileId, or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetReportFile(reportId, fileId string) (*common.ContentResponse, error) {
 	return c.GetReportFileWithContext(context.Background(), reportId, fileId)
 }

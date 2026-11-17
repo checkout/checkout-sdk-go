@@ -129,8 +129,9 @@ func (c *Client) RequestPinTokenWithContext(ctx context.Context, request PinToke
 //
 // It returns the TokenMetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." tokenId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." tokenId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetTokenMetadata(tokenId string) (*TokenMetadataResponse, error) {
 	return c.GetTokenMetadataWithContext(context.Background(), tokenId)
 }

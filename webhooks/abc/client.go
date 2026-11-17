@@ -77,8 +77,9 @@ func (c *Client) RegisterWebhookWithContext(ctx context.Context, request Webhook
 //
 // It returns the WebhookResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveWebhook(webhookId string) (*WebhookResponse, error) {
 	return c.RetrieveWebhookWithContext(context.Background(), webhookId)
 }
@@ -116,8 +117,9 @@ func (c *Client) RetrieveWebhookWithContext(ctx context.Context, webhookId strin
 //
 // It returns the WebhookResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateWebhook(webhookId string, request WebhookRequest) (*WebhookResponse, error) {
 	return c.UpdateWebhookWithContext(context.Background(), webhookId, request)
 }
@@ -156,8 +158,9 @@ func (c *Client) UpdateWebhookWithContext(ctx context.Context, webhookId string,
 //
 // It returns the WebhookResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) PartiallyUpdateWebhook(webhookId string, request WebhookRequest) (*WebhookResponse, error) {
 	return c.PartiallyUpdateWebhookWithContext(context.Background(), webhookId, request)
 }
@@ -195,8 +198,9 @@ func (c *Client) PartiallyUpdateWebhookWithContext(ctx context.Context, webhookI
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." webhookId, or
+// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RemoveWebhook(webhookId string) (*common.MetadataResponse, error) {
 	return c.RemoveWebhookWithContext(context.Background(), webhookId)
 }

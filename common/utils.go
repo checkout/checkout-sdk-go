@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/google/go-querystring/query"
 
@@ -27,11 +28,11 @@ func BuildPath(params ...string) string {
 }
 
 // EncodePathSegment percent-encodes a caller-supplied value so that it is sent as exactly one
-// path segment. An empty value, "." or "..", or a value containing "/", "\\" or an ASCII control
-// character returns a CheckoutArgumentError. Separators are refused rather than encoded because
-// the API decodes "%2F" and "%5C" back into separators.
+// path segment. An empty value, "." or "..", or a value that contains a slash, a backslash or an
+// ASCII control character, or is not valid UTF-8, returns a CheckoutArgumentError.
 func EncodePathSegment(segment string) (string, error) {
-	if segment == "" || segment == "." || segment == ".." || hasForbiddenCharacter(segment) {
+	if segment == "" || segment == "." || segment == ".." || hasForbiddenCharacter(segment) ||
+		!utf8.ValidString(segment) {
 		return "", errors.CheckoutArgumentError("invalid path segment")
 	}
 

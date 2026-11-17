@@ -47,8 +47,9 @@ func (c *Client) CreateEnrollmentWithContext(ctx context.Context, request Create
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RegisterDomain(entityId string, request RegisterDomainRequest) (*common.MetadataResponse, error) {
 	return c.RegisterDomainWithContext(context.Background(), entityId, request)
 }
@@ -81,8 +82,9 @@ func (c *Client) RegisterDomainWithContext(ctx context.Context, entityId string,
 //
 // It returns the DomainListResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetRegisteredDomains(entityId string) (*DomainListResponse, error) {
 	return c.GetRegisteredDomainsWithContext(context.Background(), entityId)
 }
@@ -114,8 +116,9 @@ func (c *Client) GetRegisteredDomainsWithContext(ctx context.Context, entityId s
 //
 // It returns the EnrollmentStateResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetEnrollmentState(entityId string) (*EnrollmentStateResponse, error) {
 	return c.GetEnrollmentStateWithContext(context.Background(), entityId)
 }

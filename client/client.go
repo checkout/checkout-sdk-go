@@ -269,7 +269,7 @@ func (a *ApiClient) handleResponse(ctx context.Context, rawResponse *http.Respon
 	version := rawResponse.Header.Get(CkoVersion)
 	body, err := a.readBody(ctx, rawResponse)
 	if err != nil {
-		return err
+		return errors.NewCheckoutTransportError(err)
 	}
 
 	if rawResponse.StatusCode >= http.StatusBadRequest {
@@ -346,7 +346,7 @@ func (a *ApiClient) doRequest(ctx context.Context, req *http.Request, responseMa
 		resp, err := a.HttpClient.Do(req)
 		elapsed := time.Since(start)
 		if err != nil {
-			return err
+			return errors.NewCheckoutTransportError(err)
 		}
 
 		lastRequestMetric.PrevRequestDuration = int(elapsed.Milliseconds())
@@ -356,7 +356,7 @@ func (a *ApiClient) doRequest(ctx context.Context, req *http.Request, responseMa
 	} else {
 		resp, err := a.HttpClient.Do(req)
 		if err != nil {
-			return err
+			return errors.NewCheckoutTransportError(err)
 		}
 
 		return a.handleResponse(ctx, resp, responseMapping)

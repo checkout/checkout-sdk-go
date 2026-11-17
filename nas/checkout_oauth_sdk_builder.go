@@ -15,6 +15,7 @@ type CheckoutOAuthSdkBuilder struct {
 	// ClientSecret is the OAuth client secret.
 	ClientSecret string
 	// AuthorizationUri is the token endpoint; when empty it is derived from the environment or subdomain.
+	// It must use https; http is accepted only for a loopback host.
 	AuthorizationUri string
 	// Scopes are the OAuth scopes requested with the token.
 	Scopes []string
@@ -27,7 +28,8 @@ func (b *CheckoutOAuthSdkBuilder) WithClientCredentials(id string, secret string
 	return b
 }
 
-// WithAuthorizationUri sets a custom token endpoint. It returns the builder.
+// WithAuthorizationUri sets a custom token endpoint, which must use https (http only for a loopback
+// host). It returns the builder.
 func (b *CheckoutOAuthSdkBuilder) WithAuthorizationUri(uri string) *CheckoutOAuthSdkBuilder {
 	b.AuthorizationUri = uri
 	return b

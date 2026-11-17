@@ -92,6 +92,18 @@ func (e CheckoutTransportError) Timeout() bool {
 	return false
 }
 
+// Temporary reports whether err or an error in its errors.Unwrap chain has a Temporary method that
+// returns true. With Timeout it makes CheckoutTransportError a net.Error, as the *url.Error it
+// usually wraps.
+func (e CheckoutTransportError) Temporary() bool {
+	for err := e.Err; err != nil; err = stderrors.Unwrap(err) {
+		if temporary, ok := err.(interface{ Temporary() bool }); ok && temporary.Temporary() {
+			return true
+		}
+	}
+	return false
+}
+
 // NewCheckoutTransportError wraps err in a CheckoutTransportError. It returns nil when err is nil
 // and returns err unchanged when err itself is a CheckoutTransportError; one nested deeper, for
 // example inside a *url.Error, is wrapped again so the returned error is always the SDK type.

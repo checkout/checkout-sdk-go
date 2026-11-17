@@ -4,6 +4,7 @@ import (
 	"context"
 	stderrors "errors"
 	"fmt"
+	"net"
 	"net/url"
 	"testing"
 
@@ -59,4 +60,24 @@ func TestCheckoutTransportErrorTimeoutAgreesWithErrorsIs(t *testing.T) {
 	byIs := &url.Error{Op: "Get", URL: "https://api.example.test", Err: fmt.Errorf("transport: %w", deadlineByIs{})}
 	assert.True(t, stderrors.Is(byIs, context.DeadlineExceeded))
 	assert.True(t, CheckoutTransportError{Err: byIs}.Timeout())
+}
+
+type temporaryError struct{ temporary bool }
+
+func (e temporaryError) Error() string   { return "temporary error" }
+func (e temporaryError) Temporary() bool { return e.temporary }
+
+// CheckoutTransportError is a net.Error, as the *url.Error it wraps, and Temporary follows the chain.
+func TestCheckoutTransportErrorIsANetError(t *testing.T) {
+	wrapped := NewCheckoutTransportError(&url.Error{Op: "Get", URL: "https://api.example.test", Err: temporaryError{temporary: true}})
+	netErr, ok := wrapped.(net.Error)
+	if assert.True(t, ok) {
+		assert.True(t, netErr.Temporary())
+		assert.False(t, netErr.Timeout())
+	}
+
+	below := CheckoutTransportError{Err: fmt.Errorf("transport: %w", temporaryError{temporary: true})}
+	assert.True(t, below.Temporary())
+	assert.False(t, CheckoutTransportError{Err: temporaryError{}}.Temporary())
+	assert.False(t, CheckoutTransportError{}.Temporary())
 }

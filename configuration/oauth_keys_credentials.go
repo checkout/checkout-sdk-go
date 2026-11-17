@@ -200,9 +200,11 @@ func (f *OAuthSdkCredentials) renew(renewal *tokenRenewal) (token string, err er
 	return accessToken.Token, nil
 }
 
-// requestAccessToken sends the token request and returns the new token. It returns an error when
-// the response has no access_token, or an expires_in that is not positive or does not fit in a
-// time.Duration.
+// requestAccessToken sends the token request and returns the new token. Before sending, it returns
+// an errors.CheckoutArgumentError when AuthorizationUri is not accepted. It returns an
+// errors.CheckoutTransportError when the request cannot be sent or the response cannot be read, an
+// errors.CheckoutAuthorizationError for a 3xx response, and an error when the response has no
+// access_token, or an expires_in that is not positive or does not fit in a time.Duration.
 func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -304,7 +306,7 @@ func validateAuthorizationUri(uri string) error {
 	if err != nil || parsed.Host == "" || parsed.Hostname() == "" {
 		return errors.CheckoutArgumentError("OAuth authorization URI must be an absolute https URL")
 	}
-	switch strings.ToLower(parsed.Scheme) {
+	switch parsed.Scheme {
 	case "https":
 		return nil
 	case "http":

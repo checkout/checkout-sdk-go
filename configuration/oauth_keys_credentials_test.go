@@ -483,6 +483,7 @@ func TestAuthorizationUriMustUseHttps(t *testing.T) {
 		"access.checkout.com/connect/token",
 		"/connect/token",
 		"https:///connect/token",
+		"https://:443/connect/token",
 		"",
 		"://bad",
 		"file:///etc/passwd",

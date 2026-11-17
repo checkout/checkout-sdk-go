@@ -71,7 +71,9 @@ func (b *CheckoutOAuthSdkBuilder) WithLegacyDomain() *CheckoutOAuthSdkBuilder {
 	return b
 }
 
-// WithHttpClient sets the client for every request the SDK sends, the token request included.
+// WithHttpClient sets the client for every request the SDK sends. The token request uses a copy
+// of it that keeps its settings, such as Transport and Timeout, and never follows redirects; the
+// client itself is not changed.
 // A client without Timeout gets a 5 second limit on the token request. When nil or not called,
 // API requests use a client with a 10 second timeout and the token request one with 5 seconds.
 // It returns the builder.

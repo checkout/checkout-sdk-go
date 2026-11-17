@@ -22,16 +22,16 @@ type (
 	OAuthSdkCredentials struct {
 		// HttpClient sends the token request. The OAuth builder sets it to the client given to
 		// WithHttpClient, so the token request uses the same settings as API calls, except that it
-		// never follows redirects, whatever CheckRedirect sets; HttpClient itself is not changed. When
-		// nil, a client with a 5 second timeout is used; a client without Timeout gets a 5 second limit
-		// on the token request only.
+		// never follows redirects, whatever CheckRedirect sets; HttpClient itself is not changed. A
+		// custom Transport applies its own behaviour. When nil, a client with a 5 second timeout is
+		// used; a client without Timeout gets a 5 second limit on the token request only.
 		HttpClient *http.Client
 		// ClientId is the OAuth client ID.
 		ClientId string
 		// ClientSecret is the OAuth client secret.
 		ClientSecret string
-		// AuthorizationUri is the token endpoint. It must use https; http is accepted only for a
-		// loopback host. Redirects from it are not followed.
+		// AuthorizationUri is the token endpoint. It must be an absolute https URI without user
+		// information; http is accepted only for a loopback host. Redirects from it are not followed.
 		AuthorizationUri string
 		// Scopes are the OAuth scopes requested with the token.
 		Scopes []string
@@ -203,18 +203,19 @@ func (f *OAuthSdkCredentials) renew(renewal *tokenRenewal) (token string, err er
 // requestAccessToken sends the token request and returns the new token. Before sending, it returns
 // an errors.CheckoutArgumentError when AuthorizationUri is not accepted. It returns an
 // errors.CheckoutTransportError when the request cannot be sent or the response cannot be read, an
-// errors.CheckoutAuthorizationError for a 3xx response, and an error when the response has no
-// access_token, or an expires_in that is not positive or does not fit in a time.Duration.
+// errors.CheckoutAuthorizationError for a 3xx response or an error response with a JSON body, and an
+// error when the response has no access_token, or an expires_in that is not positive or does not fit
+// in a time.Duration. A body that is not JSON returns the JSON decoding error.
 func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
+	if err := validateAuthorizationUri(f.AuthorizationUri); err != nil {
+		return nil, err
+	}
+
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
 	data.Set("client_id", f.ClientId)
 	data.Set("client_secret", f.ClientSecret)
 	data.Set("scope", strings.Join(f.Scopes, " "))
-
-	if err := validateAuthorizationUri(f.AuthorizationUri); err != nil {
-		return nil, err
-	}
 
 	client := f.tokenHttpClient()
 	ctx := context.Background()
@@ -299,12 +300,16 @@ func refuseRedirect(*http.Request, []*http.Request) error {
 	return http.ErrUseLastResponse
 }
 
-// validateAuthorizationUri returns a CheckoutArgumentError unless uri is an absolute https URL. An
-// http URL is accepted only for a loopback host (see isLoopbackHost), for local tests.
+// validateAuthorizationUri returns a CheckoutArgumentError unless uri is an absolute https URL
+// without user information. An http URL is accepted only for a loopback host (see isLoopbackHost),
+// for local tests.
 func validateAuthorizationUri(uri string) error {
 	parsed, err := url.Parse(uri)
-	if err != nil || parsed.Host == "" || parsed.Hostname() == "" {
+	if err != nil || parsed.Hostname() == "" {
 		return errors.CheckoutArgumentError("OAuth authorization URI must be an absolute https URL")
+	}
+	if parsed.User != nil {
+		return errors.CheckoutArgumentError("OAuth authorization URI must not include user information")
 	}
 	switch parsed.Scheme {
 	case "https":

@@ -1,8 +1,10 @@
 package configuration
 
 import (
+	"encoding/json"
 	stderrors "errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -484,6 +486,11 @@ func TestAuthorizationUriMustUseHttps(t *testing.T) {
 		"/connect/token",
 		"https:///connect/token",
 		"https://:443/connect/token",
+		"https://user:pass@access.example.com/connect/token",
+		"https://user@access.example.com/connect/token",
+		"https://user%3Apass@access.example.com/connect/token",
+		"https://:pass@access.example.com/connect/token",
+		"http://user:pass@localhost/connect/token",
 		"",
 		"://bad",
 		"file:///etc/passwd",
@@ -684,4 +691,58 @@ func TestConstructorsRejectTheAuthorizationUriBeforeSending(t *testing.T) {
 	assert.IsType(t, errors.CheckoutArgumentError(""), err)
 
 	assert.Equal(t, int32(0), atomic.LoadInt32(&requests))
+}
+
+// An authorization URI with user information is rejected before the request is sent; the log and
+// the error do not repeat the URI.
+func TestAuthorizationUriWithUserInformationIsRejectedBeforeSending(t *testing.T) {
+	var logged strings.Builder
+	var requests int32
+	credentials := &OAuthSdkCredentials{
+		ClientId:         "client_id",
+		ClientSecret:     "client_secret",
+		AuthorizationUri: "https://user:userinfo-value@access.example.com/connect/token",
+		HttpClient: &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			atomic.AddInt32(&requests, 1)
+			return nil, errors.CheckoutAPIError{Status: "must not be sent"}
+		})},
+		Log: log.New(&logged, "", 0),
+	}
+
+	err := credentials.GetAccessToken()
+
+	if assert.IsType(t, errors.CheckoutArgumentError(""), err) {
+		assert.NotContains(t, err.Error(), "userinfo-value")
+	}
+	assert.NotContains(t, logged.String(), "userinfo-value")
+	assert.Equal(t, int32(0), atomic.LoadInt32(&requests))
+}
+
+// A token response body that is not JSON returns the JSON decoding error, for a success and an
+// error status alike.
+func TestTokenResponseThatIsNotJsonReturnsTheDecodingError(t *testing.T) {
+	for _, status := range []int{http.StatusOK, http.StatusBadGateway} {
+		status := status
+		t.Run(http.StatusText(status), func(t *testing.T) {
+			credentials := &OAuthSdkCredentials{
+				ClientId:         "client_id",
+				ClientSecret:     "client_secret",
+				AuthorizationUri: "https://access.example.test/connect/token",
+				HttpClient: &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+					return &http.Response{
+						StatusCode: status,
+						Header:     http.Header{"Content-Type": []string{"text/html"}},
+						Body:       ioutil.NopCloser(strings.NewReader("<html>not json</html>")),
+						Request:    r,
+					}, nil
+				})},
+				Log: DefaultLogger(),
+			}
+
+			err := credentials.GetAccessToken()
+
+			var syntaxErr *json.SyntaxError
+			assert.True(t, stderrors.As(err, &syntaxErr), "got %T", err)
+		})
+	}
 }

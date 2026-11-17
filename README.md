@@ -151,13 +151,13 @@ When a request cannot be sent or its response cannot be read (connection failure
 context), the SDK returns an `errors.CheckoutTransportError`. It wraps the `net/http` error, so `errors.Is(err,
 context.DeadlineExceeded)` and `errors.As` with `*url.Error` keep working, and its `Timeout()` method reports timeouts.
 
-Some OAuth token responses (for example a 3xx) return an `errors.CheckoutAuthorizationError`. A custom authorization
-URI must use `https`; `http` is accepted only for a loopback host (`localhost`, `127.0.0.0/8`, `::1`, or a loopback
-address in IPv4-mapped form), and any other value returns an `errors.CheckoutArgumentError` before the token request
-is sent.
+Some OAuth token responses return an `errors.CheckoutAuthorizationError`. A custom authorization URI must be an
+absolute `https` URI without user information; `http` is accepted only for a loopback host (`localhost`,
+`127.0.0.0/8`, `::1`, or a loopback address in IPv4-mapped form), and any other value returns an
+`errors.CheckoutArgumentError` before the token request is sent.
 
 ## Custom Http Client
-Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows. With OAuth, the token requests use the settings of the same client (the client itself is not changed); if it has no `Timeout`, they are limited to 5 seconds.
+Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows. With OAuth, the token requests use the settings of the same client (the client itself is not changed; a custom Transport applies its own behaviour); if it has no `Timeout`, they are limited to 5 seconds.
 
 ```go
 import (

@@ -66,7 +66,7 @@ func (c *Client) RequestPaymentSessionsWithPaymentWithContext(ctx context.Contex
 // It returns the PaymentSessionPaymentResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) SubmitPaymentSession(sessionId string, request SubmitPaymentSessionRequest) (*PaymentSessionPaymentResponse, error) {
 	return c.SubmitPaymentSessionWithContext(context.Background(), sessionId, request)

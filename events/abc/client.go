@@ -119,7 +119,7 @@ func (c *Client) RetrieveEventsQueryWithContext(ctx context.Context, query Query
 // It returns the EventResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveEvent(eventId string) (*EventResponse, error) {
 	return c.RetrieveEventWithContext(context.Background(), eventId)
@@ -153,8 +153,8 @@ func (c *Client) RetrieveEventWithContext(ctx context.Context, eventId string) (
 // It returns the EventNotificationResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId or
-// notificationId, or one containing a slash, a backslash, a control character or invalid UTF-8,
-// returns a CheckoutArgumentError and sends no request.
+// notificationId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveEventNotification(
 	eventId string,
 	notificationId string,
@@ -199,8 +199,8 @@ func (c *Client) RetrieveEventNotificationWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId or
-// webhookId, or one containing a slash, a backslash, a control character or invalid UTF-8, returns
-// a CheckoutArgumentError and sends no request.
+// webhookId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetryWebhook(eventId string, webhookId string) (*common.MetadataResponse, error) {
 	return c.RetryWebhookWithContext(context.Background(), eventId, webhookId)
 }
@@ -245,7 +245,7 @@ func (c *Client) RetryWebhookWithContext(ctx context.Context, eventId string, we
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) RetryAllWebhooks(eventId string) (*common.MetadataResponse, error) {
 	return c.RetryAllWebhooksWithContext(context.Background(), eventId)

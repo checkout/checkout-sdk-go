@@ -53,7 +53,7 @@ func (c *Client) CreateWithContext(ctx context.Context, request CreateInstrument
 // It returns the GetInstrumentResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." instrumentId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Get(instrumentId string) (*GetInstrumentResponse, error) {
 	return c.GetWithContext(context.Background(), instrumentId)
@@ -87,7 +87,7 @@ func (c *Client) GetWithContext(ctx context.Context, instrumentId string) (*GetI
 // It returns the UpdateInstrumentResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." instrumentId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Update(instrumentId string, request UpdateInstrumentRequest) (*UpdateInstrumentResponse, error) {
 	return c.UpdateWithContext(context.Background(), instrumentId, request)
@@ -127,7 +127,7 @@ func (c *Client) UpdateWithContext(ctx context.Context, instrumentId string, req
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." instrumentId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Delete(instrumentId string) (*common.MetadataResponse, error) {
 	return c.DeleteWithContext(context.Background(), instrumentId)

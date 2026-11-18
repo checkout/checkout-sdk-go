@@ -46,7 +46,7 @@ func (c *Client) CreateWithContext(ctx context.Context, request CustomerRequest)
 // It returns the GetCustomerResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." customerId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Get(customerId string) (*GetCustomerResponse, error) {
 	return c.GetWithContext(context.Background(), customerId)
@@ -80,7 +80,7 @@ func (c *Client) GetWithContext(ctx context.Context, customerId string) (*GetCus
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." customerId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Update(customerId string, request CustomerRequest) (*common.MetadataResponse, error) {
 	return c.UpdateWithContext(context.Background(), customerId, request)
@@ -114,7 +114,7 @@ func (c *Client) UpdateWithContext(ctx context.Context, customerId string, reque
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." customerId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Delete(customerId string) (*common.MetadataResponse, error) {
 	return c.DeleteWithContext(context.Background(), customerId)

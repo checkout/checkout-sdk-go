@@ -52,7 +52,7 @@ func (c *Client) ProvisionNetworkTokenWithContext(ctx context.Context, request P
 // It returns the NetworkTokenResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." networkTokenId,
-// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetNetworkToken(networkTokenId string) (*NetworkTokenResponse, error) {
 	return c.GetNetworkTokenWithContext(context.Background(), networkTokenId)
@@ -88,7 +88,7 @@ func (c *Client) GetNetworkTokenWithContext(ctx context.Context, networkTokenId 
 // It returns the RequestCryptogramResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." networkTokenId,
-// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) RequestCryptogram(networkTokenId string, request RequestCryptogramRequest) (*RequestCryptogramResponse, error) {
 	return c.RequestCryptogramWithContext(context.Background(), networkTokenId, request)
@@ -124,7 +124,7 @@ func (c *Client) RequestCryptogramWithContext(ctx context.Context, networkTokenI
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." networkTokenId,
-// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) DeleteNetworkToken(networkTokenId string, request DeleteNetworkTokenRequest) (*common.MetadataResponse, error) {
 	return c.DeleteNetworkTokenWithContext(context.Background(), networkTokenId, request)

@@ -45,7 +45,7 @@ func (c *Client) CreateHostedPaymentsPageSessionWithContext(ctx context.Context,
 // It returns the PaymentHostedDetails, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." hostedPaymentId,
-// or one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetHostedPaymentsPageDetails(hostedPaymentId string) (*PaymentHostedDetails, error) {
 	return c.GetHostedPaymentsPageDetailsWithContext(context.Background(), hostedPaymentId)

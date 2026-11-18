@@ -88,7 +88,7 @@ func TestCallerValueWithSeparatorsIsRejectedBeforeAnyRequest(t *testing.T) {
 		{"backslash", `..\x`},
 		{"line break", "x\r\ny"},
 		{"control character", "x\x00y"},
-		{"invalid text", "x\xc0\xafy"},
+		{"not valid UTF-8", "x\xc0\xafy"},
 	}
 
 	for _, tc := range cases {

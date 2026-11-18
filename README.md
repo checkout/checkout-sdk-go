@@ -140,12 +140,12 @@ response, err := api.Payments.RequestPayment(request)
 
 ## Error Handling
 
-All the API responses that do not fall in the 2** status codes will return a `errors.CheckoutApiError`. The
-error encapsulates the `StatusCode`, `Status` and a the `ErrorDetails`, if available.
+All the API responses that do not fall in the 2** status codes will return a `errors.CheckoutAPIError`. The error
+encapsulates the `StatusCode`, `Status` and the `Data` (an `errors.ErrorDetails`), if available.
 
-A value that cannot be sent as a request path segment (empty, `.` or `..`, or one containing a slash, a backslash, a
-control character or invalid UTF-8) returns an `errors.CheckoutArgumentError` before any request is sent. Check the error type (for example with a type switch) instead of asserting
-`errors.CheckoutAPIError` directly.
+A value that cannot be sent as a request path segment (empty, `.` or `..`, or one containing a slash, a backslash,
+an ASCII control character or invalid UTF-8) returns an `errors.CheckoutArgumentError` before any request is sent.
+Check the error type (for example with a type switch) instead of asserting `errors.CheckoutAPIError` directly.
 
 ## Custom Http Client
 Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows. With OAuth, the same client also sends the token requests; if it has no `Timeout`, they are limited to 5 seconds.

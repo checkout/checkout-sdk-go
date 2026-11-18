@@ -46,7 +46,7 @@ func (c *Client) ForwardAnApiRequestWithContext(ctx context.Context, request For
 // It returns the GetForwardResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." forwardId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetForwardRequest(forwardId string) (*GetForwardResponse, error) {
 	return c.GetForwardRequestWithContext(context.Background(), forwardId)
@@ -118,7 +118,7 @@ func (c *Client) ListSecretsWithContext(ctx context.Context) (*ListSecretsRespon
 // It returns the SingleSecretResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." name, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) UpdateSecret(name string, request UpdateSecretRequest) (*SingleSecretResponse, error) {
 	return c.UpdateSecretWithContext(context.Background(), name, request)
@@ -152,7 +152,7 @@ func (c *Client) UpdateSecretWithContext(ctx context.Context, name string, reque
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." name, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) DeleteSecret(name string) (*common.MetadataResponse, error) {
 	return c.DeleteSecretWithContext(context.Background(), name)

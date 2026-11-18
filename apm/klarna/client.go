@@ -54,7 +54,7 @@ func (c *Client) CreateCreditSessionWithContext(ctx context.Context, request Cre
 // It returns the CreditSession, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetCreditSession(sessionId string) (*CreditSession, error) {
 	return c.GetCreditSessionWithContext(context.Background(), sessionId)
@@ -94,7 +94,7 @@ func (c *Client) GetCreditSessionWithContext(ctx context.Context, sessionId stri
 // It returns the CaptureResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) CapturePayment(paymentId string, request OrderCaptureRequest) (*CaptureResponse, error) {
 	return c.CapturePaymentWithContext(context.Background(), paymentId, request)
@@ -135,7 +135,7 @@ func (c *Client) CapturePaymentWithContext(ctx context.Context, paymentId string
 // It returns the payments.VoidResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) VoidPayment(paymentId string, request payments.VoidRequest) (*payments.VoidResponse, error) {
 	return c.VoidPaymentWithContext(context.Background(), paymentId, request)

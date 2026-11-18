@@ -46,7 +46,7 @@ func (c *Client) CreateAmlScreeningWithContext(ctx context.Context, request Crea
 // It returns the AmlScreeningResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." screeningId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetAmlScreening(screeningId string) (*AmlScreeningResponse, error) {
 	return c.GetAmlScreeningWithContext(context.Background(), screeningId)

@@ -49,8 +49,8 @@ func (c *Client) CreateFaceAuthenticationWithContext(ctx context.Context, reques
 // It returns the FaceAuthenticationResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".."
-// faceAuthenticationId, or one containing a slash, a backslash, a control character or invalid
-// UTF-8, returns a CheckoutArgumentError and sends no request.
+// faceAuthenticationId, or one containing a slash, a backslash, an ASCII control character or
+// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthentication(faceAuthenticationId string) (*FaceAuthenticationResponse, error) {
 	return c.GetFaceAuthenticationWithContext(context.Background(), faceAuthenticationId)
 }
@@ -85,8 +85,8 @@ func (c *Client) GetFaceAuthenticationWithContext(ctx context.Context, faceAuthe
 // It returns the FaceAuthenticationResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".."
-// faceAuthenticationId, or one containing a slash, a backslash, a control character or invalid
-// UTF-8, returns a CheckoutArgumentError and sends no request.
+// faceAuthenticationId, or one containing a slash, a backslash, an ASCII control character or
+// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeFaceAuthentication(faceAuthenticationId string) (*FaceAuthenticationResponse, error) {
 	return c.AnonymizeFaceAuthenticationWithContext(context.Background(), faceAuthenticationId)
 }
@@ -121,8 +121,8 @@ func (c *Client) AnonymizeFaceAuthenticationWithContext(ctx context.Context, fac
 // It returns the FaceAuthenticationAttemptResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".."
-// faceAuthenticationId, or one containing a slash, a backslash, a control character or invalid
-// UTF-8, returns a CheckoutArgumentError and sends no request.
+// faceAuthenticationId, or one containing a slash, a backslash, an ASCII control character or
+// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) CreateFaceAuthenticationAttempt(faceAuthenticationId string, request CreateFaceAuthenticationAttemptRequest) (*FaceAuthenticationAttemptResponse, error) {
 	return c.CreateFaceAuthenticationAttemptWithContext(context.Background(), faceAuthenticationId, request)
 }
@@ -152,6 +152,15 @@ func (c *Client) CreateFaceAuthenticationAttemptWithContext(ctx context.Context,
 //
 // Returns the first page using the API's own defaults. To page through the results, use
 // GetFaceAuthenticationAttemptsQuery. Beta.
+//
+// faceAuthenticationId is the {face_authentication_id} path value: the face authentication's unique
+// identifier.
+//
+// It returns the FaceAuthenticationAttemptsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// faceAuthenticationId, or one containing a slash, a backslash, an ASCII control character or
+// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttempts(faceAuthenticationId string) (*FaceAuthenticationAttemptsResponse, error) {
 	return c.GetFaceAuthenticationAttemptsWithContext(context.Background(), faceAuthenticationId)
 }
@@ -179,8 +188,8 @@ func (c *Client) GetFaceAuthenticationAttemptsWithContext(ctx context.Context, f
 // It returns the FaceAuthenticationAttemptsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".."
-// faceAuthenticationId, or one containing a slash, a backslash, a control character or invalid
-// UTF-8, returns a CheckoutArgumentError and sends no request.
+// faceAuthenticationId, or one containing a slash, a backslash, an ASCII control character or
+// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttemptsQuery(faceAuthenticationId string, query identities.AttemptsQueryFilter) (*FaceAuthenticationAttemptsResponse, error) {
 	return c.GetFaceAuthenticationAttemptsQueryWithContext(context.Background(), faceAuthenticationId, query)
 }
@@ -222,8 +231,8 @@ func (c *Client) GetFaceAuthenticationAttemptsQueryWithContext(ctx context.Conte
 // It returns the FaceAuthenticationAttemptResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".."
-// faceAuthenticationId or attemptId, or one containing a slash, a backslash, a control character or
-// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
+// faceAuthenticationId or attemptId, or one containing a slash, a backslash, an ASCII control
+// character or invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttempt(faceAuthenticationId, attemptId string) (*FaceAuthenticationAttemptResponse, error) {
 	return c.GetFaceAuthenticationAttemptWithContext(context.Background(), faceAuthenticationId, attemptId)
 }
@@ -265,8 +274,8 @@ func (c *Client) GetFaceAuthenticationAttemptWithContext(ctx context.Context, fa
 // It returns the FaceAuthenticationAttemptAssetsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".."
-// faceAuthenticationId or attemptId, or one containing a slash, a backslash, a control character or
-// invalid UTF-8, returns a CheckoutArgumentError and sends no request.
+// faceAuthenticationId or attemptId, or one containing a slash, a backslash, an ASCII control
+// character or invalid UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetFaceAuthenticationAttemptAssets(faceAuthenticationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*FaceAuthenticationAttemptAssetsResponse, error) {
 	return c.GetFaceAuthenticationAttemptAssetsWithContext(context.Background(), faceAuthenticationId, attemptId, query)
 }

@@ -48,17 +48,17 @@ func TestEncodePathSegmentRejectsInvalidSegments(t *testing.T) {
 		{"dot dot", ".."},
 		{"slash", "x/y"},
 		{"dots and slashes", "../x/y"},
-		{"encoded dots and slash", "%2e%2e/x"},
+		{"separator with percent signs", "%2e%2e/x"},
 		{"backslash", `..\x`},
 		{"carriage return and line feed", "x\r\ny"},
 		{"null", "x\x00y"},
 		{"unit separator", "x\x1fy"},
 		{"delete", "x\x7fy"},
-		{"overlong slash", "x\xc0\xafy"},
-		{"overlong dots", "\xc0\xae\xc0\xae"},
-		{"invalid byte", "x\xffy"},
-		{"encoded surrogate", "x\xed\xa0\x80y"},
-		{"truncated sequence", "x\xe2\x82"},
+		{"not valid UTF-8 1", "x\xc0\xafy"},
+		{"not valid UTF-8 2", "\xc0\xae\xc0\xae"},
+		{"not valid UTF-8 3", "x\xffy"},
+		{"not valid UTF-8 4", "x\xed\xa0\x80y"},
+		{"not valid UTF-8 5", "x\xe2\x82"},
 	}
 
 	for _, tc := range cases {

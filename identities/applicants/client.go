@@ -46,7 +46,7 @@ func (c *Client) CreateApplicantWithContext(ctx context.Context, request CreateA
 // It returns the ApplicantResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." applicantId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetApplicant(applicantId string) (*ApplicantResponse, error) {
 	return c.GetApplicantWithContext(context.Background(), applicantId)
@@ -81,7 +81,7 @@ func (c *Client) GetApplicantWithContext(ctx context.Context, applicantId string
 // It returns the ApplicantResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." applicantId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) UpdateApplicant(applicantId string, request UpdateApplicantRequest) (*ApplicantResponse, error) {
 	return c.UpdateApplicantWithContext(context.Background(), applicantId, request)
@@ -115,7 +115,7 @@ func (c *Client) UpdateApplicantWithContext(ctx context.Context, applicantId str
 // It returns the ApplicantResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." applicantId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeApplicant(applicantId string) (*ApplicantResponse, error) {
 	return c.AnonymizeApplicantWithContext(context.Background(), applicantId)

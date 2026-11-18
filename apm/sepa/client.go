@@ -26,7 +26,7 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 // It returns the MandateResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." mandateId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetMandate(mandateId string) (*MandateResponse, error) {
 	return c.GetMandateWithContext(context.Background(), mandateId)
@@ -60,7 +60,7 @@ func (c *Client) GetMandateWithContext(ctx context.Context, mandateId string) (*
 // It returns the SepaResource, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." mandateId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) CancelMandate(mandateId string) (*SepaResource, error) {
 	return c.CancelMandateWithContext(context.Background(), mandateId)
@@ -101,7 +101,7 @@ func (c *Client) CancelMandateWithContext(ctx context.Context, mandateId string)
 // It returns the MandateResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." mandateId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetMandateViaPpro(mandateId string) (*MandateResponse, error) {
 	return c.GetMandateViaPproWithContext(context.Background(), mandateId)
@@ -135,7 +135,7 @@ func (c *Client) GetMandateViaPproWithContext(ctx context.Context, mandateId str
 // It returns the SepaResource, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." mandateId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) CancelMandateViaPpro(mandateId string) (*SepaResource, error) {
 	return c.CancelMandateViaPproWithContext(context.Background(), mandateId)

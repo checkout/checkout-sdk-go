@@ -31,7 +31,7 @@ func NewClient(
 // It returns the SimulatorSetRequirementsDueResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) SetRequirementsDue(
 	entityId string,
@@ -80,8 +80,8 @@ func (c *Client) SetRequirementsDueWithContext(
 // It returns the SimulatorRunScenarioResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// scenarioId, or one containing a slash, a backslash, a control character or invalid UTF-8, returns
-// a CheckoutArgumentError and sends no request.
+// scenarioId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RunScenario(entityId, scenarioId string) (*SimulatorRunScenarioResponse, error) {
 	return c.RunScenarioWithContext(context.Background(), entityId, scenarioId)
 }
@@ -129,7 +129,7 @@ func (c *Client) RunScenarioWithContext(
 // It returns the SimulatorSetStatusResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) SetEntityStatus(
 	entityId string,

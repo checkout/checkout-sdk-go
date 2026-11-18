@@ -50,7 +50,7 @@ func (c *Client) QueryWithContext(ctx context.Context, queryFilter QueryFilter) 
 // It returns the DisputeResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetDisputeDetails(disputeId string) (*DisputeResponse, error) {
 	return c.GetDisputeDetailsWithContext(context.Background(), disputeId)
@@ -84,7 +84,7 @@ func (c *Client) GetDisputeDetailsWithContext(ctx context.Context, disputeId str
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) Accept(disputeId string) (*common.MetadataResponse, error) {
 	return c.AcceptWithContext(context.Background(), disputeId)
@@ -126,7 +126,7 @@ func (c *Client) AcceptWithContext(ctx context.Context, disputeId string) (*comm
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) PutEvidence(disputeId string, evidenceRequest Evidence) (*common.MetadataResponse, error) {
 	return c.PutEvidenceWithContext(context.Background(), disputeId, evidenceRequest)
@@ -167,7 +167,7 @@ func (c *Client) PutEvidenceWithContext(ctx context.Context, disputeId string, e
 // It returns the EvidenceResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetEvidence(disputeId string) (*EvidenceResponse, error) {
 	return c.GetEvidenceWithContext(context.Background(), disputeId)
@@ -201,7 +201,7 @@ func (c *Client) GetEvidenceWithContext(ctx context.Context, disputeId string) (
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) SubmitEvidence(disputeId string) (*common.MetadataResponse, error) {
 	return c.SubmitEvidenceWithContext(context.Background(), disputeId)
@@ -243,7 +243,7 @@ func (c *Client) SubmitEvidenceWithContext(ctx context.Context, disputeId string
 // It returns the DisputeCompiledSubmittedEvidenceResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetCompiledSubmittedEvidence(disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
 	return c.GetCompiledSubmittedEvidenceWithContext(context.Background(), disputeId)
@@ -301,7 +301,7 @@ func (c *Client) UploadFileWithContext(ctx context.Context, file common.File) (*
 // It returns the common.FileResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." fileId, or one
-// containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetFileDetails(fileId string) (*common.FileResponse, error) {
 	return c.GetFileDetailsWithContext(context.Background(), fileId)
@@ -336,7 +336,7 @@ func (c *Client) GetFileDetailsWithContext(ctx context.Context, fileId string) (
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) SubmitArbitrationEvidence(disputeId string) (*common.MetadataResponse, error) {
 	return c.SubmitArbitrationEvidenceWithContext(context.Background(), disputeId)
@@ -378,7 +378,7 @@ func (c *Client) SubmitArbitrationEvidenceWithContext(ctx context.Context, dispu
 // It returns the DisputeCompiledSubmittedEvidenceResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetSubmittedArbitrationEvidence(disputeId string) (*DisputeCompiledSubmittedEvidenceResponse, error) {
 	return c.GetSubmittedArbitrationEvidenceWithContext(context.Background(), disputeId)
@@ -412,7 +412,7 @@ func (c *Client) GetSubmittedArbitrationEvidenceWithContext(ctx context.Context,
 // It returns the SchemeFilesResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
-// one containing a slash, a backslash, a control character or invalid UTF-8, returns a
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetDisputeSchemeFiles(disputeId string) (*SchemeFilesResponse, error) {
 	return c.GetDisputeSchemeFilesWithContext(context.Background(), disputeId)

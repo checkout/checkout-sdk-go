@@ -69,8 +69,9 @@ var allowedBaseUri = regexp.MustCompile(`^configuration\.(Environment\.[A-Za-z]+
 var httpClientConfigDirs = map[string]bool{"client": true, "configuration": true, "nas": true, "abc": true, "common": true}
 
 // Imports for raw connections, unsafe memory or reflection, and the files allowed to use them.
+// configuration/loopback_host.go: loopback host check of the OAuth authorization URI.
 var restrictedImports = map[string]map[string]bool{
-	"net": {}, "crypto/tls": {}, "unsafe": {}, "syscall": {},
+	"net": {"configuration/loopback_host.go": true}, "crypto/tls": {}, "unsafe": {}, "syscall": {},
 	"reflect": {"client/client.go": true, "common/serializer.go": true},
 }
 
@@ -136,6 +137,27 @@ func TestLibraryEncodesEveryCallerValueInRequestPaths(t *testing.T) {
 	}
 	for _, p := range g.problems {
 		t.Error(p)
+	}
+}
+
+// TestRestrictedImportAllowlistMatchesCode fails when a restrictedImports entry names a file that
+// no longer exists or no longer imports that package, so the allowlist holds no dead exceptions.
+func TestRestrictedImportAllowlistMatchesCode(t *testing.T) {
+	_, files := runGuard(t, "..")
+	imports := map[string]map[string]bool{}
+	for _, sf := range files {
+		imports[sf.rel] = map[string]bool{}
+		for _, im := range sf.file.Imports {
+			importPath, _ := strconv.Unquote(im.Path.Value)
+			imports[sf.rel][importPath] = true
+		}
+	}
+	for importPath, allowed := range restrictedImports {
+		for rel := range allowed {
+			if !imports[rel][importPath] {
+				t.Errorf("restrictedImports[%q] allows %s, which does not import it", importPath, rel)
+			}
+		}
 	}
 }
 

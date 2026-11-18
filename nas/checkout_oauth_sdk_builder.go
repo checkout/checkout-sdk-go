@@ -15,6 +15,8 @@ type CheckoutOAuthSdkBuilder struct {
 	// ClientSecret is the OAuth client secret.
 	ClientSecret string
 	// AuthorizationUri is the token endpoint; when empty it is derived from the environment or subdomain.
+	// It must be an absolute https URI without user information; http is accepted only for a
+	// loopback host.
 	AuthorizationUri string
 	// Scopes are the OAuth scopes requested with the token.
 	Scopes []string
@@ -27,7 +29,8 @@ func (b *CheckoutOAuthSdkBuilder) WithClientCredentials(id string, secret string
 	return b
 }
 
-// WithAuthorizationUri sets a custom token endpoint. It returns the builder.
+// WithAuthorizationUri sets a custom token endpoint, which must be an absolute https URI without
+// user information (http only for a loopback host). It returns the builder.
 func (b *CheckoutOAuthSdkBuilder) WithAuthorizationUri(uri string) *CheckoutOAuthSdkBuilder {
 	b.AuthorizationUri = uri
 	return b
@@ -69,7 +72,9 @@ func (b *CheckoutOAuthSdkBuilder) WithLegacyDomain() *CheckoutOAuthSdkBuilder {
 	return b
 }
 
-// WithHttpClient sets the client for every request the SDK sends, the token request included.
+// WithHttpClient sets the client for every request the SDK sends. The token request uses a copy
+// of the client with its own policy; the client itself is not changed. A custom Transport applies
+// its own behaviour.
 // A client without Timeout gets a 5 second limit on the token request. When nil or not called,
 // API requests use a client with a 10 second timeout and the token request one with 5 seconds.
 // It returns the builder.

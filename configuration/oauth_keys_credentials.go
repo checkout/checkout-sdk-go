@@ -3,6 +3,7 @@ package configuration
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -20,15 +21,17 @@ type (
 	// NewOAuthSdkCredentialsWithHttpClient or NewOAuthSdkCredentials and do not copy it after use.
 	OAuthSdkCredentials struct {
 		// HttpClient sends the token request. The OAuth builder sets it to the client given to
-		// WithHttpClient, so the token request uses the same settings as API calls. When nil, a client
-		// with a 5 second timeout is used; a client without Timeout gets a 5 second limit on the token
-		// request only.
+		// WithHttpClient. The token request uses a copy of the client with its own policy; the client
+		// itself is not changed. A custom Transport applies its own behaviour. When nil, a client
+		// with a 5 second timeout is used; a client without Timeout gets a 5 second limit on the
+		// token request only.
 		HttpClient *http.Client
 		// ClientId is the OAuth client ID.
 		ClientId string
 		// ClientSecret is the OAuth client secret.
 		ClientSecret string
-		// AuthorizationUri is the token endpoint.
+		// AuthorizationUri is the token endpoint. It must be an absolute https URI without user
+		// information; http is accepted only for a loopback host.
 		AuthorizationUri string
 		// Scopes are the OAuth scopes requested with the token.
 		Scopes []string
@@ -75,7 +78,9 @@ type (
 // NewOAuthSdkCredentials creates the credentials and requests the first access token, using a
 // client with a 5 second timeout for the token request. Use NewOAuthSdkCredentialsWithHttpClient
 // to send it through your own http.Client: the client given to NewConfiguration is not used for
-// the token request. It returns an error when the first token request fails.
+// the token request. It returns an errors.CheckoutArgumentError, before any request is sent, when
+// authorizationUri is not accepted (see OAuthSdkCredentials.AuthorizationUri), and an error when the
+// first token request fails.
 func NewOAuthSdkCredentials(
 	clientId,
 	clientSecret,
@@ -88,7 +93,9 @@ func NewOAuthSdkCredentials(
 
 // NewOAuthSdkCredentialsWithHttpClient creates the credentials and requests the first access token
 // through httpClient, which is also used for every renewal. A nil httpClient uses a client with a
-// 5 second timeout. It returns an error when the first token request fails.
+// 5 second timeout. It returns an errors.CheckoutArgumentError, before any request is sent, when
+// authorizationUri is not accepted (see OAuthSdkCredentials.AuthorizationUri), and an error when the
+// first token request fails.
 func NewOAuthSdkCredentialsWithHttpClient(
 	clientId,
 	clientSecret,
@@ -193,10 +200,17 @@ func (f *OAuthSdkCredentials) renew(renewal *tokenRenewal) (token string, err er
 	return accessToken.Token, nil
 }
 
-// requestAccessToken sends the token request and returns the new token. It returns an error when
-// the response has no access_token, or an expires_in that is not positive or does not fit in a
-// time.Duration.
+// requestAccessToken sends the token request and returns the new token. Before sending, it returns
+// an errors.CheckoutArgumentError when AuthorizationUri is not accepted. It returns an
+// errors.CheckoutTransportError when the request cannot be sent or the response cannot be read, an
+// errors.CheckoutAuthorizationError for a 3xx response or an error response with a JSON body, and an
+// error when the response has no access_token, or an expires_in that is not positive or does not fit
+// in a time.Duration. A body that is not JSON returns the JSON decoding error.
 func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
+	if err := validateAuthorizationUri(f.AuthorizationUri); err != nil {
+		return nil, err
+	}
+
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
 	data.Set("client_id", f.ClientId)
@@ -217,16 +231,24 @@ func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	f.Log.Printf("post: %s", f.AuthorizationUri)
+	// Scheme, host and path only: the query and fragment stay out of the log.
+	f.Log.Printf("post: %s://%s%s", req.URL.Scheme, req.URL.Host, req.URL.EscapedPath())
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, errors.NewCheckoutTransportError(err)
 	}
 	defer resp.Body.Close()
 
+	// A status from 300 to 399 is an error that names the status only; the response body and
+	// headers are not read.
+	if resp.StatusCode >= http.StatusMultipleChoices && resp.StatusCode < http.StatusBadRequest {
+		return nil, errors.CheckoutAuthorizationError(fmt.Sprintf(
+			"OAuth token request returned %d; redirects are not followed", resp.StatusCode))
+	}
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, errors.NewCheckoutTransportError(err)
 	}
 
 	var oauthResp OAuthServiceResponse
@@ -261,12 +283,44 @@ const maxExpiresIn = time.Duration(math.MaxInt64 / int64(time.Second))
 // tokenRequestTimeout bounds the token request when its client sets no Timeout (zero or negative).
 const tokenRequestTimeout = time.Duration(5) * time.Second
 
-// tokenHttpClient returns HttpClient, or a client with a 5 second timeout when it is nil.
+// tokenHttpClient returns a copy of HttpClient, or a client with a 5 second timeout when it is nil.
+// The copy keeps the settings of HttpClient, such as its Transport and Timeout, and uses its own
+// response policy. HttpClient itself is not changed. The policy applies to the http.Client; a custom
+// Transport keeps its own behaviour.
 func (f *OAuthSdkCredentials) tokenHttpClient() *http.Client {
+	client := http.Client{Timeout: tokenRequestTimeout}
 	if f.HttpClient != nil {
-		return f.HttpClient
+		client = *f.HttpClient
 	}
-	return &http.Client{Timeout: tokenRequestTimeout}
+	client.CheckRedirect = refuseRedirect
+	return &client
+}
+
+// refuseRedirect makes the client return the redirect response instead of following it.
+func refuseRedirect(*http.Request, []*http.Request) error {
+	return http.ErrUseLastResponse
+}
+
+// validateAuthorizationUri returns a CheckoutArgumentError unless uri is an absolute https URL
+// without user information. An http URL is accepted only for a loopback host (see isLoopbackHost),
+// for local tests.
+func validateAuthorizationUri(uri string) error {
+	parsed, err := url.Parse(uri)
+	if err != nil || parsed.Hostname() == "" {
+		return errors.CheckoutArgumentError("OAuth authorization URI must be an absolute https URL")
+	}
+	if parsed.User != nil {
+		return errors.CheckoutArgumentError("OAuth authorization URI must not include user information")
+	}
+	switch parsed.Scheme {
+	case "https":
+		return nil
+	case "http":
+		if isLoopbackHost(parsed.Hostname()) {
+			return nil
+		}
+	}
+	return errors.CheckoutArgumentError("OAuth authorization URI must use https")
 }
 
 // IsValid reports whether the token is set and not expired.

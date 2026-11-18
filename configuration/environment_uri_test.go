@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
 
 // Every SDK client builds its path with common.BuildPath, which prefixes each segment with "/".
@@ -47,4 +49,24 @@ func TestBalancesUriJoinsCleanlyWithABuiltPath(t *testing.T) {
 
 	assert.Equal(t, "https://balances.sandbox.checkout.com/balances/ent_x", Sandbox().BalancesUri()+path)
 	assert.Equal(t, "https://balances.checkout.com/balances/ent_x", Production().BalancesUri()+path)
+}
+
+// An environment URI that cannot be parsed returns a CheckoutArgumentError that does not repeat the
+// URI.
+func TestEnvironmentSubdomainWithAnInvalidUriDoesNotRepeatIt(t *testing.T) {
+	cases := map[string]*CheckoutEnv{
+		"authorization URI": NewEnvironment("https://api.example.com", "https://user:userinfo-value@access.example.com/%zz", "", "", "", "", "", false),
+		"base URI":          NewEnvironment("https://user:userinfo-value@api.example.com/%zz", "https://access.example.com/connect/token", "", "", "", "", "", false),
+	}
+	for name, env := range cases {
+		env := env
+		t.Run(name, func(t *testing.T) {
+			subdomain, err := NewEnvironmentSubdomain(env, "abc123")
+
+			assert.Nil(t, subdomain)
+			if assert.IsType(t, errors.CheckoutArgumentError(""), err) {
+				assert.NotContains(t, err.Error(), "userinfo-value")
+			}
+		})
+	}
 }

@@ -44,7 +44,8 @@ func NewEnvironmentSubdomain(environment Environment, subdomain string) (*Enviro
 
 // createUrlWithSubdomain applies subdomain transformation to any given URI, prepending the
 // subdomain to the host. It returns an error when the subdomain is not a valid merchant-specific
-// subdomain, rather than quietly falling back to the shared host.
+// subdomain, rather than quietly falling back to the shared host, and an errors.CheckoutArgumentError
+// that does not repeat the URI when the URI cannot be parsed.
 func createUrlWithSubdomain(originalUrl, subdomain string) (string, error) {
 	if !subdomainRegex.MatchString(subdomain) {
 		return "", errors.CheckoutArgumentError(
@@ -55,7 +56,7 @@ func createUrlWithSubdomain(originalUrl, subdomain string) (string, error) {
 
 	merchantUrl, err := url.Parse(originalUrl)
 	if err != nil {
-		return "", err
+		return "", errors.CheckoutArgumentError("invalid environment URI")
 	}
 	merchantUrl.Host = subdomain + "." + merchantUrl.Host
 	return merchantUrl.String(), nil

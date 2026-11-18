@@ -163,7 +163,7 @@ absolute `https` URI without user information; `http` is accepted only for a loo
 `errors.CheckoutArgumentError` before the token request is sent.
 
 ## Custom Http Client
-Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows. With OAuth, the token requests use the settings of the same client except its `CheckRedirect` (the client itself is not changed; a custom Transport applies its own behaviour); if it has no `Timeout`, they are limited to 5 seconds.
+Go SDK supports your own configuration for `http client` using `http.Client` from the standard library. You can pass it through when instantiating the SDK as follows. With OAuth, the token requests use the settings of the same client except its `CheckRedirect` (the client itself is not changed; a custom Transport applies its own behaviour); if it has no `Timeout`, they are limited to 5 seconds. API requests also use a copy of the client with the SDK's own policy, whatever its `CheckRedirect` sets. Some API responses (for example a 3xx) return an `errors.CheckoutAPIError`; `Reports.GetReportFile` reads the file from the download URL without the SDK credentials.
 
 ```go
 import (

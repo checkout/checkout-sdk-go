@@ -21,17 +21,17 @@ type (
 	// NewOAuthSdkCredentialsWithHttpClient or NewOAuthSdkCredentials and do not copy it after use.
 	OAuthSdkCredentials struct {
 		// HttpClient sends the token request. The OAuth builder sets it to the client given to
-		// WithHttpClient, so the token request uses the same settings as API calls, except that it
-		// never follows redirects, whatever CheckRedirect sets; HttpClient itself is not changed. A
-		// custom Transport applies its own behaviour. When nil, a client with a 5 second timeout is
-		// used; a client without Timeout gets a 5 second limit on the token request only.
+		// WithHttpClient. The token request uses a copy of the client with its own policy; the client
+		// itself is not changed. A custom Transport applies its own behaviour. When nil, a client
+		// with a 5 second timeout is used; a client without Timeout gets a 5 second limit on the
+		// token request only.
 		HttpClient *http.Client
 		// ClientId is the OAuth client ID.
 		ClientId string
 		// ClientSecret is the OAuth client secret.
 		ClientSecret string
 		// AuthorizationUri is the token endpoint. It must be an absolute https URI without user
-		// information; http is accepted only for a loopback host. Redirects from it are not followed.
+		// information; http is accepted only for a loopback host.
 		AuthorizationUri string
 		// Scopes are the OAuth scopes requested with the token.
 		Scopes []string

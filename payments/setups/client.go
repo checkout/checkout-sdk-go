@@ -62,8 +62,9 @@ func (c *Client) CreatePaymentSetupWithContext(ctx context.Context, request Paym
 //
 // It returns the PaymentSetupResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdatePaymentSetup(setupId string, request PaymentSetupRequest) (*PaymentSetupResponse, error) {
 	return c.UpdatePaymentSetupWithContext(context.Background(), setupId, request)
 }
@@ -98,8 +99,9 @@ func (c *Client) UpdatePaymentSetupWithContext(ctx context.Context, setupId stri
 //
 // It returns the PaymentSetupResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetPaymentSetup(setupId string) (*PaymentSetupResponse, error) {
 	return c.GetPaymentSetupWithContext(context.Background(), setupId)
 }
@@ -138,7 +140,8 @@ func (c *Client) GetPaymentSetupWithContext(ctx context.Context, setupId string)
 // It returns the PaymentSetupResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." setupId or
-// paymentMethodName returns a CheckoutArgumentError and sends no request.
+// paymentMethodName, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) ConfirmPaymentSetup(setupId string, paymentMethodName string) (*PaymentSetupResponse, error) {
 	return c.ConfirmPaymentSetupWithContext(context.Background(), setupId, paymentMethodName)
 }

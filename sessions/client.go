@@ -62,8 +62,9 @@ func (c *Client) RequestSessionWithContext(
 //
 // It returns the GetSessionResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetSessionDetails(sessionId string, sessionSecret string) (*GetSessionResponse, error) {
 	return c.GetSessionDetailsWithContext(context.Background(), sessionId, sessionSecret)
 }
@@ -106,8 +107,9 @@ func (c *Client) GetSessionDetailsWithContext(
 //
 // It returns the GetSessionResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateSession(
 	sessionId string,
 	request channels.Channel,
@@ -156,8 +158,9 @@ func (c *Client) UpdateSessionWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CompleteSession(sessionId, sessionSecret string) (*common.MetadataResponse, error) {
 	return c.CompleteSessionWithContext(context.Background(), sessionId, sessionSecret)
 }
@@ -202,8 +205,9 @@ func (c *Client) CompleteSessionWithContext(
 //
 // It returns the Update3dsMethodCompletionResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." sessionId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) Update3dsMethodCompletion(
 	sessionId string,
 	request ThreeDsMethodCompletionRequest,

@@ -49,8 +49,9 @@ func (c *Client) QueryPaymentsReportWithContext(ctx context.Context, query Payme
 //
 // It returns the PaymentReportsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetSinglePaymentReport(paymentId string) (*PaymentReportsResponse, error) {
 	return c.GetSinglePaymentReportWithContext(context.Background(), paymentId)
 }
@@ -130,8 +131,9 @@ func (c *Client) RetrieveCVSPaymentsReportWithContext(ctx context.Context, query
 //
 // It returns the common.ContentResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." statementId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." statementId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveCVSSingleStatementReport(statementId string) (*common.ContentResponse, error) {
 	return c.RetrieveCVSSingleStatementReportWithContext(context.Background(), statementId)
 }

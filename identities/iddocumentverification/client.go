@@ -48,8 +48,9 @@ func (c *Client) CreateIdDocumentVerificationWithContext(ctx context.Context, re
 //
 // It returns the IdDocumentVerificationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdDocumentVerification(verificationId string) (*IdDocumentVerificationResponse, error) {
 	return c.GetIdDocumentVerificationWithContext(context.Background(), verificationId)
 }
@@ -84,8 +85,9 @@ func (c *Client) GetIdDocumentVerificationWithContext(ctx context.Context, verif
 //
 // It returns the IdDocumentVerificationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) AnonymizeIdDocumentVerification(verificationId string) (*IdDocumentVerificationResponse, error) {
 	return c.AnonymizeIdDocumentVerificationWithContext(context.Background(), verificationId)
 }
@@ -120,8 +122,9 @@ func (c *Client) AnonymizeIdDocumentVerificationWithContext(ctx context.Context,
 //
 // It returns the IdDocumentVerificationAttemptResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CreateIdDocumentVerificationAttempt(verificationId string, request CreateIdDocumentVerificationAttemptRequest) (*IdDocumentVerificationAttemptResponse, error) {
 	return c.CreateIdDocumentVerificationAttemptWithContext(context.Background(), verificationId, request)
 }
@@ -151,6 +154,15 @@ func (c *Client) CreateIdDocumentVerificationAttemptWithContext(ctx context.Cont
 //
 // Returns the first page using the API's own defaults. To page through the results, use
 // GetIdDocumentVerificationAttemptsQuery. Beta.
+//
+// verificationId is the {id_document_verification_id} path value: the ID document verification's
+// unique identifier.
+//
+// It returns the IdDocumentVerificationAttemptsResponse, or the error from the API.
+//
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdDocumentVerificationAttempts(verificationId string) (*IdDocumentVerificationAttemptsResponse, error) {
 	return c.GetIdDocumentVerificationAttemptsWithContext(context.Background(), verificationId)
 }
@@ -177,8 +189,9 @@ func (c *Client) GetIdDocumentVerificationAttemptsWithContext(ctx context.Contex
 //
 // It returns the IdDocumentVerificationAttemptsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdDocumentVerificationAttemptsQuery(verificationId string, query identities.AttemptsQueryFilter) (*IdDocumentVerificationAttemptsResponse, error) {
 	return c.GetIdDocumentVerificationAttemptsQueryWithContext(context.Background(), verificationId, query)
 }
@@ -220,7 +233,8 @@ func (c *Client) GetIdDocumentVerificationAttemptsQueryWithContext(ctx context.C
 // It returns the IdDocumentVerificationAttemptResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// or attemptId returns a CheckoutArgumentError and sends no request.
+// or attemptId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdDocumentVerificationAttempt(verificationId, attemptId string) (*IdDocumentVerificationAttemptResponse, error) {
 	return c.GetIdDocumentVerificationAttemptWithContext(context.Background(), verificationId, attemptId)
 }
@@ -260,8 +274,9 @@ func (c *Client) GetIdDocumentVerificationAttemptWithContext(ctx context.Context
 //
 // It returns the IdDocumentVerificationReportResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetIdDocumentVerificationReport(verificationId string) (*IdDocumentVerificationReportResponse, error) {
 	return c.GetIdDocumentVerificationReportWithContext(context.Background(), verificationId)
 }
@@ -298,7 +313,8 @@ func (c *Client) GetIdDocumentVerificationReportWithContext(ctx context.Context,
 // It returns the IdDocumentVerificationAttemptAssetsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." verificationId
-// or attemptId returns a CheckoutArgumentError and sends no request.
+// or attemptId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetIdDocumentVerificationAttemptAssets(verificationId, attemptId string, query identities.AttemptAssetsQueryFilter) (*IdDocumentVerificationAttemptAssetsResponse, error) {
 	return c.GetIdDocumentVerificationAttemptAssetsWithContext(context.Background(), verificationId, attemptId, query)
 }

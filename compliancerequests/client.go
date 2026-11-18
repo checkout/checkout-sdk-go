@@ -28,8 +28,9 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 //
 // It returns the GetComplianceRequestResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetComplianceRequest(paymentId string) (*GetComplianceRequestResponse, error) {
 	return c.GetComplianceRequestWithContext(context.Background(), paymentId)
 }
@@ -63,8 +64,9 @@ func (c *Client) GetComplianceRequestWithContext(ctx context.Context, paymentId 
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." paymentId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RespondToComplianceRequest(paymentId string, request RespondToComplianceRequestRequest) (*common.MetadataResponse, error) {
 	return c.RespondToComplianceRequestWithContext(context.Background(), paymentId, request)
 }

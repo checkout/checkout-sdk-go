@@ -118,7 +118,8 @@ func (c *Client) CreateInventoryReservationWithContext(
 //
 // It returns the InventoryReservation, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetInventoryReservation(id string) (*InventoryReservation, error) {
 	return c.GetInventoryReservationWithContext(context.Background(), id)
@@ -162,7 +163,8 @@ func (c *Client) GetInventoryReservationWithContext(
 //
 // It returns the InventoryReservation, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) CommitInventoryReservation(id string) (*InventoryReservation, error) {
 	return c.CommitInventoryReservationWithContext(context.Background(), id)
@@ -208,7 +210,8 @@ func (c *Client) CommitInventoryReservationWithContext(
 //
 // It returns the InventoryReservation, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." id, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) ReleaseInventoryReservation(id string) (*InventoryReservation, error) {
 	return c.ReleaseInventoryReservationWithContext(context.Background(), id)
@@ -256,8 +259,9 @@ func (c *Client) ReleaseInventoryReservationWithContext(
 //
 // It returns the InventoryLevels, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetInventoryLevels(variantId string, query InventoryLevelsQuery) (*InventoryLevels, error) {
 	return c.GetInventoryLevelsWithContext(context.Background(), variantId, query)
 }
@@ -301,8 +305,9 @@ func (c *Client) GetInventoryLevelsWithContext(
 //
 // It returns the InventoryLevels, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SetInventoryLevels(
 	variantId string,
 	request InventorySetLevelsRequest,
@@ -353,8 +358,9 @@ func (c *Client) SetInventoryLevelsWithContext(
 //
 // It returns the InventoryProductKnowledge, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetInventoryProduct(variantId string) (*InventoryProductKnowledge, error) {
 	return c.GetInventoryProductWithContext(context.Background(), variantId)
 }
@@ -400,8 +406,9 @@ func (c *Client) GetInventoryProductWithContext(
 //
 // It returns the InventoryProductKnowledge, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SetInventoryProduct(
 	variantId string,
 	request InventorySetProductRequest,
@@ -451,8 +458,9 @@ func (c *Client) SetInventoryProductWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." variantId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) DeleteInventoryProduct(variantId string) (*common.MetadataResponse, error) {
 	return c.DeleteInventoryProductWithContext(context.Background(), variantId)
 }

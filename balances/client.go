@@ -28,8 +28,9 @@ func NewClient(configuration *configuration.Configuration, apiClient client.Http
 //
 // It returns the QueryResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveEntityBalances(entityId string, query QueryFilter) (*QueryResponse, error) {
 	return c.RetrieveEntityBalancesWithContext(context.Background(), entityId, query)
 }
@@ -87,7 +88,8 @@ func (c *Client) RetrieveEntityBalancesWithContext(
 // It returns the TopUpInstructionsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." entityId or
-// currencyAccountId returns a CheckoutArgumentError and sends no request.
+// currencyAccountId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) RetrieveTopUpInstructions(entityId, currencyAccountId string) (*TopUpInstructionsResponse, error) {
 	return c.RetrieveTopUpInstructionsWithContext(context.Background(), entityId, currencyAccountId)
 }

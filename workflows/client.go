@@ -86,8 +86,9 @@ func (c *Client) CreateWorkflowWithContext(
 //
 // It returns the GetWorkflowResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetWorkflow(workflowId string) (*GetWorkflowResponse, error) {
 	return c.GetWorkflowWithContext(context.Background(), workflowId)
 }
@@ -128,8 +129,9 @@ func (c *Client) GetWorkflowWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RemoveWorkflow(workflowId string) (*common.MetadataResponse, error) {
 	return c.RemoveWorkflowWithContext(context.Background(), workflowId)
 }
@@ -170,8 +172,9 @@ func (c *Client) RemoveWorkflowWithContext(
 //
 // It returns the UpdateWorkflowResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateWorkflow(
 	workflowId string,
 	request UpdateWorkflowRequest,
@@ -217,8 +220,9 @@ func (c *Client) UpdateWorkflowWithContext(
 //
 // It returns the common.IdResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) AddWorkflowAction(
 	workflowId string,
 	request actions.ActionsRequest,
@@ -267,7 +271,8 @@ func (c *Client) AddWorkflowActionWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId or
-// actionId returns a CheckoutArgumentError and sends no request.
+// actionId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateWorkflowAction(
 	workflowId string,
 	actionId string,
@@ -323,7 +328,8 @@ func (c *Client) UpdateWorkflowActionWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId or
-// actionId returns a CheckoutArgumentError and sends no request.
+// actionId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveWorkflowAction(workflowId, actionId string) (*common.MetadataResponse, error) {
 	return c.RemoveWorkflowActionWithContext(context.Background(), workflowId, actionId)
 }
@@ -368,8 +374,9 @@ func (c *Client) RemoveWorkflowActionWithContext(
 //
 // It returns the common.IdResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) AddWorkflowCondition(
 	workflowId string,
 	request conditions.ConditionsRequest,
@@ -417,7 +424,8 @@ func (c *Client) AddWorkflowConditionWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId or
-// conditionId returns a CheckoutArgumentError and sends no request.
+// conditionId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateWorkflowCondition(
 	workflowId string,
 	conditionId string,
@@ -471,7 +479,8 @@ func (c *Client) UpdateWorkflowConditionWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId or
-// conditionId returns a CheckoutArgumentError and sends no request.
+// conditionId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveWorkflowCondition(workflowId, conditionId string) (*common.MetadataResponse, error) {
 	return c.RemoveWorkflowConditionWithContext(context.Background(), workflowId, conditionId)
 }
@@ -516,8 +525,9 @@ func (c *Client) RemoveWorkflowConditionWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." workflowId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) TestWorkflow(workflowId string, request events.EventTypesRequest) (*common.MetadataResponse, error) {
 	return c.TestWorkflowWithContext(context.Background(), workflowId, request)
 }
@@ -581,8 +591,9 @@ func (c *Client) GetEventTypesWithContext(ctx context.Context) (*events.EventTyp
 //
 // It returns the events.EventResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetEvent(eventId string) (*events.EventResponse, error) {
 	return c.GetEventWithContext(context.Background(), eventId)
 }
@@ -624,7 +635,8 @@ func (c *Client) GetEventWithContext(
 // It returns the actions.ActionInvocationsResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId or
-// actionId returns a CheckoutArgumentError and sends no request.
+// actionId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetActionInvocations(eventId, actionId string) (*actions.ActionInvocationsResponse, error) {
 	return c.GetActionInvocationsWithContext(context.Background(), eventId, actionId)
 }
@@ -669,8 +681,9 @@ func (c *Client) GetActionInvocationsWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) ReflowByEvent(eventId string) (*common.MetadataResponse, error) {
 	return c.ReflowByEventWithContext(context.Background(), eventId)
 }
@@ -714,7 +727,8 @@ func (c *Client) ReflowByEventWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." eventId or
-// workflowId returns a CheckoutArgumentError and sends no request.
+// workflowId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) ReflowByEventAndWorkflow(eventId, workflowId string) (*common.MetadataResponse, error) {
 	return c.ReflowByEventAndWorkflowWithContext(context.Background(), eventId, workflowId)
 }
@@ -787,8 +801,9 @@ func (c *Client) ReflowWithContext(
 //
 // It returns the events.SubjectEventsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." subjectId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." subjectId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetSubjectEvents(subjectId string) (*events.SubjectEventsResponse, error) {
 	return c.GetSubjectEventsWithContext(context.Background(), subjectId)
 }
@@ -828,8 +843,9 @@ func (c *Client) GetSubjectEventsWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." subjectId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." subjectId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) ReflowBySubject(subjectId string) (*common.MetadataResponse, error) {
 	return c.ReflowBySubjectWithContext(context.Background(), subjectId)
 }
@@ -874,7 +890,8 @@ func (c *Client) ReflowBySubjectWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." subjectId or
-// workflowId returns a CheckoutArgumentError and sends no request.
+// workflowId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) ReflowBySubjectAndWorkflow(subjectId, workflowId string) (*common.MetadataResponse, error) {
 	return c.ReflowBySubjectAndWorkflowWithContext(context.Background(), subjectId, workflowId)
 }

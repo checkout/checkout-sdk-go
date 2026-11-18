@@ -95,8 +95,9 @@ func (c *Client) CreateCardholderWithContext(
 //
 // It returns the cardholders.CardholderDetailsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetCardholder(cardholderId string) (*cardholders.CardholderDetailsResponse, error) {
 	return c.GetCardholderWithContext(context.Background(), cardholderId)
 }
@@ -135,8 +136,9 @@ func (c *Client) GetCardholderWithContext(
 //
 // It returns the cardholders.CardholderCardsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetCardholderCards(cardholderId string) (*cardholders.CardholderCardsResponse, error) {
 	return c.GetCardholderCardsWithContext(context.Background(), cardholderId)
 }
@@ -202,7 +204,8 @@ func (c *Client) CreateCardWithContext(
 //
 // It returns the cards.CardDetailsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetCardDetails(cardId string) (*cards.CardDetailsResponse, error) {
 	return c.GetCardDetailsWithContext(context.Background(), cardId)
@@ -236,7 +239,8 @@ func (c *Client) GetCardDetailsWithContext(ctx context.Context, cardId string) (
 //
 // It returns the cards.ThreeDSEnrollmentResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) EnrollThreeDS(
 	cardId string,
@@ -282,7 +286,8 @@ func (c *Client) EnrollThreeDSWithContext(
 //
 // It returns the cards.ThreeDSUpdateResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) UpdateThreeDS(
 	cardId string,
@@ -327,7 +332,8 @@ func (c *Client) UpdateThreeDSWithContext(
 //
 // It returns the cards.ThreeDSEnrollmentDetailsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetCardThreeDSDetails(cardId string) (*cards.ThreeDSEnrollmentDetailsResponse, error) {
 	return c.GetCardThreeDSDetailsWithContext(context.Background(), cardId)
@@ -367,7 +373,8 @@ func (c *Client) GetCardThreeDSDetailsWithContext(
 //
 // It returns the cards.ActivateCardResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) ActivateCard(cardId string) (*cards.ActivateCardResponse, error) {
 	return c.ActivateCardWithContext(context.Background(), cardId)
@@ -409,7 +416,8 @@ func (c *Client) ActivateCardWithContext(
 //
 // It returns the cards.CardCredentialsResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) GetCardCredentials(
 	cardId string,
@@ -456,7 +464,8 @@ func (c *Client) GetCardCredentialsWithContext(
 //
 // It returns the cards.RevokeCardResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) RevokeCard(
 	cardId string,
@@ -504,7 +513,8 @@ func (c *Client) RevokeCardWithContext(
 //
 // It returns the cards.SuspendCardResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) SuspendCard(
 	cardId string,
@@ -554,8 +564,9 @@ func (c *Client) SuspendCardWithContext(
 //
 // It returns the cards.CardUpdateResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns
-// a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateCard(
 	cardId string,
 	request cards.CardUpdateRequest,
@@ -576,8 +587,8 @@ func (c *Client) UpdateCardWithContext(
 // Encryption-Key headers from headers when they are set. The API no longer documents these
 // headers; they are still sent when set, and the response type is the same as for UpdateCard.
 //
-// cardId, request, the return value and the CheckoutArgumentError for an empty, "." or ".."
-// cardId are as for UpdateCard.
+// cardId, request, the return value and the CheckoutArgumentError for an invalid cardId are as
+// for UpdateCard.
 //
 // Deprecated: The API no longer documents these headers; use UpdateCard without headers.
 // Will be removed in the next major version.
@@ -693,8 +704,9 @@ func (c *Client) GetCardControlsWithContext(
 //
 // It returns the controls.CardControlResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetCardControlDetails(controlId string) (*controls.CardControlResponse, error) {
 	return c.GetCardControlDetailsWithContext(context.Background(), controlId)
 }
@@ -734,8 +746,9 @@ func (c *Client) GetCardControlDetailsWithContext(
 //
 // It returns the controls.CardControlResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateCardControl(
 	controlId string,
 	updateCardControlRequest controls.UpdateCardControlRequest,
@@ -779,8 +792,9 @@ func (c *Client) UpdateCardControlWithContext(
 //
 // It returns the common.IdResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RemoveCardControl(controlId string) (*common.IdResponse, error) {
 	return c.RemoveCardControlWithContext(context.Background(), controlId)
 }
@@ -849,8 +863,9 @@ func (c *Client) SimulateAuthorizationWithContext(
 //
 // It returns the testing.CardSimulationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SimulateIncrement(
 	transactionId string,
 	request testing.CardSimulationRequest,
@@ -896,8 +911,9 @@ func (c *Client) SimulateIncrementWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SimulateClearing(
 	transactionId string,
 	request testing.CardSimulationRequest,
@@ -942,8 +958,9 @@ func (c *Client) SimulateClearingWithContext(
 //
 // It returns the testing.CardSimulationResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SimulateReversal(
 	transactionId string,
 	request testing.CardSimulationRequest,
@@ -988,8 +1005,9 @@ func (c *Client) SimulateReversalWithContext(
 //
 // It returns the cardholders.CardholderUpdateResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardholderId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) UpdateCardholder(
 	cardholderId string,
 	request cardholders.CardholderRequest,
@@ -1033,7 +1051,8 @@ func (c *Client) UpdateCardholderWithContext(
 //
 // It returns the cards.RenewCardResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId returns a
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." cardId, or one
+// containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
 // CheckoutArgumentError and sends no request.
 func (c *Client) RenewCard(cardId string, request cards.RenewCardRequest) (*cards.RenewCardResponse, error) {
 	return c.RenewCardWithContext(context.Background(), cardId, request)
@@ -1131,8 +1150,9 @@ func (c *Client) CreateControlGroupWithContext(
 //
 // It returns the controlgroups.ControlGroupResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlGroupId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlGroupId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetControlGroupDetails(controlGroupId string) (*controlgroups.ControlGroupResponse, error) {
 	return c.GetControlGroupDetailsWithContext(context.Background(), controlGroupId)
 }
@@ -1172,8 +1192,9 @@ func (c *Client) GetControlGroupDetailsWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlGroupId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlGroupId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) RemoveControlGroup(controlGroupId string) (*common.MetadataResponse, error) {
 	return c.RemoveControlGroupWithContext(context.Background(), controlGroupId)
 }
@@ -1267,8 +1288,9 @@ func (c *Client) CreateControlProfileWithContext(
 //
 // It returns the controlprofiles.ControlProfileResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// controlProfileId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) GetControlProfileDetails(
 	controlProfileId string,
 ) (*controlprofiles.ControlProfileResponse, error) {
@@ -1311,8 +1333,9 @@ func (c *Client) GetControlProfileDetailsWithContext(
 //
 // It returns the controlprofiles.ControlProfileResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// controlProfileId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) UpdateControlProfile(
 	controlProfileId string,
 	request controlprofiles.ControlProfileRequest,
@@ -1356,8 +1379,9 @@ func (c *Client) UpdateControlProfileWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".."
+// controlProfileId, or one containing a slash, a backslash, an ASCII control character or invalid
+// UTF-8, returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveControlProfile(controlProfileId string) (*common.MetadataResponse, error) {
 	return c.RemoveControlProfileWithContext(context.Background(), controlProfileId)
 }
@@ -1399,7 +1423,8 @@ func (c *Client) RemoveControlProfileWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
-// or targetId returns a CheckoutArgumentError and sends no request.
+// or targetId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) AddTargetToControlProfile(
 	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
@@ -1451,7 +1476,8 @@ func (c *Client) AddTargetToControlProfileWithContext(
 // It returns the common.MetadataResponse, or the error from the API.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." controlProfileId
-// or targetId returns a CheckoutArgumentError and sends no request.
+// or targetId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
+// returns a CheckoutArgumentError and sends no request.
 func (c *Client) RemoveTargetFromControlProfile(
 	controlProfileId, targetId string,
 ) (*common.MetadataResponse, error) {
@@ -1498,8 +1524,9 @@ func (c *Client) RemoveTargetFromControlProfileWithContext(
 //
 // It returns the digitalcards.GetDigitalCardResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." digitalCardId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." digitalCardId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetDigitalCard(digitalCardId string) (*digitalcards.GetDigitalCardResponse, error) {
 	return c.GetDigitalCardWithContext(context.Background(), digitalCardId)
 }
@@ -1569,8 +1596,9 @@ func (c *Client) CreateDisputeWithContext(
 //
 // It returns the disputes.IssuingDisputeResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetDispute(disputeId string) (*disputes.IssuingDisputeResponse, error) {
 	return c.GetDisputeWithContext(context.Background(), disputeId)
 }
@@ -1610,8 +1638,9 @@ func (c *Client) GetDisputeWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) CancelDispute(disputeId string, idempotencyKey *string) (*common.MetadataResponse, error) {
 	return c.CancelDisputeWithContext(context.Background(), disputeId, idempotencyKey)
 }
@@ -1654,8 +1683,9 @@ func (c *Client) CancelDisputeWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) EscalateDispute(
 	disputeId string,
 	request disputes.EscalateDisputeRequest,
@@ -1704,8 +1734,9 @@ func (c *Client) EscalateDisputeWithContext(
 //
 // It returns the disputes.IssuingDisputeResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." disputeId, or
+// one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) AmendDispute(
 	disputeId string,
 	request disputes.AmendDisputeRequest,
@@ -1752,8 +1783,9 @@ func (c *Client) AmendDisputeWithContext(
 //
 // It returns the common.MetadataResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) SimulateRefund(
 	transactionId string,
 	request testing.SimulateRefundRequest,
@@ -1852,8 +1884,9 @@ func (c *Client) GetListTransactionsWithContext(
 //
 // It returns the transactions.TransactionResponse, or the error from the API.
 //
-// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId
-// returns a CheckoutArgumentError and sends no request.
+// Path values are percent-encoded, each as one path segment. An empty, "." or ".." transactionId,
+// or one containing a slash, a backslash, an ASCII control character or invalid UTF-8, returns a
+// CheckoutArgumentError and sends no request.
 func (c *Client) GetSingleTransaction(transactionId string) (*transactions.TransactionResponse, error) {
 	return c.GetSingleTransactionWithContext(context.Background(), transactionId)
 }

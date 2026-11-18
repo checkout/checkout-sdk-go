@@ -231,15 +231,16 @@ func (f *OAuthSdkCredentials) requestAccessToken() (*OAuthAccessToken, error) {
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	f.Log.Printf("post: %s", f.AuthorizationUri)
+	// Scheme, host and path only: the query and fragment stay out of the log.
+	f.Log.Printf("post: %s://%s%s", req.URL.Scheme, req.URL.Host, req.URL.EscapedPath())
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.NewCheckoutTransportError(err)
 	}
 	defer resp.Body.Close()
 
-	// Redirects are not followed: a 3xx is an error that names the status only, and the response
-	// body and headers are not read.
+	// A status from 300 to 399 is an error that names the status only; the response body and
+	// headers are not read.
 	if resp.StatusCode >= http.StatusMultipleChoices && resp.StatusCode < http.StatusBadRequest {
 		return nil, errors.CheckoutAuthorizationError(fmt.Sprintf(
 			"OAuth token request returned %d; redirects are not followed", resp.StatusCode))
@@ -283,8 +284,8 @@ const maxExpiresIn = time.Duration(math.MaxInt64 / int64(time.Second))
 const tokenRequestTimeout = time.Duration(5) * time.Second
 
 // tokenHttpClient returns a copy of HttpClient, or a client with a 5 second timeout when it is nil.
-// The copy keeps the settings of HttpClient, such as its Transport and Timeout, and never follows
-// redirects. HttpClient itself is not changed. The policy applies to the http.Client; a custom
+// The copy keeps the settings of HttpClient, such as its Transport and Timeout, and uses its own
+// response policy. HttpClient itself is not changed. The policy applies to the http.Client; a custom
 // Transport keeps its own behaviour.
 func (f *OAuthSdkCredentials) tokenHttpClient() *http.Client {
 	client := http.Client{Timeout: tokenRequestTimeout}

@@ -718,6 +718,25 @@ func TestAuthorizationUriWithUserInformationIsRejectedBeforeSending(t *testing.T
 	assert.Equal(t, int32(0), atomic.LoadInt32(&requests))
 }
 
+// The token request log line names the scheme, host and path of the authorization URI only: its
+// query and fragment are left out.
+func TestTokenRequestLogLeavesOutTheQueryAndFragment(t *testing.T) {
+	var logged strings.Builder
+	credentials := &OAuthSdkCredentials{
+		ClientId:         "client_id",
+		ClientSecret:     "client_secret",
+		AuthorizationUri: "https://access.example.com/connect/token?client_secret=query-value#fragment-value",
+		HttpClient: &http.Client{Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			return nil, errors.CheckoutAPIError{Status: "not sent"}
+		})},
+		Log: log.New(&logged, "", 0),
+	}
+
+	_ = credentials.GetAccessToken()
+
+	assert.Equal(t, "post: https://access.example.com/connect/token\n", logged.String())
+}
+
 // A token response body that is not JSON returns the JSON decoding error, for a success and an
 // error status alike.
 func TestTokenResponseThatIsNotJsonReturnsTheDecodingError(t *testing.T) {

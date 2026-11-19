@@ -12,10 +12,10 @@
 ## Getting started
 
 > **Version 3.0.0 is here!**
-> <br/><br/>
-> The module path is now `github.com/checkout/checkout-sdk-go/v3`, so update your imports when you upgrade. <br/>
-> Your merchant-specific subdomain is now required: call `WithEnvironmentSubdomain()`, or the deprecated `WithLegacyDomain()` to keep using the shared hosts. <br/>
-> `context.Context` support from 2.0.0 is unchanged: every client method still has a `*WithContext` variant, and the plain methods keep working. <br/>
+>
+> The module path is now `github.com/checkout/checkout-sdk-go/v3`, so update your imports when you upgrade.
+> Your merchant-specific subdomain is now required: call `WithEnvironmentSubdomain()`, or the deprecated `WithLegacyDomain()` to keep using the shared hosts.
+> `context.Context` support from 2.0.0 is unchanged: every client method still has a `*WithContext` variant, and the plain methods keep working.
 
 ### Module installer
 Make sure your project is using Go Modules:

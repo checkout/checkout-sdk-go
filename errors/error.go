@@ -116,3 +116,20 @@ func NewCheckoutTransportError(err error) error {
 	}
 	return CheckoutTransportError{Err: err}
 }
+
+// CheckoutDecodingError is returned when a successful response (status below 400) could not be
+// decoded into the response type: a body that is not valid JSON or does not match the type, or a
+// CSV or PDF reply to a call whose response has no Content field that can hold it. It carries the
+// status code and the media type.
+type CheckoutDecodingError struct {
+	// StatusCode is the HTTP status code of the response.
+	StatusCode int
+	// ContentType is the media type of the response, in lower case and without parameters: "" when
+	// the response has none, "invalid" when the header is not a plain media type.
+	ContentType string
+}
+
+// Error returns "response could not be decoded" with the status code and the media type.
+func (e CheckoutDecodingError) Error() string {
+	return fmt.Sprintf("response could not be decoded: status %d, content type %q", e.StatusCode, e.ContentType)
+}

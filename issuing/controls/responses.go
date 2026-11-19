@@ -1,6 +1,7 @@
 package issuing
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -60,7 +61,13 @@ func (l MidLimit) GetType() ControlType {
 	return MidLimitType
 }
 
+// UnmarshalJSON decodes the control and its limit for the velocity_limit, mcc_limit and mid_limit
+// control types. A JSON null leaves the response unchanged; an unknown control type returns
+// errors.UnsupportedTypeError.
 func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
+	if string(bytes.TrimSpace(data)) == "null" {
+		return nil
+	}
 	var controlData CardControlData
 	if err := json.Unmarshal(data, &controlData); err != nil {
 		return err
@@ -73,7 +80,7 @@ func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
 			VelocityLimit VelocityLimit `json:"velocity_limit,omitempty"`
 		}{}
 		if err := json.Unmarshal(data, &limit); err != nil {
-			return nil
+			return err
 		}
 		s.Limit = limit.VelocityLimit
 	case MccLimitType:
@@ -81,7 +88,7 @@ func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
 			MccLimit MccLimit `json:"mcc_limit,omitempty"`
 		}{}
 		if err := json.Unmarshal(data, &limit); err != nil {
-			return nil
+			return err
 		}
 		s.Limit = limit.MccLimit
 	case MidLimitType:
@@ -89,7 +96,7 @@ func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
 			MidLimit MidLimit `json:"mid_limit,omitempty"`
 		}{}
 		if err := json.Unmarshal(data, &limit); err != nil {
-			return nil
+			return err
 		}
 		s.Limit = limit.MidLimit
 	default:

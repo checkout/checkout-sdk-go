@@ -105,15 +105,26 @@ func NewCreateBacsInstrumentRequest() *createBacsInstrumentRequest {
 }
 
 type (
+	// CreateInstrumentResponse is the response to creating a payment instrument. One variant field
+	// is set, chosen by the instrument type of the response; a response of another type is kept in
+	// AlternativeResponse.
 	CreateInstrumentResponse struct {
-		HttpMetadata                        common.HttpMetadata
+		// HttpMetadata holds the status, headers and body of the HTTP response.
+		HttpMetadata common.HttpMetadata
+		// CreateBankAccountInstrumentResponse is set for the bank_account type.
 		CreateBankAccountInstrumentResponse *CreateBankAccountInstrumentResponse
-		CreateCardInstrumentResponse        *CreateCardInstrumentResponse
-		CreateTokenInstrumentResponse       *CreateTokenInstrumentResponse
-		CreateSepaInstrumentResponse        *CreateSepaInstrumentResponse
-		CreateAchInstrumentResponse         *CreateAchInstrumentResponse
-		CreateBacsInstrumentResponse        *CreateBacsInstrumentResponse
-		AlternativeResponse                 *common.AlternativeResponse
+		// CreateCardInstrumentResponse is set for the card type.
+		CreateCardInstrumentResponse *CreateCardInstrumentResponse
+		// CreateTokenInstrumentResponse is set for the token type.
+		CreateTokenInstrumentResponse *CreateTokenInstrumentResponse
+		// CreateSepaInstrumentResponse is set for the sepa type.
+		CreateSepaInstrumentResponse *CreateSepaInstrumentResponse
+		// CreateAchInstrumentResponse is set for the ach type.
+		CreateAchInstrumentResponse *CreateAchInstrumentResponse
+		// CreateBacsInstrumentResponse is set for the bacs type.
+		CreateBacsInstrumentResponse *CreateBacsInstrumentResponse
+		// AlternativeResponse holds the response as a map for any other type.
+		AlternativeResponse *common.AlternativeResponse
 	}
 
 	CreateBankAccountInstrumentResponse struct {
@@ -193,6 +204,8 @@ type (
 	}
 )
 
+// UnmarshalJSON decodes the response into the variant field of its type, or into
+// AlternativeResponse for any other type, and returns the error of that decoding.
 func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
 	var typeMapping common.TypeMapping
 	if err := json.Unmarshal(data, &typeMapping); err != nil {
@@ -203,43 +216,43 @@ func (s *CreateInstrumentResponse) UnmarshalJSON(data []byte) error {
 	case string(common.BankAccount):
 		var response CreateBankAccountInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.CreateBankAccountInstrumentResponse = &response
 	case string(common.Card):
 		var response CreateCardInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.CreateCardInstrumentResponse = &response
 	case string(common.Token):
 		var response CreateTokenInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.CreateTokenInstrumentResponse = &response
 	case string(common.Sepa):
 		var response CreateSepaInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.CreateSepaInstrumentResponse = &response
 	case string(common.Ach):
 		var response CreateAchInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.CreateAchInstrumentResponse = &response
 	case string(common.Bacs):
 		var response CreateBacsInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.CreateBacsInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.AlternativeResponse = &response
 	}

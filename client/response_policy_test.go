@@ -285,6 +285,62 @@ func TestFollowDownloadRedirectRefusesWhatItDoesNotFollow(t *testing.T) {
 	assert.Equal(t, http.ErrUseLastResponse, refuseRedirect(newHop(http.StatusFound, ""), []*http.Request{first}))
 }
 
+// TestFollowDownloadRedirectFollowsHttpsOrLoopbackOnly: the download URL is followed only over
+// https, or over http to a loopback host; any other scheme or host is returned as the response.
+func TestFollowDownloadRedirectFollowsHttpsOrLoopbackOnly(t *testing.T) {
+	first, _ := http.NewRequest(http.MethodGet, "https://api.example/reports/r/files/f", nil)
+	targets := map[string]bool{
+		"https://download.example/file?sig=" + redirectMarker: true,
+		"https://127.0.0.1/file":                              true,
+		"http://127.0.0.1:8080/file":                          true,
+		"http://localhost/file":                               true,
+		"http://[::1]/file":                                   true,
+		"http://download.example/file?sig=" + redirectMarker:  false,
+		"http://localhost.evil.example/file":                  false,
+		"http://127.0.0.1.nip.io/file":                        false,
+		"http://0.0.0.0/file":                                 false,
+		"http://10.0.0.1/file":                                false,
+		"ftp://download.example/file":                         false,
+		"file:///etc/passwd":                                  false,
+		"ws://127.0.0.1/file":                                 false,
+	}
+	for target, follow := range targets {
+		req, err := http.NewRequest(http.MethodGet, target, nil)
+		require.NoError(t, err, target)
+		req.Response = &http.Response{StatusCode: http.StatusFound}
+
+		got := followDownloadRedirect(req, []*http.Request{first})
+
+		if follow {
+			assert.NoError(t, got, target)
+		} else {
+			assert.Equal(t, http.ErrUseLastResponse, got, target)
+		}
+	}
+}
+
+// TestFollowDownloadRedirectDropsTheSdkHeaders: the download request carries no Authorization and
+// no Cko- header, whatever its case; other headers are kept.
+func TestFollowDownloadRedirectDropsTheSdkHeaders(t *testing.T) {
+	first, _ := http.NewRequest(http.MethodGet, "https://api.example/reports/r/files/f", nil)
+	req, _ := http.NewRequest(http.MethodGet, "https://download.example/file", nil)
+	req.Response = &http.Response{StatusCode: http.StatusFound}
+	req.Header.Set("Authorization", "Bearer "+redirectMarker)
+	req.Header.Set(CkoTelemetryHeader, redirectMarker)
+	req.Header.Set("Cko-Idempotency-Key", redirectMarker)
+	req.Header["cko-lower-case"] = []string{redirectMarker}
+	req.Header["CKO-UPPER-CASE"] = []string{redirectMarker}
+	req.Header.Set("Accept", "text/csv")
+
+	require.NoError(t, followDownloadRedirect(req, []*http.Request{first}))
+
+	for name := range req.Header {
+		assert.False(t, strings.HasPrefix(strings.ToLower(name), "cko-"), name)
+	}
+	assert.Equal(t, "", req.Header.Get("Authorization"))
+	assert.Equal(t, "text/csv", req.Header.Get("Accept"))
+}
+
 // TestApiClientRefusesRedirectsWithAMalformedOrMissingLocation: a 3xx with a Location that does not
 // parse, or with no Location, gives the same CheckoutAPIError as any other 3xx.
 func TestApiClientRefusesRedirectsWithAMalformedOrMissingLocation(t *testing.T) {

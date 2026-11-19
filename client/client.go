@@ -20,6 +20,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/configuration"
 	"github.com/checkout/checkout-sdk-go/v3/errors"
 	"github.com/checkout/checkout-sdk-go/v3/internal/download"
+	"github.com/checkout/checkout-sdk-go/v3/internal/loopback"
 )
 
 type HttpClient interface {
@@ -538,18 +539,40 @@ func refuseRedirect(*http.Request, []*http.Request) error {
 	return http.ErrUseLastResponse
 }
 
-// followDownloadRedirect follows a single 302, as a GET without the Authorization header and without
-// a body (net/http sends the request that follows a 302 as a GET with no body; a body is refused
-// anyway). Any other redirect, a second one included, is returned as the response instead of
-// being followed. Only GetReportFile, a GET, marks its context for it.
+// followDownloadRedirect follows a single 302 to an https URL (http only for a loopback host, for
+// local tests), as a GET without the Authorization header, without the SDK's own headers (any
+// Cko- header, the telemetry header included) and without a body (net/http sends the request that
+// follows a 302 as a GET with no body; a body is refused anyway). Any other redirect, a second
+// one included, is returned as the response instead of being followed. Only GetReportFile, a GET,
+// marks its context for it.
 func followDownloadRedirect(req *http.Request, via []*http.Request) error {
 	if len(via) != 1 || req.Response == nil || req.Response.StatusCode != http.StatusFound ||
-		(req.Body != nil && req.Body != http.NoBody) {
+		(req.Body != nil && req.Body != http.NoBody) || !isDownloadScheme(req.URL) {
 		return http.ErrUseLastResponse
 	}
 	req.Header.Del("Authorization")
+	for name := range req.Header {
+		if len(name) >= len(ckoHeaderPrefix) && strings.EqualFold(name[:len(ckoHeaderPrefix)], ckoHeaderPrefix) {
+			delete(req.Header, name)
+		}
+	}
 	req.URL.User = nil
 	return nil
+}
+
+// ckoHeaderPrefix starts the name of every header the SDK sets for the API only.
+const ckoHeaderPrefix = "cko-"
+
+// isDownloadScheme reports whether the download URL may be requested: https, or http for a
+// loopback host.
+func isDownloadScheme(u *url.URL) bool {
+	switch u.Scheme {
+	case "https":
+		return true
+	case "http":
+		return loopback.IsHost(u.Hostname())
+	}
+	return false
 }
 
 func isRedirect(statusCode int) bool {

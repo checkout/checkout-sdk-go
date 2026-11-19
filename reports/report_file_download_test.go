@@ -285,3 +285,92 @@ func TestGetReportFileDownloadErrorsKeepTheStatusOnly(t *testing.T) {
 		})
 	}
 }
+
+// TestGetReportFileRefusesAnHttpDownloadUrl: a download URL over http to a host that is not loopback
+// is not requested; the 302 returns a CheckoutAPIError without the Location.
+func TestGetReportFileRefusesAnHttpDownloadUrl(t *testing.T) {
+	for _, location := range []string{
+		"http://download.example/download?q=" + reportMarker,
+		"http://localhost.download.example/download?q=" + reportMarker,
+		"ftp://download.example/download?q=" + reportMarker,
+	} {
+		location := location
+		t.Run(location, func(t *testing.T) {
+			sent := 0
+			transport := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+				sent++
+				if r.URL.Host != "api.example" {
+					return nil, fmt.Errorf("unexpected request to %s", r.URL.Host)
+				}
+				header := http.Header{}
+				header.Set("Location", location)
+				header.Set("Cko-Request-Id", "req-report")
+				return &http.Response{StatusCode: http.StatusFound, Header: header,
+					Body: ioutil.NopCloser(strings.NewReader("")), Request: r}, nil
+			})
+			telemetry := false
+			var logs bytes.Buffer
+			config := configuration.NewConfiguration(
+				configuration.NewDefaultKeysSdkCredentials(reportKey, "pk_sbox_report_test"),
+				&telemetry, nil, &http.Client{Transport: transport}, log.New(&logs, "", 0))
+
+			_, err := NewClient(config, client.NewApiClient(config, "https://api.example")).GetReportFile("rpt_1", "file_1")
+
+			assertReportRedirectRefused(t, err, http.StatusFound, logs.String())
+			assert.Equal(t, 1, sent, "the download URL is not requested")
+			assert.NotContains(t, fmt.Sprintf("%v %+v", err, err), "download.example")
+			assert.Equal(t, "req-report", err.(errors.CheckoutAPIError).Data.RequestID)
+		})
+	}
+}
+
+// TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl: with telemetry on, the API receives the
+// telemetry header and the https download host receives no Cko- header and no Authorization.
+func TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl(t *testing.T) {
+	var mu sync.Mutex
+	var downloadCko, downloadAuth, apiTelemetry []string
+	host := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		for name := range r.Header {
+			if strings.HasPrefix(strings.ToLower(name), "cko-") {
+				downloadCko = append(downloadCko, name)
+			}
+		}
+		downloadAuth = append(downloadAuth, r.Header.Get("Authorization"))
+		mu.Unlock()
+		w.Header().Set("Content-Type", "text/csv")
+		_, _ = w.Write([]byte("a,b\n"))
+	}))
+	t.Cleanup(host.Close)
+	api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		apiTelemetry = append(apiTelemetry, r.Header.Get(client.CkoTelemetryHeader))
+		mu.Unlock()
+		w.Header().Set("Cko-Request-Id", "req-report")
+		w.Header().Set("Location", host.URL+"/download?q="+reportMarker)
+		w.WriteHeader(http.StatusFound)
+	}))
+	t.Cleanup(api.Close)
+	telemetry := true
+	var logs bytes.Buffer
+	config := configuration.NewConfiguration(
+		configuration.NewDefaultKeysSdkCredentials(reportKey, "pk_sbox_report_test"),
+		&telemetry, nil, host.Client(), log.New(&logs, "", 0))
+	reports := NewClient(config, client.NewApiClient(config, api.URL))
+
+	for i := 0; i < 3; i++ {
+		_, err := reports.GetReportFile("rpt_1", "file_1")
+		require.NoError(t, err)
+	}
+
+	require.Len(t, apiTelemetry, 3)
+	assert.Equal(t, "", apiTelemetry[0], "no metric before the first request")
+	assert.NotEqual(t, "", apiTelemetry[1], "the API receives the telemetry header")
+	assert.NotEqual(t, "", apiTelemetry[2], "the API receives the telemetry header")
+	assert.Equal(t, []string{"", "", ""}, downloadAuth, "three downloads, without Authorization")
+	assert.Empty(t, downloadCko, "the download host receives no Cko- header")
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }

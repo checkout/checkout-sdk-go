@@ -120,16 +120,33 @@ func NewCheckoutTransportError(err error) error {
 // CheckoutDecodingError is returned when a successful response (status below 400) could not be
 // decoded into the response type: a body that is not valid JSON or does not match the type, or a
 // CSV or PDF reply to a call whose response has no Content field that can hold it. It carries the
-// status code and the media type.
+// status code and the media type. When decoding reports an UnsupportedTypeError, errors.As still
+// finds it; no other underlying error is kept.
 type CheckoutDecodingError struct {
 	// StatusCode is the HTTP status code of the response.
 	StatusCode int
 	// ContentType is the media type of the response, in lower case and without parameters: "" when
 	// the response has none, "invalid" when the header is not a plain media type.
 	ContentType string
+	// unsupported is the UnsupportedTypeError reported while decoding, or nil.
+	unsupported error
+}
+
+// NewCheckoutDecodingError returns the CheckoutDecodingError for a response with that status code
+// and media type. When err is or wraps an UnsupportedTypeError, Unwrap returns that error.
+func NewCheckoutDecodingError(statusCode int, contentType string, err error) CheckoutDecodingError {
+	decodingErr := CheckoutDecodingError{StatusCode: statusCode, ContentType: contentType}
+	var unsupported UnsupportedTypeError
+	if stderrors.As(err, &unsupported) {
+		decodingErr.unsupported = unsupported
+	}
+	return decodingErr
 }
 
 // Error returns "response could not be decoded" with the status code and the media type.
 func (e CheckoutDecodingError) Error() string {
 	return fmt.Sprintf("response could not be decoded: status %d, content type %q", e.StatusCode, e.ContentType)
 }
+
+// Unwrap returns the UnsupportedTypeError reported while decoding, or nil.
+func (e CheckoutDecodingError) Unwrap() error { return e.unsupported }

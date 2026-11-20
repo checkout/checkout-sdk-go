@@ -37,59 +37,60 @@ func Unmarshal(metadata *HttpMetadata, responseMapping interface{}) error {
 		return errors.CheckoutDecodingError{}
 	}
 	mediaType := responseMediaType(metadata)
-	fail := func() error {
-		return errors.CheckoutDecodingError{StatusCode: metadata.StatusCode, ContentType: mediaType}
+	fail := func(err error) error {
+		return errors.NewCheckoutDecodingError(metadata.StatusCode, mediaType, err)
 	}
 
 	target := reflect.ValueOf(responseMapping)
 	if !target.IsValid() || target.Kind() != reflect.Ptr || target.IsNil() {
-		return fail()
+		return fail(nil)
 	}
 
 	body := metadata.ResponseBody
 	if len(body) != 0 {
 		switch mediaType {
 		case "text/csv":
-			if !setContent(target, body, reflect.ValueOf(string(body))) {
-				return fail()
+			if !setContent(target, body, true) {
+				return fail(nil)
 			}
 		case "application/pdf":
-			if !setContent(target, body, reflect.ValueOf(append([]byte(nil), body...))) {
-				return fail()
+			if !setContent(target, body, false) {
+				return fail(nil)
 			}
 		default:
-			if !decodeJSON(body, responseMapping) {
-				return fail()
+			if ok, err := decodeJSON(body, responseMapping); !ok {
+				return fail(err)
 			}
 		}
 	}
 
 	if !setHttpMetadata(target, metadata) {
-		return fail()
+		return fail(nil)
 	}
 	return nil
 }
 
-// decodeJSON decodes body into responseMapping and reports whether it succeeded. A JSON null leaves
-// responseMapping as it is. It reports false when the body is nested deeper than jsondepth.MaxDepth,
-// when decoding returns an error, and when a custom UnmarshalJSON does not return normally.
-func decodeJSON(body []byte, responseMapping interface{}) (ok bool) {
+// decodeJSON decodes body into responseMapping and reports whether it succeeded, with the decoding
+// error when there is one. A JSON null leaves responseMapping as it is. It reports false when the
+// body is nested deeper than jsondepth.MaxDepth, when decoding returns an error, and when a custom
+// UnmarshalJSON does not return normally (that case has no error).
+func decodeJSON(body []byte, responseMapping interface{}) (ok bool, err error) {
 	if string(bytes.TrimSpace(body)) == "null" {
-		return true
+		return true, nil
 	}
 	if !jsondepth.WithinLimit(body) {
-		return false
+		return false, nil
 	}
 	returned := false
 	defer func() {
 		if !returned {
 			_ = recover()
-			ok = false
+			ok, err = false, nil
 		}
 	}()
-	err := json.Unmarshal(body, responseMapping)
+	err = json.Unmarshal(body, responseMapping)
 	returned = true
-	return err == nil
+	return err == nil, err
 }
 
 // responseMediaType returns the lower-case media type of the response, without parameters, or ""
@@ -121,9 +122,10 @@ func isMediaTypeByte(c byte) bool {
 }
 
 // setContent sets the Content field of the struct target points to: a string field gets the body
-// as text, a []byte field a copy of it, an empty interface field the given value. It reports false
-// when there is no such field or it has another type.
-func setContent(target reflect.Value, body []byte, value reflect.Value) bool {
+// as text, a []byte field a copy of it, and an empty interface field the text when asText is true
+// or a copy of the bytes otherwise. It reports false when there is no such field or it has another
+// type.
+func setContent(target reflect.Value, body []byte, asText bool) bool {
 	field, ok := settableField(target, "Content")
 	if !ok {
 		return false
@@ -133,8 +135,10 @@ func setContent(target reflect.Value, body []byte, value reflect.Value) bool {
 		field.SetString(string(body))
 	case field.Kind() == reflect.Slice && field.Type().Elem().Kind() == reflect.Uint8:
 		field.SetBytes(append([]byte(nil), body...))
+	case field.Kind() == reflect.Interface && field.NumMethod() == 0 && asText:
+		field.Set(reflect.ValueOf(string(body)))
 	case field.Kind() == reflect.Interface && field.NumMethod() == 0:
-		field.Set(value)
+		field.Set(reflect.ValueOf(append([]byte(nil), body...)))
 	default:
 		return false
 	}

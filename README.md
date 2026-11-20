@@ -153,7 +153,9 @@ context.DeadlineExceeded)` and `errors.As` with `*url.Error` keep working, and i
 
 When a successful response cannot be decoded into the response type (a body that is not JSON or does not match the
 type, or a CSV or PDF reply the response type cannot hold), the SDK returns an `errors.CheckoutDecodingError` with the
-`StatusCode` and the media type. A JSON `null` body gives an empty response with its `HttpMetadata` set.
+`StatusCode` and the media type. An `errors.UnsupportedTypeError` from a response type with several variants (issuing
+cards and controls, payout schedules) stays reachable with `errors.As`. A JSON `null` body gives an empty response with
+its `HttpMetadata` set.
 
 Some OAuth token responses return an `errors.CheckoutAuthorizationError`. The authorization URI must be an
 absolute `https` URI without user information; `http` is accepted only for a loopback host (`localhost`,

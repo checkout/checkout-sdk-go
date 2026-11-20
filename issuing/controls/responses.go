@@ -3,7 +3,6 @@ package issuing
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
@@ -100,7 +99,7 @@ func (s *CardControlResponse) UnmarshalJSON(data []byte) error {
 		}
 		s.Limit = limit.MidLimit
 	default:
-		return errors.UnsupportedTypeError(fmt.Sprintf("%s unsupported", controlData.ControlType))
+		return errors.UnsupportedTypeError("control type unsupported")
 	}
 	return nil
 }

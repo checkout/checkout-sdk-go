@@ -3,7 +3,6 @@ package issuing
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
@@ -135,7 +134,7 @@ func (s *CardDetailsResponse) UnmarshalJSON(data []byte) error {
 		}
 		s.ExtraData = extraData.VirtualExtraData
 	default:
-		return errors.UnsupportedTypeError(fmt.Sprintf("%s unsupported", cardDetailsData.Type))
+		return errors.UnsupportedTypeError("card type unsupported")
 	}
 	return nil
 }

@@ -174,3 +174,32 @@ func TestTypedDecodersReturnTheErrorOfTheirVariant(t *testing.T) {
 		})
 	}
 }
+
+func TestUnsupportedTypeErrorStaysReachable(t *testing.T) {
+	cases := map[string]struct {
+		newValue func() interface{}
+		body     string
+	}{
+		"card type":        {func() interface{} { return new(issuingcards.CardDetailsResponse) }, `{"type":"` + decoderMarker + `"}`},
+		"control type":     {func() interface{} { return new(issuingcontrols.CardControlResponse) }, `{"control_type":"` + decoderMarker + `"}`},
+		"payout frequency": {func() interface{} { return new(accounts.PayoutSchedule) }, `{"` + decoderMarker + `":{"recurrence":{"frequency":"` + decoderMarker + `"}}}`},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			header := http.Header{}
+			header.Set("Content-Type", "application/json")
+			metadata := &common.HttpMetadata{StatusCode: http.StatusOK, ResponseBody: []byte(tc.body), Headers: &common.Headers{Header: header}}
+			err := common.Unmarshal(metadata, tc.newValue())
+
+			var decodingErr errors.CheckoutDecodingError
+			assert.True(t, stderrors.As(err, &decodingErr), "got %T", err)
+			var unsupported errors.UnsupportedTypeError
+			if assert.True(t, stderrors.As(err, &unsupported), "errors.As with UnsupportedTypeError") {
+				assert.NotContains(t, unsupported.Error(), decoderMarker)
+			}
+			for _, text := range []string{err.Error(), fmt.Sprintf("%v", err), fmt.Sprintf("%+v", err), fmt.Sprintf("%#v", err)} {
+				assert.NotContains(t, text, decoderMarker)
+			}
+		})
+	}
+}

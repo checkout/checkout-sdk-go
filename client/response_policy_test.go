@@ -3,7 +3,9 @@ package client
 import (
 	"bytes"
 	"context"
+	stderrors "errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -319,8 +321,8 @@ func TestFollowDownloadRedirectFollowsHttpsOrLoopbackOnly(t *testing.T) {
 	}
 }
 
-// TestFollowDownloadRedirectDropsTheSdkHeaders: the download request carries no Authorization and
-// no Cko- header, whatever its case; other headers are kept.
+// TestFollowDownloadRedirectDropsTheSdkHeaders: the download request carries no Authorization, no
+// Referer and no Cko- header, whatever its case; other headers are kept.
 func TestFollowDownloadRedirectDropsTheSdkHeaders(t *testing.T) {
 	first, _ := http.NewRequest(http.MethodGet, "https://api.example/reports/r/files/f", nil)
 	req, _ := http.NewRequest(http.MethodGet, "https://download.example/file", nil)
@@ -331,6 +333,7 @@ func TestFollowDownloadRedirectDropsTheSdkHeaders(t *testing.T) {
 	req.Header["cko-lower-case"] = []string{redirectMarker}
 	req.Header["CKO-UPPER-CASE"] = []string{redirectMarker}
 	req.Header.Set("Accept", "text/csv")
+	req.Header.Set("Referer", "https://api.example/reports/r/files/f?q="+redirectMarker)
 
 	require.NoError(t, followDownloadRedirect(req, []*http.Request{first}))
 
@@ -338,6 +341,7 @@ func TestFollowDownloadRedirectDropsTheSdkHeaders(t *testing.T) {
 		assert.False(t, strings.HasPrefix(strings.ToLower(name), "cko-"), name)
 	}
 	assert.Equal(t, "", req.Header.Get("Authorization"))
+	assert.Equal(t, "", req.Header.Get("Referer"))
 	assert.Equal(t, "text/csv", req.Header.Get("Accept"))
 }
 
@@ -538,3 +542,32 @@ func TestDownloadErrorsKeepTheStatusOnlyWithACallerTransport(t *testing.T) {
 	assert.NotContains(t, fmt.Sprintf("%v %+v", err, apiErr), redirectMarker)
 	assert.NotContains(t, logs.String(), redirectMarker)
 }
+
+// TestDownloadBodyReadErrorsKeepTheDownloadUrlOut: when reading the download response fails with an
+// error that carries the download URL, the CheckoutTransportError keeps the URL without its query.
+func TestDownloadBodyReadErrorsKeepTheDownloadUrlOut(t *testing.T) {
+	for _, telemetry := range []bool{false, true} {
+		transport := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			readErr := &url.Error{Op: "Get", URL: "https://download.example/file?q=" + redirectMarker, Err: io.ErrUnexpectedEOF}
+			return &http.Response{StatusCode: http.StatusOK, Status: "200 OK", Header: http.Header{},
+				Body: urlErrorBody{err: readErr}, Request: r}, nil
+		})
+		var logs bytes.Buffer
+		api := NewApiClient(configuration.NewConfiguration(nil, &telemetry, nil, &http.Client{Transport: transport}, log.New(&logs, "", 0)), "https://api.example")
+
+		err := api.GetWithContext(download.Mark(context.Background()), "/reports/r/files/f", testAuth(), nil, &common.IdResponse{})
+
+		require.Error(t, err, "telemetry=%v", telemetry)
+		transportErr, ok := err.(sdkerrors.CheckoutTransportError)
+		require.True(t, ok, "want a CheckoutTransportError, got %T: %v", err, err)
+		assert.NotContains(t, fmt.Sprintf("%v %+v", err, transportErr), redirectMarker, "telemetry=%v", telemetry)
+		assert.Contains(t, err.Error(), "https://download.example/file", "telemetry=%v", telemetry)
+		assert.True(t, stderrors.Is(err, io.ErrUnexpectedEOF), "telemetry=%v", telemetry)
+		assert.NotContains(t, logs.String(), redirectMarker)
+	}
+}
+
+type urlErrorBody struct{ err error }
+
+func (b urlErrorBody) Read([]byte) (int, error) { return 0, b.err }
+func (urlErrorBody) Close() error               { return nil }

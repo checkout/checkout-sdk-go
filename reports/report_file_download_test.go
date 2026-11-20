@@ -325,10 +325,11 @@ func TestGetReportFileRefusesAnHttpDownloadUrl(t *testing.T) {
 }
 
 // TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl: with telemetry on, the API receives the
-// telemetry header and the https download host receives no Cko- header and no Authorization.
+// telemetry header and the https download host receives no Cko- header, no Authorization and no
+// Referer.
 func TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl(t *testing.T) {
 	var mu sync.Mutex
-	var downloadCko, downloadAuth, apiTelemetry []string
+	var downloadCko, downloadAuth, downloadReferer, apiTelemetry []string
 	host := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mu.Lock()
 		for name := range r.Header {
@@ -337,6 +338,7 @@ func TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl(t *testing.T) {
 			}
 		}
 		downloadAuth = append(downloadAuth, r.Header.Get("Authorization"))
+		downloadReferer = append(downloadReferer, r.Header.Get("Referer"))
 		mu.Unlock()
 		w.Header().Set("Content-Type", "text/csv")
 		_, _ = w.Write([]byte("a,b\n"))
@@ -369,6 +371,7 @@ func TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl(t *testing.T) {
 	assert.NotEqual(t, "", apiTelemetry[2], "the API receives the telemetry header")
 	assert.Equal(t, []string{"", "", ""}, downloadAuth, "three downloads, without Authorization")
 	assert.Empty(t, downloadCko, "the download host receives no Cko- header")
+	assert.Equal(t, []string{"", "", ""}, downloadReferer, "the download host receives no Referer")
 }
 
 type roundTripFunc func(*http.Request) (*http.Response, error)

@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	stderrors "errors"
 	"fmt"
 	"io"
@@ -571,3 +572,33 @@ type urlErrorBody struct{ err error }
 
 func (b urlErrorBody) Read([]byte) (int, error) { return 0, b.err }
 func (urlErrorBody) Close() error               { return nil }
+
+// TestTelemetryHeaderCarriesTheMetricsOfAnEarlierRequest: with EnableTelemetry, the first request
+// sends no telemetry header and the next one sends the metrics of the first.
+func TestTelemetryHeaderCarriesTheMetricsOfAnEarlierRequest(t *testing.T) {
+	var mu sync.Mutex
+	var headers []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		headers = append(headers, r.Header.Get(CkoTelemetryHeader))
+		mu.Unlock()
+		jsonOK(w)
+	}))
+	t.Cleanup(server.Close)
+	telemetry := true
+	api := NewApiClient(configuration.NewConfiguration(nil, &telemetry, nil, nil, log.New(ioutil.Discard, "", 0)), server.URL)
+
+	for i := 0; i < 2; i++ {
+		require.NoError(t, api.Get("/test", testAuth(), nil, &common.IdResponse{}))
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+	require.Len(t, headers, 2)
+	assert.Equal(t, "", headers[0], "the first request sends no telemetry header")
+	var metrics common.RequestMetrics
+	require.NoError(t, json.Unmarshal([]byte(headers[1]), &metrics))
+	assert.NotEqual(t, "", metrics.PrevRequestId, "the second request carries the id of the first")
+	assert.NotEqual(t, "", metrics.RequestId)
+	assert.NotEqual(t, metrics.PrevRequestId, metrics.RequestId)
+}

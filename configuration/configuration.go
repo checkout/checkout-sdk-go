@@ -10,7 +10,8 @@ import (
 type Configuration struct {
 	// Credentials authorize each request.
 	Credentials SdkCredentials
-	// EnableTelemetry sends the SDK telemetry header with each request when true.
+	// EnableTelemetry, when true, sends the SDK telemetry header with the metrics of an earlier
+	// request; the first request sends none.
 	EnableTelemetry bool
 	// Environment is the sandbox or production environment.
 	Environment Environment

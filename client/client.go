@@ -308,6 +308,8 @@ func (a *ApiClient) getHeaders(contentType string, authorization string, idempot
 	return headers
 }
 
+// readBody returns the response body, or nil when the response has none. It returns the context
+// error when ctx is already done, and the read error when the body cannot be read.
 func (a *ApiClient) readBody(ctx context.Context, response *http.Response) ([]byte, error) {
 	// Check if context is already cancelled before reading
 	select {
@@ -316,6 +318,9 @@ func (a *ApiClient) readBody(ctx context.Context, response *http.Response) ([]by
 	default:
 	}
 
+	if response.Body == nil {
+		return nil, nil
+	}
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, err

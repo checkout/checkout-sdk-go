@@ -14,14 +14,24 @@ type QueryBankAccountFormatting struct {
 }
 
 type (
+	// GetInstrumentResponse is the response to retrieving a payment instrument. One variant field is
+	// set, chosen by the instrument type of the response; a response of another type is kept in
+	// AlternativeResponse.
 	GetInstrumentResponse struct {
-		HttpMetadata                     common.HttpMetadata
-		GetCardInstrumentResponse        *GetCardInstrumentResponse
-		GetSepaInstrumentResponse        *GetSepaInstrumentResponse
+		// HttpMetadata holds the status, headers and body of the HTTP response.
+		HttpMetadata common.HttpMetadata
+		// GetCardInstrumentResponse is set for the card type.
+		GetCardInstrumentResponse *GetCardInstrumentResponse
+		// GetSepaInstrumentResponse is set for the sepa type.
+		GetSepaInstrumentResponse *GetSepaInstrumentResponse
+		// GetBankAccountInstrumentResponse is set for the bank_account type.
 		GetBankAccountInstrumentResponse *GetBankAccountInstrumentResponse
-		GetAchInstrumentResponse         *GetAchInstrumentResponse
-		GetBacsInstrumentResponse        *GetBacsInstrumentResponse
-		AlternativeResponse              *common.AlternativeResponse
+		// GetAchInstrumentResponse is set for the ach type.
+		GetAchInstrumentResponse *GetAchInstrumentResponse
+		// GetBacsInstrumentResponse is set for the bacs type.
+		GetBacsInstrumentResponse *GetBacsInstrumentResponse
+		// AlternativeResponse holds the response as a map for any other type.
+		AlternativeResponse *common.AlternativeResponse
 	}
 
 	GetCardInstrumentResponse struct {
@@ -177,6 +187,8 @@ type (
 	}
 )
 
+// UnmarshalJSON decodes the response into the variant field of its type, or into
+// AlternativeResponse for any other type, and returns the error of that decoding.
 func (s *GetInstrumentResponse) UnmarshalJSON(data []byte) error {
 	var typeMapping common.TypeMapping
 	if err := json.Unmarshal(data, &typeMapping); err != nil {
@@ -187,37 +199,37 @@ func (s *GetInstrumentResponse) UnmarshalJSON(data []byte) error {
 	case string(common.BankAccount):
 		var response GetBankAccountInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.GetBankAccountInstrumentResponse = &response
 	case string(common.Card):
 		var response GetCardInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.GetCardInstrumentResponse = &response
 	case string(common.Sepa):
 		var response GetSepaInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.GetSepaInstrumentResponse = &response
 	case string(common.Ach):
 		var response GetAchInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.GetAchInstrumentResponse = &response
 	case string(common.Bacs):
 		var response GetBacsInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.GetBacsInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.AlternativeResponse = &response
 	}

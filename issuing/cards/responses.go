@@ -1,8 +1,8 @@
 package issuing
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
@@ -92,8 +92,12 @@ type (
 		IsSingleUse bool `json:"is_single_use,omitempty"`
 	}
 
+	// CardDetailsResponse is the response to retrieving an issued card: the details of every card
+	// type, and ExtraData for the fields of its type.
 	CardDetailsResponse struct {
 		CardDetailsData
+		// ExtraData holds the fields of the card type: VirtualExtraData for a virtual card, nil for a
+		// physical card.
 		ExtraData ExtraData `json:"limit,omitempty"`
 	}
 
@@ -106,7 +110,12 @@ func (l VirtualExtraData) GetResponseType() CardType {
 	return Virtual
 }
 
+// UnmarshalJSON decodes the card details and, for a virtual card, its extra data. A JSON null leaves
+// the response unchanged; an unknown card type returns errors.UnsupportedTypeError.
 func (s *CardDetailsResponse) UnmarshalJSON(data []byte) error {
+	if string(bytes.TrimSpace(data)) == "null" {
+		return nil
+	}
 	var cardDetailsData CardDetailsData
 	if err := json.Unmarshal(data, &cardDetailsData); err != nil {
 		return err
@@ -121,11 +130,11 @@ func (s *CardDetailsResponse) UnmarshalJSON(data []byte) error {
 			VirtualExtraData
 		}{}
 		if err := json.Unmarshal(data, &extraData); err != nil {
-			return nil
+			return err
 		}
 		s.ExtraData = extraData.VirtualExtraData
 	default:
-		return errors.UnsupportedTypeError(fmt.Sprintf("%s unsupported", cardDetailsData.Type))
+		return errors.UnsupportedTypeError("card type unsupported")
 	}
 	return nil
 }

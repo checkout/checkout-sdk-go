@@ -96,14 +96,24 @@ func NewUpdateBacsInstrumentRequest() *updateBacsInstrumentRequest {
 }
 
 type (
+	// UpdateInstrumentResponse is the response to updating a payment instrument. One variant field
+	// is set, chosen by the instrument type of the response; a response of another type is kept in
+	// AlternativeResponse.
 	UpdateInstrumentResponse struct {
-		HttpMetadata                        common.HttpMetadata
-		UpdateCardInstrumentResponse        *UpdateCardInstrumentResponse
+		// HttpMetadata holds the status, headers and body of the HTTP response.
+		HttpMetadata common.HttpMetadata
+		// UpdateCardInstrumentResponse is set for the card type.
+		UpdateCardInstrumentResponse *UpdateCardInstrumentResponse
+		// UpdateBankAccountInstrumentResponse is set for the bank_account type.
 		UpdateBankAccountInstrumentResponse *UpdateBankAccountInstrumentResponse
-		UpdateSepaInstrumentResponse        *UpdateSepaInstrumentResponse
-		UpdateAchInstrumentResponse         *UpdateAchInstrumentResponse
-		UpdateBacsInstrumentResponse        *UpdateBacsInstrumentResponse
-		AlternativeResponse                 *common.AlternativeResponse
+		// UpdateSepaInstrumentResponse is set for the sepa type.
+		UpdateSepaInstrumentResponse *UpdateSepaInstrumentResponse
+		// UpdateAchInstrumentResponse is set for the ach type.
+		UpdateAchInstrumentResponse *UpdateAchInstrumentResponse
+		// UpdateBacsInstrumentResponse is set for the bacs type.
+		UpdateBacsInstrumentResponse *UpdateBacsInstrumentResponse
+		// AlternativeResponse holds the response as a map for any other type.
+		AlternativeResponse *common.AlternativeResponse
 	}
 
 	UpdateCardInstrumentResponse struct {
@@ -139,6 +149,8 @@ type (
 	}
 )
 
+// UnmarshalJSON decodes the response into the variant field of its type, or into
+// AlternativeResponse for any other type, and returns the error of that decoding.
 func (s *UpdateInstrumentResponse) UnmarshalJSON(data []byte) error {
 	var typeMapping common.TypeMapping
 	if err := json.Unmarshal(data, &typeMapping); err != nil {
@@ -149,37 +161,37 @@ func (s *UpdateInstrumentResponse) UnmarshalJSON(data []byte) error {
 	case string(common.BankAccount):
 		var response UpdateBankAccountInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.UpdateBankAccountInstrumentResponse = &response
 	case string(common.Card):
 		var response UpdateCardInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.UpdateCardInstrumentResponse = &response
 	case string(common.Sepa):
 		var response UpdateSepaInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.UpdateSepaInstrumentResponse = &response
 	case string(common.Ach):
 		var response UpdateAchInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.UpdateAchInstrumentResponse = &response
 	case string(common.Bacs):
 		var response UpdateBacsInstrumentResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.UpdateBacsInstrumentResponse = &response
 	default:
 		var response common.AlternativeResponse
 		if err := json.Unmarshal(data, &response); err != nil {
-			return nil
+			return err
 		}
 		s.AlternativeResponse = &response
 	}

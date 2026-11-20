@@ -2,7 +2,6 @@ package accounts
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/errors"
@@ -151,7 +150,7 @@ func (p *PayoutSchedule) UnmarshalJSON(data []byte) error {
 				}
 				currency.Recurrence = schedule[k].Recurrence
 			default:
-				return errors.UnsupportedTypeError(fmt.Sprintf("%s currency frequency is unsupported", k))
+				return errors.UnsupportedTypeError("payout frequency unsupported")
 			}
 
 			currency.Enabled = currencyMap[k].Enabled

@@ -151,6 +151,12 @@ When a request cannot be sent or its response cannot be read (connection failure
 context), the SDK returns an `errors.CheckoutTransportError`. It wraps the `net/http` error, so `errors.Is(err,
 context.DeadlineExceeded)` and `errors.As` with `*url.Error` keep working, and its `Timeout()` method reports timeouts.
 
+When a successful response cannot be decoded into the response type (a body that is not JSON or does not match the
+type, or a CSV or PDF reply the response type cannot hold), the SDK returns an `errors.CheckoutDecodingError` with the
+`StatusCode` and the media type. An `errors.UnsupportedTypeError` from a response type with several variants (issuing
+cards and controls, payout schedules) stays reachable with `errors.As`. A JSON `null` body gives an empty response with
+its `HttpMetadata` set.
+
 Some OAuth token responses return an `errors.CheckoutAuthorizationError`. The authorization URI must be an
 absolute `https` URI without user information; `http` is accepted only for a loopback host (`localhost`,
 `127.0.0.0/8`, `::1`, or a loopback address in IPv4-mapped form), and any other value returns an

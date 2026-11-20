@@ -545,26 +545,34 @@ func TestDownloadErrorsKeepTheStatusOnlyWithACallerTransport(t *testing.T) {
 }
 
 // TestDownloadBodyReadErrorsKeepTheDownloadUrlOut: when reading the download response fails with an
-// error that carries the download URL, the CheckoutTransportError keeps the URL without its query.
+// error that carries the download URL, the CheckoutTransportError keeps the URL without its query, or
+// a placeholder when the URL does not parse.
 func TestDownloadBodyReadErrorsKeepTheDownloadUrlOut(t *testing.T) {
-	for _, telemetry := range []bool{false, true} {
-		transport := roundTripFunc(func(r *http.Request) (*http.Response, error) {
-			readErr := &url.Error{Op: "Get", URL: "https://download.example/file?q=" + redirectMarker, Err: io.ErrUnexpectedEOF}
-			return &http.Response{StatusCode: http.StatusOK, Status: "200 OK", Header: http.Header{},
-				Body: urlErrorBody{err: readErr}, Request: r}, nil
-		})
-		var logs bytes.Buffer
-		api := NewApiClient(configuration.NewConfiguration(nil, &telemetry, nil, &http.Client{Transport: transport}, log.New(&logs, "", 0)), "https://api.example")
+	cases := []struct{ errUrl, want string }{
+		{"https://download.example/file?q=" + redirectMarker, "https://download.example/file"},
+		// a URL that does not parse is replaced as a whole
+		{"https://download.example/f%zz?q=" + redirectMarker, "(download URL)"},
+	}
+	for _, c := range cases {
+		for _, telemetry := range []bool{false, true} {
+			readErr := &url.Error{Op: "Get", URL: c.errUrl, Err: io.ErrUnexpectedEOF}
+			transport := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+				return &http.Response{StatusCode: http.StatusOK, Status: "200 OK", Header: http.Header{},
+					Body: urlErrorBody{err: readErr}, Request: r}, nil
+			})
+			var logs bytes.Buffer
+			api := NewApiClient(configuration.NewConfiguration(nil, &telemetry, nil, &http.Client{Transport: transport}, log.New(&logs, "", 0)), "https://api.example")
 
-		err := api.GetWithContext(download.Mark(context.Background()), "/reports/r/files/f", testAuth(), nil, &common.IdResponse{})
+			err := api.GetWithContext(download.Mark(context.Background()), "/reports/r/files/f", testAuth(), nil, &common.IdResponse{})
 
-		require.Error(t, err, "telemetry=%v", telemetry)
-		transportErr, ok := err.(sdkerrors.CheckoutTransportError)
-		require.True(t, ok, "want a CheckoutTransportError, got %T: %v", err, err)
-		assert.NotContains(t, fmt.Sprintf("%v %+v", err, transportErr), redirectMarker, "telemetry=%v", telemetry)
-		assert.Contains(t, err.Error(), "https://download.example/file", "telemetry=%v", telemetry)
-		assert.True(t, stderrors.Is(err, io.ErrUnexpectedEOF), "telemetry=%v", telemetry)
-		assert.NotContains(t, logs.String(), redirectMarker)
+			require.Error(t, err, "%s telemetry=%v", c.want, telemetry)
+			transportErr, ok := err.(sdkerrors.CheckoutTransportError)
+			require.True(t, ok, "want a CheckoutTransportError, got %T: %v", err, err)
+			assert.NotContains(t, fmt.Sprintf("%v %+v", err, transportErr), redirectMarker, "%s telemetry=%v", c.want, telemetry)
+			assert.Contains(t, err.Error(), c.want, "telemetry=%v", telemetry)
+			assert.True(t, stderrors.Is(err, io.ErrUnexpectedEOF), "%s telemetry=%v", c.want, telemetry)
+			assert.NotContains(t, logs.String(), redirectMarker)
+		}
 	}
 }
 

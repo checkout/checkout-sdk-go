@@ -47,9 +47,10 @@ type ApiClient struct {
 	HttpClient http.Client
 	// BaseUri is prefixed to every request path.
 	BaseUri string
-	// EnableTelemetry sends the SDK telemetry header with each request when true.
+	// EnableTelemetry, when true, sends the SDK telemetry header with the metrics of an earlier
+	// request held in RequestMetricsQueue; the first request sends none.
 	EnableTelemetry bool
-	// RequestMetricsQueue holds the metrics of the previous request for the telemetry header.
+	// RequestMetricsQueue holds the metrics of earlier requests for the telemetry header.
 	RequestMetricsQueue common.TelemetryQueue
 	// Log receives the request log lines.
 	Log configuration.StdLogger
@@ -581,9 +582,8 @@ func isRedirect(statusCode int) bool {
 }
 
 // statusOnlyError is the error for a 3xx response and for an error of the download URL (see
-// redirectGuard). It carries
-// the status code, the standard status text and the request id only: the server reason phrase, the
-// Location and the body are not used.
+// redirectGuard). It carries the status code, the standard status text and the request id only:
+// the server reason phrase, the Location and the body are not used.
 func statusOnlyError(statusCode int, requestId string) errors.CheckoutAPIError {
 	return errors.CheckoutAPIError{
 		StatusCode: statusCode,

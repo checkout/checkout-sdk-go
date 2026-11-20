@@ -81,7 +81,7 @@ func (a *ApiClient) Get(path string, authorization *configuration.SdkAuthorizati
 // GetWithContext sends a GET request to path with authorization and decodes the response into
 // responseMapping. request, when not nil, only supplies per-request headers: a GET has no body.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) GetWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
 	if request != nil {
 		// request carries headers only (e.g. the Accept schema-version header); a GET must not send a body,
@@ -107,7 +107,7 @@ func (a *ApiClient) Post(path string, authorization *configuration.SdkAuthorizat
 // PostWithContext sends request as a JSON body in a POST to path with authorization and the
 // idempotency key when not nil, and decodes the response into responseMapping.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) PostWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
 	return a.invoke(ctx, http.MethodPost, path, authorization, request, responseMapping, idempotencyKey)
 }
@@ -120,7 +120,7 @@ func (a *ApiClient) Put(path string, authorization *configuration.SdkAuthorizati
 // PutWithContext sends request as a JSON body in a PUT to path with authorization and the
 // idempotency key when not nil, and decodes the response into responseMapping.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) PutWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}, idempotencyKey *string) error {
 	return a.invoke(ctx, http.MethodPut, path, authorization, request, responseMapping, idempotencyKey)
 }
@@ -133,7 +133,7 @@ func (a *ApiClient) Patch(path string, authorization *configuration.SdkAuthoriza
 // PatchWithContext sends request as a JSON body in a PATCH to path with authorization and decodes
 // the response into responseMapping.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) PatchWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request interface{}, responseMapping interface{}) error {
 	return a.invoke(ctx, http.MethodPatch, path, authorization, request, responseMapping, nil)
 }
@@ -146,7 +146,7 @@ func (a *ApiClient) Delete(path string, authorization *configuration.SdkAuthoriz
 // DeleteWithContext sends a DELETE request to path with authorization and decodes the response
 // into responseMapping.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) DeleteWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, responseMapping interface{}) error {
 	return a.invoke(ctx, http.MethodDelete, path, authorization, nil, responseMapping, nil)
 }
@@ -159,7 +159,7 @@ func (a *ApiClient) Upload(path string, authorization *configuration.SdkAuthoriz
 // UploadWithContext sends request as a multipart form in a POST to path with authorization and
 // decodes the response into responseMapping.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) UploadWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, request *common.FileUploadRequest, responseMapping interface{}) error {
 	return a.submit(ctx, path, authorization, request, responseMapping)
 }
@@ -172,7 +172,7 @@ func (a *ApiClient) PostForm(path string, authorization *configuration.SdkAuthor
 // PostFormWithContext sends formData as a URL-encoded form in a POST to path with authorization
 // and decodes the response into responseMapping.
 // It returns an errors.CheckoutAPIError for a response that is not a 2xx, and an
-// errors.CheckoutTransportError when the request cannot be sent or its response cannot be read.
+// errors.CheckoutTransportError when sending the request or reading its response fails.
 func (a *ApiClient) PostFormWithContext(ctx context.Context, path string, authorization *configuration.SdkAuthorization, formData url.Values, responseMapping interface{}) error {
 	return a.submitForm(ctx, path, authorization, formData, responseMapping)
 }
@@ -324,7 +324,7 @@ func (a *ApiClient) handleResponse(ctx context.Context, rawResponse *http.Respon
 	version := rawResponse.Header.Get(CkoVersion)
 	body, err := a.readBody(ctx, rawResponse)
 	if err != nil {
-		return errors.NewCheckoutTransportError(err)
+		return errors.NewCheckoutTransportError(withoutDownloadUrl(ctx, err))
 	}
 
 	if rawResponse.StatusCode >= http.StatusBadRequest {
@@ -541,16 +541,17 @@ func refuseRedirect(*http.Request, []*http.Request) error {
 
 // followDownloadRedirect follows a single 302 to an https URL (http only for a loopback host, for
 // local tests), as a GET without the Authorization header, without the SDK's own headers (any
-// Cko- header, the telemetry header included) and without a body (net/http sends the request that
-// follows a 302 as a GET with no body; a body is refused anyway). Any other redirect, a second
-// one included, is returned as the response instead of being followed. Only GetReportFile, a GET,
-// marks its context for it.
+// Cko- header, the telemetry header included), without a Referer and without a body (net/http
+// sends the request that follows a 302 as a GET with no body; a body is refused anyway). Any other
+// redirect, a second one included, is returned as the response instead of being followed. Only
+// GetReportFile, a GET, marks its context for it.
 func followDownloadRedirect(req *http.Request, via []*http.Request) error {
 	if len(via) != 1 || req.Response == nil || req.Response.StatusCode != http.StatusFound ||
 		(req.Body != nil && req.Body != http.NoBody) || !isDownloadScheme(req.URL) {
 		return http.ErrUseLastResponse
 	}
 	req.Header.Del("Authorization")
+	req.Header.Del("Referer")
 	for name := range req.Header {
 		if len(name) >= len(ckoHeaderPrefix) && strings.EqualFold(name[:len(ckoHeaderPrefix)], ckoHeaderPrefix) {
 			delete(req.Header, name)

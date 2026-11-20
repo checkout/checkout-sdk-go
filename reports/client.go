@@ -6,6 +6,7 @@ import (
 	"github.com/checkout/checkout-sdk-go/v3/client"
 	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/configuration"
+	"github.com/checkout/checkout-sdk-go/v3/internal/download"
 )
 
 type Client struct {
@@ -85,6 +86,11 @@ func (c *Client) GetReportDetailsWithContext(ctx context.Context, reportId strin
 //
 // It returns the common.ContentResponse, or the error from the API.
 //
+// The file is read from the download URL the API returns, over https (http only for a loopback
+// host, for local tests), in one request without the SDK credentials, its Cko- headers, a Referer
+// or a body. Any other download URL, or a response of the download URL that is not a 2xx, returns
+// an errors.CheckoutAPIError with its status code only.
+//
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." reportId or
 // fileId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,
 // returns a CheckoutArgumentError and sends no request.
@@ -110,7 +116,7 @@ func (c *Client) GetReportFileWithContext(ctx context.Context, reportId, fileId 
 	}
 
 	var response common.ContentResponse
-	err = c.apiClient.GetWithContext(ctx, common.BuildPath(reports, reportId, files, fileId), auth, nil, &response)
+	err = c.apiClient.GetWithContext(download.Mark(ctx), common.BuildPath(reports, reportId, files, fileId), auth, nil, &response)
 	if err != nil {
 		return nil, err
 	}

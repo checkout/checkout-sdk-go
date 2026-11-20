@@ -16,7 +16,8 @@ type Configuration struct {
 	Environment Environment
 	// EnvironmentSubdomain is the merchant-specific subdomain, when set.
 	EnvironmentSubdomain *EnvironmentSubdomain
-	// HttpClient sends the API requests.
+	// HttpClient sends the API requests. Each request uses a copy of it with the SDK's own policy; the
+	// client itself is not changed. A custom Transport applies its own behaviour.
 	HttpClient http.Client
 	// Logger receives the request log lines.
 	Logger StdLogger

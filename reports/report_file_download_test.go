@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/checkout/checkout-sdk-go/v3/client"
+	"github.com/checkout/checkout-sdk-go/v3/common"
 	"github.com/checkout/checkout-sdk-go/v3/configuration"
 	"github.com/checkout/checkout-sdk-go/v3/errors"
 )
@@ -125,14 +126,18 @@ func TestGetReportFileFollowsTheDownloadRedirectWithoutAuthorization(t *testing.
 				var logs bytes.Buffer
 				reports := newReportClient(api.URL, &logs)
 
+				var response *common.ContentResponse
 				var err error
 				if withContext {
-					_, err = reports.GetReportFileWithContext(context.Background(), "rpt_1", "file_1")
+					response, err = reports.GetReportFileWithContext(context.Background(), "rpt_1", "file_1")
 				} else {
-					_, err = reports.GetReportFile("rpt_1", "file_1")
+					response, err = reports.GetReportFile("rpt_1", "file_1")
 				}
 
 				require.NoError(t, err)
+				require.NotNil(t, response)
+				assert.Equal(t, "a,b\n1,2\n", response.Content, "the content of the download URL")
+				assert.Equal(t, http.StatusOK, response.HttpMetadata.StatusCode)
 				assert.Equal(t, []string{"Bearer " + reportKey}, download.apiAuth, "the API receives the exact Authorization once")
 				require.Equal(t, 1, download.hits)
 				assert.Equal(t, http.MethodGet, download.methods[0])
@@ -361,8 +366,10 @@ func TestGetReportFileSendsNoSdkHeadersToTheDownloadUrl(t *testing.T) {
 	reports := NewClient(config, client.NewApiClient(config, api.URL))
 
 	for i := 0; i < 3; i++ {
-		_, err := reports.GetReportFile("rpt_1", "file_1")
+		response, err := reports.GetReportFile("rpt_1", "file_1")
 		require.NoError(t, err)
+		require.NotNil(t, response)
+		assert.Equal(t, "a,b\n", response.Content, "the content of the download URL")
 	}
 
 	require.Len(t, apiTelemetry, 3)

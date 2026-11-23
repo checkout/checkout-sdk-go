@@ -610,3 +610,67 @@ func TestTelemetryHeaderCarriesTheMetricsOfAnEarlierRequest(t *testing.T) {
 	assert.NotEqual(t, "", metrics.RequestId)
 	assert.NotEqual(t, metrics.PrevRequestId, metrics.RequestId)
 }
+
+// TestTelemetryKeepsTheMetricsOfARefusedRedirect: with EnableTelemetry, a refused 3xx still adds its
+// metrics, so the request after it carries the id of the 3xx request (calls: 200, 302, 200).
+func TestTelemetryKeepsTheMetricsOfARefusedRedirect(t *testing.T) {
+	var mu sync.Mutex
+	var headers []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		headers = append(headers, r.Header.Get(CkoTelemetryHeader))
+		call := len(headers)
+		mu.Unlock()
+		if call == 2 {
+			w.Header().Set("Location", "/elsewhere")
+			w.WriteHeader(http.StatusFound)
+			return
+		}
+		jsonOK(w)
+	}))
+	t.Cleanup(server.Close)
+	telemetry := true
+	api := NewApiClient(configuration.NewConfiguration(nil, &telemetry, nil, nil, log.New(ioutil.Discard, "", 0)), server.URL)
+
+	require.NoError(t, api.Get("/test", testAuth(), nil, &common.IdResponse{}))
+	err := api.Get("/test", testAuth(), nil, &common.IdResponse{})
+	apiErr, ok := err.(sdkerrors.CheckoutAPIError)
+	require.True(t, ok, "want a CheckoutAPIError, got %T: %v", err, err)
+	assert.Equal(t, http.StatusFound, apiErr.StatusCode)
+	require.NoError(t, api.Get("/test", testAuth(), nil, &common.IdResponse{}))
+
+	mu.Lock()
+	defer mu.Unlock()
+	require.Len(t, headers, 3, "the 302 is not followed")
+	var redirected, third common.RequestMetrics
+	require.NoError(t, json.Unmarshal([]byte(headers[1]), &redirected))
+	require.NotEqual(t, "", headers[2], "the request after the refused 3xx carries the telemetry header")
+	require.NoError(t, json.Unmarshal([]byte(headers[2]), &third))
+	assert.Equal(t, redirected.RequestId, third.PrevRequestId, "the third request carries the id of the 3xx request")
+}
+
+// TestTelemetryAddsNoMetricsForATransportError: with EnableTelemetry, a request that gets no
+// response adds no metrics, so the request after it sends no telemetry header.
+func TestTelemetryAddsNoMetricsForATransportError(t *testing.T) {
+	var headers []string
+	transport := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		headers = append(headers, r.Header.Get(CkoTelemetryHeader))
+		if len(headers) == 2 {
+			return nil, io.ErrUnexpectedEOF
+		}
+		return &http.Response{StatusCode: http.StatusOK, Status: "200 OK",
+			Header: http.Header{"Content-Type": []string{"application/json"}},
+			Body:   ioutil.NopCloser(strings.NewReader(`{"id":"ok"}`)), Request: r}, nil
+	})
+	telemetry := true
+	api := NewApiClient(configuration.NewConfiguration(nil, &telemetry, nil, &http.Client{Transport: transport}, log.New(ioutil.Discard, "", 0)), "https://api.example")
+
+	require.NoError(t, api.Get("/test", testAuth(), nil, &common.IdResponse{}))
+	_, ok := api.Get("/test", testAuth(), nil, &common.IdResponse{}).(sdkerrors.CheckoutTransportError)
+	require.True(t, ok, "want a CheckoutTransportError")
+	require.NoError(t, api.Get("/test", testAuth(), nil, &common.IdResponse{}))
+
+	require.Len(t, headers, 3)
+	assert.NotEqual(t, "", headers[1], "the second request carries the metrics of the first")
+	assert.Equal(t, "", headers[2], "the failed request added no metrics")
+}

@@ -89,7 +89,7 @@ func (c *Client) GetReportDetailsWithContext(ctx context.Context, reportId strin
 // The file is read from the download URL the API returns, over https (http only for a loopback
 // host, for local tests), in one request without the SDK credentials, its Cko- headers, a Referer
 // or a body. Any other download URL, or a response of the download URL that is not a 2xx, returns
-// an errors.CheckoutAPIError with its status code only.
+// an errors.CheckoutAPIError with its status code, status text and request id only.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." reportId or
 // fileId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,

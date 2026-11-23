@@ -26,7 +26,7 @@ const cardholderMarker = "cardholder-form-marker"
 
 // TestRequestCardholderTokenResponsePolicy: the request goes through the API client policy: the
 // form reaches the API host only, the second host receives no request, and the error is a
-// CheckoutAPIError with the status code only.
+// CheckoutAPIError with the status code, status text and request id only.
 func TestRequestCardholderTokenResponsePolicy(t *testing.T) {
 	for _, code := range []int{http.StatusTemporaryRedirect, http.StatusPermanentRedirect} {
 		t.Run(fmt.Sprint(code), func(t *testing.T) {

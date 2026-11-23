@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/checkout/checkout-sdk-go/v3/errors"
+	"github.com/checkout/checkout-sdk-go/v3/internal/loopback"
 )
 
 type (
@@ -302,8 +303,8 @@ func refuseRedirect(*http.Request, []*http.Request) error {
 }
 
 // validateAuthorizationUri returns a CheckoutArgumentError unless uri is an absolute https URL
-// without user information. An http URL is accepted only for a loopback host (see isLoopbackHost),
-// for local tests.
+// without user information. An http URL is accepted only for a loopback host (localhost or a
+// loopback IP address), for local tests.
 func validateAuthorizationUri(uri string) error {
 	parsed, err := url.Parse(uri)
 	if err != nil || parsed.Hostname() == "" {
@@ -316,7 +317,7 @@ func validateAuthorizationUri(uri string) error {
 	case "https":
 		return nil
 	case "http":
-		if isLoopbackHost(parsed.Hostname()) {
+		if loopback.IsHost(parsed.Hostname()) {
 			return nil
 		}
 	}

@@ -10,13 +10,15 @@ import (
 type Configuration struct {
 	// Credentials authorize each request.
 	Credentials SdkCredentials
-	// EnableTelemetry sends the SDK telemetry header with each request when true.
+	// EnableTelemetry, when true, sends the SDK telemetry header with the metrics of an earlier
+	// request; the first request sends none. When sending the request fails, it adds no metrics.
 	EnableTelemetry bool
 	// Environment is the sandbox or production environment.
 	Environment Environment
 	// EnvironmentSubdomain is the merchant-specific subdomain, when set.
 	EnvironmentSubdomain *EnvironmentSubdomain
-	// HttpClient sends the API requests.
+	// HttpClient sends the API requests. Each request uses a copy of it with the SDK's own policy; the
+	// client itself is not changed. A custom Transport applies its own behaviour.
 	HttpClient http.Client
 	// Logger receives the request log lines.
 	Logger StdLogger

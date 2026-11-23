@@ -69,9 +69,10 @@ var allowedBaseUri = regexp.MustCompile(`^configuration\.(Environment\.[A-Za-z]+
 var httpClientConfigDirs = map[string]bool{"client": true, "configuration": true, "nas": true, "abc": true, "common": true}
 
 // Imports for raw connections, unsafe memory or reflection, and the files allowed to use them.
-// configuration/loopback_host.go: loopback host check of the OAuth authorization URI.
+// internal/loopback/loopback.go: loopback host check of the OAuth authorization URI and the
+// download URL of GetReportFile.
 var restrictedImports = map[string]map[string]bool{
-	"net": {"configuration/loopback_host.go": true}, "crypto/tls": {}, "unsafe": {}, "syscall": {},
+	"net": {"internal/loopback/loopback.go": true}, "crypto/tls": {}, "unsafe": {}, "syscall": {},
 	"reflect": {"client/client.go": true, "common/serializer.go": true},
 }
 

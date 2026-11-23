@@ -268,11 +268,13 @@ func TestGetReportFileDownloadErrorsKeepTheStatusOnly(t *testing.T) {
 		t.Run(fmt.Sprint(code), func(t *testing.T) {
 			host := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/xml")
+				w.Header().Set("Cko-Request-Id", "chosen-by-the-download-host")
 				w.WriteHeader(code)
 				_, _ = w.Write([]byte("<Error><Url>/download?q=" + reportMarker + "</Url></Error>"))
 			}))
 			t.Cleanup(host.Close)
 			api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Cko-Request-Id", "req-report")
 				w.Header().Set("Location", host.URL+"/download")
 				w.WriteHeader(http.StatusFound)
 			}))
@@ -286,7 +288,40 @@ func TestGetReportFileDownloadErrorsKeepTheStatusOnly(t *testing.T) {
 			require.True(t, ok, "want a CheckoutAPIError, got %T: %v", err, err)
 			assert.Equal(t, code, apiErr.StatusCode)
 			assert.Equal(t, fmt.Sprintf("%d %s", code, http.StatusText(code)), apiErr.Status)
+			require.NotNil(t, apiErr.Data)
+			assert.Equal(t, "req-report", apiErr.Data.RequestID, "the request id of the API response, not of the download host")
 			assertReportRedirectRefused(t, err, code, logs.String())
+		})
+	}
+}
+
+// TestGetReportFileDecodingErrorForOtherMediaTypes: a download that is neither text/csv nor
+// application/pdf returns a CheckoutDecodingError with the status code and the media type only.
+func TestGetReportFileDecodingErrorForOtherMediaTypes(t *testing.T) {
+	for _, mediaType := range []string{"application/octet-stream", "binary/octet-stream"} {
+		mediaType := mediaType
+		t.Run(mediaType, func(t *testing.T) {
+			host := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", mediaType)
+				_, _ = w.Write([]byte("a,b\n"))
+			}))
+			t.Cleanup(host.Close)
+			api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Location", host.URL+"/download?q="+reportMarker)
+				w.WriteHeader(http.StatusFound)
+			}))
+			t.Cleanup(api.Close)
+			var logs bytes.Buffer
+
+			_, err := newReportClient(api.URL, &logs).GetReportFile("rpt_1", "file_1")
+
+			require.Error(t, err)
+			decodingErr, ok := err.(errors.CheckoutDecodingError)
+			require.True(t, ok, "want a CheckoutDecodingError, got %T: %v", err, err)
+			assert.Equal(t, http.StatusOK, decodingErr.StatusCode)
+			assert.Equal(t, mediaType, decodingErr.ContentType)
+			assert.NotContains(t, fmt.Sprintf("%v %+v", err, decodingErr), reportMarker)
+			assert.NotContains(t, logs.String(), reportMarker)
 		})
 	}
 }

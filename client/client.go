@@ -48,8 +48,8 @@ type ApiClient struct {
 	// BaseUri is prefixed to every request path.
 	BaseUri string
 	// EnableTelemetry, when true, sends the SDK telemetry header with the metrics of an earlier
-	// request held in RequestMetricsQueue; the first request sends none. A request that gets no
-	// response (a CheckoutTransportError) adds no metrics.
+	// request held in RequestMetricsQueue; the first request sends none. When sending the request
+	// fails, it adds no metrics.
 	EnableTelemetry bool
 	// RequestMetricsQueue holds the metrics of earlier requests for the telemetry header.
 	RequestMetricsQueue common.TelemetryQueue
@@ -489,7 +489,12 @@ func (g *redirectGuard) RoundTrip(req *http.Request) (*http.Response, error) {
 	if g.download && req.Response == nil && resp.StatusCode == http.StatusFound && hasValidLocation(req, resp) {
 		return resp, nil
 	}
-	refusal := &redirectRefusal{statusCode: resp.StatusCode, requestId: resp.Header.Get(CkoRequestId)}
+	// An error of the download URL keeps the request id of the API response that redirected to it.
+	requestId := resp.Header.Get(CkoRequestId)
+	if downloadHop {
+		requestId = req.Response.Header.Get(CkoRequestId)
+	}
+	refusal := &redirectRefusal{statusCode: resp.StatusCode, requestId: requestId}
 	if resp.Body != nil {
 		_ = resp.Body.Close()
 	}

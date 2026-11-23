@@ -549,7 +549,8 @@ func TestDownloadErrorsKeepTheStatusOnlyWithACallerTransport(t *testing.T) {
 // a placeholder when the URL does not parse.
 func TestDownloadBodyReadErrorsKeepTheDownloadUrlOut(t *testing.T) {
 	cases := []struct{ errUrl, want string }{
-		{"https://download.example/file?q=" + redirectMarker, "https://download.example/file"},
+		// the query, the fragment and the user information are removed
+		{"https://user:" + redirectMarker + "@download.example/file?q=" + redirectMarker + "#" + redirectMarker, "https://download.example/file"},
 		// a URL that does not parse is replaced as a whole
 		{"https://download.example/f%zz?q=" + redirectMarker, "(download URL)"},
 	}

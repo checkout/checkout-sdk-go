@@ -11,8 +11,7 @@ type Configuration struct {
 	// Credentials authorize each request.
 	Credentials SdkCredentials
 	// EnableTelemetry, when true, sends the SDK telemetry header with the metrics of an earlier
-	// request; the first request sends none. A request that gets no response (a
-	// CheckoutTransportError) adds no metrics.
+	// request; the first request sends none. When sending the request fails, it adds no metrics.
 	EnableTelemetry bool
 	// Environment is the sandbox or production environment.
 	Environment Environment

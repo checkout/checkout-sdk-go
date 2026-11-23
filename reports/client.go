@@ -90,8 +90,8 @@ func (c *Client) GetReportDetailsWithContext(ctx context.Context, reportId strin
 // host, for local tests), in one request without the SDK credentials, its Cko- headers, a Referer
 // or a body. Any other download URL, or a response of the download URL that is not a 2xx, returns
 // an errors.CheckoutAPIError with its status code, status text and the request id of the API
-// response only. A text/csv or application/pdf file is returned in Content; any other body is
-// decoded as JSON, and one that cannot be decoded returns an errors.CheckoutDecodingError.
+// response only. A text/csv or application/pdf file is returned in Content; any other non-empty
+// body is decoded as JSON, and one that cannot be decoded returns an errors.CheckoutDecodingError.
 //
 // Path values are percent-encoded, each as one path segment. An empty, "." or ".." reportId or
 // fileId, or one containing a slash, a backslash, an ASCII control character or invalid UTF-8,

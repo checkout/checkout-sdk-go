@@ -58,6 +58,7 @@ func newReportServers(t *testing.T, code int, crossHost, secondHop bool) (*httpt
 	downloadHandler := func(w http.ResponseWriter, r *http.Request) {
 		download.record(r)
 		if secondHop && r.URL.Path == "/download" {
+			w.Header().Set("Cko-Request-Id", "chosen-by-the-download-host")
 			w.Header().Set("Location", "/download-again?q="+reportMarker)
 			w.WriteHeader(http.StatusFound)
 			return
@@ -178,6 +179,9 @@ func TestGetReportFileRefusesASecondRedirect(t *testing.T) {
 	_, err := newReportClient(api.URL, &logs).GetReportFile("rpt_1", "file_1")
 
 	assertReportRedirectRefused(t, err, http.StatusFound, logs.String())
+	apiErr := err.(errors.CheckoutAPIError)
+	require.NotNil(t, apiErr.Data)
+	assert.Equal(t, "req-report", apiErr.Data.RequestID, "the request id of the API response, not of the download host")
 	assert.Equal(t, 1, download.hits, "only the first download URL is requested")
 	assert.Equal(t, "", download.auth[0])
 }
@@ -296,8 +300,26 @@ func TestGetReportFileDownloadErrorsKeepTheStatusOnly(t *testing.T) {
 }
 
 // TestGetReportFileDecodingErrorForOtherMediaTypes: a download that is neither text/csv nor
-// application/pdf returns a CheckoutDecodingError with the status code and the media type only.
+// application/pdf is decoded as JSON; a body that is not JSON returns a CheckoutDecodingError with
+// the status code and the media type only, and a JSON body fills the response.
 func TestGetReportFileDecodingErrorForOtherMediaTypes(t *testing.T) {
+	t.Run("json body", func(t *testing.T) {
+		host := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/octet-stream")
+			_, _ = w.Write([]byte(`{"content":"x"}`))
+		}))
+		t.Cleanup(host.Close)
+		api := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Location", host.URL+"/download")
+			w.WriteHeader(http.StatusFound)
+		}))
+		t.Cleanup(api.Close)
+
+		response, err := newReportClient(api.URL, &bytes.Buffer{}).GetReportFile("rpt_1", "file_1")
+
+		require.NoError(t, err)
+		assert.Equal(t, "x", response.Content)
+	})
 	for _, mediaType := range []string{"application/octet-stream", "binary/octet-stream"} {
 		mediaType := mediaType
 		t.Run(mediaType, func(t *testing.T) {
